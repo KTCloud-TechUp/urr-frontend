@@ -13,26 +13,23 @@
 커밋 메시지는 다음 형식을 따릅니다.
 
 ```
-[타입] - 변경 내용
+[타입] 변경 내용
 ```
 
 ### 규칙
 1. **타입 `[타입]`**  
    - 커밋 목적을 명시  
 
-2. **날짜 `_MM/DD`**  
-   - 커밋한 날짜 표기  
-
-3. **변경 내용 `- 메시지`**  
+2. **변경 내용 `메시지`**  
    - **명사형**으로 끝내기  
    - 변경 내용을 구체적으로 작성  
 
-4. **작업 단위 커밋**  
+3. **작업 단위 커밋**  
    - 한 커밋에는 한 가지 작업/기능만 포함  
    - 작업한 기능이 여러 개라면 **커밋도 나눠서**, **작업한 파일도 기능별로 나눠서 올리기**  
    - 이렇게 하면 히스토리 관리와 코드 리뷰가 쉬워짐  
 
-5. **파일 단위 커밋**
+4. **파일 단위 커밋**
    - 커밋 메시지에 연관된 파일만 선택해서 올리기
    - 전체 파일을 한번에 올리지 말고, 작업한 기능과 관련된 파일만 추가
 
@@ -42,14 +39,14 @@
 
 | 타입     | 의미                                     | 예시 커밋 메시지                     |
 |----------|----------------------------------------|-----------------------------------|
-| feat     | 새로운 기능 추가                        | `[feat] - 알람 기능 추가`    |
-| fix      | 버그 수정                                | `[fix] - 로그인 오류 수정`   |
-| docs     | 문서 수정                                | `[docs] - README 설치 방법 업데이트` |
-| style    | 코드 포맷팅, 세미콜론 누락 등 기능 변화 없음 | `[style] - 버튼 마진 통일`  |
-| refactor | 코드 구조 개선, 기능 변화 없음            | `[refactor] - 사용자 데이터 처리 구조 개선` |
-| perf     | 성능 개선                                | `[perf] - 이미지 로딩 속도 개선` |
-| test     | 테스트 코드 추가/수정                     | `[test] - 로그인 유닛 테스트 추가` |
-| chore    | 빌드, 패키지, 잡일 등                     | `[chore] - 패키지 버전 업데이트` |
+| feat     | 새로운 기능 추가                        | `[feat] 알람 기능 추가`    |
+| fix      | 버그 수정                                | `[fix] 로그인 오류 수정`   |
+| docs     | 문서 수정                                | `[docs] README 설치 방법 업데이트` |
+| style    | 코드 포맷팅, 세미콜론 누락 등 기능 변화 없음 | `[style] 버튼 마진 통일`  |
+| refactor | 코드 구조 개선, 기능 변화 없음            | `[refactor] 사용자 데이터 처리 구조 개선` |
+| perf     | 성능 개선                                | `[perf] 이미지 로딩 속도 개선` |
+| test     | 테스트 코드 추가/수정                     | `[test] 로그인 유닛 테스트 추가` |
+| chore    | 빌드, 패키지, 잡일 등                     | `[chore] 패키지 버전 업데이트` |
 
 ---
 
@@ -57,9 +54,9 @@
 
 로그인 기능 개발 중 UI, API, 테스트 각각 별도로 커밋
 ```
-[feat] - 로그인 UI 추가
-[feat] - 로그인 API 연결
-[test] - 로그인 유닛 테스트 작성
+[feat] 로그인 UI 추가
+[feat] 로그인 API 연결
+[test] 로그인 유닛 테스트 작성
 ```
 
 이렇게 커밋을 나누면 코드 리뷰, 히스토리 확인, 롤백이 훨씬 용이
@@ -72,22 +69,22 @@
 ```bash
 # 모든 파일을 한번에 커밋
 git add .
-git commit -m "[feat]_10/31 - 여러 기능 추가"
+git commit -m "[feat] 여러 기능 추가"
 ```
 
 **올바른 예시 ✅**
 ```bash
 # 로그인 관련 파일만 커밋
 git add src/components/Login.jsx src/pages/LoginPage.jsx
-git commit -m "[feat]_10/31 - 로그인 UI 추가"
+git commit -m "[feat] 로그인 UI 추가"
 
 # 상품 목록 관련 파일만 커밋
 git add src/components/ProductList.jsx src/api/productApi.js
-git commit -m "[feat]_10/31 - 상품 목록 조회 기능 추가"
+git commit -m "[feat] 상품 목록 조회 기능 추가"
 
 # 스타일 변경 관련 파일만 커밋
 git add src/styles/button.css
-git commit -m "[style]_10/31 - 버튼 스타일 통일"
+git commit -m "[style] 버튼 스타일 통일"
 ```
 
 ---
@@ -126,7 +123,7 @@ git checkout -b john
 
 # 작업 후 커밋
 git add src/components/Header.jsx
-git commit -m "[feat]_10/31 - 헤더 컴포넌트 추가"
+git commit -m "[feat] 헤더 컴포넌트 추가"
 
 # 개인 브랜치를 GitHub에 푸시
 git push origin john
@@ -277,10 +274,10 @@ git merge dev
 
 # 4. 관련 파일만 선택해서 커밋
 git add src/components/ProductCard.jsx
-git commit -m "[feat]_10/31 - 상품 카드 컴포넌트 추가"
+git commit -m "[feat] 상품 카드 컴포넌트 추가"
 
 git add src/styles/product.css
-git commit -m "[style]_10/31 - 상품 카드 스타일 추가"
+git commit -m "[style] 상품 카드 스타일 추가"
 
 # 5. 개인 브랜치 푸시
 git push origin john
