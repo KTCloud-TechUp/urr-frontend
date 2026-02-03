@@ -1,0 +1,76 @@
+name: CD - Deploy Frontend
+
+on:
+  workflow_run:
+    workflows: ["CI"]        # CI workflow name (정확히 일치해야 함)
+    types:
+      - completed
+
+jobs:
+  deploy:
+    # 조건:
+    # 1) CI 성공
+    # 2) PR 이벤트
+    # 3) PR 대상 브랜치가 main
+    if: >
+       github.event.workflow_run.conclusion == 'success'
+       && github.event.workflow_run.event == 'pull_request'
+       && github.event.workflow_run.pull_requests != null
+       && github.event.workflow_run.pull_requests[0].base.ref == 'main'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & Export
+        run: npm run export
+
+      - name: Load SSM parameters
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          REGION=$(aws ssm get-parameter \
+            --name /common/aws/region \
+            --query Parameter.Value \
+            --output text)
+
+          BUCKET=$(aws ssm get-parameter \
+            --name /frontend/s3/bucket-name \
+            --query Parameter.Value \
+            --output text)
+
+          DIST_ID=$(aws ssm get-parameter \
+            --name /frontend/cloudfront/distribution-id \
+            --query Parameter.Value \
+            --output text)
+
+          echo "AWS_REGION=$REGION" >> $GITHUB_ENV
+          echo "S3_BUCKET=$BUCKET" >> $GITHUB_ENV
+          echo "CF_DIST_ID=$DIST_ID" >> $GITHUB_ENV
+
+      - name: Upload to S3
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          aws s3 sync out/ s3://$S3_BUCKET --delete
+
+      - name: Invalidate CloudFront
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $CF_DIST_ID \
+            --paths "/*"
