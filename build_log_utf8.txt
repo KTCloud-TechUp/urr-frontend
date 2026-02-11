@@ -1,0 +1,126 @@
+﻿
+> urr-frontend@0.1.0 build
+> next build
+
+??Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+node.exe : 
+위치 줄:1 문자:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Use
+rs\ookim\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:
+S    tring) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandErr
+o    r
+ 
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./src/shared/ui/Button.tsx:2:1
+Module not found: Can't resolve 'clsx'
+[0m [90m 1 |[39m [36mimport[39m { [33mBu
+ttonHTMLAttributes[39m[33m,[39m forwardRef 
+} [36mfrom[39m [32m'react'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 2 |[39m [36mimport
+[39m { clsx[33m,[39m type [33mClassValue[
+39m } [36mfrom[39m [32m'clsx'[39m[33m;[3
+9m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 3 |[39m [36mimport[39m { twMerge } 
+[36mfrom[39m [32m'tailwind-merge'[39m[33m;
+[39m
+ [90m 4 |[39m
+ [90m 5 |[39m [36mfunction[39m cn([33m...
+[39minputs[33m:[39m [33mClassValue[39m[])
+ {[0m
+
+
+
+Import trace:
+  Server Component:
+    ./src/shared/ui/Button.tsx
+    ./src/app/ticketing/page.tsx
+
+https://nextjs.org/docs/messages/module-not-fo
+und
+
+
+./src/shared/ui/Button.tsx:3:1
+Module not found: Can't resolve 'tailwind-merg
+e'
+[0m [90m 1 |[39m [36mimport[39m { [33mBu
+ttonHTMLAttributes[39m[33m,[39m forwardRef 
+} [36mfrom[39m [32m'react'[39m[33m;[39m
+ [90m 2 |[39m [36mimport[39m { clsx[33m,
+[39m type [33mClassValue[39m } [36mfrom[39
+m [32m'clsx'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 3 |[39m [36mimport
+[39m { twMerge } [36mfrom[39m [32m'tailwin
+d-merge'[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[
+22m[39m
+ [90m 4 |[39m
+ [90m 5 |[39m [36mfunction[39m cn([33m...
+[39minputs[33m:[39m [33mClassValue[39m[])
+ {
+ [90m 6 |[39m     [36mreturn[39m twMerge(c
+lsx(inputs))[33m;[39m[0m
+
+
+
+Import trace:
+  Server Component:
+    ./src/shared/ui/Button.tsx
+    ./src/app/ticketing/page.tsx
+
+https://nextjs.org/docs/messages/module-not-fo
+und
+
+
+    at <unknown> (./src/shared/ui/Button.tsx:2
+:1)
+    at <unknown> (https://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./src/shared/ui/Button.tsx:3
+:1)
+    at <unknown> (https://nextjs.org/docs/mess
+ages/module-not-found)
