@@ -2,6 +2,8 @@
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { requestKakaoAuth } from "@/shared/api/auth/social";
+import { persistAuthTokens } from "@/shared/lib/auth/tokenStorage";
 
 function KakaoCallbackContent() {
   const router = useRouter();
@@ -10,6 +12,7 @@ function KakaoCallbackContent() {
   useEffect(() => {
     const handleCallback = async () => {
       const code = searchParams.get("code");
+      const state = searchParams.get("state");
 
       if (!code) {
         console.error("No authorization code received");
@@ -17,32 +20,20 @@ function KakaoCallbackContent() {
         return;
       }
 
+      // CSRF 검증: state 파라미터 확인
+      const storedState = sessionStorage.getItem("oauth_state_kakao");
+      if (!state || state !== storedState) {
+        console.error("State mismatch: CSRF attack detected");
+        router.push("/login?error=csrf_detected");
+        return;
+      }
+
+      // 검증 완료 후 상태값 삭제
+      sessionStorage.removeItem("oauth_state_kakao");
+
       try {
-        // 백엔드 API로 인증 코드 전송
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/kakao/callback`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ code }),
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Login failed");
-        }
-
-        const data = await response.json();
-
-        // 토큰 저장 (예: localStorage 또는 쿠키)
-        if (data.accessToken) {
-          localStorage.setItem("accessToken", data.accessToken);
-          if (data.refreshToken) {
-            localStorage.setItem("refreshToken", data.refreshToken);
-          }
-        }
+        const data = await requestKakaoAuth(code, state ?? undefined);
+        persistAuthTokens(data);
 
         // 로그인 성공 후 메인 페이지로 이동
         router.push("/");
@@ -55,14 +46,7 @@ function KakaoCallbackContent() {
     handleCallback();
   }, [router, searchParams]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-neutral-200 border-t-yellow-400 mx-auto"></div>
-        <p className="text-neutral-600">카카오 로그인 처리 중...</p>
-      </div>
-    </div>
-  );
+  return null;
 }
 
 export default function KakaoCallbackPage() {

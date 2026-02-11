@@ -26,8 +26,14 @@ export const loginWithKakao = () => {
   const redirectUri = encodeURIComponent(
     process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || "",
   );
+  const state = generateRandomState();
 
-  const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
+  // 상태값을 세션에 저장 (CSRF 방지)
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("oauth_state_kakao", state);
+  }
+
+  const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&state=${state}`;
 
   window.location.href = kakaoAuthUrl;
 };

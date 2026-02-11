@@ -2,6 +2,8 @@
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { requestGoogleAuth } from "@/shared/api/auth/social";
+import { persistAuthTokens } from "@/shared/lib/auth/tokenStorage";
 
 function GoogleCallbackContent() {
   const router = useRouter();
@@ -13,7 +15,10 @@ function GoogleCallbackContent() {
       const state = searchParams.get("state");
       const storedState = sessionStorage.getItem("oauth_state_google");
 
-      if (state !== storedState) {
+      // state 값이 모두 null이거나 undefined일 경우 우회 방지
+      if (!state || !storedState || state !== storedState) {
+        // 값이 일치하지 않을 경우 저장된 상태를 초기화
+        sessionStorage.removeItem("oauth_state_google");
         console.error("State mismatch - possible CSRF attack");
         router.push("/login?error=invalid_state");
         return;
@@ -26,29 +31,8 @@ function GoogleCallbackContent() {
       }
 
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/google/callback`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ code, state }),
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Login failed");
-        }
-
-        const data = await response.json();
-
-        if (data.accessToken) {
-          localStorage.setItem("accessToken", data.accessToken);
-          if (data.refreshToken) {
-            localStorage.setItem("refreshToken", data.refreshToken);
-          }
-        }
+        const data = await requestGoogleAuth(code, state);
+        persistAuthTokens(data);
 
         sessionStorage.removeItem("oauth_state_google");
         router.push("/");

@@ -2,6 +2,8 @@
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { requestNaverAuth } from "@/shared/api/auth/social";
+import { persistAuthTokens } from "@/shared/lib/auth/tokenStorage";
 
 function NaverCallbackContent() {
   const router = useRouter();
@@ -14,7 +16,7 @@ function NaverCallbackContent() {
       const storedState = sessionStorage.getItem("oauth_state");
 
       // CSRF 검증
-      if (state !== storedState) {
+      if (!state || !storedState || state !== storedState) {
         console.error("State mismatch - possible CSRF attack");
         router.push("/login?error=invalid_state");
         return;
@@ -27,31 +29,8 @@ function NaverCallbackContent() {
       }
 
       try {
-        // 백엔드 API로 인증 코드 전송
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/naver/callback`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ code, state }),
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Login failed");
-        }
-
-        const data = await response.json();
-
-        // 토큰 저장 (예: localStorage 또는 쿠키)
-        if (data.accessToken) {
-          localStorage.setItem("accessToken", data.accessToken);
-          if (data.refreshToken) {
-            localStorage.setItem("refreshToken", data.refreshToken);
-          }
-        }
+        const data = await requestNaverAuth(code, state);
+        persistAuthTokens(data);
 
         // 세션 스토리지 정리
         sessionStorage.removeItem("oauth_state");
