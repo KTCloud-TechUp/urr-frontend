@@ -1,420 +1,150 @@
-# URR Frontend Architecture
+# 🛠️ URR 프로젝트 기술스택
 
-## Overview
-
-URR은 K-POP 팬덤 기반 티켓팅 플랫폼이다.
-
-핵심 기능
-
-- 아티스트 조회
-- 공연 조회
-- 대기열 시스템
-- 티켓 예매
-- 좌석 선택
-- 멤버십
-- 티켓 양도
-
-Frontend는 **Next.js App Router + TypeScript** 기반으로 개발되며  
-아키텍처는 **Feature-Sliced Design (FSD)** 구조를 따른다.
-
-Backend는 **Spring Boot REST API**이다.
+**Frontend는 Next.js + TypeScript + FSD 구조로 구축하고, Spring Boot REST API와 AWS를 통해 연결.**
 
 ---
 
-# Tech Stack
+## 🎯 필수 이해사항
 
-Frontend
+### Frontend 스택
 
-- Next.js (App Router)
-- React
-- TypeScript
-- Feature-Sliced Design (FSD)
-- TanStack Query (Server State)
-- Tailwind CSS, shadcn/ui
+| 분야             | 기술           | 버전/설정        | 역할                      |
+| ---------------- | -------------- | ---------------- | ------------------------- |
+| **Framework**    | Next.js        | 14+ (App Router) | 서버/클라이언트 통합      |
+| **Language**     | TypeScript     | Strict Mode      | 타입 안정성               |
+| **Styling**      | Tailwind CSS   | Utility-first    | 빠른 UI 개발              |
+| **UI Library**   | Shadcn/ui      | Radix + Tailwind | 재사용 가능한 UI 컴포넌트 |
+| **Server State** | TanStack Query | v5               | API 데이터 캐싱/동기화    |
+| **Client State** | Zustand        | 최소한만 사용    | UI 상태 및 전역 상태 관리 |
 
-Backend
+### Backend & 인프라
 
-- Spring Boot
-- REST API
-
-Infra
-
-- AWS
-- RDS
+| 분야               | 기술        | 설명             |
+| ------------------ | ----------- | ---------------- |
+| **Backend**        | Spring Boot | RESTful API 제공 |
+| **API 방식**       | REST API    | Frontend와 통신  |
+| **Hosting**        | AWS         | 프로덕션 배포    |
+| **Authentication** | JWT         | 사용자 인증/인가 |
 
 ---
 
-# Architecture Style
+## 🏗️ 파일 구조
 
-Frontend는 **Feature-Sliced Design (FSD)** 구조를 따른다.
+프로젝트는 **Feature-Sliced Design(FSD)** 구조를 따르며
 
-레이어 구조
+Next.js App Router 특성상 다음 레이어로 구성됨
 
 app → widgets → features → entities → shared
 
-각 레이어는 단방향 의존성을 가진다.
+### FSD Layer 구조
+
+| 폴더          | 역할                                   | 예시                                                               |
+| ------------- | -------------------------------------- | ------------------------------------------------------------------ |
+| **app/**      | Next.js 라우팅 및 페이지 엔트리        | `/events`, `/events/[eventId]`, `/ticketing/[eventId]`, `/login`   |
+| **widgets/**  | 페이지를 구성하는 큰 UI 블록           | `EventListSection`, `EventDetailSection`, `BookingPanel`, `Header` |
+| **features/** | 하나의 사용자 행동 기능                | 로그인, 티켓 예매, 결제, 양도                                      |
+| **entities/** | 도메인 모델 및 데이터 구조             | `User`, `Artist`, `Event`, `Ticket`, `Membership`                  |
+| **shared/**   | 모든 레이어에서 공통으로 사용하는 코드 | 공통 UI 컴포넌트, API 클라이언트, 유틸 함수                        |
+
+**핵심 원칙**: 각 Feature는 독립적이어야 함 (다른 Feature에 의존하면 안 됨)
 
 ---
 
-# Directory Structure
+## 🔧 Backend
 
-src/
+### Backend 도메인 구조 (Spring Boot)
 
-app/
-widgets/
-features/
-entities/
-shared/
+| 도메인        | 주요 역할                        |
+| ------------- | -------------------------------- |
+| **Users**     | 사용자 정보, 프로필, 회원 관리   |
+| **Event**     | 공연/이벤트 정보, 아티스트       |
+| **Ticketing** | 티켓 예매, 좌석 관리, VQA/대기열 |
+| **Payments**  | 결제 처리 (카카오페이 등)        |
+| **Community** | 팬 커뮤니티, 게시물, 댓글        |
+| **Queue**     | 대기열 시스템, 트래픽 제어       |
 
----
+### REST API 엔드포인트 (주요)
 
-# 1. app (Next.js Routing Layer)
+#### 👤 Users (인증/회원)
 
-src/app
+```
+POST   /api/auth/login                 → 로그인
+POST   /api/auth/oauth/kakao           → 카카오 OAuth 로그인
+GET    /api/auth/me                    → 현재 사용자 정보
+POST   /api/auth/logout                → 로그아웃
+POST   /api/auth/reissue               → 토큰 재발급 (갱신)
+DELETE /api/auth/me/withdraw           → 회원 탈퇴
+```
 
-역할
+#### 🎪 Event (공연/아티스트)
 
-- Next.js 라우팅
-- 페이지 정의
-- layout 관리
+```
+GET    /api/events                     → 전체 공연 목록
+GET    /api/events/:id                 → 공연 상세 정보
+GET    /api/events/artists             → 아티스트 목록
+GET    /api/events/artists/:id         → 아티스트 상세 정보
+```
 
-허용 파일
+#### 🎫 Ticketing (예매)
 
-- page.tsx
-- layout.tsx
-- loading.tsx
-- error.tsx
-- not-found.tsx
-- route.ts
+```
+GET    /api/ticketing/:eventId         → 공연별 티켓 정보
+POST   /api/ticketing/book             → 티켓 예매
+GET    /api/ticketing/my-tickets       → 내 티켓 조회
+GET    /api/ticketing/queue/status     → 대기열 상태 확인
+```
 
-규칙
+#### 💳 Payments (결제)
 
-- page는 최대한 얇게 유지
-- 비즈니스 로직은 features/widgets/entities로 이동
-- `_components` 사용 최소화
+```
+POST   /api/payments/create             → 결제 생성
+POST   /api/payments/confirm            → 결제 확인/승인
+GET    /api/payments/{orderId}          → 결제 상세 조회
+POST   /api/payments/{paymentKey}/cancel → 결제 취소
+```
 
----
+#### 💬 Community (커뮤니티)
 
-# 2. widgets (Page UI Blocks)
+```
+GET    /api/community/posts            → 게시물 목록
+POST   /api/community/posts            → 게시물 작성
+POST   /api/community/posts/:id/comment → 댓글 작성
+```
 
-src/widgets
+### Frontend ↔ Backend 통신
 
-페이지를 구성하는 큰 UI 블록.
+- **Protocol**: HTTP/REST
+- **Base URL**: `https://urr.guru` (또는 환경변수)
+- **Format**: JSON
+- **Authentication**: JWT 토큰
+  - Header: `Authorization: Bearer <accessToken>`
+  - Refresh: `POST /api/auth/reissue`로 토큰 갱신
 
-예
+### API 에러 핸들링
 
-- header
-- footer
-- concert-list
-- queue-panel
-- seat-reservation-panel
+```typescript
+// 예시: shared/api/client.ts에서 JWT 만료 시 자동 갱신
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response.status === 401) {
+      const { data } = await apiClient.post("/api/auth/reissue");
 
-특징
+      apiClient.defaults.headers.Authorization = `Bearer ${data.accessToken}`;
 
-- entities + features 조합
-- 페이지 수준 UI
-- 새로운 비즈니스 로직 생성 금지
-
----
-
-# 3. features (User Actions)
-
-src/features
-
-사용자가 수행하는 행동 단위.
-
-예
-
-- login
-- signup
-- join-membership
-- enter-queue
-- select-seat
-- checkout
-- create-transfer
-- request-transfer
-
-구조
-
-feature/
-api/
-model/
-ui/
-lib/
-
-규칙
-
-- mutation API는 feature에 위치
-- 행동 중심 로직 관리
+      return apiClient(error.config);
+    }
+  },
+);
+```
 
 ---
 
-# 4. entities (Domain Models)
-
-src/entities
-
-도메인 명사 단위.
-
-예
-
-- user
-- artist
-- concert
-- ticket
-- membership
-- queue
-- transfer
-
-구조
-
-entity/
-model/
-api/
-ui/
-lib/
-
-규칙
-
-- 조회 API는 entities에 위치
-- 도메인 타입 정의
-- entity는 사용자 행동 로직을 가지지 않는다
-
----
-
-# 5. shared (Common Infrastructure)
-
-src/shared
-
-진짜 공용 코드만 위치한다.
-
-구성
-
-shared/
-api/
-ui/
-hooks/
-lib/
-config/
-types/
-styles/
-
-허용
-
-- API client
-- axios interceptors
-- 공용 UI 컴포넌트
-- 공용 util 함수
-- config
-- 공용 타입
-
-좋은 예
-
-shared/api/client.ts
-shared/ui/button.tsx
-shared/lib/format.ts
-shared/hooks/use-debounce.ts
-
-금지
-
-shared/api/auth.ts
-shared/hooks/use-auth.ts
-shared/api/concert.ts
-
-shared에는 **도메인 로직을 넣지 않는다.**
-
----
-
-# API Placement Rules
-
-shared/api
-
-공용 네트워크 인프라
-
-shared/api/client.ts
-shared/api/interceptors.ts
-shared/api/error-handler.ts
-
-조회 API
-
-entities/\*/api
-
-예
-
-entities/concert/api/get-concert.ts
-entities/user/api/get-me.ts
-entities/artist/api/get-artists.ts
-
-mutation API
-
-features/\*/api
-
-예
-
-features/auth/login/api/post-login.ts
-features/ticketing/select-seat/api/post-hold-seat.ts
-features/membership/join-membership/api/post-join-membership.ts
-
----
-
-# Import Rules
-
-허용
-
-app → widgets → features → entities → shared
-widgets → features → entities → shared
-features → entities → shared
-entities → shared
-
-금지
-
-shared → entities/features/widgets/app
-
-feature 간 직접 import는 최소화한다.
-
----
-
-# State Management
-
-Server State
-
-- TanStack Query
-
-사용 예
-
-- 공연 목록
-- 아티스트 목록
-- 티켓 목록
-- 멤버십 정보
-
-Local State
-
-- React State
-
-사용 예
-
-- form 상태
-- UI 상태
-
-Global State (필요 시)
-
-- Zustand
-
-사용 예
-
-- 로그인 상태
-- queue 상태
-
----
-
-# Authentication Architecture
-
-인증 방식
-
-JWT 기반 인증
-
-구성
-
-- access token
-- refresh token
-
-토큰 처리
-
-- axios interceptor
-- refresh token 재발급
-
-로그인 흐름
-
-login → access token 발급 → API 인증 → refresh token 갱신
-
----
-
-# Ticketing Flow
-
-티켓 예매 흐름
-
-1 대기열 진입
-2 queue token 발급
-3 queue polling
-4 예매 페이지 진입
-5 좌석 선택
-6 좌석 hold
-7 결제
-8 티켓 생성
-
----
-
-# Rendering Strategy
-
-SSR
-
-- 공연 상세
-- 마이페이지
-
-ISR
-
-- 공연 목록
-- 아티스트 목록
-
-CSR
-
-- 대기열
-- 좌석 선택
-- 인터랙션 UI
-
----
-
-# Naming Conventions
-
-API
-
-get-concert.ts
-post-login.ts
-post-hold-seat.ts
-
-Hooks
-
-use-login-form.ts
-use-seat-selection.ts
-
-UI
-
-login-form.tsx
-seat-map.tsx
-concert-card.tsx
-
-Types
-
-types.ts
-schema.ts
-
----
-
-# Development Principles
-
-우선순위
-
-1 유지보수성  
-2 일관성  
-3 단순함  
-4 FSD 규칙
-
-과도한 추상화 금지
-
----
-
-# Important Rules
-
-금지
-
-- shared에 도메인 API 생성
-- shared/hooks에 도메인 훅 생성
-- page.tsx에 비즈니스 로직 작성
-- feature 간 강한 결합
-- 과도한 파일 분리
-
-애매하면
-
-shared ❌
-features/entities ✅
-
-shared는 **마지막 선택지**이다.
+## ☁️ Infrastructure (AWS)
+
+| 서비스            | 역할                                |
+| ----------------- | ----------------------------------- |
+| **Amplify / ECS** | Frontend & Backend 배포             |
+| **RDS**           | 데이터베이스 (Spring Boot에서 관리) |
+| **S3**            | 정적 파일 저장 (이미지, 아이콘)     |
+| **CloudFront**    | CDN (빠른 배포)                     |
