@@ -1,211 +1,330 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
 
-@theme {
-  /* Primitive Colors - Neutral */
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #fafafa;
-  --color-neutral-100: #f5f5f5;
-  --color-neutral-200: #e5e5e5;
-  --color-neutral-300: #d4d4d4;
-  --color-neutral-400: #a3a3a3;
-  --color-neutral-500: #737373;
-  --color-neutral-600: #525252;
-  --color-neutral-700: #404040;
-  --color-neutral-800: #262626;
-  --color-neutral-900: #171717;
-  --color-neutral-950: #0a0a0a;
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Brand Colors */
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-200: #bfdbfe;
-  --color-brand-300: #93c5fd;
-  --color-brand-400: #60a5fa;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-700: #1d4ed8;
-  --color-brand-800: #1e40af;
-  --color-brand-900: #1e3a8a;
+  /* Semantic */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-  /* Neutral Gray Scale */
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-sidebar-muted-foreground: var(--sidebar-muted-foreground);
 
-  /* Error Colors */
-  --color-error-50: #fef2f2;
-  --color-error-100: #fee2e2;
-  --color-error-200: #fecaca;
-  --color-error-300: #fca5a5;
-  --color-error-400: #f87171;
-  --color-error-500: #ef4444;
-  --color-error-600: #dc2626;
-  --color-error-700: #b91c1c;
-  --color-error-800: #991b1b;
-  --color-error-900: #7f1d1d;
+  /* Tier */
+  --color-tier-diamond: var(--tier-diamond);
+  --color-tier-diamond-bg: var(--tier-diamond-bg);
+  --color-tier-gold: var(--tier-gold);
+  --color-tier-gold-bg: var(--tier-gold-bg);
+  --color-tier-silver: var(--tier-silver);
+  --color-tier-silver-bg: var(--tier-silver-bg);
+  --color-tier-bronze: var(--tier-bronze);
+  --color-tier-bronze-bg: var(--tier-bronze-bg);
 
-  /* Warning Colors */
-  --color-warning-50: #fefce8;
-  --color-warning-100: #fef9c3;
-  --color-warning-200: #fef08a;
-  --color-warning-300: #fde047;
-  --color-warning-400: #facc15;
-  --color-warning-500: #eab308;
-  --color-warning-600: #ca8a04;
-  --color-warning-700: #a16207;
-  --color-warning-800: #854d0e;
-  --color-warning-900: #713f12;
+  /* Seat Status */
+  --color-seat-available: var(--seat-available);
+  --color-seat-selected: var(--seat-selected);
+  --color-seat-taken: var(--seat-taken);
+  --color-seat-locked: var(--seat-locked);
 
-  /* Success Colors */
-  --color-success-50: #f0fdf4;
-  --color-success-100: #dcfce7;
-  --color-success-200: #bbf7d0;
-  --color-success-300: #86efac;
-  --color-success-400: #4ade80;
-  --color-success-500: #22c55e;
-  --color-success-600: #16a34a;
-  --color-success-700: #15803d;
-  --color-success-800: #166534;
-  --color-success-900: #14532d;
+  /* Booking Status */
+  --color-booking-open: var(--booking-open);
+  --color-booking-upcoming: var(--booking-upcoming);
+  --color-booking-soldout: var(--booking-soldout);
+  --color-booking-closed: var(--booking-closed);
 
-  /* Semantic Colors */
-  --color-background: var(--color-neutral-50);
-  --color-foreground: var(--color-neutral-950);
-  --color-card: var(--color-neutral-0);
-  --color-card-foreground: var(--color-neutral-950);
-  --color-primary: var(--color-neutral-900);
-  --color-primary-foreground: var(--color-neutral-50);
-  --color-secondary: var(--color-neutral-100);
-  --color-secondary-foreground: var(--color-neutral-900);
-  --color-muted: var(--color-neutral-100);
-  --color-muted-foreground: var(--color-neutral-500);
-  --color-accent: var(--color-neutral-100);
-  --color-accent-foreground: var(--color-neutral-900);
-  --color-destructive: #dc2626;
-  --color-destructive-foreground: var(--color-neutral-50);
-  --color-border: var(--color-neutral-200);
-  --color-input: var(--color-neutral-200);
-  --color-ring: var(--color-neutral-400);
+  /* Transfer Status */
+  --color-transfer-listed: var(--transfer-listed);
+  --color-transfer-sold: var(--transfer-sold);
+  --color-transfer-cancelled: var(--transfer-cancelled);
 
-  /* Border Radius */
-  --radius-none: 0px;
-  --radius-sm: 4px;
-  --radius-default: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-  --radius-3xl: 24px;
-  --radius-full: 9999px;
+  /* System Feedback */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+}
 
-  /* Spacing */
-  --spacing-0: 0px;
-  --spacing-0\.5: 2px;
-  --spacing-1: 4px;
-  --spacing-1\.5: 6px;
-  --spacing-2: 8px;
-  --spacing-2\.5: 10px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-5: 20px;
-  --spacing-6: 24px;
-  --spacing-8: 32px;
-  --spacing-10: 40px;
-  --spacing-12: 48px;
-  --spacing-16: 64px;
-  --spacing-20: 80px;
-  --spacing-24: 96px;
+:root {
+  --radius: 0.625rem;
 
-  /* Font Families */
-  --font-family-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-family-mono: "JetBrains Mono", "SF Mono", Monaco, Consolas, monospace;
+  /* Semantic — originals: background oklch(1 0 0), foreground oklch(0.145 0 0) */
+  --background: #fffefe;
+  --foreground: #221415;
+  --card: #fffefe;
+  --card-foreground: #221415;
+  --popover: #fffefe;
+  --popover-foreground: #221415;
+  --primary: #ff5e32;
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: #1f2792;
+  --secondary-foreground: #ffffff;
+  --muted: oklch(0.968 0.003 264);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: #f2f0e6; /* original: oklch(0.955 0.005 264) */
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27);
+  --border: oklch(0.922 0.004 264);
+  --input: oklch(0.922 0.004 264);
+  --ring: #ff5e32;
 
-  /* Font Weights */
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  /* Sidebar — originals: #FFFFFF, oklch(0.145 0 0) */
+  --sidebar: #fbfaf8;
+  --sidebar-foreground: #221415;
+  --sidebar-primary: #ff5e32;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: #f2f0e6; /* original: oklch(0.955 0.005 264) */
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0.004 264);
+  --sidebar-ring: #ff5e32;
+  --sidebar-active: #e3e1d9;
+  --sidebar-muted-foreground: oklch(0.556 0 0);
 
-  /* Font Sizes */
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 18px;
-  --font-size-lg: 30px;
-  --font-size-xl: 36px;
+  /* Tier (멤버십 등급) */
+  --tier-diamond: oklch(0.65 0.18 295);
+  --tier-diamond-bg: oklch(0.94 0.04 295);
+  --tier-gold: oklch(0.75 0.15 85);
+  --tier-gold-bg: oklch(0.95 0.04 85);
+  --tier-silver: oklch(0.55 0.02 264);
+  --tier-silver-bg: oklch(0.95 0.005 264);
+  --tier-bronze: oklch(0.6 0.12 55);
+  --tier-bronze-bg: oklch(0.95 0.03 55);
 
-  /* Line Heights */
-  --line-height-tight: 16px;
-  --line-height-normal: 20px;
-  --line-height-relaxed: 28px;
-  --line-height-loose: 38px;
-  --line-height-extra-loose: 40px;
+  /* Seat Status (좌석 상태) */
+  --seat-available: oklch(0.6 0.17 152);
+  --seat-selected: oklch(0.55 0.2 260);
+  --seat-taken: oklch(0.65 0.02 264);
+  --seat-locked: oklch(0.8 0.15 85);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-default: 0 1px 2px -1px rgb(0 0 0 / 0.1), 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  --shadow-md: 0 2px 4px -2px rgb(0 0 0 / 0.1), 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 4px 6px -4px rgb(0 0 0 / 0.1), 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 20px 25px -5px rgb(0 0 0 / 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  /* Booking Status (예매 상태) */
+  --booking-open: #ff5e32;
+  --booking-upcoming: oklch(0.55 0.2 260);
+  --booking-soldout: oklch(0.556 0 0);
+  --booking-closed: oklch(0.708 0 0);
+
+  /* Transfer Status (양도 상태) */
+  --transfer-listed: oklch(0.55 0.2 260);
+  --transfer-sold: oklch(0.55 0.17 152);
+  --transfer-cancelled: oklch(0.556 0 0);
+
+  /* System Feedback */
+  --success: oklch(0.55 0.17 152);
+  --warning: oklch(0.75 0.15 85);
+  --danger: oklch(0.577 0.245 27);
+  --info: oklch(0.55 0.2 260);
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
   body {
-    font-family: var(--font-family-sans);
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground;
+    font-family:
+      "Pretendard Variable",
+      "Pretendard",
+      -apple-system,
+      BlinkMacSystemFont,
+      system-ui,
+      sans-serif;
+    letter-spacing: -0.015em;
   }
 }
 
-@layer utilities {
-  /* Typography Styles */
-  .typography-body {
-    font-family: var(--font-family-sans);
-    font-weight: var(--font-weight-regular);
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-normal);
+/* Timer pulse animation (30초 이하) */
+@keyframes pulse-timer {
+  0%,
+  100% {
+    transform: scale(1);
   }
+  50% {
+    transform: scale(1.05);
+  }
+}
 
-  .typography-body-bold {
-    font-family: var(--font-family-sans);
-    font-weight: var(--font-weight-semibold);
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-normal);
-  }
+.animate-pulse-timer {
+  animation: pulse-timer 1s ease-in-out infinite;
+}
 
-  .typography-label {
-    font-family: var(--font-family-sans);
-    font-weight: var(--font-weight-regular);
-    font-size: var(--font-size-xs);
-    line-height: var(--line-height-tight);
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
   }
+  100% {
+    background-position: 200% 0;
+  }
+}
 
-  .typography-subheader {
-    font-family: var(--font-family-sans);
-    font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-base);
-    line-height: var(--line-height-relaxed);
+/* VQA incorrect answer shake */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
   }
+  16.6% {
+    transform: translateX(-3px);
+  }
+  33.3% {
+    transform: translateX(3px);
+  }
+  50% {
+    transform: translateX(-3px);
+  }
+  66.6% {
+    transform: translateX(3px);
+  }
+  83.3% {
+    transform: translateX(-3px);
+  }
+}
 
-  .typography-section-header {
-    font-family: var(--font-family-sans);
-    font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-lg);
-    line-height: var(--line-height-loose);
-  }
+.animate-shake {
+  animation: shake 400ms ease-in-out;
+}
 
-  .typography-header {
-    font-family: var(--font-family-sans);
-    font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-xl);
-    line-height: var(--line-height-extra-loose);
+/* VQA correct answer flash */
+@keyframes flash-green {
+  0% {
+    background-color: rgb(220 252 231);
   }
+  50% {
+    background-color: rgb(187 247 208);
+  }
+  100% {
+    background-color: rgb(220 252 231);
+  }
+}
+
+.animate-flash-green {
+  animation: flash-green 300ms ease-in-out;
+}
+
+/* VQA incorrect answer flash */
+@keyframes flash-red {
+  0% {
+    background-color: rgb(254 226 226);
+  }
+  50% {
+    background-color: rgb(254 202 202);
+  }
+  100% {
+    background-color: rgb(254 226 226);
+  }
+}
+
+.animate-flash-red {
+  animation: flash-red 300ms ease-in-out;
+}
+
+/* Queue position counter roll */
+@keyframes counter-roll {
+  0% {
+    transform: translateY(-8px);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-counter-roll {
+  animation: counter-roll 500ms ease-out;
+}
+
+/* Seat hover outline for interactive available seats */
+.seat-interactive:hover {
+  stroke: var(--seat-selected);
+  stroke-width: 1.5;
+}
+
+/* Seat overlay fade-in */
+@keyframes seat-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.seat-overlay-fade-in {
+  animation: seat-overlay-in 300ms ease-out forwards;
+}
+
+/* Seat row staggered fade-in */
+@keyframes seat-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.seat-row-fade-in {
+  opacity: 0;
+  animation: seat-row-in 200ms ease-out forwards;
+}
+
+/* Chair hover effect */
+.seat-chair-hover {
+  transition: opacity 150ms ease;
+}
+.seat-chair-hover:hover {
+  opacity: 0.15;
+  fill: var(--seat-selected);
+}
+
+/* Minimap slide-in */
+@keyframes minimap-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.minimap-container {
+  animation: minimap-in 300ms ease-out forwards;
 }
