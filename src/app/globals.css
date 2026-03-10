@@ -46,14 +46,20 @@
   --color-sidebar-muted-foreground: var(--sidebar-muted-foreground);
 
   /* Tier */
-  --color-tier-diamond: var(--tier-diamond);
-  --color-tier-diamond-bg: var(--tier-diamond-bg);
-  --color-tier-gold: var(--tier-gold);
-  --color-tier-gold-bg: var(--tier-gold-bg);
-  --color-tier-silver: var(--tier-silver);
-  --color-tier-silver-bg: var(--tier-silver-bg);
-  --color-tier-bronze: var(--tier-bronze);
-  --color-tier-bronze-bg: var(--tier-bronze-bg);
+  --color-tier-lightning: var(--tier-lightning);
+  --color-tier-lightning-bg: var(--tier-lightning-bg);
+  --color-tier-thunder: var(--tier-thunder);
+  --color-tier-thunder-bg: var(--tier-thunder-bg);
+  --color-tier-cloud: var(--tier-cloud);
+  --color-tier-cloud-bg: var(--tier-cloud-bg);
+  --color-tier-mist: var(--tier-mist);
+  --color-tier-mist-bg: var(--tier-mist-bg);
+
+  /* Seat Grade */
+  --color-seat-grade-vip: var(--seat-grade-vip);
+  --color-seat-grade-r: var(--seat-grade-r);
+  --color-seat-grade-s: var(--seat-grade-s);
+  --color-seat-grade-a: var(--seat-grade-a);
 
   /* Seat Status */
   --color-seat-available: var(--seat-available);
@@ -95,7 +101,7 @@
   --secondary-foreground: #ffffff;
   --muted: oklch(0.968 0.003 264);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: #f2f0e6; /* original: oklch(0.955 0.005 264) */
+  --accent: #f0efed; /* original: oklch(0.955 0.005 264) */
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27);
   --border: oklch(0.922 0.004 264);
@@ -103,26 +109,32 @@
   --ring: #ff5e32;
 
   /* Sidebar — originals: #FFFFFF, oklch(0.145 0 0) */
-  --sidebar: #fbfaf8;
+  --sidebar: #f7f6f5;
   --sidebar-foreground: #221415;
   --sidebar-primary: #ff5e32;
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: #f2f0e6; /* original: oklch(0.955 0.005 264) */
+  --sidebar-accent: #f0efed; /* original: oklch(0.955 0.005 264) */
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0.004 264);
   --sidebar-ring: #ff5e32;
-  --sidebar-active: #e3e1d9;
+  --sidebar-active: #efedeb;
   --sidebar-muted-foreground: oklch(0.556 0 0);
 
   /* Tier (멤버십 등급) */
-  --tier-diamond: oklch(0.65 0.18 295);
-  --tier-diamond-bg: oklch(0.94 0.04 295);
-  --tier-gold: oklch(0.75 0.15 85);
-  --tier-gold-bg: oklch(0.95 0.04 85);
-  --tier-silver: oklch(0.55 0.02 264);
-  --tier-silver-bg: oklch(0.95 0.005 264);
-  --tier-bronze: oklch(0.6 0.12 55);
-  --tier-bronze-bg: oklch(0.95 0.03 55);
+  --tier-lightning: #ff5e32;
+  --tier-lightning-bg: #ff5e3220;
+  --tier-thunder: #1f2792;
+  --tier-thunder-bg: #1f279220;
+  --tier-cloud: #7e8cda;
+  --tier-cloud-bg: #7e8cda20;
+  --tier-mist: #9e9487;
+  --tier-mist-bg: #9e948720;
+
+  /* Seat Grade (좌석 등급) */
+  --seat-grade-vip: #6171d2;
+  --seat-grade-r: #7754c7;
+  --seat-grade-s: #ff8c8b;
+  --seat-grade-a: #8a9348;
 
   /* Seat Status (좌석 상태) */
   --seat-available: oklch(0.6 0.17 152);
@@ -142,10 +154,10 @@
   --transfer-cancelled: oklch(0.556 0 0);
 
   /* System Feedback */
-  --success: oklch(0.55 0.17 152);
-  --warning: oklch(0.75 0.15 85);
-  --danger: oklch(0.577 0.245 27);
-  --info: oklch(0.55 0.2 260);
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #e7000b;
+  --info: #3b82f6;
 }
 
 @layer base {
@@ -297,6 +309,45 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.seat-row-fade-in {
+  opacity: 0;
+  animation: seat-row-in 200ms ease-out forwards;
+}
+
+/* Chair hover effect */
+.seat-chair-hover {
+  transition: opacity 150ms ease;
+}
+.seat-chair-hover:hover {
+  opacity: 0.15;
+  fill: var(--seat-selected);
+}
+
+/* Minimap slide-in */
+@keyframes minimap-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.minimap-container {
+  animation: minimap-in 300ms ease-out forwards;
+}
+
+/* Hide scrollbar but keep scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 .seat-row-fade-in {
