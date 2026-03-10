@@ -1,7 +1,9 @@
-# URR Design System v1.1
+# URR Design System v1.2
 
 > Single Source of Truth for URR UI development.
 > All components, tokens, and patterns documented here must be referenced during every build phase.
+>
+> **v1.2 변경사항**: 사이드바 색상 #FBFAF8 / Accent #F2F0E6 실측값 반영, PostCard·EventTagBadge 추가, EventCard·TicketCard props 업데이트, Membership/User 타입 확장, 라우트·파일 구조 전면 동기화, 커스텀 애니메이션 클래스 상세화
 >
 > **v1.1 변경사항**: Primary(#FF5E32 오렌지) / Secondary(#1F2792 네이비) 컬러 적용, 사이드바 White Pattern 전환 (220px)
 
@@ -30,57 +32,57 @@
 
 ### 2.1 Semantic (Base)
 
-| CSS Variable             | Light Value              | Tailwind Class              | Usage                         |
-| ------------------------ | ------------------------ | --------------------------- | ----------------------------- |
-| `--background`           | `oklch(1 0 0)`           | `bg-background`             | 메인 콘텐츠 배경              |
-| `--foreground`           | `oklch(0.145 0 0)`       | `text-foreground`           | 기본 텍스트                   |
-| `--card`                 | `oklch(1 0 0)`           | `bg-card`                   | 카드/패널 배경                |
-| `--card-foreground`      | `oklch(0.145 0 0)`       | `text-card-foreground`      | 카드 텍스트                   |
-| `--popover`              | `oklch(1 0 0)`           | `bg-popover`                | 팝오버/드롭다운 배경          |
-| `--popover-foreground`   | `oklch(0.145 0 0)`       | `text-popover-foreground`   | 팝오버 텍스트                 |
-| `--primary`              | `#FF5E32`                | `bg-primary`                | CTA, 활성 상태, 링크 (오렌지) |
-| `--primary-foreground`   | `oklch(0.985 0 0)`       | `text-primary-foreground`   | Primary 위 텍스트             |
-| `--secondary`            | `#1F2792`                | `bg-secondary`              | 보조 CTA, 네이비 버튼         |
-| `--secondary-foreground` | `#FFFFFF`                | `text-secondary-foreground` | Secondary 위 텍스트           |
-| `--muted`                | `oklch(0.968 0.003 264)` | `bg-muted`                  | 비활성/배경 레이어            |
-| `--muted-foreground`     | `oklch(0.556 0 0)`       | `text-muted-foreground`     | 보조 텍스트, 힌트             |
-| `--accent`               | `oklch(0.955 0.005 264)` | `bg-accent`                 | hover/selected 배경           |
-| `--accent-foreground`    | `oklch(0.205 0 0)`       | `text-accent-foreground`    | accent 위 텍스트              |
-| `--destructive`          | `oklch(0.577 0.245 27)`  | `bg-destructive`            | 에러, 삭제, VQA 오답          |
-| `--border`               | `oklch(0.922 0.004 264)` | `border-border`             | 기본 border                   |
-| `--input`                | `oklch(0.922 0.004 264)` | `border-input`              | Input border                  |
-| `--ring`                 | `#FF5E32`                | `ring-ring`                 | Focus ring (primary와 동일)   |
+| CSS Variable             | Light Value              | Tailwind Class              | Usage                           |
+| ------------------------ | ------------------------ | --------------------------- | ------------------------------- |
+| `--background`           | `#FFFEFE`                | `bg-background`             | 메인 콘텐츠 배경                |
+| `--foreground`           | `#221415`                | `text-foreground`           | 기본 텍스트                     |
+| `--card`                 | `#FFFEFE`                | `bg-card`                   | 카드/패널 배경                  |
+| `--card-foreground`      | `#221415`                | `text-card-foreground`      | 카드 텍스트                     |
+| `--popover`              | `#FFFEFE`                | `bg-popover`                | 팝오버/드롭다운 배경            |
+| `--popover-foreground`   | `#221415`                | `text-popover-foreground`   | 팝오버 텍스트                   |
+| `--primary`              | `#FF5E32`                | `bg-primary`                | CTA, 활성 상태, 링크 (오렌지)   |
+| `--primary-foreground`   | `oklch(0.985 0 0)`       | `text-primary-foreground`   | Primary 위 텍스트               |
+| `--secondary`            | `#1F2792`                | `bg-secondary`              | 보조 CTA, 네이비 버튼           |
+| `--secondary-foreground` | `#FFFFFF`                | `text-secondary-foreground` | Secondary 위 텍스트             |
+| `--muted`                | `oklch(0.968 0.003 264)` | `bg-muted`                  | 비활성/배경 레이어              |
+| `--muted-foreground`     | `oklch(0.556 0 0)`       | `text-muted-foreground`     | 보조 텍스트, 힌트               |
+| `--accent`               | `#F2F0E6`                | `bg-accent`                 | hover/selected 배경 (웜 베이지) |
+| `--accent-foreground`    | `oklch(0.205 0 0)`       | `text-accent-foreground`    | accent 위 텍스트                |
+| `--destructive`          | `oklch(0.577 0.245 27)`  | `bg-destructive`            | 에러, 삭제, VQA 오답            |
+| `--border`               | `oklch(0.922 0.004 264)` | `border-border`             | 기본 border                     |
+| `--input`                | `oklch(0.922 0.004 264)` | `border-input`              | Input border                    |
+| `--ring`                 | `#FF5E32`                | `ring-ring`                 | Focus ring (primary와 동일)     |
 
 > **Two-Tone CTA**: Primary(오렌지 #FF5E32) + Secondary(네이비 #1F2792) 2색 CTA 체계. 오렌지는 주요 액션, 네이비는 보조 액션에 사용.
 
-### 2.2 Sidebar (White Pattern — 220px)
+### 2.2 Sidebar (Warm Off-White Pattern — 220px)
 
-| CSS Variable                   | Light Value              | Tailwind Class                    | Usage                      |
-| ------------------------------ | ------------------------ | --------------------------------- | -------------------------- |
-| `--sidebar`                    | `#FFFFFF`                | `bg-sidebar`                      | GNB Sidebar 배경 (화이트)  |
-| `--sidebar-foreground`         | `oklch(0.145 0 0)`       | `text-sidebar-foreground`         | 사이드바 텍스트            |
-| `--sidebar-primary`            | `#FF5E32`                | `bg-sidebar-primary`              | 활성 메뉴 / CTA 버튼       |
-| `--sidebar-primary-foreground` | `oklch(0.985 0 0)`       | `text-sidebar-primary-foreground` | 활성 메뉴 텍스트           |
-| `--sidebar-accent`             | `oklch(0.955 0.005 264)` | `bg-sidebar-accent`               | hover/active 아이템 배경   |
-| `--sidebar-accent-foreground`  | `oklch(0.205 0 0)`       | `text-sidebar-accent-foreground`  | hover/active 아이템 텍스트 |
-| `--sidebar-border`             | `oklch(0.922 0.004 264)` | `border-sidebar-border`           | 사이드바 내 구분선         |
-| `--sidebar-ring`               | `#FF5E32`                | `ring-sidebar-ring`               | 사이드바 내 focus ring     |
-| `--sidebar-muted-foreground`   | `oklch(0.556 0 0)`       | `text-sidebar-muted-foreground`   | 사이드바 보조 텍스트       |
+| CSS Variable                   | Light Value              | Tailwind Class                    | Usage                                |
+| ------------------------------ | ------------------------ | --------------------------------- | ------------------------------------ |
+| `--sidebar`                    | `#FBFAF8`                | `bg-sidebar`                      | GNB Sidebar 배경 (웜 오프화이트)     |
+| `--sidebar-foreground`         | `#221415`                | `text-sidebar-foreground`         | 사이드바 텍스트                      |
+| `--sidebar-primary`            | `#FF5E32`                | `bg-sidebar-primary`              | 활성 메뉴 / CTA 버튼                 |
+| `--sidebar-primary-foreground` | `oklch(0.985 0 0)`       | `text-sidebar-primary-foreground` | 활성 메뉴 텍스트                     |
+| `--sidebar-accent`             | `#F2F0E6`                | `bg-sidebar-accent`               | hover/active 아이템 배경 (웜 베이지) |
+| `--sidebar-accent-foreground`  | `oklch(0.205 0 0)`       | `text-sidebar-accent-foreground`  | hover/active 아이템 텍스트           |
+| `--sidebar-border`             | `oklch(0.922 0.004 264)` | `border-sidebar-border`           | 사이드바 내 구분선                   |
+| `--sidebar-ring`               | `#FF5E32`                | `ring-sidebar-ring`               | 사이드바 내 focus ring               |
+| `--sidebar-muted-foreground`   | `oklch(0.556 0 0)`       | `text-sidebar-muted-foreground`   | 사이드바 보조 텍스트                 |
 
-> **White Sidebar**: 화이트(`#FFFFFF`) 배경 사이드바, `border-r`로 콘텐츠 영역과 구분. 기본 폭 220px, 접힘 시 64px.
+> **Warm Off-White Sidebar**: 웜 오프화이트(`#FBFAF8`) 배경 사이드바, `border-r`로 콘텐츠 영역과 구분. 기본 폭 220px, 접힘 시 64px. 추가 토큰: `--sidebar-active: #E3E1D9` (활성 아이템 강조).
 
 ### 2.3 Tier (등급)
 
-| CSS Variable        | Light Value             | Tailwind Class       | Emoji | Usage                   |
-| ------------------- | ----------------------- | -------------------- | ----- | ----------------------- |
-| `--tier-diamond`    | `oklch(0.65 0.18 295)`  | `text-tier-diamond`  | 💎    | Diamond 등급 (바이올렛) |
-| `--tier-diamond-bg` | `oklch(0.94 0.04 295)`  | `bg-tier-diamond-bg` | —     | Diamond 배지 배경       |
-| `--tier-gold`       | `oklch(0.75 0.15 85)`   | `text-tier-gold`     | 🥇    | Gold 등급 (앰버)        |
-| `--tier-gold-bg`    | `oklch(0.95 0.04 85)`   | `bg-tier-gold-bg`    | —     | Gold 배지 배경          |
-| `--tier-silver`     | `oklch(0.55 0.02 264)`  | `text-tier-silver`   | 🥈    | Silver 등급 (쿨 그레이) |
-| `--tier-silver-bg`  | `oklch(0.95 0.005 264)` | `bg-tier-silver-bg`  | —     | Silver 배지 배경        |
-| `--tier-bronze`     | `oklch(0.60 0.12 55)`   | `text-tier-bronze`   | 🥉    | Bronze 등급 (코퍼)      |
-| `--tier-bronze-bg`  | `oklch(0.95 0.03 55)`   | `bg-tier-bronze-bg`  | —     | Bronze 배지 배경        |
+| CSS Variable          | Light Value             | Tailwind Class         | Emoji | Usage                    |
+| --------------------- | ----------------------- | ---------------------- | ----- | ------------------------ |
+| `--tier-lightning`    | `#FF5E32`               | `text-tier-lightning`  | 🌩️    | Lightning 등급 (오렌지)  |
+| `--tier-lightning-bg` | `oklch(0.94 0.04 295)`  | `bg-tier-lightning-bg` | —     | Lightning 배지 배경      |
+| `--tier-thunder`      | `#1F2792`               | `text-tier-thunder`    | ⚡    | Thunder 등급 (네이비)    |
+| `--tier-thunder-bg`   | `oklch(0.95 0.04 85)`   | `bg-tier-thunder-bg`   | —     | Thunder 배지 배경        |
+| `--tier-cloud`        | `#7E8CDA`               | `text-tier-cloud`      | ☁️    | Cloud 등급 (라벤더 블루) |
+| `--tier-cloud-bg`     | `oklch(0.95 0.005 264)` | `bg-tier-cloud-bg`     | —     | Cloud 배지 배경          |
+| `--tier-mist`         | `#D5CCC0`               | `text-tier-mist`       | 🌫️    | Mist 등급 (웜 그레이)    |
+| `--tier-mist-bg`      | `oklch(0.95 0.03 55)`   | `bg-tier-mist-bg`      | —     | Mist 배지 배경           |
 
 ### 2.4 Seat (좌석 상태)
 
@@ -92,6 +94,17 @@
 | `--seat-locked`    | `oklch(0.80 0.15 85)`  | `text-seat-locked`    | 타인 점유 (노랑) |
 
 배경 사용 시: `bg-seat-available`, `bg-seat-selected`, `bg-seat-taken`, `bg-seat-locked`
+
+### 2.4.1 Seat Grade (좌석 등급)
+
+| CSS Variable       | Light Value | Tailwind Class        | Usage |
+| ------------------ | ----------- | --------------------- | ----- |
+| `--seat-grade-a`   | `#8A9348`   | `text-seat-grade-a`   | A석   |
+| `--seat-grade-s`   | `#FF8C8B`   | `text-seat-grade-s`   | S석   |
+| `--seat-grade-r`   | `#7754C7`   | `text-seat-grade-r`   | R석   |
+| `--seat-grade-vip` | `#6171D2`   | `text-seat-grade-vip` | VIP석 |
+
+배경 사용 시: `bg-seat-grade-a`, `bg-seat-grade-s`, `bg-seat-grade-r`, `bg-seat-grade-vip`
 
 ### 2.5 Booking Status (예매 상태)
 
@@ -112,12 +125,12 @@
 
 ### 2.7 System Feedback
 
-| CSS Variable | Light Value             | Tailwind Class | Usage                  |
-| ------------ | ----------------------- | -------------- | ---------------------- |
-| `--success`  | `oklch(0.55 0.17 152)`  | `text-success` | 성공 피드백, VQA 정답  |
-| `--warning`  | `oklch(0.75 0.15 85)`   | `text-warning` | 경고, 타이머 1분 남음  |
-| `--danger`   | `oklch(0.577 0.245 27)` | `text-danger`  | 에러, 타이머 30초 남음 |
-| `--info`     | `oklch(0.55 0.2 260)`   | `text-info`    | 안내 메시지            |
+| CSS Variable | Light Value | Tailwind Class | Usage                  |
+| ------------ | ----------- | -------------- | ---------------------- |
+| `--success`  | `#22C55E`   | `text-success` | 성공 피드백, VQA 정답  |
+| `--warning`  | `#F59E0B`   | `text-warning` | 경고, 타이머 1분 남음  |
+| `--danger`   | `#E7000B`   | `text-danger`  | 에러, 타이머 30초 남음 |
+| `--info`     | `#3B82F6`   | `text-info`    | 안내 메시지            |
 
 ### 2.8 Face Value Comparison (정가 대비)
 
@@ -219,23 +232,30 @@
 
 | Prop        | Type                        | Default     | Description                                        |
 | ----------- | --------------------------- | ----------- | -------------------------------------------------- |
-| `tier`      | `TierLevel`                 | required    | `'diamond' \| 'gold' \| 'silver' \| 'bronze'`      |
+| `tier`      | `TierLevel`                 | required    | `'lightning' \| 'thunder' \| 'cloud' \| 'mist'`    |
 | `size`      | `'default' \| 'sm' \| 'lg'` | `'default'` | 뱃지 크기                                          |
-| `showLabel` | `boolean`                   | `true`      | `false`: 이모지만 표시 (접근성 주의: tooltip 필요) |
+| `showLabel` | `boolean`                   | `true`      | `false`: 아이콘만 표시 (접근성 주의: tooltip 필요) |
 | `className` | `string`                    | —           | 추가 클래스                                        |
 
 **Display**:
 
-- default: Emoji + text label in pill (`bg-tier-*-bg text-tier-*`)
+- default: Lucide icon + text label in pill (`bg-tier-*-bg text-tier-*`)
 - sm: 작은 pill, 12px 텍스트
 - lg: 큰 pill, 16px 텍스트, 사이드바 프로필 영역
 
-**Accessibility Rule**: 이모지만 표시할 때는 반드시 `aria-label` 또는 tooltip 제공. TierBadge는 **읽기 전용** — 절대 클릭 불가.
+**Tier Badge Icons** (Lucide):
+
+- Mist: `Haze`
+- Cloud: `Cloud`
+- Thunder: `CloudLightning`
+- Lightning: `Zap`
+
+**Accessibility Rule**: 아이콘만 표시할 때는 반드시 `aria-label` 또는 tooltip 제공. TierBadge는 **읽기 전용** — 절대 클릭 불가.
 
 ```tsx
-<TierBadge tier="diamond" />              // 💎 Diamond
-<TierBadge tier="gold" size="sm" />       // 🥇 Gold (작은 크기)
-<TierBadge tier="bronze" showLabel={false} /> // 🥉 (이모지만, tooltip)
+<TierBadge tier="lightning" />              // 🌩️ 라이트닝
+<TierBadge tier="thunder" size="sm" />       // ⚡ 썬더 (작은 크기)
+<TierBadge tier="mist" showLabel={false} /> // 🌫️ (이모지만, tooltip)
 ```
 
 ### 5.2 BookingStatusBadge
@@ -392,11 +412,12 @@
 
 **File**: `src/components/urr/EventCard.tsx`
 
-| Prop        | Type                     | Default     | Description   |
-| ----------- | ------------------------ | ----------- | ------------- |
-| `event`     | `Event`                  | required    | 이벤트 데이터 |
-| `variant`   | `'default' \| 'compact'` | `'default'` | 카드 변형     |
-| `className` | `string`                 | —           | 추가 클래스   |
+| Prop         | Type                     | Default     | Description                          |
+| ------------ | ------------------------ | ----------- | ------------------------------------ |
+| `event`      | `Event`                  | required    | 이벤트 데이터                        |
+| `variant`    | `'default' \| 'compact'` | `'default'` | 카드 변형                            |
+| `artistName` | `string`                 | —           | 아티스트명 (미입력 시 artistId 표시) |
+| `className`  | `string`                 | —           | 추가 클래스                          |
 
 **Layout (default)**:
 
@@ -438,19 +459,22 @@
 
 **File**: `src/components/urr/TicketCard.tsx`
 
-| Prop         | Type                        | Default      | Description          |
-| ------------ | --------------------------- | ------------ | -------------------- |
-| `ticket`     | `Ticket & { event: Event }` | required     | 티켓 + 이벤트 데이터 |
-| `variant`    | `'upcoming' \| 'past'`      | `'upcoming'` | 카드 스타일          |
-| `onViewQR`   | `() => void`                | —            | QR 보기 클릭         |
-| `onTransfer` | `() => void`                | —            | 양도 등록 클릭       |
-| `className`  | `string`                    | —            | 추가 클래스          |
+| Prop               | Type                        | Default      | Description                               |
+| ------------------ | --------------------------- | ------------ | ----------------------------------------- |
+| `ticket`           | `Ticket & { event: Event }` | required     | 티켓 + 이벤트 데이터                      |
+| `variant`          | `'upcoming' \| 'past'`      | `'upcoming'` | 카드 스타일                               |
+| `isListed`         | `boolean`                   | —            | 양도 등록 상태 (TransferStatusBadge 표시) |
+| `onViewQR`         | `() => void`                | —            | QR 보기 클릭                              |
+| `onTransfer`       | `() => void`                | —            | 양도 등록 클릭                            |
+| `onCancelTransfer` | `() => void`                | —            | 양도 취소 클릭                            |
+| `className`        | `string`                    | —            | 추가 클래스                               |
 
-**Layout**: 가로 — 포스터 썸네일 | 이벤트 정보 + 좌석 정보 | 액션 버튼
+**Layout**: 가로 — 포스터 썸네일 (80x112) | 이벤트 정보 + 좌석 정보 | 액션 버튼
 
 - 이벤트: 제목 (T4) + 날짜 + 장소 (B4)
-- 좌석: "A구역 3열 15번" (B2, medium)
+- 좌석: "A구역 3열 15번" (B2, medium) + isListed 시 TransferStatusBadge
 - 버튼 (upcoming): [QR 보기] primary + [양도 등록] secondary
+- 버튼 (upcoming + isListed): [QR 보기] primary + [양도 취소] danger outline
 - past variant: 전체 opacity-60, 버튼 없음
 
 ```tsx
@@ -534,6 +558,53 @@
 />
 ```
 
+### 5.14 PostCard
+
+**File**: `src/components/urr/PostCard.tsx`
+
+| Prop             | Type                     | Default     | Description                                      |
+| ---------------- | ------------------------ | ----------- | ------------------------------------------------ |
+| `post`           | `CommunityPost`          | required    | 커뮤니티 게시글 데이터 (`@/data/mock-community`) |
+| `variant`        | `'default' \| 'compact'` | `'default'` | 카드 변형                                        |
+| `artistGradient` | `string`                 | —           | 아바타/이미지 그라데이션 배경                    |
+
+**Layout (default)**: 세로 — 아바타(40px)+작성자 | 본문 (line-clamp-4) | 이미지 갤러리 | 좋아요+댓글
+**Layout (compact)**: 축소 — 아바타(32px)+작성자 | 본문 (line-clamp-2) | 좋아요+댓글
+
+- 공식 계정: `BadgeCheck` 아이콘 (primary 색상)
+- 시간 표시: 상대 시간 (방금 전, N분 전, N시간 전, N일 전)
+
+**Import**: `CommunityPost` 타입은 `@/data/mock-community`에서 export.
+
+```tsx
+<PostCard post={samplePost} />
+<PostCard post={samplePost} variant="compact" />
+```
+
+### 5.15 EventTagBadge
+
+**File**: `src/components/urr/EventTagBadge.tsx`
+
+| Prop        | Type              | Default      | Description                                 |
+| ----------- | ----------------- | ------------ | ------------------------------------------- |
+| `tag`       | `string`          | required     | 태그 텍스트 (HOT, NEW, 선예매, 일반예매 등) |
+| `variant`   | `EventTagVariant` | auto-resolve | `'default' \| 'hot' \| 'highlight'`         |
+| `className` | `string`          | —            | 추가 클래스                                 |
+
+**Auto-resolve**: variant 미지정 시 tag 값에 따라 자동 결정
+
+- `'HOT'` → `hot` (destructive/10 + destructive 텍스트)
+- `'NEW'`, `'선예매'`, `'일반예매'` → `highlight` (booking-upcoming/10 + booking-upcoming 텍스트)
+- 기타 → `default` (muted + foreground/70 텍스트)
+
+**스타일**: `text-[10px] font-semibold px-1.5 py-0.5 rounded` (C4 크기, pill 형태)
+
+```tsx
+<EventTagBadge tag="HOT" />       // 빨간 배경 pill
+<EventTagBadge tag="NEW" />       // 파란 배경 pill
+<EventTagBadge tag="일반예매" />   // 파란 배경 pill
+```
+
 ---
 
 ## 6. Layout Patterns
@@ -600,15 +671,18 @@
 ### 6.3 Routing Structure
 
 ```
-/                         → Home
-/search                   → Search
-/events                   → Global Events
-/artists                  → Artist Directory
-/artists/:artistId        → Artist Page (tabs: home/events/transfer)
-/events/:eventId          → Booking Page (2-Panel)
-/my-page                  → My Page (tabs: membership/wallet/transfers)
-/notifications            → Notifications
-/onboarding               → Onboarding (full-screen, no sidebar)
+/                                          → Home
+/search                                    → Search
+/events                                    → Global Events
+/artists                                   → Artist Directory
+/artists/:artistId/*                       → Artist Page (tabs: home/community/events/transfers)
+/artists/:artistId/transfers/:listingId    → Transfer Detail Page
+/events/:eventId                           → Booking Page (2-Panel)
+/membership                                → Membership Join (4-Step Flow)
+/my-page/*                                 → My Page (tabs: tickets/membership/transfers/settings)
+/notifications                             → Notifications
+/onboarding                                → Onboarding (full-screen, no sidebar)
+/style-guide                               → Style Guide (dev only)
 ```
 
 네비게이션 active 상태는 React Router `useLocation()` URL 기반 판단.
@@ -645,6 +719,21 @@
 | 툴팁 표시            | Fade-in (300ms delay 후)                   | 150ms          |
 | 툴팁 숨김            | Fade-out                                   | 100ms          |
 
+### 6.4.1 Custom Animation Classes (`index.css`)
+
+| Class                     | Animation                        | Duration | Usage                 |
+| ------------------------- | -------------------------------- | -------- | --------------------- |
+| `.animate-pulse-timer`    | scale(1→1.05→1) loop             | 1s       | 타이머 30초 이하 펄스 |
+| `.animate-shake`          | translateX(±3px, 3회)            | 400ms    | VQA 오답 흔들림       |
+| `.animate-flash-green`    | 연초록 배경 깜빡                 | 300ms    | VQA 정답              |
+| `.animate-flash-red`      | 연빨강 배경 깜빡                 | 300ms    | VQA 오답              |
+| `.animate-counter-roll`   | translateY(-8px→0) + fade        | 500ms    | 큐 순번 업데이트      |
+| `.seat-interactive:hover` | stroke highlight                 | instant  | 좌석 호버             |
+| `.seat-overlay-fade-in`   | opacity 0→1                      | 300ms    | 좌석 오버레이         |
+| `.seat-row-fade-in`       | opacity+translateY stagger       | 200ms    | 좌석 행 순차 등장     |
+| `.seat-chair-hover`       | opacity + fill transition        | 150ms    | 좌석 의자 호버        |
+| `.minimap-container`      | opacity+scale(0.95→1)+translateY | 300ms    | 미니맵 진입           |
+
 ### 6.5 State Management
 
 **Booking State Machine** (React Context + useReducer):
@@ -679,6 +768,17 @@ interface LayoutState {
 }
 ```
 
+**Notification State** (React Context — `src/contexts/NotificationContext.tsx`):
+
+```typescript
+interface NotificationContextValue {
+  notifications: Notification[];
+  unreadCount: number;
+  markAsRead: (id: string) => void;
+  markAllAsRead: () => void;
+}
+```
+
 ---
 
 ## 7. Icon System
@@ -709,16 +809,16 @@ interface LayoutState {
 | 에러      | `AlertCircle`                  | 에러 피드백                    |
 | 경고      | `AlertTriangle`                | 경고 피드백                    |
 
-### Tier Emojis
+### Tier Icons & Emojis
 
-| Tier    | Emoji | Usage                         |
-| ------- | ----- | ----------------------------- |
-| Diamond | 💎    | TierBadge, 프로필, 큐, 수수료 |
-| Gold    | 🥇    | TierBadge, 프로필, 큐, 수수료 |
-| Silver  | 🥈    | TierBadge, 프로필, 큐, 수수료 |
-| Bronze  | 🥉    | TierBadge, 프로필, 큐, 수수료 |
+| Tier                 | Lucide Icon      | Emoji | Usage                         |
+| -------------------- | ---------------- | ----- | ----------------------------- |
+| Lightning (라이트닝) | `Zap`            | 🌩️    | TierBadge, 프로필, 큐, 수수료 |
+| Thunder (썬더)       | `CloudLightning` | ⚡    | TierBadge, 프로필, 큐, 수수료 |
+| Cloud (클라우드)     | `Cloud`          | ☁️    | TierBadge, 프로필, 큐, 수수료 |
+| Mist (미스트)        | `Haze`           | 🌫️    | TierBadge, 프로필, 큐, 수수료 |
 
-**Rule**: Tier emoji는 항상 text label과 함께 사용 (접근성). emoji 단독 사용 금지.
+**Rule**: Tier 아이콘/emoji는 항상 text label과 함께 사용 (접근성). 아이콘/emoji 단독 사용 금지.
 
 ---
 
@@ -731,7 +831,7 @@ interface LayoutState {
 ```typescript
 // === Enums & Literals ===
 
-type TierLevel = "diamond" | "gold" | "silver" | "bronze";
+type TierLevel = "lightning" | "thunder" | "cloud" | "mist";
 type BookingStatus = "open" | "upcoming" | "soldout" | "closed";
 type TransferStatus = "listed" | "sold" | "completed" | "cancelled";
 type SeatStatus = "available" | "selected" | "taken" | "locked";
@@ -835,6 +935,9 @@ interface Membership {
   artistId: string;
   artistName: string;
   tier: TierLevel;
+  nickname: string;
+  membershipNumber: string;
+  joinedAt: string;
   expiresAt: string;
   isActive: boolean;
 }
@@ -845,8 +948,26 @@ interface User {
   email: string;
   avatar: string;
   tier: TierLevel;
+  phoneNumber: string;
+  birthDate: string;
+  gender: "male" | "female";
+  authProvider: "kakao" | "naver" | "email";
   memberships: Membership[];
   followedArtistIds: string[];
+}
+
+interface ConfirmationData {
+  bookingId: string;
+  tickets: {
+    seatId: string;
+    sectionName: string;
+    row: string;
+    seatNumber: string;
+    price: number;
+    tierFee: number;
+  }[];
+  totalAmount: number;
+  bookedAt: string;
 }
 
 interface Notification {
@@ -871,17 +992,17 @@ interface VQAQuestion {
 
 ```typescript
 const TIER_LABELS: Record<TierLevel, string> = {
-  diamond: "Diamond",
-  gold: "Gold",
-  silver: "Silver",
-  bronze: "Bronze",
+  lightning: "라이트닝",
+  thunder: "썬더",
+  cloud: "클라우드",
+  mist: "미스트",
 };
 
 const TIER_EMOJIS: Record<TierLevel, string> = {
-  diamond: "💎",
-  gold: "🥇",
-  silver: "🥈",
-  bronze: "🥉",
+  lightning: "🌩️",
+  thunder: "⚡",
+  cloud: "☁️",
+  mist: "🌫️",
 };
 
 const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
@@ -910,28 +1031,26 @@ const SEAT_STATUS_LABELS: Record<SeatStatus, string> = {
 
 ## 9. shadcn/ui Base Components
 
-현재 설치: `button`, `badge`, `card`, `input`, `tabs`, `avatar`, `separator`, `tooltip`, `skeleton`, `progress`
+현재 설치 (16개):
 
-### 추가 필요 컴포넌트
-
-| Component     | shadcn name     | Key Usage                                       |
-| ------------- | --------------- | ----------------------------------------------- |
-| Badge         | `badge`         | BookingStatusBadge, TransferStatusBadge 베이스  |
-| Card          | `card`          | EventCard, ArtistCard, TicketCard, TransferCard |
-| Dialog        | `dialog`        | VQA 모달, 에러 모달, QR 오버레이                |
-| Dropdown Menu | `dropdown-menu` | 날짜 선택, 필터                                 |
-| Input         | `input`         | 검색, 가격 입력, 인증코드                       |
-| Checkbox      | `checkbox`      | 약관 동의                                       |
-| Select        | `select`        | 통신사 선택, 날짜 선택                          |
-| Tabs          | `tabs`          | 아티스트 페이지, My Page, 온보딩 카테고리       |
-| Tooltip       | `tooltip`       | 좌석 호버, 정보 팁                              |
-| Separator     | `separator`     | 사이드바 구분선                                 |
-| Avatar        | `avatar`        | 아티스트, 유저 프로필                           |
-| Sonner        | `sonner`        | Toast 알림 (shadcn toast 대신 sonner 사용)      |
-| Skeleton      | `skeleton`      | 로딩 상태                                       |
-| Progress      | `progress`      | VQA 진행, 온보딩 진행                           |
-| Sheet         | `sheet`         | 모바일 미지원이지만 사이드 패널 대안            |
-| Popover       | `popover`       | 필터 드롭다운                                   |
+| Component    | shadcn name    | Key Usage                                       |
+| ------------ | -------------- | ----------------------------------------------- |
+| Alert Dialog | `alert-dialog` | 삭제 확인, 양도 취소 확인                       |
+| Avatar       | `avatar`       | 아티스트, 유저 프로필                           |
+| Badge        | `badge`        | BookingStatusBadge, TransferStatusBadge 베이스  |
+| Button       | `button`       | CTA, 액션 버튼                                  |
+| Card         | `card`         | EventCard, ArtistCard, TicketCard, TransferCard |
+| Checkbox     | `checkbox`     | 약관 동의, 자동 로그인                          |
+| Dialog       | `dialog`       | VQA 모달, QR 모달, 결제 모달                    |
+| Input        | `input`        | 검색, 가격 입력, 인증코드                       |
+| Label        | `label`        | 폼 필드 라벨                                    |
+| Progress     | `progress`     | VQA 진행, 온보딩 진행                           |
+| Select       | `select`       | 통신사 선택, 날짜 선택                          |
+| Separator    | `separator`    | 사이드바 구분선                                 |
+| Skeleton     | `skeleton`     | 로딩 상태                                       |
+| Switch       | `switch`       | 설정 토글                                       |
+| Tabs         | `tabs`         | 아티스트 페이지, My Page                        |
+| Tooltip      | `tooltip`      | 좌석 호버, 정보 팁                              |
 
 설치 명령: `npx shadcn@latest add <component-name>`
 
@@ -941,14 +1060,14 @@ const SEAT_STATUS_LABELS: Record<SeatStatus, string> = {
 
 ### Do
 
-- CSS 변수 토큰만 사용 (`bg-primary`, `text-tier-diamond`, `bg-seat-available` 등)
+- CSS 변수 토큰만 사용 (`bg-primary`, `text-tier-lightning`, `bg-seat-available` 등)
 - 컴포넌트 variant는 CVA (class-variance-authority)로 정의
 - 클래스 병합은 `cn()` (`src/lib/utils.ts`)
 - 도메인 컴포넌트는 `src/components/urr/`에 생성하고 `index.ts` barrel export
 - 레이아웃 컴포넌트는 `src/components/layout/`에 생성하고 `index.ts` barrel export
 - shadcn/ui 기존 컴포넌트 우선 활용 → 커스텀은 최후 수단
 - 모든 가격은 `₩{comma}` 형식 사용 (`Intl.NumberFormat`)
-- TierBadge는 항상 emoji + text label 함께 사용 (접근성)
+- TierBadge는 항상 icon + text label 함께 사용 (접근성)
 - 타이머는 반드시 monospace 폰트 (JetBrains Mono)
 - 좌석맵에는 반드시 SeatStatusLegend 포함 (색상만으로 정보 전달 금지)
 - 에러 메시지는 한국어, 인간적, 복구 액션 포함
@@ -972,9 +1091,6 @@ const SEAT_STATUS_LABELS: Record<SeatStatus, string> = {
 
 ## Source References
 
-- **PRD**: `Docs/prd.md` v1.1
-- **UX Spec**: `Docs/prd-ux-spec.md` (6-pass)
-- **UX Brainstorming**: `Docs/ux-brainstorming.md`
-- **Build Prompts**: `Docs/building-order-prompts.md` (17 prompts)
+- **PRD**: `Docs/PRD.md` v1.1
 - **Design Reference**: Suno AI (layout) + shadcn/ui (components)
-- **Constraints**: Tailwind v4 + shadcn/ui (New York)
+- **Constraints**: Desktop only, light mode, mock data, next.js + Tailwind v4 + shadcn/ui (New York)

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface OnboardingHeroProps {
   step: number;
 }
@@ -69,10 +71,12 @@ export function OnboardingHero({ step }: OnboardingHeroProps) {
 
       {/* URR branding */}
       <div className="absolute bottom-8 flex items-center gap-2">
-        <img
-          src="logos/URR_Logo.png"
+        <Image
+          src="/logos/URR_Logo.png"
           alt="URR"
-          className="h-10 opacity-40 brightness-0 invert"
+          width={160}
+          height={40}
+          className="h-10 w-auto opacity-40 brightness-0 invert"
         />
         <span className="text-white/40 text-sm font-medium tracking-wider">
           — 우르르

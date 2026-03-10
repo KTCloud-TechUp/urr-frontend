@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 type VerificationState = "idle" | "sent" | "expired" | "verifying";
 
