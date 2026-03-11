@@ -1089,8 +1089,179 @@ const SEAT_STATUS_LABELS: Record<SeatStatus, string> = {
 
 ---
 
+## 11. File Structure (React 버전)
+
+```
+src/
+├── components/
+│   ├── ui/                    # shadcn/ui base (16 components)
+│   │   ├── alert-dialog.tsx
+│   │   ├── avatar.tsx
+│   │   ├── badge.tsx
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── checkbox.tsx
+│   │   ├── dialog.tsx
+│   │   ├── input.tsx
+│   │   ├── label.tsx
+│   │   ├── progress.tsx
+│   │   ├── select.tsx
+│   │   ├── separator.tsx
+│   │   ├── skeleton.tsx
+│   │   ├── switch.tsx
+│   │   ├── tabs.tsx
+│   │   └── tooltip.tsx
+│   ├── urr/                   # URR domain components (15)
+│   │   ├── index.ts
+│   │   ├── TierBadge.tsx
+│   │   ├── BookingStatusBadge.tsx
+│   │   ├── TransferStatusBadge.tsx
+│   │   ├── SeatStatusLegend.tsx
+│   │   ├── TimerDisplay.tsx
+│   │   ├── PriceDisplay.tsx
+│   │   ├── FaceValueBadge.tsx
+│   │   ├── EventCard.tsx
+│   │   ├── EventTagBadge.tsx
+│   │   ├── ArtistCard.tsx
+│   │   ├── TicketCard.tsx
+│   │   ├── TransferCard.tsx
+│   │   ├── NotificationCard.tsx
+│   │   ├── PostCard.tsx
+│   │   └── QueueStatusCard.tsx
+│   ├── layout/                # Layout components
+│   │   ├── index.ts
+│   │   ├── AppSidebar.tsx
+│   │   ├── SidebarNavItem.tsx
+│   │   ├── ArtistTreeItem.tsx
+│   │   ├── TopBar.tsx
+│   │   ├── ContentArea.tsx
+│   │   └── Footer.tsx
+│   ├── artist/                # 아티스트 상세 페이지
+│   │   ├── ArtistHeader.tsx
+│   │   ├── ArtistHomeTab.tsx
+│   │   ├── ArtistCommunityTab.tsx
+│   │   ├── ArtistEventsTab.tsx
+│   │   ├── ArtistTransferTab.tsx
+│   │   ├── ArtistPageSkeleton.tsx
+│   │   ├── MembershipGate.tsx
+│   │   └── StaticVenuePreview.tsx
+│   ├── booking/               # 예매 플로우 (27 components)
+│   │   ├── index.ts
+│   │   ├── BookingLayout.tsx
+│   │   ├── LeftPanel.tsx
+│   │   ├── LeftPanelCollapsed.tsx
+│   │   ├── RightMain.tsx
+│   │   ├── IdleView.tsx
+│   │   ├── VQAOptionCard.tsx
+│   │   ├── QueueLeaveModal.tsx
+│   │   ├── QueuePromotionOverlay.tsx
+│   │   ├── SectionMap.tsx
+│   │   ├── SectionMapLegend.tsx
+│   │   ├── SectionListTable.tsx
+│   │   ├── SectionListInteractive.tsx
+│   │   ├── SectionSelectionView.tsx
+│   │   ├── SeatGrid.tsx
+│   │   ├── SeatInfoPanel.tsx
+│   │   ├── SeatOverlay.tsx
+│   │   ├── SeatSelectionView.tsx
+│   │   ├── UnifiedSeatView.tsx
+│   │   ├── VenueMap.tsx
+│   │   ├── Minimap.tsx
+│   │   ├── TimerExpiryModal.tsx
+│   │   ├── PaymentView.tsx
+│   │   ├── PaymentProcessingOverlay.tsx
+│   │   ├── ConfirmationView.tsx
+│   │   ├── BookingModal.tsx
+│   │   └── BookingSidePanel.tsx
+│   ├── home/                  # 홈페이지 섹션
+│   │   ├── HeroBannerCarousel.tsx
+│   │   ├── SectionHeader.tsx
+│   │   └── HomePageSkeleton.tsx
+│   ├── membership/            # 멤버십 가입 플로우
+│   │   ├── ArtistSelectStep.tsx
+│   │   ├── MembershipIntroStep.tsx
+│   │   ├── MembershipPaymentStep.tsx
+│   │   └── MembershipCompleteStep.tsx
+│   ├── my-page/               # 마이페이지 탭
+│   │   ├── MyPageHeader.tsx
+│   │   ├── MyPageSkeleton.tsx
+│   │   ├── TicketWalletTab.tsx
+│   │   ├── MembershipTab.tsx
+│   │   ├── MembershipCard.tsx
+│   │   ├── MembershipCancelDialog.tsx
+│   │   ├── TransferHistoryTab.tsx
+│   │   ├── TransferListingModal.tsx
+│   │   ├── SettingsTab.tsx
+│   │   ├── AccountDeleteDialog.tsx
+│   │   └── QRCodeModal.tsx
+│   ├── onboarding/            # 온보딩 플로우
+│   │   ├── AuthStep.tsx
+│   │   ├── IdentityStep.tsx
+│   │   └── OnboardingHero.tsx
+│   ├── transfer/              # 양도 상세 페이지
+│   │   ├── TransferInfoPanel.tsx
+│   │   └── TransferPurchaseSidebar.tsx
+│   └── common/                # 공통 컴포넌트
+│       └── PaymentDialog.tsx
+├── contexts/
+│   ├── LayoutContext.tsx       # Sidebar/panel state
+│   ├── BookingContext.tsx      # Booking state machine
+│   └── NotificationContext.tsx # 알림 상태
+├── hooks/
+│   ├── useLayout.ts
+│   ├── useBooking.ts
+│   ├── useCountdown.ts        # 범용 카운트다운 타이머
+│   ├── useMapTransform.ts     # 좌석맵 확대/이동
+│   ├── useNavigationBlock.ts  # 페이지 이탈 방지
+│   ├── useNotifications.ts    # 알림 Context consumer
+│   ├── useQueueSimulation.ts  # 대기열 시뮬레이션
+│   ├── useSeatTimer.ts        # 좌석 선택 제한시간
+│   └── useVQAQuiz.ts          # VQA 퀴즈 로직
+├── types/
+│   └── index.ts               # All domain types
+├── data/
+│   ├── mock-artists.ts        # 아티스트 목록 (10명)
+│   ├── mock-artist-page.ts    # 아티스트별 상세 데이터
+│   ├── mock-community.ts      # 커뮤니티 게시글
+│   ├── mock-events.ts         # 예매 이벤트
+│   ├── mock-home.ts           # 홈페이지 mock (배너, 랭킹 등)
+│   ├── mock-my-page.ts        # 마이페이지 mock (티켓, 양도)
+│   ├── mock-notifications.ts  # 알림
+│   ├── mock-search.ts         # 검색 결과
+│   ├── mock-seats.ts          # 좌석 데이터
+│   ├── mock-user.ts           # 사용자 정보
+│   └── mock-vqa.ts            # VQA 퀴즈 문제
+├── lib/
+│   ├── utils.ts               # cn() utility
+│   └── format.ts              # formatPrice(), formatTimer(), parseSeatDisplay(), formatCountdown()
+├── pages/
+│   ├── HomePage.tsx
+│   ├── SearchPage.tsx
+│   ├── EventsPage.tsx
+│   ├── ArtistsPage.tsx
+│   ├── ArtistPage.tsx
+│   ├── BookingPage.tsx
+│   ├── MembershipPage.tsx
+│   ├── MyPage.tsx
+│   ├── TransferDetailPage.tsx
+│   ├── NotificationsPage.tsx
+│   ├── OnboardingPage.tsx
+│   └── StyleGuidePage.tsx     # 디자인 시스템 데모 (개발용)
+├── layouts/
+│   ├── MainLayout.tsx         # Sidebar + TopBar + Content
+│   └── OnboardingLayout.tsx   # Full-screen (no sidebar)
+├── index.css                  # Design tokens + 커스텀 애니메이션
+├── main.tsx
+└── App.tsx                    # Router
+```
+
+---
+
 ## Source References
 
-- **PRD**: `Docs/PRD.md` v1.1
+- **PRD**: `Docs/prd.md` v1.1
+- **UX Spec**: `Docs/prd-ux-spec.md` (6-pass)
+- **UX Brainstorming**: `Docs/ux-brainstorming.md`
+- **Build Prompts**: `Docs/building-order-prompts.md` (17 prompts)
 - **Design Reference**: Suno AI (layout) + shadcn/ui (components)
-- **Constraints**: Desktop only, light mode, mock data, next.js + Tailwind v4 + shadcn/ui (New York)
+- **Constraints**: Desktop only, light mode, mock data, React 19 + Vite 7 + Tailwind v4 + shadcn/ui (New York)
