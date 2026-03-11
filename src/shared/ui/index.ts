@@ -14,6 +14,9 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
 } from "./select";
+export { Avatar, AvatarImage, AvatarFallback } from "./avatar";
+export { Separator } from "./separator";
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./tooltip";
 
 // shared UI
 export { SectionHeader } from "./SectionHeader";
