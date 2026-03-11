@@ -14,3 +14,6 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
 } from "./select";
+
+// shared UI
+export { SectionHeader } from "./SectionHeader";
