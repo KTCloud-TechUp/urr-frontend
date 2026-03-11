@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
+import { formatTimer } from "@/shared/lib/format";
 
 type VerificationState = "idle" | "sent" | "expired" | "verifying";
 
@@ -23,12 +24,6 @@ interface IdentityStepProps {
     gender: "male" | "female";
   }) => void;
   onBack: () => void;
-}
-
-function formatTimer(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
 export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
