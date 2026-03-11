@@ -1,7 +1,7 @@
 // shadcn/ui components
 export { Input } from "./input";
 export { Checkbox } from "./checkbox";
-export { Button } from "./Button";
+export { Button } from "./button";
 export {
   Select,
   SelectGroup,

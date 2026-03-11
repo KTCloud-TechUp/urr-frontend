@@ -7,7 +7,7 @@
 
 ## 주요 페이지 & 라우트
 
-| 라우트               | 페이지         | 설명                                              |
+| URL                  | 페이지         | 설명                                              |
 | -------------------- | -------------- | ------------------------------------------------- |
 | `/`                  | HomePage       | 배너, 인기 아티스트, 지금 뜨는 공연, 랭킹, 선예매 |
 | `/artists`           | ArtistsPage    | 아티스트 목록                                     |
@@ -74,6 +74,4 @@ npm run build    # 빌드
 ## 참고 문서
 
 - [PRD](Docs/prd.md)
-- [UX Spec](Docs/prd-ux-spec.md)
 - [디자인 시스템](Docs/designsystem.md)
-- [빌드 순서 프롬프트](Docs/building-order-prompts.md)
