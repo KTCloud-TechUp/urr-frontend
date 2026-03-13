@@ -1,0 +1,98 @@
+import type { Notification } from '@/types'
+
+function hoursAgo(h: number): string {
+  return new Date(Date.now() - h * 3600000).toISOString()
+}
+
+export const mockNotifications: Notification[] = [
+  {
+    id: 'noti-01',
+    type: 'booking',
+    title: 'G-Dragon MAMA DOME TOUR 예매 오픈',
+    description: '⚡ 라이트닝 예매가 3월 5일 09:00에 오픈됩니다.',
+    timestamp: hoursAgo(0.25),
+    isRead: false,
+    link: '/events/evt-gdragon-2026',
+  },
+  {
+    id: 'noti-02',
+    type: 'transfer',
+    title: '양도 등록한 티켓이 판매되었습니다',
+    description: 'A구역 3열 15번 티켓이 성공적으로 양도되었습니다.',
+    timestamp: hoursAgo(2),
+    isRead: false,
+    link: '/my-page/transfers',
+  },
+  {
+    id: 'noti-03',
+    type: 'tier',
+    title: '등급 업그레이드',
+    description: '축하합니다! 썬더 등급으로 승급되었습니다. 🥇',
+    timestamp: hoursAgo(5),
+    isRead: false,
+    link: '/my-page',
+  },
+  {
+    id: 'noti-04',
+    type: 'payment',
+    title: '결제 완료',
+    description: 'DETOX ASIA TOUR 티켓 결제가 완료되었습니다. (165,000원)',
+    timestamp: hoursAgo(24),
+    isRead: false,
+    link: '/my-page/wallet',
+  },
+  {
+    id: 'noti-05',
+    type: 'membership',
+    title: 'G-Dragon 멤버십이 갱신되었습니다',
+    description: '2027년 3월 1일까지 멤버십이 연장되었습니다.',
+    timestamp: hoursAgo(30),
+    isRead: true,
+    link: '/artists/gdragon',
+  },
+  {
+    id: 'noti-06',
+    type: 'booking',
+    title: 'BTS YET TO COME ENCORE 선예매 오픈',
+    description: '⚡ 썬더 이상 회원 선예매가 3월 10일 시작됩니다.',
+    timestamp: hoursAgo(48),
+    isRead: true,
+    link: '/events/evt-bts-encore-2026',
+  },
+  {
+    id: 'noti-07',
+    type: 'transfer',
+    title: '양도 구매한 티켓이 확인되었습니다',
+    description: 'B구역 5열 22번 티켓이 월렛에 등록되었습니다.',
+    timestamp: hoursAgo(52),
+    isRead: true,
+    link: '/my-page/wallet',
+  },
+  {
+    id: 'noti-08',
+    type: 'payment',
+    title: 'aespa LIVE SYNK 결제 영수증',
+    description: '결제 영수증이 등록된 이메일로 발송되었습니다.',
+    timestamp: hoursAgo(72),
+    isRead: true,
+    link: '/my-page/wallet',
+  },
+  {
+    id: 'noti-09',
+    type: 'tier',
+    title: '이번 달 활동 리포트가 도착했습니다',
+    description: '2월 활동 요약: 공연 2회 참석, 양도 1건 완료',
+    timestamp: hoursAgo(96),
+    isRead: true,
+    link: '/my-page',
+  },
+  {
+    id: 'noti-10',
+    type: 'membership',
+    title: '멤버십 만료 예정',
+    description: 'aespa 멤버십이 30일 후 만료됩니다. 갱신하세요.',
+    timestamp: hoursAgo(120),
+    isRead: true,
+    link: '/artists/aespa',
+  },
+]
