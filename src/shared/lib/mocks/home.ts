@@ -206,6 +206,67 @@ export const homeRankingEvents: RankingEvent[] = [
   { id: "evt-brunomars-2026", artistId: "brunomars", artistName: "Bruno Mars", title: "Bruno Mars Live in Seoul", viewCount: 5400, status: "upcoming", profileImage: "/Profile_Bruno Mars.png" },
 ];
 
+// --- 추천 아티스트 ---
+export interface FeaturedArtist {
+  id: string;
+  name: string;
+  image: string;
+  followerCount: number;
+  category: "group" | "solo" | "new";
+}
+
+export const featuredArtists: FeaturedArtist[] = [
+  { id: "akmu", name: "악동뮤지션", image: "/추천아티스트_악동뮤지션.png", followerCount: 1420000, category: "group" },
+  { id: "kwon", name: "권정렬", image: "/추천아티스트_권정렬.png", followerCount: 1420000, category: "solo" },
+  { id: "riize", name: "RIIZE", image: "/추천아티스트_라이즈.png", followerCount: 1420000, category: "new" },
+  { id: "iu", name: "IU", image: "/추천아티스트_아이유.png", followerCount: 7800000, category: "solo" },
+  { id: "aespa-feat", name: "aespa", image: "/추천 아티스트_aespa.png", followerCount: 5500000, category: "group" },
+  { id: "nmixx-feat", name: "NMIXX", image: "/추천 아티스트_NMIXX.png", followerCount: 2800000, category: "group" },
+  { id: "txt-feat", name: "TXT", image: "/추천 아티스트_TXT.png", followerCount: 4300000, category: "group" },
+  { id: "tours-feat", name: "투어스", image: "/추천 아티스트_투어스.png", followerCount: 1200000, category: "new" },
+  { id: "newjeans-feat", name: "NewJeans", image: "/Artist_NewJeans.png", followerCount: 6100000, category: "new" },
+  { id: "straykids-feat", name: "Stray Kids", image: "/Artist_Stray Kids.png", followerCount: 5800000, category: "group" },
+  { id: "seventeen-feat", name: "SEVENTEEN", image: "/Artist_Seventeen.png", followerCount: 5200000, category: "group" },
+  { id: "gidle-feat", name: "(G)I-DLE", image: "/Artist_(G)I-DLE.png", followerCount: 3900000, category: "group" },
+];
+
+// --- 주목할 만한 NEW 아티스트 ---
+export interface NewArtistCard {
+  id: string;
+  name: string;
+  profileImage: string;
+  label: string;
+  title: string;
+  description: string;
+}
+
+export const newArtistCards: NewArtistCard[] = [
+  {
+    id: "riize",
+    name: "RIIZE",
+    profileImage: "/새로운 아티스트_라이즈.png",
+    label: "신인상 수상",
+    title: "RIIZE, 데뷔와 동시에 음원차트 올킬",
+    description: "SM의 새로운 보이그룹 RIIZE가 데뷔 앨범으로 주요 음원차트를 석권하며 신인상을 수상했습니다.",
+  },
+  {
+    id: "akmu",
+    name: "악동뮤지션",
+    profileImage: "/새로운 아티스트_악동뮤지션.png",
+    label: "컴백 확정",
+    title: "악동뮤지션, 2년 만의 정규앨범 컴백",
+    description: "악동뮤지션이 2년 만에 정규앨범으로 돌아옵니다. 타이틀곡 선공개가 예정되어 있습니다.",
+  },
+  {
+    id: "kwon",
+    name: "권정렬",
+    profileImage: "/새로운 아티스트_권정렬.png",
+    label: "단독 콘서트",
+    title: "권정렬, 첫 단독 콘서트 개최 확정",
+    description: "10CM 권정렬이 첫 단독 콘서트를 개최합니다. 전석 매진이 예상되는 뜨거운 관심입니다.",
+  },
+];
+
 // --- 선예매 오픈 임박 ---
 export const homePreSaleEvents: PreSaleEvent[] = [
   {

@@ -3,7 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Calendar, Users, ChevronLeft, ChevronRight, Crown } from "lucide-react";
+import {
+  Home,
+  Calendar,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  Crown,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui";
 import { Separator } from "@/shared/ui/separator";
@@ -25,8 +32,13 @@ const navItems = [
 const MAX_VISIBLE_ARTISTS = 5;
 
 export function AppSidebar() {
-  const { isSidebarExpanded, toggleSidebar, isArtistExpanded, toggleArtist, expandArtist } =
-    useLayout();
+  const {
+    isSidebarExpanded,
+    toggleSidebar,
+    isArtistExpanded,
+    toggleArtist,
+    expandArtist,
+  } = useLayout();
   const pathname = usePathname();
   const [showAllArtists, setShowAllArtists] = useState(false);
 
@@ -74,7 +86,7 @@ export function AppSidebar() {
         )}
         <button
           onClick={toggleSidebar}
-          className="size-8 flex items-center justify-center rounded-md text-sidebar-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+          className="size-8 flex items-center justify-center rounded-md text-sidebar-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
           aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
@@ -108,7 +120,12 @@ export function AppSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className={cn("flex flex-col gap-0.5 px-2", collapsed && "items-center")}>
+      <nav
+        className={cn(
+          "flex flex-col gap-0.5 px-2",
+          collapsed && "items-center",
+        )}
+      >
         {navItems.map((item) => (
           <SidebarNavItem
             key={item.href}
@@ -149,7 +166,12 @@ export function AppSidebar() {
             </div>
           )
         ) : (
-          <div className={cn("flex flex-col gap-0.5", collapsed ? "items-center" : "px-2")}>
+          <div
+            className={cn(
+              "flex flex-col gap-0.5",
+              collapsed ? "items-center" : "px-2",
+            )}
+          >
             {visibleArtists.map((artist) => (
               <ArtistTreeItem
                 key={artist.id}
@@ -164,7 +186,7 @@ export function AppSidebar() {
             {hiddenCount > 0 && !collapsed && (
               <button
                 onClick={() => setShowAllArtists(!showAllArtists)}
-                className="flex items-center h-8 px-3 text-[13px] text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors"
+                className="flex items-center h-8 px-3 text-[13px] text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors cursor-pointer"
               >
                 {showAllArtists ? "접기" : `더 보기 (+${hiddenCount})`}
               </button>

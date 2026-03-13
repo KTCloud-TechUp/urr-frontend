@@ -300,14 +300,14 @@ export function AuthStep({ onComplete }: AuthStepProps) {
         서비스에 가입하면 URR의{" "}
         <button
           type="button"
-          className="underline underline-offset-2 hover:text-foreground"
+          className="underline underline-offset-2 hover:text-foreground cursor-pointer"
         >
           서비스 이용약관
         </button>{" "}
         및{" "}
         <button
           type="button"
-          className="underline underline-offset-2 hover:text-foreground"
+          className="underline underline-offset-2 hover:text-foreground cursor-pointer"
         >
           개인정보 처리방침
         </button>

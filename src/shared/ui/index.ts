@@ -20,3 +20,5 @@ export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./tool
 
 // shared UI
 export { SectionHeader } from "./SectionHeader";
+export { FilterChip } from "./FilterChip";
+export { ScrollableRow } from "./ScrollableRow";
