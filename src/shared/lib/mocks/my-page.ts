@@ -198,3 +198,11 @@ export function getMyTickets(): (Ticket & { event: Event })[] {
 export function getMyTransferRecords(): (MyTransferRecord & { event: Event })[] {
   return myTransferRecords
 }
+
+export function addMyTicket(ticket: Ticket & { event: Event }): void {
+  myTickets.push(ticket)
+}
+
+export function addMyTransferRecord(record: MyTransferRecord & { event: Event }): void {
+  myTransferRecords.push(record)
+}

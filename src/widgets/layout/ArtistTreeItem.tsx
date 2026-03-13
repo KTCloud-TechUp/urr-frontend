@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
@@ -16,9 +16,9 @@ interface ArtistTreeItemProps {
 }
 
 const subItems = [
-  { label: "아티스트 홈", path: "", end: true },
-  { label: "공연", path: "/events", end: false },
-  { label: "양도", path: "/transfers", end: false },
+  { label: "아티스트 홈", tab: "", end: true },
+  { label: "공연", tab: "events", end: false },
+  { label: "양도", tab: "transfers", end: false },
 ];
 
 export function ArtistTreeItem({
@@ -28,6 +28,8 @@ export function ArtistTreeItem({
   collapsed,
 }: ArtistTreeItemProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab") ?? "";
   const isActive = pathname.startsWith(`/artists/${artist.id}`);
   const basePath = `/artists/${artist.id}`;
 
@@ -94,14 +96,14 @@ export function ArtistTreeItem({
         <div className="overflow-hidden">
           <div className="py-0.5">
             {subItems.map((item) => {
-              const href = `${basePath}${item.path}`;
+              const href = item.tab ? `${basePath}?tab=${item.tab}` : basePath;
               const itemActive = item.end
-                ? pathname === href
-                : pathname.startsWith(href);
+                ? pathname === basePath && !currentTab
+                : pathname === basePath && currentTab === item.tab;
 
               return (
                 <Link
-                  key={item.path}
+                  key={item.tab}
                   href={href}
                   className={cn(
                     "flex items-center h-8 pl-11 pr-3 rounded-md text-[13px] transition-colors duration-150 relative",

@@ -1,4 +1,4 @@
-import type { Event, TransferListing } from "@/shared/types";
+import type { Event, TransferListing, TransferStatus } from "@/shared/types";
 
 // --- Extended artist info ---
 
@@ -109,6 +109,65 @@ const artistTransfersMap: Record<string, TransferListing[]> = {
 
 export function getTransfersByArtistId(artistId: string): TransferListing[] {
   return artistTransfersMap[artistId] ?? [];
+}
+
+export function getTransferListingById(
+  artistId: string,
+  listingId: string,
+): (TransferListing & { event: Event }) | undefined {
+  const all = getTransferListingsWithEvent(artistId);
+  return all.find((t) => t.id === listingId);
+}
+
+export function updateTransferListingStatus(
+  artistId: string,
+  listingId: string,
+  status: TransferStatus,
+): void {
+  const listings = artistTransfersMap[artistId];
+  if (!listings) return;
+  const listing = listings.find((t) => t.id === listingId);
+  if (listing) listing.status = status;
+}
+
+// ── Seller profiles ──────────────────────────────────────
+
+export interface SellerProfile {
+  id: string;
+  name: string;
+  bio: string;
+}
+
+const sellerProfiles: Record<string, SellerProfile> = {
+  "u-101": { id: "u-101", name: "콘서트매니아", bio: "공연을 사랑하는 다이아몬드 거래자" },
+  "u-102": { id: "u-102", name: "뮤직러버22", bio: "음악이 있는 곳에 항상 함께" },
+  "u-103": { id: "u-103", name: "티켓마스터", bio: "공연 관람 3년차" },
+  "u-104": { id: "u-104", name: "라이브킹", bio: "공연 관람 전문가" },
+  "u-105": { id: "u-105", name: "팬클럽회장", bio: "다양한 아티스트의 팬" },
+  "u-106": { id: "u-106", name: "뉴비팬", bio: "첫 거래 도전!" },
+  "u-201": { id: "u-201", name: "아미포에버", bio: "BTS 영원히 사랑해" },
+  "u-202": { id: "u-202", name: "보라해ARMY", bio: "보라해 💜" },
+  "u-203": { id: "u-203", name: "방탄소년팬", bio: "아미 2년차" },
+  "u-204": { id: "u-204", name: "콘서트홀릭", bio: "매주 공연 관람" },
+  "u-205": { id: "u-205", name: "첫거래유저", bio: "양도 초보입니다" },
+  "u-206": { id: "u-206", name: "VIP관람러", bio: "VIP석 전문 거래자" },
+  "u-301": { id: "u-301", name: "마이윈터", bio: "aespa 팬" },
+  "u-302": { id: "u-302", name: "에스파팬", bio: "MY 최애" },
+  "u-303": { id: "u-303", name: "카리나러브", bio: "다이아 거래자" },
+  "u-304": { id: "u-304", name: "닝닝팬", bio: "신규 팬" },
+  "u-305": { id: "u-305", name: "지젤팬", bio: "골드 거래자" },
+  "u-401": { id: "u-401", name: "아이브팬", bio: "IVE 응원" },
+  "u-402": { id: "u-402", name: "원영이최고", bio: "장원영 팬" },
+  "u-403": { id: "u-403", name: "가을사랑해", bio: "신규 유저" },
+  "u-501": { id: "u-501", name: "블링크포에버", bio: "BLINK 영원히" },
+  "u-502": { id: "u-502", name: "로제팬", bio: "로제 최애" },
+  "u-503": { id: "u-503", name: "지수사랑", bio: "지수 팬" },
+  "u-504": { id: "u-504", name: "리사팬클럽", bio: "리사 골드팬" },
+  "u-505": { id: "u-505", name: "제니팬", bio: "신규 블링크" },
+};
+
+export function getSellerProfile(sellerId: string): SellerProfile {
+  return sellerProfiles[sellerId] ?? { id: sellerId, name: "익명 판매자", bio: "" };
 }
 
 export function getTransferListingsWithEvent(

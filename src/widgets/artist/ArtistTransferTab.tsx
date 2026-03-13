@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { ShoppingBag } from "lucide-react";
 import { Button, Input, EmptyState } from "@/shared/ui";
 import { TransferCard } from "@/entities/transfer";
@@ -18,7 +19,8 @@ interface ArtistTransferTabProps {
 const selectClass =
   "h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring";
 
-export function ArtistTransferTab({ listings, events, membership }: ArtistTransferTabProps) {
+export function ArtistTransferTab({ listings, events, membership, artistId }: ArtistTransferTabProps) {
+  const router = useRouter();
   const [eventId, setEventId] = useState("");
   const [section, setSection] = useState("");
   const [priceMin, setPriceMin] = useState("");
@@ -115,7 +117,10 @@ export function ArtistTransferTab({ listings, events, membership }: ArtistTransf
         <div className="grid grid-cols-3 gap-4">
           {filtered.map((listing) => (
             <div key={listing.id} className="relative">
-              <TransferCard listing={listing} />
+              <TransferCard
+                listing={listing}
+                onClick={() => router.push(`/transfer/${artistId}/${listing.id}`)}
+              />
               {!isMember && (
                 <div
                   className="absolute inset-0 rounded-lg bg-background/60 flex items-center justify-center cursor-not-allowed"

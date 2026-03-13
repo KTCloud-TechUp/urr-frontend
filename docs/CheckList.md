@@ -293,13 +293,13 @@ src/
 - [x] **Artist Detail Widget** — 아티스트 상세 (탭 포함)
 - [x] **Events Widget** — 공연 목록
 - [ ] **Booking Widget** — 예매 5단계 플로우
-- [ ] **Membership Widget** — 멤버십 가입 4단계 플로우
-- [ ] **MyPage Widget** — 마이페이지 탭 (티켓/멤버십/양도/설정)
+- [x] **Membership Widget** — 멤버십 가입 4단계 플로우
+- [x] **MyPage Widget** — 마이페이지 탭 (티켓/멤버십/양도/설정)
 
 - [x] **App Router 페이지** — `/` (홈), `/onboarding`
 - [x] **App Router 페이지** — `/artists`, `/artists/[artistId]`
-- [x] **App Router 페이지** — `/events` ✅ (나머지 미완료)
-- [ ] **App Router 페이지** — `/membership`, `/my-page`
+- [x] **App Router 페이지** — `/events` ✅
+- [x] **App Router 페이지** — `/membership`, `/my-page`
 - [ ] **App Router 페이지** — `/transfer/[transferId]`, `/notifications`, `/search`
 
 ### Phase 6: 레이아웃 및 컨텍스트 통합 ✅ 완료
@@ -354,9 +354,9 @@ src/
 - [x] **3. `/events` 페이지** — 공연 목록 (EventsWidget + app/events/page.tsx)
 - [x] **4. `/events/[eventId]` 페이지** — 공연 상세
 - [ ] **5. `/events/[eventId]/booking` 페이지** — 예매 5단계 플로우 (VQA → 대기열 → 구역/좌석 → 결제 → 확인)
-- [ ] **6. `/membership` 페이지** — 멤버십 가입 4단계 플로우 (아티스트 선택 → 티어 소개 → Mock 결제 → 완료)
-- [ ] **7. `/my-page` 페이지** — 마이페이지 (티켓/멤버십/양도/설정 탭)
-- [ ] **8. `/transfer/[transferId]` 페이지** — 양도 상세
+- [x] **6. `/membership` 페이지** — 멤버십 가입 4단계 플로우 (아티스트 선택 → 티어 소개 → Mock 결제 → 완료)
+- [x] **7. `/my-page` 페이지** — 마이페이지 (티켓/멤버십/양도/설정 탭)
+- [x] **8. `/transfer/[transferId]` 페이지** — 양도 상세
 - [ ] **9. `shared/api/` 클라이언트** — Fetch 기반, Bearer 토큰, 401 자동 갱신
 - [ ] **10. Spring Boot API 연동** — Mock 데이터 → 실제 API 전환
 
@@ -417,8 +417,8 @@ src/
 - [x] **Phase 2 완료**: Shared Layer (UI 컴포넌트, 유틸, Mock 데이터)
 - [x] **Phase 3 완료**: Entities Layer (user/artist/event 기본 구조)
 - [x] **Phase 6 완료**: 레이아웃 시스템 (사이드바, TopBar, Footer, LayoutContext)
-- [ ] **Phase 4 진행 중**: Features Layer — auth/onboarding ✅, artist ✅, booking/membership/transfer ❌
-- [ ] **Phase 5 진행 중**: Widgets + App Router — home/onboarding/artists/artist-detail ✅, 나머지 페이지 ❌
+- [ ] **Phase 4 진행 중**: Features Layer — auth/onboarding ✅, artist ✅, membership ✅, booking/transfer ❌
+- [ ] **Phase 5 진행 중**: Widgets + App Router — home/onboarding/artists/artist-detail/events/membership/my-page ✅, booking/transfer ❌
 - [ ] **Phase 7**: API 클라이언트 및 Spring Boot 연동
 - [ ] **Phase 8**: 빌드 검증, 성능 최적화, CI/CD
 - [ ] 모든 페이지 정상 렌더링 및 라우팅 동작
