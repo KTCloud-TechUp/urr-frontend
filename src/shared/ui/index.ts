@@ -27,3 +27,5 @@ export { PriceDisplay } from "./PriceDisplay";
 export { FaceValueBadge } from "./FaceValueBadge";
 export { ViewToggle } from "./ViewToggle";
 export { Skeleton } from "./skeleton";
+export { PaymentDialog } from "./PaymentDialog";
+export { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
