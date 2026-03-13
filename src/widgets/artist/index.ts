@@ -1,0 +1,1 @@
+export { ArtistDetailWidget } from "./ArtistDetailWidget";

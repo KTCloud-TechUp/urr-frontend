@@ -155,7 +155,7 @@ export function HomeWidget() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs text-muted-foreground tabular-nums">
-                  조회 {formatCompactNumber(event.viewCount)}
+                  조 {formatCompactNumber(event.viewCount)}
                 </span>
                 <span
                   className={cn(

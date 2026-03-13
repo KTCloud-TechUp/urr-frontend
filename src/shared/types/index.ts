@@ -115,6 +115,19 @@ export interface User {
   followedArtistIds: string[]
 }
 
+export interface CommunityPost {
+  id: string
+  artistId: string
+  authorName: string
+  authorAvatar: string
+  isOfficial: boolean
+  content: string
+  images: string[]
+  likeCount: number
+  commentCount: number
+  createdAt: string
+}
+
 export interface Notification {
   id: string
   type: NotificationType
