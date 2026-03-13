@@ -14,7 +14,7 @@ const NO_SHELL_ROUTES = ["/onboarding"];
 function ShellInner({ children }: { children: ReactNode }) {
   const { isSidebarExpanded } = useLayout();
   const pathname = usePathname();
-  const isFullWidth = /^\/events\/[^/]+$/.test(pathname);
+  const isFullWidth = /^\/events\/[^/]+\/booking$/.test(pathname);
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">

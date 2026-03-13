@@ -262,9 +262,9 @@ src/
   - 기존 src/components/transfer/ → src/features/transfer/ui/
   - 양도 목록, 수정(가격 변경), 취소(확인 다이얼로그) 기능
 
-- [ ] **Artist Feature** (아티스트 탭 기능)
+- [x] **Artist Feature** (아티스트 탭 기능)
   - 아티스트 상세 탭: 홈 / 소통 / 공연 / 양도 (Lv.2 이상 멤버십 게이트)
-  - `features/artist/ui/` 하위 탭 컴포넌트들
+  - `widgets/artist/` 하위 탭 컴포넌트들 (ArtistHomeTab, ArtistCommunityTab, ArtistEventsTab, ArtistTransferTab, MembershipGate)
 
 - [ ] **Notification Feature** (알림 기능)
   - useNotifications.ts → src/features/notification/lib/
@@ -289,16 +289,16 @@ src/
 - [x] **Auth Widget**
   - `widgets/auth/OnboardingWidget.tsx` — 온보딩 레이아웃 (좌/우 패널)
 
-- [ ] **Artists Widget** — 아티스트 목록 그리드
-- [ ] **Artist Detail Widget** — 아티스트 상세 (탭 포함)
-- [ ] **Events Widget** — 공연 목록
+- [x] **Artists Widget** — 아티스트 목록 그리드
+- [x] **Artist Detail Widget** — 아티스트 상세 (탭 포함)
+- [x] **Events Widget** — 공연 목록
 - [ ] **Booking Widget** — 예매 5단계 플로우
 - [ ] **Membership Widget** — 멤버십 가입 4단계 플로우
 - [ ] **MyPage Widget** — 마이페이지 탭 (티켓/멤버십/양도/설정)
 
 - [x] **App Router 페이지** — `/` (홈), `/onboarding`
-- [ ] **App Router 페이지** — `/artists`, `/artists/[artistId]`
-- [ ] **App Router 페이지** — `/events`, `/events/[eventId]`, `/events/[eventId]/booking`
+- [x] **App Router 페이지** — `/artists`, `/artists/[artistId]`
+- [x] **App Router 페이지** — `/events` ✅ (나머지 미완료)
 - [ ] **App Router 페이지** — `/membership`, `/my-page`
 - [ ] **App Router 페이지** — `/transfer/[transferId]`, `/notifications`, `/search`
 
@@ -350,9 +350,9 @@ src/
 > **규칙**: 한 번에 하나의 작업만 진행. 완료 후 `[x]` 체크하고 다음으로 넘어간다.
 
 - [x] **1. `/artists` 페이지** — 아티스트 목록 그리드 (ArtistsWidget + app/artists/page.tsx)
-- [ ] **2. `/artists/[artistId]` 페이지** — 아티스트 상세 (탭: 홈/소통/공연/양도 + 멤버십 게이트)
-- [ ] **3. `/events` 페이지** — 공연 목록 (EventsWidget + app/events/page.tsx)
-- [ ] **4. `/events/[eventId]` 페이지** — 공연 상세
+- [x] **2. `/artists/[artistId]` 페이지** — 아티스트 상세 (탭: 홈/소통/공연/양도 + 멤버십 게이트)
+- [x] **3. `/events` 페이지** — 공연 목록 (EventsWidget + app/events/page.tsx)
+- [x] **4. `/events/[eventId]` 페이지** — 공연 상세
 - [ ] **5. `/events/[eventId]/booking` 페이지** — 예매 5단계 플로우 (VQA → 대기열 → 구역/좌석 → 결제 → 확인)
 - [ ] **6. `/membership` 페이지** — 멤버십 가입 4단계 플로우 (아티스트 선택 → 티어 소개 → Mock 결제 → 완료)
 - [ ] **7. `/my-page` 페이지** — 마이페이지 (티켓/멤버십/양도/설정 탭)
@@ -394,6 +394,15 @@ src/
 - Spring Boot API 연동은 Phase 7 이후 별도 작업
 - 파일 이동 시 import 경로 모두 업데이트 필수
 
+### ⚠️ 디자인 변경 금지 원칙
+
+- **반드시 원본 참조**: 컴포넌트 마이그레이션 시 `C:\Users\kkaeng\Desktop\Dev\URR\URR-v2` 원본 파일을 먼저 읽고 디자인을 1:1로 맞출 것
+- **임의 변경 금지**: 섹션 제목, 폰트 크기, 간격, 색상, 레이아웃 등 디자인 디테일을 Claude 판단으로 바꾸지 말 것
+- **클래스 교체 금지**: 원본의 Tailwind 클래스를 "더 나은" 것으로 교체하지 말 것 (예: `hover:bg-[#F3F2F0]` → `hover:bg-accent` 같은 임의 변환 금지)
+- **컴포넌트 교체 금지**: 원본이 raw `<span>`을 쓰면 그대로 `<span>`, 원본이 특정 컴포넌트를 쓰면 그 컴포넌트를 사용
+- **이미지 경로**: 원본 `src/assets/` 이미지는 `public/`으로 복사 후 문자열 경로로 사용. 한글 파일명 대신 원본의 영문 파일명 유지
+- **예외**: React Router → Next.js Link/useRouter 변환, `import` 이미지 → `/파일명` 문자열 경로 변환은 허용
+
 ### 기존 코드 품질 고려사항
 
 - **바이브코딩 특성**: 디자인팀이 만든 코드로 구조적 문제가 있을 수 있음
@@ -408,8 +417,8 @@ src/
 - [x] **Phase 2 완료**: Shared Layer (UI 컴포넌트, 유틸, Mock 데이터)
 - [x] **Phase 3 완료**: Entities Layer (user/artist/event 기본 구조)
 - [x] **Phase 6 완료**: 레이아웃 시스템 (사이드바, TopBar, Footer, LayoutContext)
-- [ ] **Phase 4 진행 중**: Features Layer — auth/onboarding ✅, booking/membership/transfer/artist ❌
-- [ ] **Phase 5 진행 중**: Widgets + App Router — home/onboarding ✅, 나머지 페이지 ❌
+- [ ] **Phase 4 진행 중**: Features Layer — auth/onboarding ✅, artist ✅, booking/membership/transfer ❌
+- [ ] **Phase 5 진행 중**: Widgets + App Router — home/onboarding/artists/artist-detail ✅, 나머지 페이지 ❌
 - [ ] **Phase 7**: API 클라이언트 및 Spring Boot 연동
 - [ ] **Phase 8**: 빌드 검증, 성능 최적화, CI/CD
 - [ ] 모든 페이지 정상 렌더링 및 라우팅 동작
