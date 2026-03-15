@@ -114,9 +114,9 @@ find src -name "*.ts" | xargs grep -l "<관련 키워드>" 2>/dev/null | head -5
 ## URR 피처별 핵심 주의사항
 
 ### 예매 플로우
-- 상태머신: `idle → vqa(Silver/Bronze) or queue(Diamond/Gold) → seats-section → seats-individual → payment → confirmation`
-- Diamond/Gold: VQA **면제** (Fast Track)
-- Silver/Bronze: VQA **필수** (Standard Path)
+- 상태머신: `idle → vqa(클라우드/미스트) or queue(라이트닝/썬더) → seats-section → seats-individual → payment → confirmation`
+- 라이트닝/썬더: VQA **면제** (Fast Track)
+- 클라우드/미스트: VQA **필수** (Standard Path)
 - VQA: 텍스트 3문제, 30초/문항, 2/3 통과, 최대 2회 재시도
 - 좌석: 최대 **4석**, **3분** 타이머, 만료 시 seats-section 복귀
 - 결제: Toss Payments 모킹
@@ -124,7 +124,7 @@ find src -name "*.ts" | xargs grep -l "<관련 키워드>" 2>/dev/null | head -5
 ### 온보딩
 - CI 기반 1인 1계정 본인인증 필수 (통신사 SMS)
 - 약관 3가지: 이용약관(필수), 개인정보(필수), 마케팅(선택)
-- 가입 완료 즉시 **Bronze 자동 부여**
+- 가입 완료 즉시 **미스트 자동 부여**
 - 아티스트 선택 최소 1명 필수
 - 멜론 연동 = 강제 게이트 아님, "상위 등급 잠금 해제" CTA
 
@@ -136,7 +136,7 @@ find src -name "*.ts" | xargs grep -l "<관련 키워드>" 2>/dev/null | head -5
 
 ### 아티스트 상세 탭
 - 홈: 누구나 접근 가능
-- 공연/양도: **멤버십 게이트** (Lv.2 Silver 이상)
+- 공연/양도: **멤버십 게이트** (Lv.2 클라우드 이상)
 
 ### 검색 페이지 (`/search`)
 - 아티스트 + 공연 통합 검색

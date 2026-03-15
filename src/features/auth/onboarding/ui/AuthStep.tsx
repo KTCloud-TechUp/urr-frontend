@@ -124,7 +124,7 @@ export function AuthStep({ onComplete }: AuthStepProps) {
   }
 
   return (
-    <div className="max-w-[400px] w-full mx-auto flex flex-col items-center">
+    <div className="max-w-100 w-full mx-auto flex flex-col items-center">
       <Image
         src="/logos/logo5.svg"
         alt="URR"

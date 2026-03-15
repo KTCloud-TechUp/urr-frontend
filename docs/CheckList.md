@@ -3,7 +3,7 @@
 ## 프로젝트 개요
 
 - **기존 스택**: React 19 + TypeScript + Vite 7 + Tailwind CSS v4 + shadcn/ui
-- **목표 스택**: Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui + FSD 아키텍처
+- **목표 스택**: Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui + FSD 아키텍처
 - **백엔드**: Spring Boot
 - **CI/CD**: AWS
 - **문서 참조**: CLAUDE.md, docs/prd.md, docs/designsystem.md, docs/ARCHITECTURE.md

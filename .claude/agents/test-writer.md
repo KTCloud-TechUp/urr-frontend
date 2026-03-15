@@ -66,15 +66,15 @@ expect(calculateTransferFee(100000, 'silver')).toBe(10000) // 10%
 ```
 
 ## URR 핵심 비즈니스 로직 — 우선 테스트 대상
-- **티어별 VQA 분기**: Diamond/Gold → queue 직행, Silver/Bronze → VQA
+- **티어별 VQA 분기**: 라이트닝/썬더 → queue 직행, 클라우드/미스트 → VQA
 - **VQA 규칙**: 3문제, 2/3 통과, 최대 2회 재시도
 - **예매 상태머신**: idle → vqa/queue → seats-section → seats-individual → payment → confirmation
 - **좌석 타이머**: 3분(180초), 만료 시 seats-expired → seats-section 복귀
 - **최대 좌석 4석** 제한
 - **양도 가격 범위**: 정가의 0.5x~1.5x (벗어나면 에러)
-- **양도 수수료**: Diamond/Gold 5%, Silver/Bronze 10%
-- **멜론 미연동 → Bronze 유지** (상위 등급 불가)
-- **회원가입 즉시 Bronze 부여**
+- **양도 수수료**: 라이트닝/썬더 5%, 클라우드 10% — 미스트는 양도게시판 접근 불가
+- **멜론 미연동 → 미스트 유지** (상위 등급 불가)
+- **회원가입 즉시 미스트 부여**
 
 ```tsx
 // 예시: 비즈니스 로직 단위 테스트
