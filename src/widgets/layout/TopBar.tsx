@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Search, Bell, ChevronRight } from "lucide-react";
 import { Button } from "@/shared/ui";
 import { getArtistById } from "@/shared/lib/mocks/artists";
+import { useNotifications } from "@/features/notification";
 
 interface BreadcrumbItem {
   label: string;
@@ -52,6 +53,8 @@ function useBreadcrumbs(): BreadcrumbItem[] {
     }
   } else if (segments[0] === "membership") {
     crumbs.push({ label: "멤버십", href: "/membership" });
+  } else if (segments[0] === "notifications") {
+    crumbs.push({ label: "알림", href: "/notifications" });
   }
 
   return crumbs;
@@ -59,6 +62,7 @@ function useBreadcrumbs(): BreadcrumbItem[] {
 
 export function TopBar() {
   const crumbs = useBreadcrumbs();
+  const { unreadCount } = useNotifications();
 
   return (
     <header className="h-14 shrink-0 border-b border-border bg-background flex items-center justify-between px-6 sticky top-0 z-10">
@@ -95,9 +99,14 @@ export function TopBar() {
           </Link>
         </Button>
 
-        <Button variant="ghost" size="icon" asChild className="size-9">
+        <Button variant="ghost" size="icon" asChild className="size-9 relative">
           <Link href="/notifications">
             <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 size-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </Link>
         </Button>
       </div>

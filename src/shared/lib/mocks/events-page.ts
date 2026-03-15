@@ -418,6 +418,12 @@ export const allEventsData: EventListItem[] = [
   },
 ];
 
+/** All events across popular + grid sections, deduplicated by id */
+export const allEventsCombined: EventListItem[] = [
+  ...popularEvents,
+  ...allEventsData.filter((e) => !popularEvents.some((p) => p.id === e.id)),
+];
+
 export function filterEventsByCategory(
   events: EventListItem[],
   category: EventCategoryFilter,
