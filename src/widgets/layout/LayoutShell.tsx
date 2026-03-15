@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { LayoutProvider, useLayout } from "./model/useLayout";
@@ -18,7 +19,7 @@ function ShellInner({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <AppSidebar />
+      <Suspense fallback={null}><AppSidebar /></Suspense>
       <div
         className="flex flex-1 flex-col min-w-0 transition-[margin-left] duration-250 ease-out"
         style={{ marginLeft: isSidebarExpanded ? 220 : 64 }}

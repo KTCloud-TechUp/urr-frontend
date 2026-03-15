@@ -1,8 +1,11 @@
 import { EventDetailWidget } from "@/widgets/event-detail";
-import { allEventsData } from "@/shared/lib/mocks/events-page";
+import { allEventsCombined } from "@/shared/lib/mocks/events-page";
 
 export function generateStaticParams() {
-  return allEventsData.map((event) => ({ eventId: event.id }));
+  return [
+    { eventId: "evt-gdragon-2026" },
+    ...allEventsCombined.map((event) => ({ eventId: event.id })),
+  ];
 }
 
 interface EventDetailPageProps {

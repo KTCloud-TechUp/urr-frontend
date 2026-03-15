@@ -1,6 +1,7 @@
 import "./globals.css";
 import { TooltipProvider } from "@/shared/ui/tooltip";
 import { LayoutShell } from "@/widgets/layout";
+import { NotificationProvider } from "@/features/notification";
 
 export default function RootLayout({
   children,
@@ -10,9 +11,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <TooltipProvider>
-          <LayoutShell>{children}</LayoutShell>
-        </TooltipProvider>
+        <NotificationProvider>
+          <TooltipProvider>
+            <LayoutShell>{children}</LayoutShell>
+          </TooltipProvider>
+        </NotificationProvider>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 import type { BookingStatus, EventDate, Section } from "@/shared/types";
 import type { EventCategory } from "@/shared/lib/mocks/events-page";
-import { allEventsData } from "@/shared/lib/mocks/events-page";
+import { allEventsCombined } from "@/shared/lib/mocks/events-page";
 
 // --- Types ---
 
@@ -109,6 +109,44 @@ const gdragonSections: Section[] = [
   { id: "sec-a", name: "A석", price: 99000, totalSeats: 3000, remainingSeats: 802 },
 ];
 
+const sectionsByDate: Record<string, Section[]> = {
+  "date-0601": [
+    { id: "sec-vip", name: "VIP", price: 165000, totalSeats: 2000, remainingSeats: 42 },
+    { id: "sec-floor-r", name: "플로어R석", price: 154000, totalSeats: 1800, remainingSeats: 95 },
+    { id: "sec-r", name: "R석", price: 143000, totalSeats: 3500, remainingSeats: 291 },
+    { id: "sec-s", name: "S석", price: 121000, totalSeats: 4500, remainingSeats: 1060 },
+    { id: "sec-a", name: "A석", price: 99000, totalSeats: 3000, remainingSeats: 802 },
+  ],
+  "date-0602": [
+    { id: "sec-vip", name: "VIP", price: 165000, totalSeats: 2000, remainingSeats: 891 },
+    { id: "sec-floor-r", name: "플로어R석", price: 154000, totalSeats: 1800, remainingSeats: 720 },
+    { id: "sec-r", name: "R석", price: 143000, totalSeats: 3500, remainingSeats: 1560 },
+    { id: "sec-s", name: "S석", price: 121000, totalSeats: 4500, remainingSeats: 2340 },
+    { id: "sec-a", name: "A석", price: 99000, totalSeats: 3000, remainingSeats: 1102 },
+  ],
+  "date-0603": [
+    { id: "sec-vip", name: "VIP", price: 165000, totalSeats: 2000, remainingSeats: 1800 },
+    { id: "sec-floor-r", name: "플로어R석", price: 154000, totalSeats: 1800, remainingSeats: 1650 },
+    { id: "sec-r", name: "R석", price: 143000, totalSeats: 3500, remainingSeats: 3200 },
+    { id: "sec-s", name: "S석", price: 121000, totalSeats: 4500, remainingSeats: 4100 },
+    { id: "sec-a", name: "A석", price: 99000, totalSeats: 3000, remainingSeats: 2800 },
+  ],
+};
+
+export function getSectionsForDate(dateId: string): Section[] {
+  return sectionsByDate[dateId] ?? gdragonSections;
+}
+
+export const mockEvent = {
+  id: "evt-gdragon-2026",
+  artistId: "gdragon",
+  title: "G-Dragon 2026 MAMA DOME TOUR",
+  venue: "KSPO DOME (올림픽체조경기장)",
+  dates: gdragonDates,
+  poster: "/Hero_G-dragon.png",
+  status: "open" as const,
+};
+
 // --- G-Dragon Event Detail (full data) ---
 
 const gdragonDetail: EventDetail = {
@@ -214,7 +252,7 @@ const eventDetailMap: Record<string, EventDetail> = {
 // --- Fallback generator for events without explicit detail ---
 
 function createFallbackDetail(eventId: string): EventDetail | undefined {
-  const listItem = allEventsData.find((e) => e.id === eventId);
+  const listItem = allEventsCombined.find((e) => e.id === eventId);
   if (!listItem) return undefined;
 
   const dateParts = listItem.dateRange.split(" - ");

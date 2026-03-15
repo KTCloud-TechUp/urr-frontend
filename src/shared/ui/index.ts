@@ -52,3 +52,4 @@ export {
 } from "./alert-dialog";
 export { Label } from "./label";
 export { Switch } from "./switch";
+export { StaticVenuePreview } from "./StaticVenuePreview";
