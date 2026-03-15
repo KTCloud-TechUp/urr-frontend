@@ -55,6 +55,8 @@ function useBreadcrumbs(): BreadcrumbItem[] {
     crumbs.push({ label: "멤버십", href: "/membership" });
   } else if (segments[0] === "notifications") {
     crumbs.push({ label: "알림", href: "/notifications" });
+  } else if (segments[0] === "search") {
+    crumbs.push({ label: "검색", href: "/search" });
   }
 
   return crumbs;
