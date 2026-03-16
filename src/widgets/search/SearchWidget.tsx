@@ -236,11 +236,8 @@ export function SearchWidget() {
 
   // 200ms debounce
   useEffect(() => {
-    if (!query.trim()) {
-      setDebouncedQuery("");
-      return;
-    }
-    const timer = setTimeout(() => setDebouncedQuery(query.trim()), 200);
+    const delay = query.trim() ? 200 : 0;
+    const timer = setTimeout(() => setDebouncedQuery(query.trim()), delay);
     return () => clearTimeout(timer);
   }, [query]);
 
