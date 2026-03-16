@@ -10,13 +10,13 @@ export function useCountdown(targetIso: string | null): number {
 
   useEffect(() => {
     if (!targetIso) {
-      setSecondsLeft(0);
+      queueMicrotask(() => setSecondsLeft(0));
       return;
     }
 
     const calc = () =>
       Math.max(0, Math.floor((new Date(targetIso).getTime() - Date.now()) / 1000));
-    setSecondsLeft(calc());
+    queueMicrotask(() => setSecondsLeft(calc()));
 
     const id = setInterval(() => {
       const next = calc();

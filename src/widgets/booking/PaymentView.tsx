@@ -72,7 +72,7 @@ export function PaymentView() {
   // Watch retry timer expiry
   useEffect(() => {
     if (phase === "failed" && retryTimer.isExpired) {
-      setPhase("failed-expired");
+      queueMicrotask(() => setPhase("failed-expired"));
     }
   }, [phase, retryTimer.isExpired]);
 

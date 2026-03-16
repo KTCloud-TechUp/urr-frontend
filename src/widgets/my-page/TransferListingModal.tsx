@@ -42,9 +42,11 @@ export function TransferListingModal({ ticket, userTier, open, onClose, onListed
   // Reset state when ticket changes or modal opens
   useEffect(() => {
     if (open && ticket) {
-      setStep('price-input')
-      setPriceStr(formatNumberWithComma(ticket.price))
-      setIsSubmitting(false)
+      queueMicrotask(() => {
+        setStep('price-input')
+        setPriceStr(formatNumberWithComma(ticket.price))
+        setIsSubmitting(false)
+      })
     }
   }, [open, ticket])
 

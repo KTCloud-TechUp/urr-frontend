@@ -78,7 +78,7 @@ function useQueueSimulationCore(
 
   useEffect(() => {
     if (totalRemaining === 0 && phase === "waiting") {
-      setPhase("sold-out");
+      queueMicrotask(() => setPhase("sold-out"));
     }
   }, [totalRemaining, phase]);
 

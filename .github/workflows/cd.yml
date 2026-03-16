@@ -6,6 +6,10 @@ on:
     types:
       - completed
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   deploy:
     # 조건:
@@ -35,42 +39,22 @@ jobs:
         run: npm ci
 
       - name: Build & Export
-        run: npm run export
-
-      - name: Load SSM parameters
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          REGION=$(aws ssm get-parameter \
-            --name /common/aws/region \
-            --query Parameter.Value \
-            --output text)
+          NEXT_PUBLIC_API_BASE_URL: https://urr.guru
+        run: npm run build
 
-          BUCKET=$(aws ssm get-parameter \
-            --name /urr-frontend/s3/bucket-name \
-            --query Parameter.Value \
-            --output text)
-
-          DIST_ID=$(aws ssm get-parameter \
-            --name /urr-frontend/cloudfront/distribution-id \
-            --query Parameter.Value \
-            --output text)
-
-          echo "AWS_REGION=$REGION" >> $GITHUB_ENV
-          echo "S3_BUCKET=$BUCKET" >> $GITHUB_ENV
-          echo "CF_DIST_ID=$DIST_ID" >> $GITHUB_ENV
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::022232268286:role/github-actions-frontend-role
+          aws-region: ap-northeast-2
 
       - name: Upload to S3
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
         run: |
-          aws s3 sync out/ s3://$S3_BUCKET --delete
+          aws s3 sync out/ s3://urr-dev-frontend --delete
 
       - name: Invalidate CloudFront
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id $CF_DIST_ID \
+            --distribution-id E1SRBN3FALYH49 \
             --paths "/*"
