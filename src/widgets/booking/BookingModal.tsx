@@ -37,7 +37,7 @@ function QueueContent() {
   const [isRolling, setIsRolling] = useState(false);
   useEffect(() => {
     if (previousPosition !== null && previousPosition !== position) {
-      setIsRolling(true);
+      queueMicrotask(() => setIsRolling(true));
       const timeout = setTimeout(() => setIsRolling(false), 500);
       return () => clearTimeout(timeout);
     }

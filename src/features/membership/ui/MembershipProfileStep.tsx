@@ -50,10 +50,10 @@ export function MembershipProfileStep({ artist, onComplete }: MembershipProfileS
   // Debounced duplicate check
   useEffect(() => {
     if (!nickname || nickname.length < 2 || validateNickname(nickname)) {
-      setNicknameStatus('idle')
+      queueMicrotask(() => setNicknameStatus('idle'))
       return
     }
-    setNicknameStatus('checking')
+    queueMicrotask(() => setNicknameStatus('checking'))
     const timer = setTimeout(() => {
       const isDuplicate = TAKEN_NICKNAMES.some((n) => n === nickname)
       setNicknameStatus(isDuplicate ? 'duplicate' : 'available')
