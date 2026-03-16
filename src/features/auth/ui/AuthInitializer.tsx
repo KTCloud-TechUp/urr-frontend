@@ -31,6 +31,12 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
       },
     });
 
+    // 이미 토큰이 있으면 (소셜 로그인 직후 등) reissue 스킵
+    if (tokenStore.getToken()) {
+      setReady(true);
+      return;
+    }
+
     // 새로고침 시 httpOnly 쿠키로 세션 복원
     reissueToken().then((token) => {
       if (token) {

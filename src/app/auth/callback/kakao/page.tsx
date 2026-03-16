@@ -1,5 +1,5 @@
-import KakaoCallbackWidget from "@/widgets/auth/KakaoCallbackWidget";
+import SocialCallbackWidget from "@/widgets/auth/SocialCallbackWidget";
 
 export default function KakaoCallbackPage() {
-  return <KakaoCallbackWidget />;
+  return <SocialCallbackWidget provider="kakao" />;
 }

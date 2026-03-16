@@ -8,8 +8,10 @@ import { MembershipTab } from './MembershipTab'
 import { TicketWalletTab } from './TicketWalletTab'
 import { TransferHistoryTab } from './TransferHistoryTab'
 import { SettingsTab } from './SettingsTab'
+import { MyPageSkeleton } from './MyPageSkeleton'
 import { mockUser } from '@/shared/lib/mocks/user'
 import { getMyTickets, getMyTransferRecords } from '@/shared/lib/mocks/my-page'
+import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
 import type { User } from '@/shared/types'
 
 const tickets = getMyTickets()
@@ -20,7 +22,17 @@ export function MyPageWidget() {
   const router = useRouter()
   const activeTab = searchParams.get('tab') ?? 'membership'
 
+  const { data: meData, isLoading } = useCurrentUser()
+
   const [user, setUser] = useState<User>(() => ({ ...mockUser }))
+
+  const mergedUser: User = {
+    ...user,
+    name: meData?.nickname ?? user.name,
+    email: meData?.email ?? user.email,
+  }
+
+  if (isLoading) return <MyPageSkeleton />
 
   const handleTabChange = (tab: string) => {
     router.push(`/my-page?tab=${tab}`, { scroll: false })
@@ -50,7 +62,7 @@ export function MyPageWidget() {
 
   return (
     <div>
-      <MyPageHeader user={user} />
+      <MyPageHeader user={mergedUser} />
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList variant="line" className="w-full justify-start mt-8 border-b border-border">
@@ -62,14 +74,14 @@ export function MyPageWidget() {
 
         <TabsContent value="membership" className="pt-6">
           <MembershipTab
-            memberships={user.memberships}
+            memberships={mergedUser.memberships}
             onCancelMembership={handleCancelMembership}
             onNicknameChange={handleNicknameChange}
           />
         </TabsContent>
 
         <TabsContent value="wallet" className="pt-6">
-          <TicketWalletTab tickets={tickets} user={user} />
+          <TicketWalletTab tickets={tickets} user={mergedUser} />
         </TabsContent>
 
         <TabsContent value="transfers" className="pt-6">
@@ -77,7 +89,7 @@ export function MyPageWidget() {
         </TabsContent>
 
         <TabsContent value="settings" className="pt-6">
-          <SettingsTab user={user} onUpdateUser={handleUpdateUser} />
+          <SettingsTab user={mergedUser} onUpdateUser={handleUpdateUser} />
         </TabsContent>
       </Tabs>
     </div>

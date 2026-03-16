@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -13,6 +14,8 @@ import {
 } from '@/shared/ui/alert-dialog'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { Label } from '@/shared/ui/label'
+import { deleteAccount } from '@/features/auth/api/deleteAccount'
+import { tokenStore } from '@/shared/api'
 
 interface AccountDeleteDialogProps {
   open: boolean
@@ -20,6 +23,7 @@ interface AccountDeleteDialogProps {
 }
 
 export function AccountDeleteDialog({ open, onOpenChange }: AccountDeleteDialogProps) {
+  const router = useRouter()
   const [confirmed, setConfirmed] = useState(false)
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -62,6 +66,11 @@ export function AccountDeleteDialog({ open, onOpenChange }: AccountDeleteDialogP
           <AlertDialogAction
             disabled={!confirmed}
             className="bg-destructive text-white hover:bg-destructive/90"
+            onClick={async () => {
+              await deleteAccount()
+              tokenStore.clearToken()
+              router.replace('/onboarding')
+            }}
           >
             탈퇴하기
           </AlertDialogAction>
