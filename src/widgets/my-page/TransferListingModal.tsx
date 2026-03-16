@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Calendar, MapPin, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react'
 import {
@@ -40,13 +40,15 @@ export function TransferListingModal({ ticket, userTier, open, onClose, onListed
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Reset state when ticket changes or modal opens
-  const prevOpenRef = useRef(false)
-  if (open && ticket && !prevOpenRef.current) {
-    setStep('price-input')
-    setPriceStr(formatNumberWithComma(ticket.price))
-    setIsSubmitting(false)
-  }
-  prevOpenRef.current = open
+  useEffect(() => {
+    if (open && ticket) {
+      queueMicrotask(() => {
+        setStep('price-input')
+        setPriceStr(formatNumberWithComma(ticket.price))
+        setIsSubmitting(false)
+      })
+    }
+  }, [open, ticket])
 
   if (!ticket) return null
 

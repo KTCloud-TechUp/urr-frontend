@@ -27,8 +27,10 @@ export function MembershipWidget() {
     if (artistId) {
       const artist = mockArtists.find((a) => a.id === artistId)
       if (artist) {
-        setSelectedArtist(artist)
-        setStep('intro')
+        queueMicrotask(() => {
+          setSelectedArtist(artist)
+          setStep('intro')
+        })
       }
     }
   }, [searchParams])

@@ -46,8 +46,10 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
   // Sync edit fields when user data changes externally
   useEffect(() => {
     if (!isEditing) {
-      setEditName(user.name)
-      setEditEmail(user.email)
+      queueMicrotask(() => {
+        setEditName(user.name)
+        setEditEmail(user.email)
+      })
     }
   }, [user.name, user.email, isEditing])
 
