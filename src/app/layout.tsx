@@ -2,6 +2,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/shared/ui/tooltip";
 import { LayoutShell } from "@/widgets/layout";
 import { NotificationProvider } from "@/features/notification";
+import { Providers } from "./providers";
 
 export default function RootLayout({
   children,
@@ -11,11 +12,13 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <NotificationProvider>
-          <TooltipProvider>
-            <LayoutShell>{children}</LayoutShell>
-          </TooltipProvider>
-        </NotificationProvider>
+        <Providers>
+          <NotificationProvider>
+            <TooltipProvider>
+              <LayoutShell>{children}</LayoutShell>
+            </TooltipProvider>
+          </NotificationProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -19,6 +19,7 @@ type VerificationState = "idle" | "sent" | "expired" | "verifying";
 interface IdentityStepProps {
   onComplete: (data: {
     userName: string;
+    nickname: string;
     phoneNumber: string;
     birthDate: string;
     gender: "male" | "female";
@@ -29,6 +30,7 @@ interface IdentityStepProps {
 export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
   const [carrier, setCarrier] = useState("");
   const [name, setName] = useState("");
+  const [nickname, setNickname] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState<"male" | "female" | null>(null);
   const [nationality, setNationality] = useState<"domestic" | "foreign" | null>(
@@ -61,6 +63,7 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
     phone.length >= 10 &&
     carrier &&
     name.trim() &&
+    nickname.trim() &&
     dob.length === 8 &&
     gender !== null &&
     nationality !== null;
@@ -83,6 +86,7 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
     setTimeout(() => {
       onComplete({
         userName: name,
+        nickname,
         phoneNumber: phone,
         birthDate: dob,
         gender: gender!,
@@ -132,6 +136,16 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="실명 입력"
+          />
+        </div>
+
+        {/* Nickname */}
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">닉네임</label>
+          <Input
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            placeholder="사용할 닉네임 입력"
           />
         </div>
 

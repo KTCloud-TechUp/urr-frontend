@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import {
   AuthStep,
   IdentityStep,
@@ -10,11 +12,15 @@ import {
 
 type FlowState = "auth" | "identity";
 
-export default function OnboardingWidget() {
-  const [flowState, setFlowState] = useState<FlowState>("auth");
+function OnboardingWidgetInner() {
+  const searchParams = useSearchParams();
+  const initialStep = searchParams.get("step") === "identity" ? "identity" : "auth";
+  const isSocial = initialStep === "identity";
+  const [flowState, setFlowState] = useState<FlowState>(initialStep);
 
   const { handleAuthComplete, handleIdentityComplete } = useOnboardingAuth({
     onEmailRegister: () => setFlowState("identity"),
+    isSocial,
   });
 
   const heroStep = flowState === "auth" ? 1 : 2;
@@ -42,5 +48,13 @@ export default function OnboardingWidget() {
         <OnboardingHero step={heroStep} />
       </div>
     </div>
+  );
+}
+
+export default function OnboardingWidget() {
+  return (
+    <Suspense>
+      <OnboardingWidgetInner />
+    </Suspense>
   );
 }
