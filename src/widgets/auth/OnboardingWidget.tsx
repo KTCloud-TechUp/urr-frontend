@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import {
   AuthStep,
@@ -9,19 +9,46 @@ import {
   OnboardingHero,
   useOnboardingAuth,
 } from "@/features/auth/onboarding";
+import { tokenStore } from "@/shared/api/tokenStore";
+import { reissueToken } from "@/features/auth/api/reissue";
 
 type FlowState = "auth" | "identity";
 
 function OnboardingWidgetInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialStep = searchParams.get("step") === "identity" ? "identity" : "auth";
   const isSocial = initialStep === "identity";
   const [flowState, setFlowState] = useState<FlowState>(initialStep);
+  // identity step은 소셜 신규가입 플로우 — 체크 불필요
+  const [authChecked, setAuthChecked] = useState(initialStep === "identity");
+
+  useEffect(() => {
+    if (initialStep !== "auth") return;
+
+    // 메모리에 토큰이 있으면 이미 로그인 상태
+    if (tokenStore.getToken()) {
+      router.replace("/");
+      return;
+    }
+
+    // 세션 복원 시도 (refresh_token 쿠키 유효 여부 확인)
+    reissueToken().then((token) => {
+      if (token) {
+        tokenStore.setToken(token);
+        router.replace("/");
+      } else {
+        setAuthChecked(true);
+      }
+    });
+  }, [initialStep, router]);
 
   const { handleAuthComplete, handleIdentityComplete } = useOnboardingAuth({
     onEmailRegister: () => setFlowState("identity"),
     isSocial,
   });
+
+  if (!authChecked) return null;
 
   const heroStep = flowState === "auth" ? 1 : 2;
 
