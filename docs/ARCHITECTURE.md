@@ -1,5 +1,16 @@
 # URR — 아키텍처 & API
 
+### Frontend 스택
+
+| 분야             | 기술            | 역할                      |
+| ---------------- | --------------- | ------------------------- |
+| **Framework**    | Next.js         | 서버/클라이언트 통합      |
+| **Language**     | TypeScript      | 타입 안정성               |
+| **Styling**      | Tailwind CSS v4 | 빠른 UI 개발              |
+| **UI Library**   | Shadcn/ui       | 재사용 가능한 UI 컴포넌트 |
+| **Server State** | TanStack Query  | API 데이터 캐싱/동기화    |
+| **Client State** | Zustand         | UI 상태 및 전역 상태 관리 |
+
 ## FSD 레이어 구조
 
 ```
@@ -92,14 +103,14 @@ POST /api/community/posts/:id/comment
 
 ## 인프라 (AWS)
 
-| 서비스       | 역할                              |
-| ------------ | --------------------------------- |
-| S3           | Next.js 정적 빌드 결과물 배포     |
-| CloudFront   | 프론트엔드 CDN (S3 오리진)        |
-| ECR          | Docker 이미지 레지스트리          |
-| EKS          | 프론트·백엔드 컨테이너 오케스트레이션 |
-| ArgoCD       | GitOps 기반 EKS 배포 자동화       |
-| RDS          | DB (Spring Boot 관리)             |
+| 서비스     | 역할                                  |
+| ---------- | ------------------------------------- |
+| S3         | Next.js 정적 빌드 결과물 배포         |
+| CloudFront | 프론트엔드 CDN (S3 오리진)            |
+| ECR        | Docker 이미지 레지스트리              |
+| EKS        | 프론트·백엔드 컨테이너 오케스트레이션 |
+| ArgoCD     | GitOps 기반 EKS 배포 자동화           |
+| RDS        | DB (Spring Boot 관리)                 |
 
 ## CI/CD 파이프라인
 
