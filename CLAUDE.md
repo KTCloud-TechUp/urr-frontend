@@ -284,12 +284,21 @@ seats-individual → seats-expired (3분 타임아웃) → seats-section 복귀
 ## API 엔드포인트 (Spring Boot)
 
 ```
-# 인증
-POST  /api/auth/login
-POST  /api/auth/oauth/kakao
-GET   /api/auth/me
-POST  /api/auth/logout
-POST  /api/auth/reissue        ← JWT 갱신
+# 인증 — 소셜
+POST  /api/auth/oauth/kakao          ← 카카오 OAuth 로그인 (인가코드 → 토큰 발급)
+POST  /api/auth/onboarding/social    ← 소셜 로그인 온보딩 완료 처리
+
+# 인증 — ID 기반
+POST  /api/auth/register             ← 회원가입 + 토큰 발급
+POST  /api/auth/login                ← 로그인 + 토큰 발급
+
+# 토큰 / 세션
+POST  /api/auth/token/reissue        ← Access/Refresh 토큰 재발급
+POST  /api/auth/logout               ← 로그아웃 (Refresh 토큰 무효화)
+
+# 사용자
+GET    /api/auth/me                  ← 현재 로그인 유저 정보 조회
+DELETE /api/auth/me                  ← 회원 탈퇴
 
 # 아티스트/공연
 GET   /api/events
@@ -316,7 +325,7 @@ POST  /api/community/posts/:id/comment
 ```
 
 인증 헤더: `Authorization: Bearer <accessToken>`
-401 응답 시 `/api/auth/reissue`로 자동 갱신 후 재시도.
+401 응답 시 `/api/auth/token/reissue`로 자동 갱신 후 재시도.
 
 ---
 
@@ -344,6 +353,8 @@ review/merge-<a>-<b>      # 리뷰 에이전트 전용.
 
 ## ⚠️ 디자인 변경 금지 원칙
 
+> **적용 범위**: 신규 페이지 추가 시 `URR-v2` 디자인 참조할 때만 해당. 일반 API 연동 작업에는 적용 안 함.
+
 - 원본(`URR-v2`) 참조 시 디자인 1:1 유지
 - Tailwind 클래스 임의 교체 금지 (예: `hover:bg-[#F3F2F0]` → `hover:bg-accent` 변환 금지)
 - 원본이 `<span>`이면 `<span>`, 원본이 shadcn 컴포넌트면 그대로 사용
@@ -354,7 +365,8 @@ review/merge-<a>-<b>      # 리뷰 에이전트 전용.
 
 ## 참고 문서
 
-- `Docs/PRD.md` — 비즈니스 규칙, 멤버십 등급, 온보딩 플로우, 예매 상태머신
-- `Docs/ARCHITECTURE.md` — FSD 레이어 규칙, API 엔드포인트, 인프라
-- `Docs/designsystem.md` — 색상 토큰, 컴포넌트 스펙, 애니메이션
-- `CheckList.md` — 마이그레이션 진행 현황 (완료/미완료 추적)
+- `docs/PRD.md` — 비즈니스 규칙, 멤버십 등급, 온보딩 플로우, 예매 상태머신
+- `docs/ARCHITECTURE.md` — FSD 레이어 규칙, API 엔드포인트, 인프라
+- `docs/designsystem.md` — 색상 토큰, 컴포넌트 스펙, 애니메이션
+- `docs/CheckList.md` — API 연동 진행 현황 (Phase 7 체크리스트)
+- `docs/migration.md` — 신규 페이지 추가 가이드 (**디자인팀이 새 페이지 완성했을 때만 참조**)
