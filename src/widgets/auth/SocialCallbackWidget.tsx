@@ -2,8 +2,20 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { kakaoLogin } from "@/features/auth/api";
+import { kakaoLogin, naverLogin } from "@/features/auth/api";
 import { tokenStore } from "@/shared/api/tokenStore";
+
+type SocialProvider = "kakao" | "naver";
+
+const loginFn = {
+  kakao: kakaoLogin,
+  naver: naverLogin,
+} as const;
+
+const providerLabel: Record<SocialProvider, string> = {
+  kakao: "카카오",
+  naver: "네이버",
+};
 
 function Spinner() {
   return (
@@ -13,7 +25,7 @@ function Spinner() {
   );
 }
 
-function KakaoCallbackInner() {
+function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState(false);
@@ -25,9 +37,9 @@ function KakaoCallbackInner() {
       return;
     }
 
-    const redirectUri = `${window.location.origin}/auth/callback/kakao`;
+    const redirectUri = `${window.location.origin}/auth/callback/${provider}`;
 
-    kakaoLogin(code, redirectUri)
+    loginFn[provider](code, redirectUri)
       .then((result) => {
         tokenStore.setToken(result.tokens.accessToken);
         if (result.onboardingRequired) {
@@ -39,12 +51,14 @@ function KakaoCallbackInner() {
       .catch(() => {
         setError(true);
       });
-  }, [searchParams, router]);
+  }, [searchParams, router, provider]);
 
   if (error) {
     return (
       <div className="flex h-screen items-center justify-center flex-col gap-4">
-        <p className="text-sm text-muted-foreground">카카오 로그인에 실패했습니다.</p>
+        <p className="text-sm text-muted-foreground">
+          {providerLabel[provider]} 로그인에 실패했습니다.
+        </p>
         <button
           onClick={() => router.replace("/onboarding")}
           className="text-sm text-primary underline cursor-pointer"
@@ -58,10 +72,14 @@ function KakaoCallbackInner() {
   return <Spinner />;
 }
 
-export default function KakaoCallbackWidget() {
+export default function SocialCallbackWidget({
+  provider,
+}: {
+  provider: SocialProvider;
+}) {
   return (
     <Suspense fallback={<Spinner />}>
-      <KakaoCallbackInner />
+      <SocialCallbackInner provider={provider} />
     </Suspense>
   );
 }

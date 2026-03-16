@@ -1,5 +1,5 @@
-import NaverCallbackWidget from "@/widgets/auth/NaverCallbackWidget";
+import SocialCallbackWidget from "@/widgets/auth/SocialCallbackWidget";
 
 export default function NaverCallbackPage() {
-  return <NaverCallbackWidget />;
+  return <SocialCallbackWidget provider="naver" />;
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Check, Loader2, LogOut, Pencil, UserX } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
@@ -18,6 +19,8 @@ import {
   AlertDialogAction,
 } from '@/shared/ui/alert-dialog'
 import { AccountDeleteDialog } from './AccountDeleteDialog'
+import { logout } from '@/features/auth/api/logout'
+import { tokenStore } from '@/shared/api'
 import type { User } from '@/shared/types'
 
 interface SettingsTabProps {
@@ -26,6 +29,8 @@ interface SettingsTabProps {
 }
 
 export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
+  const router = useRouter()
+
   // Profile editing
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState(user.name)
@@ -254,7 +259,15 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction>로그아웃</AlertDialogAction>
+            <AlertDialogAction
+              onClick={async () => {
+                await logout().catch(() => {})
+                tokenStore.clearToken()
+                router.replace('/onboarding')
+              }}
+            >
+              로그아웃
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
