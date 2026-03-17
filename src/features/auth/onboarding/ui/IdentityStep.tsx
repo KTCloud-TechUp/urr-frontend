@@ -25,6 +25,7 @@ interface IdentityStepProps {
     gender: "male" | "female";
   }) => void;
   onBack: () => void;
+  identityError?: string | null;
 }
 
 function validateName(name: string): string | null {
@@ -85,7 +86,7 @@ function validatePhone(phone: string): string | null {
   return null;
 }
 
-export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
+export function IdentityStep({ onComplete, onBack, identityError }: IdentityStepProps) {
   const [carrier, setCarrier] = useState("");
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
@@ -453,6 +454,10 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
       >
         {verificationState === "verifying" ? "확인 중..." : "시작하기"}
       </Button>
+
+      {identityError && (
+        <p className="text-xs text-destructive text-center mt-3">{identityError}</p>
+      )}
     </div>
   );
 }

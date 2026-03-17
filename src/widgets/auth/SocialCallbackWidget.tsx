@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { kakaoLogin, naverLogin } from "@/features/auth/api";
 import { tokenStore } from "@/shared/api/tokenStore";
@@ -28,7 +28,6 @@ function Spinner() {
 function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -49,25 +48,9 @@ function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
         }
       })
       .catch(() => {
-        setError(true);
+        router.replace(`/onboarding?error=${provider}`);
       });
   }, [searchParams, router, provider]);
-
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center flex-col gap-4">
-        <p className="text-sm text-muted-foreground">
-          {providerLabel[provider]} 로그인에 실패했습니다.
-        </p>
-        <button
-          onClick={() => router.replace("/onboarding")}
-          className="text-sm text-primary underline cursor-pointer"
-        >
-          다시 시도
-        </button>
-      </div>
-    );
-  }
 
   return <Spinner />;
 }

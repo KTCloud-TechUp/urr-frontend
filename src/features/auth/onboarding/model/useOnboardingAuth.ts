@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { tokenStore } from "@/shared/api/tokenStore";
 import { login, register, socialOnboarding } from "@/features/auth/api";
@@ -35,36 +35,36 @@ export function useOnboardingAuth({
   isSocial = false,
 }: UseOnboardingAuthParams) {
   const router = useRouter();
-  // Store register data across steps (AuthStep → IdentityStep)
   const pendingRegisterRef = useRef<Pick<
     RegisterParams,
     "email" | "password"
   > | null>(null);
 
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [identityError, setIdentityError] = useState<string | null>(null);
+
   const handleAuthComplete = useCallback(
     async (data: AuthCompleteData) => {
-      // Kakao OAuth — redirect to Kakao auth page
       if (data.provider === "kakao") {
         const redirectUri = `${window.location.origin}/auth/callback/kakao`;
         window.location.href = buildKakaoAuthUrl(redirectUri);
         return;
       }
 
-      // Naver OAuth — redirect to Naver auth page
       if (data.provider === "naver") {
         const redirectUri = `${window.location.origin}/auth/callback/naver`;
         window.location.href = buildNaverAuthUrl(redirectUri);
         return;
       }
 
-      // Email login
       if (data.mode === "login") {
+        setLoginError(null);
         try {
           const result = await login(data.email!, data.password!);
           tokenStore.setToken(result.tokens.accessToken);
           router.push("/");
-        } catch (error) {
-          console.error("Login failed", error);
+        } catch {
+          setLoginError("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
         return;
       }
@@ -81,7 +81,6 @@ export function useOnboardingAuth({
 
   const handleIdentityComplete = useCallback(
     async (identityData: IdentityData) => {
-      // Convert birthDate YYYYMMDD → YYYY-MM-DD
       const raw = identityData.birthDate;
       const birthDate =
         raw.length === 8
@@ -91,7 +90,8 @@ export function useOnboardingAuth({
       const gender: "MALE" | "FEMALE" =
         identityData.gender === "male" ? "MALE" : "FEMALE";
 
-      // Social OAuth flow — call social onboarding endpoint
+      setIdentityError(null);
+
       if (isSocial) {
         try {
           await socialOnboarding({
@@ -101,13 +101,12 @@ export function useOnboardingAuth({
             gender,
           });
           router.push("/");
-        } catch (error) {
-          console.error("Social onboarding failed", error);
+        } catch {
+          setIdentityError("온보딩 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
         return;
       }
 
-      // Email register flow
       const pending = pendingRegisterRef.current;
       if (!pending) return;
 
@@ -122,8 +121,8 @@ export function useOnboardingAuth({
         });
         tokenStore.setToken(result.tokens.accessToken);
         router.push("/");
-      } catch (error) {
-        console.error("Register failed", error);
+      } catch {
+        setIdentityError("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
       }
     },
     [router, isSocial],
@@ -132,5 +131,7 @@ export function useOnboardingAuth({
   return {
     handleAuthComplete,
     handleIdentityComplete,
+    loginError,
+    identityError,
   };
 }
