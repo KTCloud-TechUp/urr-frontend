@@ -8,7 +8,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
 import type {
@@ -179,7 +178,6 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     return window?.opensAt ?? null;
   }, [selectedDate, userTier]);
 
-  const [now] = useState(() => Date.now());
   const isWindowOpen = useMemo(() => {
     if (!userWindowOpensAt) return false;
     return new Date(userWindowOpensAt).getTime() <= now;
