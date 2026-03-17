@@ -38,7 +38,7 @@ function OnboardingWidgetInner() {
       .split(";")
       .some((c) => c.trim().startsWith("is_authenticated=1"));
     if (!hasSession) {
-      setAuthChecked(true);
+      setTimeout(() => setAuthChecked(true), 0);
       return;
     }
 

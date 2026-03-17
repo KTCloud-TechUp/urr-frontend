@@ -78,7 +78,8 @@ function useQueueSimulationCore(
 
   useEffect(() => {
     if (totalRemaining === 0 && phase === "waiting") {
-      setPhase("sold-out");
+      const t = setTimeout(() => setPhase("sold-out"), 0);
+      return () => clearTimeout(t);
     }
   }, [totalRemaining, phase]);
 

@@ -72,7 +72,8 @@ export function PaymentView() {
   // Watch retry timer expiry
   useEffect(() => {
     if (phase === "failed" && retryTimer.isExpired) {
-      setPhase("failed-expired");
+      const t = setTimeout(() => setPhase("failed-expired"), 0);
+      return () => clearTimeout(t);
     }
   }, [phase, retryTimer.isExpired]);
 

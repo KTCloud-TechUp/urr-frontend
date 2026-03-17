@@ -37,9 +37,9 @@ function QueueContent() {
   const [isRolling, setIsRolling] = useState(false);
   useEffect(() => {
     if (previousPosition !== null && previousPosition !== position) {
-      setIsRolling(true);
-      const timeout = setTimeout(() => setIsRolling(false), 500);
-      return () => clearTimeout(timeout);
+      const t1 = setTimeout(() => setIsRolling(true), 0);
+      const t2 = setTimeout(() => setIsRolling(false), 500);
+      return () => { clearTimeout(t1); clearTimeout(t2); };
     }
   }, [previousPosition, position]);
 

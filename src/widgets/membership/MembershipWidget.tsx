@@ -27,8 +27,11 @@ export function MembershipWidget() {
     if (artistId) {
       const artist = mockArtists.find((a) => a.id === artistId)
       if (artist) {
-        setSelectedArtist(artist)
-        setStep('intro')
+        const t = setTimeout(() => {
+          setSelectedArtist(artist)
+          setStep('intro')
+        }, 0)
+        return () => clearTimeout(t)
       }
     }
   }, [searchParams])

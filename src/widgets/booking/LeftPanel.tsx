@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { ChevronLeft, MapPin } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { useBooking } from "@/features/booking/model/BookingContext";
@@ -48,7 +49,12 @@ function TierScheduleRow({
   opensAt: string;
   isUserTier: boolean;
 }) {
-  const isOpen = new Date(opensAt).getTime() <= Date.now();
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const isOpen = new Date(opensAt).getTime() <= now;
 
   return (
     <div

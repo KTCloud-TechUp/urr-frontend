@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useState,
   type ReactNode,
 } from "react";
 import type {
@@ -155,6 +156,12 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   const userTier = mockUser.tier;
   const maxSeats = MAX_SEATS_PER_TIER[userTier];
 
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
   const selectedDate = useMemo(() => {
     if (!state.selectedDateId) return null;
     return mockEvent.dates.find((d) => d.id === state.selectedDateId) ?? null;
@@ -173,8 +180,8 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
 
   const isWindowOpen = useMemo(() => {
     if (!userWindowOpensAt) return false;
-    return new Date(userWindowOpensAt).getTime() <= Date.now();
-  }, [userWindowOpensAt]);
+    return new Date(userWindowOpensAt).getTime() <= now;
+  }, [userWindowOpensAt, now]);
 
   const isSoldOut = useMemo(() => {
     if (sectionsForDate.length === 0) return false;

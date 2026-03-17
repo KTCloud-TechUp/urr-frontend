@@ -10,21 +10,24 @@ export function useCountdown(targetIso: string | null): number {
 
   useEffect(() => {
     if (!targetIso) {
-      setSecondsLeft(0);
-      return;
+      const t = setTimeout(() => setSecondsLeft(0), 0);
+      return () => clearTimeout(t);
     }
 
     const calc = () =>
       Math.max(0, Math.floor((new Date(targetIso).getTime() - Date.now()) / 1000));
-    setSecondsLeft(calc());
 
+    const t = setTimeout(() => setSecondsLeft(calc()), 0);
     const id = setInterval(() => {
       const next = calc();
       setSecondsLeft(next);
       if (next <= 0) clearInterval(id);
     }, 1000);
 
-    return () => clearInterval(id);
+    return () => {
+      clearTimeout(t);
+      clearInterval(id);
+    };
   }, [targetIso]);
 
   return secondsLeft;
