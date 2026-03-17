@@ -36,6 +36,9 @@ jobs:
           curl -H "Content-Type: application/json" \
             -d '{"embeds": [{"title": "✅ 프론트 CI 성공", "description": "**${{ github.repository }}**\nPR: ${{ github.event.pull_request.title }}", "color": 65280}]}' \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
+          curl -H "Content-Type: application/json" \
+            -d '{"embeds": [{"title": "✅ 프론트 CI 성공", "description": "**${{ github.repository }}**\nPR: ${{ github.event.pull_request.title }}", "color": 65280}]}' \
+            ${{ secrets.DISCORD_WEBHOOK_URL_2 }}
 
       # Discord 알림 (실패)
       - name: Discord notification (failure)
@@ -44,3 +47,6 @@ jobs:
           curl -H "Content-Type: application/json" \
             -d '{"embeds": [{"title": "❌ 프론트 CI 실패", "description": "**${{ github.repository }}**\nPR: ${{ github.event.pull_request.title }}\n[로그 확인](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "color": 16711680}]}' \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
+          curl -H "Content-Type: application/json" \
+            -d '{"embeds": [{"title": "❌ 프론트 CI 실패", "description": "**${{ github.repository }}**\nPR: ${{ github.event.pull_request.title }}\n[로그 확인](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "color": 16711680}]}' \
+            ${{ secrets.DISCORD_WEBHOOK_URL_2 }}
