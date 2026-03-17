@@ -58,3 +58,19 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id E1SRBN3FALYH49 \
             --paths "/*"
+
+      # Discord 알림 (배포 성공)
+      - name: Discord notification (success)
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"embeds": [{"title": "🚀 프론트 배포 완료", "description": "**urr-frontend**\nS3 업로드 + CloudFront 캐시 무효화 완료\nhttps://urr.guru", "color": 65280}]}' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # Discord 알림 (배포 실패)
+      - name: Discord notification (failure)
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"embeds": [{"title": "❌ 프론트 배포 실패", "description": "**urr-frontend**\n[로그 확인](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "color": 16711680}]}' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
