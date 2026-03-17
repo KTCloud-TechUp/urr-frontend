@@ -50,15 +50,15 @@ export function MembershipProfileStep({ artist, onComplete }: MembershipProfileS
   // Debounced duplicate check
   useEffect(() => {
     if (!nickname || nickname.length < 2 || validateNickname(nickname)) {
-      queueMicrotask(() => setNicknameStatus('idle'))
-      return
+      const t = setTimeout(() => setNicknameStatus('idle'), 0)
+      return () => clearTimeout(t)
     }
-    queueMicrotask(() => setNicknameStatus('checking'))
-    const timer = setTimeout(() => {
+    const t1 = setTimeout(() => setNicknameStatus('checking'), 0)
+    const t2 = setTimeout(() => {
       const isDuplicate = TAKEN_NICKNAMES.some((n) => n === nickname)
       setNicknameStatus(isDuplicate ? 'duplicate' : 'available')
     }, 500)
-    return () => clearTimeout(timer)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [nickname])
 
   const resultTier: TierLevel = melonState === 'done' ? MOCK_MELON_RESULT.tier : 'cloud'

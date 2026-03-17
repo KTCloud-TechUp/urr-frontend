@@ -14,6 +14,8 @@ interface AuthStepProps {
     password?: string;
     mode?: "login" | "register";
   }) => void;
+  socialError?: "kakao" | "naver" | null;
+  loginError?: string | null;
 }
 
 function KakaoIcon() {
@@ -50,7 +52,12 @@ function validateEmail(email: string): string | null {
   return null;
 }
 
-export function AuthStep({ onComplete }: AuthStepProps) {
+const socialErrorMessage: Record<"kakao" | "naver", string> = {
+  kakao: "카카오 로그인에 실패했습니다. 다시 시도해주세요.",
+  naver: "네이버 로그인에 실패했습니다. 다시 시도해주세요.",
+};
+
+export function AuthStep({ onComplete, socialError, loginError }: AuthStepProps) {
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -148,13 +155,20 @@ export function AuthStep({ onComplete }: AuthStepProps) {
         </button>
 
         <button
-          onClick={() => onComplete({ provider: "naver" })}
-          className="w-full h-12 rounded-lg bg-[#03C75A] text-white font-medium text-sm flex items-center justify-center gap-2 hover:bg-[#03C75A]/90 transition-colors cursor-pointer"
+          disabled
+          className="w-full h-12 rounded-lg bg-[#03C75A]/40 text-white/60 font-medium text-sm flex items-center justify-center gap-2 cursor-not-allowed"
         >
           <NaverIcon />
           네이버로 시작하기
         </button>
       </div>
+
+      {/* Social login error */}
+      {socialError && socialErrorMessage[socialError] && (
+        <p className="text-xs text-destructive mt-2 w-full">
+          {socialErrorMessage[socialError]}
+        </p>
+      )}
 
       {/* Divider */}
       <div className="flex items-center gap-3 w-full mt-8">
@@ -285,6 +299,11 @@ export function AuthStep({ onComplete }: AuthStepProps) {
           <Mail size={16} />
           {mode === "login" ? "로그인" : "회원가입"}
         </Button>
+
+        {/* Login error */}
+        {mode === "login" && loginError && (
+          <p className="text-xs text-destructive text-center">{loginError}</p>
+        )}
 
         {/* Mode switch */}
         <div className="text-center pt-1">

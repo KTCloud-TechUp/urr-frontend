@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { cn } from '@/shared/lib/utils'
 import { Calendar, MapPin, QrCode, ArrowLeftRight, XCircle } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
@@ -29,7 +30,7 @@ export function TicketCard({ ticket, variant = 'upcoming', isListed, onViewQR, o
     )}>
       <div className="w-[80px] h-[112px] rounded-lg bg-muted shrink-0 overflow-hidden relative">
         {ticket.event.poster ? (
-          <img src={ticket.event.poster} alt={ticket.event.title} className="absolute inset-0 w-full h-full object-cover" />
+          <Image src={ticket.event.poster} alt={ticket.event.title} fill className="object-cover" />
         ) : (
           <div
             className="absolute inset-0 flex items-center justify-center text-white text-xs font-medium"

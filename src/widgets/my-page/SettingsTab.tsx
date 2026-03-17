@@ -18,6 +18,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/shared/ui/alert-dialog'
+import { toast } from 'sonner'
 import { AccountDeleteDialog } from './AccountDeleteDialog'
 import { logout } from '@/features/auth/api/logout'
 import { tokenStore } from '@/shared/api'
@@ -51,10 +52,11 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
   // Sync edit fields when user data changes externally
   useEffect(() => {
     if (!isEditing) {
-      queueMicrotask(() => {
+      const t = setTimeout(() => {
         setEditName(user.name)
         setEditEmail(user.email)
-      })
+      }, 0)
+      return () => clearTimeout(t)
     }
   }, [user.name, user.email, isEditing])
 
@@ -263,7 +265,12 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
             <AlertDialogCancel>취소</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
-                await logout().catch(() => {})
+                try {
+                  await logout()
+                } catch {
+                  toast.error("로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.")
+                  return
+                }
                 tokenStore.clearToken()
                 router.replace('/onboarding')
               }}

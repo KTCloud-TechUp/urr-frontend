@@ -7,8 +7,11 @@ export function middleware(request: NextRequest) {
   console.log("[middleware] cookies:", request.cookies.getAll());
   console.log("[middleware] hasRefreshToken:", hasRefreshToken);
 
+  const isAuthenticated =
+    hasRefreshToken || request.cookies.has("is_authenticated");
+
   // 로그인 상태에서 /onboarding 접근 시 홈으로
-  if (pathname.startsWith("/onboarding") && hasRefreshToken) {
+  if (pathname.startsWith("/onboarding") && isAuthenticated) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

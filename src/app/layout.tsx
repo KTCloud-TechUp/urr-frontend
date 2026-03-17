@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/shared/ui/tooltip";
 import { LayoutShell } from "@/widgets/layout";
 import { NotificationProvider } from "@/features/notification";
@@ -19,6 +20,7 @@ export default function RootLayout({
             </TooltipProvider>
           </NotificationProvider>
         </Providers>
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   );

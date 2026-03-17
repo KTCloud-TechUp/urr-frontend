@@ -17,7 +17,9 @@ function Spinner() {
 export function AuthInitializer({ children }: { children: ReactNode }) {
   const router = useRouter();
   const routerRef = useRef(router);
-  routerRef.current = router;
+  useEffect(() => {
+    routerRef.current = router;
+  }, [router]);
 
   const [ready, setReady] = useState(false);
 
@@ -33,7 +35,7 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
 
     // 이미 토큰이 있으면 (소셜 로그인 직후 등) reissue 스킵
     if (tokenStore.getToken()) {
-      setReady(true);
+      setTimeout(() => setReady(true), 0);
       return;
     }
 
