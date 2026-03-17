@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Calendar, Clock, MapPin, Users, Heart, Share2 } from "lucide-react";
 import { BookingStatusBadge } from "@/entities/event";
 import { EventTagBadge } from "@/entities/event";
@@ -50,10 +51,11 @@ export function EventDetailHero({ event }: EventDetailHeroProps) {
         {/* Poster */}
         <div className="w-[280px] shrink-0">
           <div className="relative rounded-lg overflow-hidden bg-muted aspect-[3/4]">
-            <img
+            <Image
               src={event.poster}
               alt={event.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
             {/* Date overlay on poster bottom */}
             <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-3 py-2.5 space-y-0.5">

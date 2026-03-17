@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Heart, MessageCircle, BadgeCheck } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { formatCompactNumber, formatRelativeTime } from "@/shared/lib/format";
@@ -17,11 +18,14 @@ export function PostCard({ post, variant = "default", artistGradient }: PostCard
       {/* Header */}
       <div className="flex items-center gap-3">
         {post.authorAvatar ? (
-          <img
-            src={post.authorAvatar}
-            alt={post.authorName}
-            className={cn("shrink-0 rounded-full object-cover", isCompact ? "size-8" : "size-10")}
-          />
+          <div className={cn("shrink-0 rounded-full overflow-hidden relative", isCompact ? "size-8" : "size-10")}>
+            <Image
+              src={post.authorAvatar}
+              alt={post.authorName}
+              fill
+              className="object-cover"
+            />
+          </div>
         ) : (
           <div
             className={cn(
@@ -63,17 +67,22 @@ export function PostCard({ post, variant = "default", artistGradient }: PostCard
       {!isCompact && post.images.length > 0 && (
         <div className="flex gap-2 mt-3">
           {post.images.map((src, idx) => (
-            <img
+            <div
               key={idx}
-              src={src}
-              alt={`${post.authorName} 게시글 이미지 ${idx + 1}`}
               className={cn(
-                "rounded-lg object-cover",
+                "rounded-lg overflow-hidden relative",
                 post.images.length === 1
                   ? "w-full aspect-[16/9]"
                   : "flex-1 aspect-[4/3] min-w-0",
               )}
-            />
+            >
+              <Image
+                src={src}
+                alt={`${post.authorName} 게시글 이미지 ${idx + 1}`}
+                fill
+                className="object-cover"
+              />
+            </div>
           ))}
         </div>
       )}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Heart, Users } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
@@ -25,10 +26,11 @@ export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }
       style={{ background: getArtistGradient(artist.id) }}
     >
       {artist.banner && (
-        <img
+        <Image
           src={artist.banner}
           alt={artist.name}
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -37,9 +39,11 @@ export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }
         {/* Left: Avatar + Info */}
         <div className="flex items-end gap-5">
           {artist.avatar ? (
-            <img
+            <Image
               src={artist.avatar}
               alt={artist.name}
+              width={88}
+              height={88}
               className="size-[88px] rounded-full border-[3px] border-white/30 shrink-0 object-cover"
             />
           ) : (

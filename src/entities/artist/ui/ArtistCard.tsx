@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/shared/lib/utils";
 import { formatCompactNumber } from "@/shared/lib/format";
 import type { Artist } from "@/shared/types";
@@ -18,10 +19,11 @@ export function ArtistCard({ artist, selected = false, className }: ArtistCardPr
         )}
       >
         {artist.avatar ? (
-          <img
+          <Image
             src={artist.avatar}
             alt={artist.name}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         ) : (
           <div className="w-full h-full bg-accent flex items-center justify-center text-sm font-semibold text-muted-foreground">
