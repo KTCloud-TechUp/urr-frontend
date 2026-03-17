@@ -9,7 +9,7 @@
 1. [브랜치 전략](#브랜치-전략)
 2. [커밋 메시지 규칙](#커밋-메시지-규칙)
 3. [PR 규칙](#pr-규칙)
-4. [AI 에이전트 작업 규칙](#ai-에이전트-작업-규칙)
+4. [작업 완료 체크리스트](#작업-완료-체크리스트)
 5. [유용한 Git 명령어](#유용한-git-명령어)
 
 ---
@@ -126,69 +126,13 @@ dev
 
 ---
 
-## AI 에이전트 작업 규칙
+## 작업 완료 체크리스트
 
-AI 에이전트(Claude Code 등)에게 태스크를 줄 때 따르는 규칙.
+작업이 끝나면 반드시 아래 순서로 확인한다.
 
-### 핵심 원칙
-
-1. **에이전트 1개 = 브랜치 1개** — 태스크 시작 전 반드시 작업 브랜치를 지정한다.
-2. **분기점은 항상 `dev`** — 에이전트가 브랜치를 생성할 때 `dev` 기준으로 분기.
-3. **에이전트는 `dev`, `main`에 직접 push 금지** — feature 브랜치까지만.
-4. **브랜치 간 의존 금지** — 에이전트 A의 브랜치 코드를 에이전트 B가 import하지 않는다. 공유 로직이 필요하면 먼저 `dev`에 merge하고 나서 다른 브랜치가 rebase.
-5. **작업 완료 = PR 생성** — 에이전트가 작업을 마치면 PR을 생성하고 사람이 검토 후 merge.
-
-### 일반 에이전트 태스크 형식
-
-```
-브랜치: feat/artist-community-tab
-기준: dev
-작업: 아티스트 상세 페이지의 소통 탭 구현. 멤버십 게이트 포함.
-완료 조건: npm run build 통과, PR 생성
-```
-
-### 리뷰 에이전트 (review/merge-*)
-
-두 feature 브랜치가 동일 파일을 수정했거나, dev에 순차 merge 시 충돌이 예상될 때 사용.
-리뷰 에이전트는 코드를 새로 작성하는 게 아니라 **두 브랜치의 변경사항을 모두 반영한 충돌 없는 최종 코드**를 작성한다.
-
-**태스크 형식**:
-```
-브랜치: review/merge-<a>-<b>
-기준: dev
-대상 A: feat/<a>
-대상 B: feat/<b>
-작업:
-  1. dev 대비 A, B 각각의 diff 분석
-  2. 충돌 지점 파악 (동일 파일·함수·import 수정 여부)
-  3. 두 변경사항을 모두 반영한 충돌 없는 코드 작성
-  4. npm run build 통과 확인
-  5. review/merge-<a>-<b> → dev PR 생성 (제목: merge: feat/<a> + feat/<b> 충돌 없이 통합)
-```
-
-**플로우**:
-```
-feat/<a>  feat/<b>
-    \         /
-   review/merge-<a>-<b>   ← 리뷰 에이전트 작업
-          |
-          ▼ PR (Squash merge)
-         dev
-```
-
-### 에이전트 시작 명령어
-
-```bash
-# 일반 에이전트 — dev 기준으로 새 브랜치 생성
-git checkout dev
-git pull origin dev
-git checkout -b feat/<scope>
-
-# 리뷰 에이전트 — dev 기준으로 review 브랜치 생성
-git checkout dev
-git pull origin dev
-git checkout -b review/merge-<a>-<b>
-```
+1. `npm run build` 실행 → 빌드 오류 없음 확인
+2. GitHub Actions CI 빌드 상태 확인 (`gh run list --limit 5` 또는 PR 페이지)
+3. 위 두 항목 모두 통과한 상태에서만 PR을 생성하거나 완료 보고
 
 ---
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/shared/lib/utils";
 import { Button, SectionHeader } from "@/shared/ui";
@@ -78,10 +79,11 @@ export function HomeWidget() {
               {/* 포스터 + 순위 */}
               <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden">
                 {event.poster ? (
-                  <img
+                  <Image
                     src={event.poster}
                     alt={event.title}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 ) : (
                   <div
@@ -134,9 +136,11 @@ export function HomeWidget() {
                 {index + 1}
               </span>
               {event.profileImage ? (
-                <img
+                <Image
                   src={event.profileImage}
                   alt={event.artistName}
+                  width={40}
+                  height={40}
                   className="size-10 rounded-full shrink-0 object-cover"
                 />
               ) : (
@@ -185,11 +189,14 @@ export function HomeWidget() {
               className="group flex gap-3 p-3 rounded-lg border border-border hover:bg-[#F3F2F0] transition-colors bg-card"
             >
               {event.poster ? (
-                <img
-                  src={event.poster}
-                  alt={event.title}
-                  className="w-[80px] h-[100px] rounded-md shrink-0 object-cover"
-                />
+                <div className="relative w-[80px] h-[100px] rounded-md shrink-0 overflow-hidden">
+                  <Image
+                    src={event.poster}
+                    alt={event.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <div
                   className="w-[80px] h-[100px] rounded-md shrink-0 flex items-center justify-center text-white text-xs font-medium"

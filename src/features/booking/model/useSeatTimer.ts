@@ -15,9 +15,10 @@ export function useSeatTimer(durationSeconds: number = 180): UseSeatTimerReturn 
   const [secondsLeft, setSecondsLeft] = useState(durationSeconds);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isExpired = secondsLeft <= 0;
 
   useEffect(() => {
-    if (!isRunning || secondsLeft <= 0) {
+    if (!isRunning || isExpired) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -41,7 +42,7 @@ export function useSeatTimer(durationSeconds: number = 180): UseSeatTimerReturn 
         intervalRef.current = null;
       }
     };
-  }, [isRunning, secondsLeft <= 0]);
+  }, [isRunning, isExpired]);
 
   const start = useCallback(() => setIsRunning(true), []);
   const pause = useCallback(() => setIsRunning(false), []);

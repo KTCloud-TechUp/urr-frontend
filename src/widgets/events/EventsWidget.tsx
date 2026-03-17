@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { FilterChip, ScrollableRow, ViewToggle } from "@/shared/ui";
 import { EventTagBadge } from "@/entities/event";
@@ -24,11 +25,12 @@ function PopularEventCard({ event }: { event: EventListItem }) {
       className="group shrink-0 w-[240px] rounded-xl overflow-hidden relative block"
     >
       {/* Poster image */}
-      <div className="w-full aspect-[3/4] bg-muted">
-        <img
+      <div className="relative w-full aspect-[3/4] bg-muted overflow-hidden">
+        <Image
           src={event.poster}
           alt={event.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 
@@ -69,10 +71,11 @@ function EventGridCard({ event }: { event: EventListItem }) {
   return (
     <Link href={`/events/${event.id}`} className="group min-w-0">
       <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden bg-muted">
-        <img
+        <Image
           src={event.poster}
           alt={event.title}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
       </div>
       <div className="mt-2.5 space-y-1.5">
@@ -103,11 +106,12 @@ function EventListRow({ event }: { event: EventListItem }) {
       href={`/events/${event.id}`}
       className="group flex items-center gap-4 py-3 px-2 -mx-2 rounded-lg hover:bg-[#F3F2F0] transition-colors"
     >
-      <div className="w-[72px] aspect-[3/4] rounded-lg overflow-hidden bg-muted shrink-0">
-        <img
+      <div className="relative w-[72px] aspect-[3/4] rounded-lg overflow-hidden bg-muted shrink-0">
+        <Image
           src={event.poster}
           alt={event.title}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
       </div>
       <div className="flex-1 min-w-0 space-y-1.5">

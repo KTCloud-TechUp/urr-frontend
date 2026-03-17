@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/shared/lib/utils";
 import { Calendar } from "lucide-react";
 import { PriceDisplay, FaceValueBadge } from "@/shared/ui";
@@ -28,10 +29,11 @@ export function TransferCard({ listing, onClick, className }: TransferCardProps)
       <div className="flex items-start gap-3 mb-3">
         <div className="w-12 h-16 rounded bg-muted shrink-0 overflow-hidden relative">
           {listing.event.poster ? (
-            <img
+            <Image
               src={listing.event.poster}
               alt={listing.event.title}
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <div

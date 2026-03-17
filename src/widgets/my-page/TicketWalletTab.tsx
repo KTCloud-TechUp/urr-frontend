@@ -8,7 +8,6 @@ import { TicketCard } from '@/shared/ui/TicketCard'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { QRCodeModal } from './QRCodeModal'
 import { TransferListingModal } from './TransferListingModal'
-import type { MyTransferRecord } from '@/shared/lib/mocks/my-page'
 import type { Ticket, Event, TierLevel, User } from '@/shared/types'
 
 interface TicketWalletTabProps {
@@ -31,7 +30,7 @@ export function TicketWalletTab({ tickets, user }: TicketWalletTabProps) {
   const upcoming = tickets.filter((t) => t.isUpcoming)
   const past = tickets.filter((t) => !t.isUpcoming)
 
-  const handleListed = useCallback((ticketId: string, _price: number) => {
+  const handleListed = useCallback((ticketId: string, _: number) => {
     setListedTicketIds((prev) => new Set(prev).add(ticketId))
   }, [])
 

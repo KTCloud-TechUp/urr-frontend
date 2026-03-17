@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Search,
@@ -83,9 +84,11 @@ function PopularArtistsSection({ artists }: { artists: Artist[] }) {
             className="flex flex-col items-center gap-2 shrink-0 w-[72px] group"
           >
             {artist.avatar ? (
-              <img
+              <Image
                 src={artist.avatar}
                 alt={artist.name}
+                width={64}
+                height={64}
                 className="size-16 rounded-full object-cover ring-2 ring-transparent group-hover:ring-primary/40 transition-all"
               />
             ) : (
@@ -123,9 +126,11 @@ function PopularEventsSection() {
               {i + 1}
             </span>
             {evt.profileImage ? (
-              <img
+              <Image
                 src={evt.profileImage}
                 alt={evt.title}
+                width={44}
+                height={44}
                 className="size-11 rounded-lg shrink-0 object-cover"
               />
             ) : (
@@ -153,9 +158,11 @@ function ArtistResultRow({ artist }: { artist: Artist }) {
       className="flex items-center gap-4 px-4 py-3 hover:bg-accent/50 transition-colors"
     >
       {artist.avatar ? (
-        <img
+        <Image
           src={artist.avatar}
           alt={artist.name}
+          width={48}
+          height={48}
           className="size-12 rounded-full shrink-0 object-cover"
         />
       ) : (
@@ -184,9 +191,11 @@ function EventResultRow({ event }: { event: SearchableEvent }) {
       className="flex items-center gap-4 px-4 py-3 hover:bg-accent/50 transition-colors"
     >
       {event.poster ? (
-        <img
+        <Image
           src={event.poster}
           alt={event.title}
+          width={60}
+          height={60}
           className="size-[60px] rounded-lg shrink-0 object-cover"
         />
       ) : (

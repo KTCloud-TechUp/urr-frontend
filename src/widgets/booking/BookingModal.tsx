@@ -20,9 +20,18 @@ const SECTION_LABEL_POS: Record<string, { x: number; y: number }> = {
 
 function QueueContent() {
   const { sectionsForDate, transitionTo, resetBooking } = useBooking();
-  const { position, totalInQueue, estimatedWait, probability, phase, previousPosition, stayInQueue } =
-    useQueueSimulation(sectionsForDate);
-  const { showPrompt, cancelLeave, confirmLeave } = useNavigationBlock(phase === "waiting");
+  const {
+    position,
+    totalInQueue,
+    estimatedWait,
+    probability,
+    phase,
+    previousPosition,
+    stayInQueue,
+  } = useQueueSimulation(sectionsForDate);
+  const { showPrompt, cancelLeave, confirmLeave } = useNavigationBlock(
+    phase === "waiting",
+  );
 
   const [drainOffset, setDrainOffset] = useState(0);
 
@@ -39,7 +48,10 @@ function QueueContent() {
     if (previousPosition !== null && previousPosition !== position) {
       const t1 = setTimeout(() => setIsRolling(true), 0);
       const t2 = setTimeout(() => setIsRolling(false), 500);
-      return () => { clearTimeout(t1); clearTimeout(t2); };
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
     }
   }, [previousPosition, position]);
 
@@ -54,32 +66,67 @@ function QueueContent() {
   }, [confirmLeave, resetBooking]);
 
   const probColor =
-    probability >= 60 ? "text-green-600" : probability >= 20 ? "text-amber-500" : "text-red-500";
+    probability >= 60
+      ? "text-green-600"
+      : probability >= 20
+        ? "text-amber-500"
+        : "text-red-500";
 
   const progressPercent = Math.max(0, 100 - (position / totalInQueue) * 100);
 
   const sectionPercentages = sectionsForDate.map((sec) => {
-    const drained = Math.min(sec.remainingSeats, drainOffset * Math.ceil(sec.totalSeats / 200));
+    const drained = Math.min(
+      sec.remainingSeats,
+      drainOffset * Math.ceil(sec.totalSeats / 200),
+    );
     const remaining = Math.max(0, sec.remainingSeats - drained);
-    const pct = sec.totalSeats > 0 ? Math.round((remaining / sec.totalSeats) * 100) : 0;
+    const pct =
+      sec.totalSeats > 0 ? Math.round((remaining / sec.totalSeats) * 100) : 0;
     return { id: sec.id, name: sec.name, pct, remaining };
   });
 
   const percentageOverlay = (
     <g style={{ pointerEvents: "none" }} className="select-none">
-      <rect x="0" y="0" width="895" height="698" fill="white" fillOpacity={0.55} />
+      <rect
+        x="0"
+        y="0"
+        width="895"
+        height="698"
+        fill="white"
+        fillOpacity={0.55}
+      />
       <defs>
         <filter id="badge-shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="1" stdDeviation="2" floodColor="#000" floodOpacity="0.12" />
+          <feDropShadow
+            dx="0"
+            dy="1"
+            stdDeviation="2"
+            floodColor="#000"
+            floodOpacity="0.12"
+          />
         </filter>
       </defs>
       {sectionPercentages.map(({ id, pct }) => {
         const pos = SECTION_LABEL_POS[id];
         if (!pos) return null;
-        const color = pct === 0 ? "#9CA3AF" : pct > 30 ? "#16A34A" : pct > 10 ? "#EA580C" : "#DC2626";
+        const color =
+          pct === 0
+            ? "#9CA3AF"
+            : pct > 30
+              ? "#16A34A"
+              : pct > 10
+                ? "#EA580C"
+                : "#DC2626";
         return (
           <g key={id} filter="url(#badge-shadow)">
-            <rect x={pos.x - 32} y={pos.y - 16} width={64} height={32} rx={16} fill="white" />
+            <rect
+              x={pos.x - 32}
+              y={pos.y - 16}
+              width={64}
+              height={32}
+              rx={16}
+              fill="white"
+            />
             <text
               x={pos.x}
               y={pos.y + 1}
@@ -100,12 +147,21 @@ function QueueContent() {
   return (
     <>
       <div className="px-6 pt-6 pb-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">대기열</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          대기열
+        </p>
         <div className="flex items-baseline gap-2 mt-2">
-          <span className={cn("text-4xl font-bold text-primary tabular-nums", isRolling && "animate-pulse")}>
+          <span
+            className={cn(
+              "text-4xl font-bold text-primary tabular-nums",
+              isRolling && "animate-pulse",
+            )}
+          >
             #{position}
           </span>
-          <span className="text-sm text-muted-foreground">/ {totalInQueue.toLocaleString()}명</span>
+          <span className="text-sm text-muted-foreground">
+            / {totalInQueue.toLocaleString()}명
+          </span>
         </div>
       </div>
 
@@ -116,7 +172,10 @@ function QueueContent() {
             예상 대기: {estimatedWait}
           </span>
           <span className="text-muted-foreground">
-            성공 확률: <span className={cn("font-bold tabular-nums", probColor)}>{probability}%</span>
+            성공 확률:{" "}
+            <span className={cn("font-bold tabular-nums", probColor)}>
+              {probability}%
+            </span>
           </span>
         </div>
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -134,7 +193,11 @@ function QueueContent() {
           </div>
         </div>
         <div className="flex-1 min-h-0 flex items-center justify-center">
-          <VenueMap miniature seatOverlay={percentageOverlay} className="w-full h-full max-h-[380px]" />
+          <VenueMap
+            miniature
+            seatOverlay={percentageOverlay}
+            className="w-full h-full max-h-95"
+          />
         </div>
         <div className="py-3 space-y-1.5 shrink-0">
           {sectionPercentages.map(({ id, name, pct, remaining }) => (
@@ -144,13 +207,28 @@ function QueueContent() {
                   className="size-2 rounded-full shrink-0"
                   style={{
                     backgroundColor:
-                      pct === 0 ? "#9CA3AF" : pct > 30 ? "#22C55E" : pct > 10 ? "#F97316" : "#EF4444",
+                      pct === 0
+                        ? "#9CA3AF"
+                        : pct > 30
+                          ? "#22C55E"
+                          : pct > 10
+                            ? "#F97316"
+                            : "#EF4444",
                   }}
                 />
                 <span className="font-medium">{name}</span>
               </div>
-              <span className={cn("tabular-nums", pct === 0 ? "text-muted-foreground" : "text-foreground font-semibold")}>
-                {pct === 0 ? "매진" : `${remaining.toLocaleString()}석 (${pct}%)`}
+              <span
+                className={cn(
+                  "tabular-nums",
+                  pct === 0
+                    ? "text-muted-foreground"
+                    : "text-foreground font-semibold",
+                )}
+              >
+                {pct === 0
+                  ? "매진"
+                  : `${remaining.toLocaleString()}석 (${pct}%)`}
               </span>
             </div>
           ))}
@@ -161,25 +239,34 @@ function QueueContent() {
         {phase === "sold-out" ? (
           <div className="space-y-3">
             <p className="text-sm text-center text-muted-foreground">
-              현재 잔여 좌석이 없습니다. 취소표가 나올 수 있으니 대기를 유지해보세요.
+              현재 잔여 좌석이 없습니다. 취소표가 나올 수 있으니 대기를
+              유지해보세요.
             </p>
             <div className="flex gap-3 justify-center">
-              <Button variant="ghost" size="sm" onClick={handleLeaveQueue}>나가기</Button>
-              <Button size="sm" onClick={stayInQueue}>대기 유지</Button>
+              <Button variant="ghost" size="sm" onClick={handleLeaveQueue}>
+                나가기
+              </Button>
+              <Button size="sm" onClick={stayInQueue}>
+                대기 유지
+              </Button>
             </div>
           </div>
         ) : (
           <Button
             variant="ghost"
             className="w-full text-muted-foreground"
-            onClick={() => { if (phase === "waiting") handleLeaveQueue(); }}
+            onClick={() => {
+              if (phase === "waiting") handleLeaveQueue();
+            }}
           >
             대기열 나가기
           </Button>
         )}
       </div>
 
-      {showPrompt && <QueueLeaveModal onStay={cancelLeave} onLeave={handleLeaveQueue} />}
+      {showPrompt && (
+        <QueueLeaveModal onStay={cancelLeave} onLeave={handleLeaveQueue} />
+      )}
     </>
   );
 }
@@ -191,10 +278,12 @@ export function BookingModal() {
     <div className="fixed inset-0 z-40">
       <div className="fixed inset-0 bg-black/50" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <div className={cn(
-          "relative w-full rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col",
-          "max-w-[680px] max-h-[85vh]",
-        )}>
+        <div
+          className={cn(
+            "relative w-full rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col",
+            "max-w-170 max-h-[85vh]",
+          )}
+        >
           <button
             onClick={resetBooking}
             className="absolute top-4 right-4 z-10 p-1.5 rounded-md hover:bg-accent transition-colors"

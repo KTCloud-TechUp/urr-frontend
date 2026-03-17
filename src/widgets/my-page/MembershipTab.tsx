@@ -42,7 +42,7 @@ export function MembershipTab({ memberships, onCancelMembership, onNicknameChang
     setCancelDialogOpen(true)
   }
 
-  const handleCancelConfirm = (_reason: string) => {
+  const handleCancelConfirm = (_: string) => {
     if (!cancelTargetId) return
     setIsCancelling(true)
     setTimeout(() => {

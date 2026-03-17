@@ -340,14 +340,13 @@ chore/<scope>             # 설정·의존성·문서.
 review/merge-<a>-<b>      # 리뷰 에이전트 전용.
 ```
 
-### AI 에이전트 작업 규칙
+### 작업 완료 체크리스트
 
-1. **에이전트 1개 = 브랜치 1개** — 작업 전 브랜치 지정 필수
-2. **분기점은 항상 `dev`** — `git checkout -b feat/<scope> dev`
-3. **`dev`, `main`에 직접 push 금지**
-4. **브랜치 간 의존 금지** — 공유 로직은 `dev` merge 후 rebase
-5. **작업 완료 후 PR 생성** — 사람이 검토 후 merge
-6. **빌드 통과 필수** — `npm run build` 통과하는 상태로만 push
+작업이 끝나면 반드시 아래 순서로 확인한다.
+
+1. `npm run build` 실행 → 빌드 오류 없음 확인
+2. GitHub Actions CI 빌드 상태 확인 (`gh run list --limit 5` 또는 PR 페이지)
+3. 위 두 항목 모두 통과한 상태에서만 PR을 생성하거나 완료 보고
 
 ---
 

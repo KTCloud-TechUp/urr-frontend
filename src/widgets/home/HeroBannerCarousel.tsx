@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Calendar, MapPin } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
@@ -69,10 +70,11 @@ export function HeroBannerCarousel({ banners }: HeroBannerCarouselProps) {
             className="relative w-full h-full shrink-0 block"
           >
             {banner.bannerImage ? (
-              <img
+              <Image
                 src={banner.bannerImage}
                 alt={banner.title}
-                className="absolute inset-0 w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
             ) : (
               <div

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Users } from "lucide-react";
@@ -77,11 +78,12 @@ export function ArtistsWidget() {
               href={getArtistLink(artist.id)}
               className="group shrink-0 w-[125px]"
             >
-              <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted">
-                <img
+              <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted">
+                <Image
                   src={artist.image}
                   alt={artist.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-200"
                 />
               </div>
               <div className="mt-2 text-center">
@@ -122,11 +124,12 @@ export function ArtistsWidget() {
                 {card.label}
               </span>
               <div className="flex gap-3">
-                <div className="w-[110px] h-[110px] rounded-lg overflow-hidden shrink-0 bg-muted">
-                  <img
+                <div className="relative w-[110px] h-[110px] rounded-lg overflow-hidden shrink-0 bg-muted">
+                  <Image
                     src={card.profileImage}
                     alt={card.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col h-[110px]">
@@ -179,9 +182,11 @@ export function ArtistsWidget() {
                 {index + 1}
               </span>
               {artist.avatar ? (
-                <img
+                <Image
                   src={artist.avatar}
                   alt={artist.name}
+                  width={40}
+                  height={40}
                   className="size-10 rounded-full shrink-0 object-cover"
                 />
               ) : (

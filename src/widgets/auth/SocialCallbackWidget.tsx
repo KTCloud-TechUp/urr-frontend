@@ -12,10 +12,6 @@ const loginFn = {
   naver: naverLogin,
 } as const;
 
-const providerLabel: Record<SocialProvider, string> = {
-  kakao: "카카오",
-  naver: "네이버",
-};
 
 function Spinner() {
   return (

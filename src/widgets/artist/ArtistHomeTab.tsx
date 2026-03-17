@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -252,10 +253,11 @@ export function ArtistHomeTab({
                   style={{ background: getArtistGradient(artist.id) }}
                 >
                   {nextEvent.poster ? (
-                    <img
+                    <Image
                       src={nextEvent.poster}
                       alt={nextEvent.title}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -311,10 +313,11 @@ export function ArtistHomeTab({
                         style={{ background: getArtistGradient(artist.id) }}
                       >
                         {event.poster ? (
-                          <img
+                          <Image
                             src={event.poster}
                             alt={event.title}
-                            className="absolute inset-0 w-full h-full object-cover"
+                            fill
+                            className="object-cover"
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center text-[10px] text-white font-medium">

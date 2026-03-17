@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { ChevronLeft, MapPin } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { useBooking } from "@/features/booking/model/BookingContext";
@@ -82,7 +83,7 @@ function TierScheduleRow({
 function LeftPanelSkeleton() {
   return (
     <div className="p-5 space-y-4">
-      <Skeleton className="w-full h-[200px] rounded-xl" />
+      <Skeleton className="w-full h-50 rounded-xl" />
       <Skeleton className="w-3/5 h-3" />
       <Skeleton className="w-full h-6" />
       <Skeleton className="w-2/5 h-4" />
@@ -128,7 +129,7 @@ export function LeftPanel() {
     <div
       className={cn(
         "h-full border-r border-border bg-white shrink-0 transition-[width] duration-200 ease-out z-20 flex flex-col",
-        isLeftPanelExpanded ? "w-[360px]" : "w-12",
+        isLeftPanelExpanded ? "w-90" : "w-12",
       )}
     >
       {!isLeftPanelExpanded && <LeftPanelCollapsed />}
@@ -143,7 +144,8 @@ export function LeftPanel() {
             >
               {event?.dates.map((d) => (
                 <option key={d.id} value={d.id}>
-                  {formatCompactDate(d.date)} — 잔여 {d.remainingSeats.toLocaleString()}석
+                  {formatCompactDate(d.date)} — 잔여{" "}
+                  {d.remainingSeats.toLocaleString()}석
                 </option>
               ))}
             </select>
@@ -161,26 +163,35 @@ export function LeftPanel() {
               <LeftPanelSkeleton />
             ) : event ? (
               <div className="p-5 space-y-4">
-                <div className="w-full h-[200px] rounded-xl bg-muted overflow-hidden relative">
+                <div className="w-full h-50 rounded-xl bg-muted overflow-hidden relative">
                   {event.poster ? (
-                    <img
+                    <Image
                       src={event.poster}
                       alt={event.title}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-muted-foreground text-sm">포스터</span>
+                      <span className="text-muted-foreground text-sm">
+                        포스터
+                      </span>
                     </div>
                   )}
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="secondary" className="text-[11px]">단독 공연</Badge>
-                  <Badge variant="outline" className="text-[11px]">DOME TOUR</Badge>
+                  <Badge variant="secondary" className="text-[11px]">
+                    단독 공연
+                  </Badge>
+                  <Badge variant="outline" className="text-[11px]">
+                    DOME TOUR
+                  </Badge>
                 </div>
 
-                <h2 className="text-xl font-semibold leading-snug line-clamp-2">{event.title}</h2>
+                <h2 className="text-xl font-semibold leading-snug line-clamp-2">
+                  {event.title}
+                </h2>
 
                 <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
                   <MapPin size={14} className="shrink-0" />
@@ -194,7 +205,9 @@ export function LeftPanel() {
                   <div className="space-y-0.5">
                     {selectedDate &&
                       TIER_ORDER.map((tier) => {
-                        const window = selectedDate.bookingWindows.find((w) => w.tier === tier);
+                        const window = selectedDate.bookingWindows.find(
+                          (w) => w.tier === tier,
+                        );
                         if (!window) return null;
                         return (
                           <TierScheduleRow
@@ -207,7 +220,9 @@ export function LeftPanel() {
                       })}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-muted-foreground">내 등급:</span>
+                    <span className="text-xs font-medium text-muted-foreground">
+                      내 등급:
+                    </span>
                     <TierBadge tier={userTier} size="sm" />
                   </div>
                 </div>
@@ -218,14 +233,22 @@ export function LeftPanel() {
           {!isLoading && event && (
             <div className="shrink-0 border-t border-border px-5 py-3">
               {isSoldOut ? (
-                <Button disabled className="w-full" size="lg">매진</Button>
+                <Button disabled className="w-full" size="lg">
+                  매진
+                </Button>
               ) : isBookingActive ? (
-                <Button disabled className="w-full" size="lg">예매 진행 중</Button>
+                <Button disabled className="w-full" size="lg">
+                  예매 진행 중
+                </Button>
               ) : isWindowOpen ? (
-                <Button className="w-full" size="lg" onClick={startBooking}>예매하기</Button>
+                <Button className="w-full" size="lg" onClick={startBooking}>
+                  예매하기
+                </Button>
               ) : (
                 <Button disabled className="w-full" size="lg">
-                  <span className="tabular-nums">예매 오픈까지 {formatCountdown(countdownToOpen)}</span>
+                  <span className="tabular-nums">
+                    예매 오픈까지 {formatCountdown(countdownToOpen)}
+                  </span>
                 </Button>
               )}
             </div>
