@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Check, Loader2, LogOut, Pencil, UserX } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
@@ -17,7 +18,10 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/shared/ui/alert-dialog'
+import { toast } from 'sonner'
 import { AccountDeleteDialog } from './AccountDeleteDialog'
+import { logout } from '@/features/auth/api/logout'
+import { tokenStore } from '@/shared/api'
 import type { User } from '@/shared/types'
 
 interface SettingsTabProps {
@@ -26,6 +30,8 @@ interface SettingsTabProps {
 }
 
 export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
+  const router = useRouter()
+
   // Profile editing
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState(user.name)
@@ -46,10 +52,11 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
   // Sync edit fields when user data changes externally
   useEffect(() => {
     if (!isEditing) {
-      queueMicrotask(() => {
+      const t = setTimeout(() => {
         setEditName(user.name)
         setEditEmail(user.email)
-      })
+      }, 0)
+      return () => clearTimeout(t)
     }
   }, [user.name, user.email, isEditing])
 
@@ -256,7 +263,20 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction>로그아웃</AlertDialogAction>
+            <AlertDialogAction
+              onClick={async () => {
+                try {
+                  await logout()
+                } catch {
+                  toast.error("로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.")
+                  return
+                }
+                tokenStore.clearToken()
+                router.replace('/onboarding')
+              }}
+            >
+              로그아웃
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -13,6 +14,8 @@ import {
 } from '@/shared/ui/alert-dialog'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { Label } from '@/shared/ui/label'
+import { deleteAccount } from '@/features/auth/api/deleteAccount'
+import { tokenStore } from '@/shared/api'
 
 interface AccountDeleteDialogProps {
   open: boolean
@@ -20,10 +23,15 @@ interface AccountDeleteDialogProps {
 }
 
 export function AccountDeleteDialog({ open, onOpenChange }: AccountDeleteDialogProps) {
+  const router = useRouter()
   const [confirmed, setConfirmed] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) setConfirmed(false)
+    if (!isOpen) {
+      setConfirmed(false)
+      setError(null)
+    }
     onOpenChange(isOpen)
   }
 
@@ -45,6 +53,10 @@ export function AccountDeleteDialog({ open, onOpenChange }: AccountDeleteDialogP
             <p className="text-muted-foreground">• 이 작업은 되돌릴 수 없습니다</p>
           </div>
 
+          {error && (
+            <p className="text-xs text-destructive">{error}</p>
+          )}
+
           <div className="flex items-center gap-2">
             <Checkbox
               id="delete-confirm"
@@ -62,6 +74,18 @@ export function AccountDeleteDialog({ open, onOpenChange }: AccountDeleteDialogP
           <AlertDialogAction
             disabled={!confirmed}
             className="bg-destructive text-white hover:bg-destructive/90"
+            onClick={async (e) => {
+              e.preventDefault()
+              setError(null)
+              try {
+                await deleteAccount()
+                tokenStore.clearToken()
+                router.replace('/onboarding')
+              } catch (err) {
+                const message = err instanceof Error ? err.message : String(err)
+                setError(`탈퇴 실패: ${message}`)
+              }
+            }}
           >
             탈퇴하기
           </AlertDialogAction>

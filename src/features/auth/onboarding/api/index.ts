@@ -1,2 +1,2 @@
-export { startSocialLogin } from "./startSocialLogin";
-export type { SocialProvider } from "./startSocialLogin";
+export { buildKakaoAuthUrl } from "./buildKakaoAuthUrl";
+export { buildNaverAuthUrl } from "./buildNaverAuthUrl";

@@ -19,22 +19,89 @@ type VerificationState = "idle" | "sent" | "expired" | "verifying";
 interface IdentityStepProps {
   onComplete: (data: {
     userName: string;
+    nickname: string;
     phoneNumber: string;
     birthDate: string;
     gender: "male" | "female";
   }) => void;
   onBack: () => void;
+  identityError?: string | null;
 }
 
-export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
+function validateName(name: string): string | null {
+  if (!name) return null;
+  if (!/^[가-힣a-zA-Z\s]{2,20}$/.test(name.trim()))
+    return "이름은 2~20자의 한글 또는 영문만 입력 가능합니다";
+  return null;
+}
+
+function validateNickname(nickname: string): string | null {
+  if (!nickname) return null;
+  if (nickname.trim().length < 2) return "닉네임은 2자 이상이어야 합니다";
+  if (nickname.trim().length > 20) return "닉네임은 20자 이하여야 합니다";
+  if (!/^[가-힣a-zA-Z0-9]+$/.test(nickname.trim()))
+    return "닉네임은 한글, 영문, 숫자만 사용 가능합니다";
+  return null;
+}
+
+function validateDob(dob: string): string | null {
+  if (dob.length === 0) return null;
+  if (dob.length !== 8) return "생년월일 8자리를 모두 입력해주세요";
+
+  const year = parseInt(dob.slice(0, 4), 10);
+  const month = parseInt(dob.slice(4, 6), 10);
+  const day = parseInt(dob.slice(6, 8), 10);
+
+  if (month < 1 || month > 12) return "올바른 월을 입력해주세요 (01~12)";
+  if (day < 1 || day > 31) return "올바른 일을 입력해주세요 (01~31)";
+
+  // 실제 존재하는 날짜 체크
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return "존재하지 않는 날짜입니다";
+  }
+
+  const today = new Date();
+  if (date > today) return "미래 날짜는 입력할 수 없습니다";
+
+  // 만 14세 이상
+  const age14 = new Date(today.getFullYear() - 14, today.getMonth(), today.getDate());
+  if (date > age14) return "만 14세 이상만 가입 가능합니다";
+
+  // 너무 오래된 날짜 (130세 초과)
+  const age130 = new Date(today.getFullYear() - 130, today.getMonth(), today.getDate());
+  if (date < age130) return "올바른 생년월일을 입력해주세요";
+
+  return null;
+}
+
+function validatePhone(phone: string): string | null {
+  if (!phone) return null;
+  if (!/^01[016789]\d{7,8}$/.test(phone))
+    return "올바른 휴대폰 번호를 입력해주세요 (010, 011, 016~019)";
+  return null;
+}
+
+export function IdentityStep({ onComplete, onBack, identityError }: IdentityStepProps) {
   const [carrier, setCarrier] = useState("");
   const [name, setName] = useState("");
+  const [nickname, setNickname] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState<"male" | "female" | null>(null);
   const [nationality, setNationality] = useState<"domestic" | "foreign" | null>(
     null,
   );
   const [phone, setPhone] = useState("");
+
+  const [nameTouched, setNameTouched] = useState(false);
+  const [nicknameTouched, setNicknameTouched] = useState(false);
+  const [dobTouched, setDobTouched] = useState(false);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [sendAttempted, setSendAttempted] = useState(false);
 
   const [verificationState, setVerificationState] =
     useState<VerificationState>("idle");
@@ -57,15 +124,36 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
     return () => clearInterval(id);
   }, [verificationState]);
 
-  const canSendCode =
+  const nameError = validateName(name);
+  const nicknameError = validateNickname(nickname);
+  const dobError = validateDob(dob);
+  const phoneError = validatePhone(phone);
+
+  const showNameError = nameError && (nameTouched || sendAttempted);
+  const showNicknameError = nicknameError && (nicknameTouched || sendAttempted);
+  const showDobError = dobError && (dobTouched || sendAttempted);
+  const showPhoneError = phoneError && (phoneTouched || sendAttempted);
+
+  const showCarrierError = sendAttempted && !carrier;
+  const showGenderError = sendAttempted && gender === null;
+  const showNationalityError = sendAttempted && nationality === null;
+
+  const allFieldsValid =
+    !nameError &&
+    name.trim().length >= 2 &&
+    !nicknameError &&
+    nickname.trim().length >= 2 &&
+    !dobError &&
+    dob.length === 8 &&
+    !phoneError &&
     phone.length >= 10 &&
     carrier &&
-    name.trim() &&
-    dob.length === 8 &&
     gender !== null &&
     nationality !== null;
 
   const handleSendCode = () => {
+    setSendAttempted(true);
+    if (!allFieldsValid) return;
     setVerificationState("sent");
     setTimerSeconds(180);
     setCode("");
@@ -83,6 +171,7 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
     setTimeout(() => {
       onComplete({
         userName: name,
+        nickname,
         phoneNumber: phone,
         birthDate: dob,
         gender: gender!,
@@ -113,7 +202,9 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
         <div>
           <label className="text-sm font-medium mb-1.5 block">통신사</label>
           <Select value={carrier} onValueChange={setCarrier}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger
+              className={cn("w-full", showCarrierError && "border-destructive")}
+            >
               <SelectValue placeholder="통신사 선택" />
             </SelectTrigger>
             <SelectContent>
@@ -123,6 +214,9 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
               <SelectItem value="mvno">알뜰폰</SelectItem>
             </SelectContent>
           </Select>
+          {showCarrierError && (
+            <p className="text-xs text-destructive mt-1.5">통신사를 선택해주세요</p>
+          )}
         </div>
 
         {/* Name */}
@@ -131,8 +225,36 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={() => setNameTouched(true)}
             placeholder="실명 입력"
+            className={
+              showNameError
+                ? "border-destructive focus-visible:ring-destructive/30"
+                : ""
+            }
           />
+          {showNameError && (
+            <p className="text-xs text-destructive mt-1.5">{nameError}</p>
+          )}
+        </div>
+
+        {/* Nickname */}
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">닉네임</label>
+          <Input
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            onBlur={() => setNicknameTouched(true)}
+            placeholder="2~20자, 한글·영문·숫자"
+            className={
+              showNicknameError
+                ? "border-destructive focus-visible:ring-destructive/30"
+                : ""
+            }
+          />
+          {showNicknameError && (
+            <p className="text-xs text-destructive mt-1.5">{nicknameError}</p>
+          )}
         </div>
 
         {/* DOB */}
@@ -143,16 +265,30 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
             onChange={(e) =>
               setDob(e.target.value.replace(/\D/g, "").slice(0, 8))
             }
+            onBlur={() => setDobTouched(true)}
             placeholder="YYYYMMDD"
             maxLength={8}
             inputMode="numeric"
+            className={
+              showDobError
+                ? "border-destructive focus-visible:ring-destructive/30"
+                : ""
+            }
           />
+          {showDobError && (
+            <p className="text-xs text-destructive mt-1.5">{dobError}</p>
+          )}
         </div>
 
         {/* Gender */}
         <div>
           <label className="text-sm font-medium mb-1.5 block">성별</label>
-          <div className="flex rounded-lg border border-input overflow-hidden">
+          <div
+            className={cn(
+              "flex rounded-lg border overflow-hidden",
+              showGenderError ? "border-destructive" : "border-input",
+            )}
+          >
             <button
               type="button"
               className={cn(
@@ -168,7 +304,8 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
             <button
               type="button"
               className={cn(
-                "flex-1 py-2.5 text-sm font-medium transition-colors border-l border-input cursor-pointer",
+                "flex-1 py-2.5 text-sm font-medium transition-colors border-l cursor-pointer",
+                showGenderError ? "border-destructive" : "border-input",
                 gender === "female"
                   ? "bg-primary text-primary-foreground"
                   : "bg-background text-muted-foreground hover:bg-accent",
@@ -178,12 +315,20 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
               여성
             </button>
           </div>
+          {showGenderError && (
+            <p className="text-xs text-destructive mt-1.5">성별을 선택해주세요</p>
+          )}
         </div>
 
         {/* Nationality */}
         <div>
           <label className="text-sm font-medium mb-1.5 block">내/외국인</label>
-          <div className="flex rounded-lg border border-input overflow-hidden">
+          <div
+            className={cn(
+              "flex rounded-lg border overflow-hidden",
+              showNationalityError ? "border-destructive" : "border-input",
+            )}
+          >
             <button
               type="button"
               className={cn(
@@ -199,7 +344,8 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
             <button
               type="button"
               className={cn(
-                "flex-1 py-2.5 text-sm font-medium transition-colors border-l border-input cursor-pointer",
+                "flex-1 py-2.5 text-sm font-medium transition-colors border-l cursor-pointer",
+                showNationalityError ? "border-destructive" : "border-input",
                 nationality === "foreign"
                   ? "bg-primary text-primary-foreground"
                   : "bg-background text-muted-foreground hover:bg-accent",
@@ -209,6 +355,9 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
               외국인
             </button>
           </div>
+          {showNationalityError && (
+            <p className="text-xs text-destructive mt-1.5">내/외국인을 선택해주세요</p>
+          )}
         </div>
 
         {/* Phone + Send code */}
@@ -222,21 +371,29 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
               onChange={(e) =>
                 setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))
               }
+              onBlur={() => setPhoneTouched(true)}
               placeholder="01012345678"
               inputMode="numeric"
-              className="flex-1"
+              className={cn(
+                "flex-1",
+                showPhoneError &&
+                  "border-destructive focus-visible:ring-destructive/30",
+              )}
             />
             <Button
               variant="outline"
               onClick={
                 verificationState === "expired" ? handleResend : handleSendCode
               }
-              disabled={!canSendCode || verificationState === "verifying"}
+              disabled={verificationState === "verifying"}
               className="shrink-0"
             >
               {verificationState === "idle" ? "인증번호 발송" : "재발송"}
             </Button>
           </div>
+          {showPhoneError && (
+            <p className="text-xs text-destructive mt-1.5">{phoneError}</p>
+          )}
         </div>
 
         {/* Verification code section */}
@@ -297,6 +454,10 @@ export function IdentityStep({ onComplete, onBack }: IdentityStepProps) {
       >
         {verificationState === "verifying" ? "확인 중..." : "시작하기"}
       </Button>
+
+      {identityError && (
+        <p className="text-xs text-destructive text-center mt-3">{identityError}</p>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -19,6 +20,7 @@ import { TierBadge } from "@/entities/user";
 import { SidebarNavItem } from "./SidebarNavItem";
 import { ArtistTreeItem } from "./ArtistTreeItem";
 import { useLayout } from "./model/useLayout";
+import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { mockUser } from "@/shared/lib/mocks/user";
 import { mockArtists } from "@/shared/lib/mocks/artists";
 import { cn } from "@/shared/lib/utils";
@@ -43,6 +45,8 @@ export function AppSidebar() {
   const [showAllArtists, setShowAllArtists] = useState(false);
 
   const collapsed = !isSidebarExpanded;
+  const { data: meData } = useCurrentUser();
+  const displayName = meData?.nickname ?? mockUser.name;
 
   // Resolve membership artists (only active memberships)
   const membershipArtists = mockUser.memberships
@@ -81,7 +85,7 @@ export function AppSidebar() {
       >
         {!collapsed && (
           <Link href="/" className="flex items-center">
-            <img src="/logos/logo5.svg" alt="URR" className="h-10" />
+            <Image src="/logos/logo5.svg" alt="URR" width={40} height={40} />
           </Link>
         )}
         <button
@@ -205,16 +209,16 @@ export function AppSidebar() {
                 className="flex items-center justify-center h-14 hover:bg-sidebar-accent/50 transition-colors"
               >
                 <Avatar className="size-8">
-                  <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
+                  <AvatarImage src={mockUser.avatar} alt={displayName} />
                   <AvatarFallback className="text-xs font-medium bg-muted">
-                    {mockUser.name.charAt(0)}
+                    {displayName.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
               </Link>
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={8}>
               <div className="flex items-center gap-2">
-                <span>{mockUser.name}</span>
+                <span>{displayName}</span>
                 <TierBadge tier={mockUser.tier} size="sm" />
               </div>
             </TooltipContent>
@@ -225,14 +229,14 @@ export function AppSidebar() {
             className="flex items-center gap-3 px-4 h-14 hover:bg-sidebar-accent/50 transition-colors"
           >
             <Avatar className="size-8 shrink-0">
-              <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
+              <AvatarImage src={mockUser.avatar} alt={displayName} />
               <AvatarFallback className="text-xs font-medium bg-muted">
-                {mockUser.name.charAt(0)}
+                {displayName.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-sm font-medium text-sidebar-foreground truncate">
-                {mockUser.name}
+                {displayName}
               </span>
               <TierBadge tier={mockUser.tier} size="sm" />
             </div>

@@ -8,9 +8,10 @@ import { AppSidebar } from "./AppSidebar";
 import { TopBar } from "./TopBar";
 import { Footer } from "./Footer";
 import { cn } from "@/shared/lib/utils";
+import { AuthInitializer } from "@/features/auth/ui/AuthInitializer";
 
 // Pages without sidebar/topbar
-const NO_SHELL_ROUTES = ["/onboarding"];
+const NO_SHELL_ROUTES = ["/onboarding", "/auth/callback"];
 
 function ShellInner({ children }: { children: ReactNode }) {
   const { isSidebarExpanded } = useLayout();
@@ -56,7 +57,9 @@ export function LayoutShell({ children }: { children: ReactNode }) {
 
   return (
     <LayoutProvider>
-      <ShellInner>{children}</ShellInner>
+      <AuthInitializer>
+        <ShellInner>{children}</ShellInner>
+      </AuthInitializer>
     </LayoutProvider>
   );
 }

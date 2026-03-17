@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/shared/lib/utils";
 import { Calendar, MapPin } from "lucide-react";
 import { BookingStatusBadge } from "./BookingStatusBadge";
@@ -26,7 +27,7 @@ export function EventCard({ event, variant = "default", artistName, className }:
       >
         <div className="aspect-[3/4] bg-muted relative overflow-hidden">
           {event.poster ? (
-            <img src={event.poster} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
+            <Image src={event.poster} alt={event.title} fill className="object-cover" />
           ) : (
             <div
               className="absolute inset-0 flex items-center justify-center text-white text-sm font-medium"
@@ -64,7 +65,7 @@ export function EventCard({ event, variant = "default", artistName, className }:
     >
       <div className="w-[100px] h-[140px] rounded-lg bg-muted shrink-0 overflow-hidden relative">
         {event.poster ? (
-          <img src={event.poster} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
+          <Image src={event.poster} alt={event.title} fill className="object-cover" />
         ) : (
           <div
             className="absolute inset-0 flex items-center justify-center text-white text-xs font-medium"
