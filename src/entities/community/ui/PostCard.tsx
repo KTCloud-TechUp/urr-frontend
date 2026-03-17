@@ -10,15 +10,29 @@ interface PostCardProps {
   artistGradient?: string;
 }
 
-export function PostCard({ post, variant = "default", artistGradient }: PostCardProps) {
+export function PostCard({
+  post,
+  variant = "default",
+  artistGradient,
+}: PostCardProps) {
   const isCompact = variant === "compact";
 
   return (
-    <div className={cn("rounded-xl border border-border bg-card", isCompact ? "p-4" : "p-5")}>
+    <div
+      className={cn(
+        "rounded-xl border border-border bg-card",
+        isCompact ? "p-4" : "p-5",
+      )}
+    >
       {/* Header */}
       <div className="flex items-center gap-3">
         {post.authorAvatar ? (
-          <div className={cn("shrink-0 rounded-full overflow-hidden relative", isCompact ? "size-8" : "size-10")}>
+          <div
+            className={cn(
+              "shrink-0 rounded-full overflow-hidden relative",
+              isCompact ? "size-8" : "size-10",
+            )}
+          >
             <Image
               src={post.authorAvatar}
               alt={post.authorName}
@@ -32,14 +46,22 @@ export function PostCard({ post, variant = "default", artistGradient }: PostCard
               "shrink-0 rounded-full flex items-center justify-center text-white font-bold",
               isCompact ? "size-8 text-xs" : "size-10 text-sm",
             )}
-            style={{ background: artistGradient ?? "linear-gradient(135deg, #374151, #6b7280)" }}
+            style={{
+              background:
+                artistGradient ?? "linear-gradient(135deg, #374151, #6b7280)",
+            }}
           >
             {post.authorName.charAt(0)}
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className={cn("font-semibold truncate", isCompact ? "text-xs" : "text-sm")}>
+            <span
+              className={cn(
+                "font-semibold truncate",
+                isCompact ? "text-xs" : "text-sm",
+              )}
+            >
               {post.authorName}
             </span>
             {post.isOfficial && (
@@ -49,7 +71,9 @@ export function PostCard({ post, variant = "default", artistGradient }: PostCard
               />
             )}
           </div>
-          <span className="text-xs text-muted-foreground">{formatRelativeTime(post.createdAt)}</span>
+          <span className="text-xs text-muted-foreground">
+            {formatRelativeTime(post.createdAt)}
+          </span>
         </div>
       </div>
 
@@ -72,8 +96,8 @@ export function PostCard({ post, variant = "default", artistGradient }: PostCard
               className={cn(
                 "rounded-lg overflow-hidden relative",
                 post.images.length === 1
-                  ? "w-full aspect-[16/9]"
-                  : "flex-1 aspect-[4/3] min-w-0",
+                  ? "w-full aspect-video"
+                  : "flex-1 aspect-4/3 min-w-0",
               )}
             >
               <Image
@@ -91,7 +115,9 @@ export function PostCard({ post, variant = "default", artistGradient }: PostCard
       <div
         className={cn(
           "flex items-center gap-5 text-muted-foreground",
-          isCompact ? "mt-2 text-xs" : "mt-3 pt-3 border-t border-border text-sm",
+          isCompact
+            ? "mt-2 text-xs"
+            : "mt-3 pt-3 border-t border-border text-sm",
         )}
       >
         <span className="flex items-center gap-1.5">
