@@ -56,6 +56,7 @@ export function EventDetailHero({ event }: EventDetailHeroProps) {
               alt={event.title}
               fill
               className="object-cover"
+              priority
             />
             {/* Date overlay on poster bottom */}
             <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-3 py-2.5 space-y-0.5">

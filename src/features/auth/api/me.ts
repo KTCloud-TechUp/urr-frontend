@@ -11,5 +11,8 @@ export async function fetchMe(): Promise<AuthUser> {
     nickname: data.nickname,
     role: data.role,
     onboardingCompleted: data.onboardingCompleted,
+    marketingConsent: data.marketingConsent,
+    pushConsent: data.pushConsent,
+    smsConsent: data.smsConsent,
   };
 }

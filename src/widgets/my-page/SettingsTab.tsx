@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
+import { AUTH_ME_QUERY_KEY } from '@/features/auth/model/useCurrentUser'
+import type { AuthUser } from '@/features/auth/model/types'
 import { Check, Loader2, LogOut, Pencil, UserX } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
@@ -20,17 +23,23 @@ import {
 } from '@/shared/ui/alert-dialog'
 import { toast } from 'sonner'
 import { AccountDeleteDialog } from './AccountDeleteDialog'
-import { logout } from '@/features/auth/api/logout'
+import { logout, updateConsents } from '@/features/auth/api'
 import { tokenStore } from '@/shared/api'
 import type { User } from '@/shared/types'
 
 interface SettingsTabProps {
   user: User
   onUpdateUser: (updates: Partial<Pick<User, 'name' | 'email'>>) => void
+  initialConsents?: {
+    marketingConsent: boolean
+    pushConsent: boolean
+    smsConsent: boolean
+  }
 }
 
-export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
+export function SettingsTab({ user, onUpdateUser, initialConsents }: SettingsTabProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   // Profile editing
   const [isEditing, setIsEditing] = useState(false)
@@ -41,9 +50,34 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
   const [emailError, setEmailError] = useState('')
 
   // Notification toggles
-  const [marketingConsent, setMarketingConsent] = useState(false)
-  const [pushNotifications, setPushNotifications] = useState(true)
-  const [smsNotifications, setSmsNotifications] = useState(false)
+  const [marketingConsent, setMarketingConsent] = useState(initialConsents?.marketingConsent ?? false)
+  const [pushNotifications, setPushNotifications] = useState(initialConsents?.pushConsent ?? false)
+  const [smsNotifications, setSmsNotifications] = useState(initialConsents?.smsConsent ?? false)
+  const handleConsentChange = async (
+    field: 'marketing' | 'push' | 'sms',
+    value: boolean,
+  ) => {
+    const next = {
+      marketingConsent: field === 'marketing' ? value : marketingConsent,
+      pushConsent: field === 'push' ? value : pushNotifications,
+      smsConsent: field === 'sms' ? value : smsNotifications,
+    }
+    if (field === 'marketing') setMarketingConsent(value)
+    else if (field === 'push') setPushNotifications(value)
+    else setSmsNotifications(value)
+
+    try {
+      await updateConsents(next)
+      queryClient.setQueryData<AuthUser>(AUTH_ME_QUERY_KEY, (prev) =>
+        prev ? { ...prev, ...next } : prev,
+      )
+    } catch {
+      if (field === 'marketing') setMarketingConsent(!value)
+      else if (field === 'push') setPushNotifications(!value)
+      else setSmsNotifications(!value)
+      toast.error('알림 설정 저장에 실패했습니다.')
+    }
+  }
 
   // Account action dialogs
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
@@ -191,7 +225,8 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
             <Switch
               id="marketing"
               checked={marketingConsent}
-              onCheckedChange={setMarketingConsent}
+
+              onCheckedChange={(v) => handleConsentChange('marketing', v)}
             />
           </div>
 
@@ -205,7 +240,8 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
             <Switch
               id="push"
               checked={pushNotifications}
-              onCheckedChange={setPushNotifications}
+
+              onCheckedChange={(v) => handleConsentChange('push', v)}
             />
           </div>
 
@@ -219,7 +255,8 @@ export function SettingsTab({ user, onUpdateUser }: SettingsTabProps) {
             <Switch
               id="sms"
               checked={smsNotifications}
-              onCheckedChange={setSmsNotifications}
+
+              onCheckedChange={(v) => handleConsentChange('sms', v)}
             />
           </div>
         </div>

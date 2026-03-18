@@ -21,6 +21,9 @@ export interface AuthResponseData {
     nickname: string;
     role: string;
     onboardingCompleted: boolean;
+    marketingConsent: boolean;
+    pushConsent: boolean;
+    smsConsent: boolean;
   };
   onboardingRequired: boolean;
   nextPath: string;
@@ -34,6 +37,9 @@ export interface MeResponseData {
   nickname: string;
   role: string;
   onboardingCompleted: boolean;
+  marketingConsent: boolean;
+  pushConsent: boolean;
+  smsConsent: boolean;
 }
 
 // === 프론트 auth 도메인 모델 ===
@@ -45,4 +51,7 @@ export interface AuthUser {
   nickname: string;
   role: string;
   onboardingCompleted: boolean;
+  marketingConsent: boolean;
+  pushConsent: boolean;
+  smsConsent: boolean;
 }

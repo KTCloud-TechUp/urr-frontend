@@ -8,4 +8,6 @@ export { naverLogin } from "./naverLogin";
 export { fetchMe } from "./me";
 export { socialOnboarding } from "./socialOnboarding";
 export type { SocialOnboardingParams } from "./socialOnboarding";
-export { reissueToken } from "./reissue";
+export { reissueToken } from "./reissue"
+export { updateConsents } from "./updateConsents"
+export type { UpdateConsentsParams } from "./updateConsents";

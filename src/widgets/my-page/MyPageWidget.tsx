@@ -89,7 +89,15 @@ export function MyPageWidget() {
         </TabsContent>
 
         <TabsContent value="settings" className="pt-6">
-          <SettingsTab user={mergedUser} onUpdateUser={handleUpdateUser} />
+          <SettingsTab
+            user={mergedUser}
+            onUpdateUser={handleUpdateUser}
+            initialConsents={meData ? {
+              marketingConsent: meData.marketingConsent,
+              pushConsent: meData.pushConsent,
+              smsConsent: meData.smsConsent,
+            } : undefined}
+          />
         </TabsContent>
       </Tabs>
     </div>

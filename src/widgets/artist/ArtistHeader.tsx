@@ -31,6 +31,7 @@ export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }
           alt={artist.name}
           fill
           className="object-cover"
+          priority
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -45,6 +46,7 @@ export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }
               width={88}
               height={88}
               className="size-[88px] rounded-full border-[3px] border-white/30 shrink-0 object-cover"
+              priority
             />
           ) : (
             <div
