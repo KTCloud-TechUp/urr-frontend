@@ -78,9 +78,10 @@ features/<domain>/<feature-name>/
 | -------------------------------- | ------------------ | -------------------------------------- |
 | `/`                              | HomePage           | 배너·인기아티스트·공연랭킹·선예매 섹션 |
 | `/artists`                       | ArtistsPage        | 아티스트 목록 그리드                   |
-| `/artists/:artistId`             | ArtistPage         | 홈/공연/양도 탭 (멤버십 게이트)        |
+| `/artists/:artistId`             | ArtistPage         | 홈/소통/공연/양도 탭 (멤버십 게이트)   |
 | `/events`                        | EventsPage         | 공연 목록                              |
-| `/events/:eventId`               | BookingPage        | 예매 2-Panel 플로우                    |
+| `/events/:eventId`               | EventDetailPage    | 공연 상세                              |
+| `/events/:eventId/booking`       | BookingPage        | 예매 2-Panel 플로우                    |
 | `/membership`                    | MembershipPage     | 4단계 가입 플로우                      |
 | `/my-page`                       | MyPage             | 멤버십/티켓 월렛/양도 내역 탭          |
 | `/onboarding`                    | OnboardingPage     | 회원가입·로그인                        |
