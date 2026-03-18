@@ -26,10 +26,10 @@
 
 | 등급         | 텍스트                | 배경                   |
 | ------------ | --------------------- | ---------------------- |
-| Diamond (🌩️) | `text-tier-lightning` | `bg-tier-lightning-bg` |
-| Gold (⚡)    | `text-tier-thunder`   | `bg-tier-thunder-bg`   |
-| Silver (☁️)  | `text-tier-cloud`     | `bg-tier-cloud-bg`     |
-| Bronze (🌫️)  | `text-tier-mist`      | `bg-tier-mist-bg`      |
+| 라이트닝 (🌩️) | `text-tier-lightning` | `bg-tier-lightning-bg` |
+| 썬더 (⚡)     | `text-tier-thunder`   | `bg-tier-thunder-bg`   |
+| 클라우드 (☁️) | `text-tier-cloud`     | `bg-tier-cloud-bg`     |
+| 미스트 (🌫️)  | `text-tier-mist`      | `bg-tier-mist-bg`      |
 
 ### 좌석 상태
 
@@ -84,7 +84,6 @@
 | 보조 텍스트    | `text-[13px]`                     |
 | 배지/상태      | `text-xs font-semibold`           |
 | 타이머 (좌석)  | `text-[28px] font-bold font-mono` |
-| 타이머 (VQA)   | `text-xl font-semibold font-mono` |
 
 ---
 
@@ -109,8 +108,6 @@
 | 좌측 패널 접기      | width 200ms ease-out                      |
 | 모달 열림           | fade + scale 95%→100%, 200ms ease-out     |
 | 모달 닫힘           | fade + scale 100%→95%, 150ms ease-in      |
-| VQA 정답            | 초록 flash 300ms                          |
-| VQA 오답            | 빨간 flash + translateX(±3px) shake 400ms |
 | 대기열 순번         | digit roll 500ms                          |
 | 타이머 pulse (≤30s) | scale 1.05, 1s loop                       |
 | 결제 성공           | canvas-confetti burst 800ms               |
