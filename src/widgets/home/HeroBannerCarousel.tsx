@@ -63,7 +63,7 @@ export function HeroBannerCarousel({ banners }: HeroBannerCarouselProps) {
         className="flex h-full transition-transform duration-500 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
-        {banners.map((banner) => (
+        {banners.map((banner, index) => (
           <Link
             key={banner.id}
             href={`/events/${banner.id}`}
@@ -75,6 +75,7 @@ export function HeroBannerCarousel({ banners }: HeroBannerCarouselProps) {
                 alt={banner.title}
                 fill
                 className="object-cover"
+                priority={index === 0}
               />
             ) : (
               <div
