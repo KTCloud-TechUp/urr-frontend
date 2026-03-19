@@ -25,6 +25,20 @@ npm run dev    # 개발 서버
 npm run build  # 빌드 검증
 ```
 
+### 상태 관리 기준
+
+| 상황 | 사용 |
+|---|---|
+| API 데이터 조회 (GET) | `useQuery` |
+| API 데이터 변경 (POST/PUT/DELETE) | `useMutation` |
+| 모달 열림/닫힘, 탭 선택 등 UI 상태 | `useState` |
+| 여러 페이지에 걸쳐 공유되는 클라이언트 상태 | `Zustand` |
+| 앱 초기화 로직 (세션 복원, OAuth 콜백 등) | `useEffect` 직접 사용 허용 |
+
+- **새 페이지 API 연동 시 반드시 TanStack Query 사용** (`useState + useEffect` 패턴 금지)
+- Zustand는 전역 공유 상태가 실제로 필요할 때만 도입 (현재 미사용)
+- `apiRequest()`를 직접 호출하지 말고 `features/<domain>/api/` 함수를 통해 호출
+
 ---
 
 ## 파일 구조 — FSD (Feature-Sliced Design)
