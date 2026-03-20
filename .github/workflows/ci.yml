@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.9.0
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -34,10 +34,10 @@ jobs:
         if: success()
         run: |
           curl -H "Content-Type: application/json" \
-            -d '{"embeds": [{"title": "✅ 프론트 CI 성공", "description": "**${{ github.repository }}**\nPR: ${{ github.event.pull_request.title }}", "color": 65280}]}' \
+            -d '{"embeds": [{"title": "✅ 프론트 CI 성공", "description": "**${{ github.repository }}**\nPR: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})\n커밋: [`${{ github.event.pull_request.head.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha }})", "color": 65280}]}' \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
           curl -H "Content-Type: application/json" \
-            -d '{"embeds": [{"title": "✅ 프론트 CI 성공", "description": "**${{ github.repository }}**\nPR: ${{ github.event.pull_request.title }}", "color": 65280}]}' \
+            -d '{"embeds": [{"title": "✅ 프론트 CI 성공", "description": "**${{ github.repository }}**\nPR: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})\n커밋: [`${{ github.event.pull_request.head.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha }})", "color": 65280}]}' \
             ${{ secrets.DISCORD_WEBHOOK_URL_2 }}
 
       # Discord 알림 (실패)
@@ -45,8 +45,8 @@ jobs:
         if: failure()
         run: |
           curl -H "Content-Type: application/json" \
-            -d '{"embeds": [{"title": "❌ 프론트 CI 실패", "description": "**${{ github.repository }}**\nPR: ${{ github.event.pull_request.title }}\n[로그 확인](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "color": 16711680}]}' \
+            -d '{"embeds": [{"title": "❌ 프론트 CI 실패", "description": "**${{ github.repository }}**\nPR: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})\n커밋: [`${{ github.event.pull_request.head.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha }})\n[로그 확인](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "color": 16711680}]}' \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
           curl -H "Content-Type: application/json" \
-            -d '{"embeds": [{"title": "❌ 프론트 CI 실패", "description": "**${{ github.repository }}**\nPR: ${{ github.event.pull_request.title }}\n[로그 확인](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "color": 16711680}]}' \
+            -d '{"embeds": [{"title": "❌ 프론트 CI 실패", "description": "**${{ github.repository }}**\nPR: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})\n커밋: [`${{ github.event.pull_request.head.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha }})\n[로그 확인](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "color": 16711680}]}' \
             ${{ secrets.DISCORD_WEBHOOK_URL_2 }}
