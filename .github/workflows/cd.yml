@@ -51,7 +51,9 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 sync out/ s3://urr-dev-frontend --delete
+          aws s3 sync out/ s3://urr-dev-frontend --delete --exclude "index.html" --exclude "404.html"
+          aws s3 cp out/index.html s3://urr-dev-frontend/index.html --cache-control "no-cache, no-store, must-revalidate"
+          aws s3 cp out/404.html s3://urr-dev-frontend/404.html --cache-control "no-cache, no-store, must-revalidate"
 
       - name: Invalidate CloudFront
         run: |
