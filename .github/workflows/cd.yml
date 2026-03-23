@@ -28,6 +28,8 @@ jobs:
       - name: Build & Export
         env:
           NEXT_PUBLIC_API_BASE_URL: https://urr.guru
+          NEXT_PUBLIC_KAKAO_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_KAKAO_CLIENT_ID }}
+          NEXT_PUBLIC_NAVER_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_NAVER_CLIENT_ID }}
         run: npm run build
 
       - name: Configure AWS credentials
@@ -52,12 +54,10 @@ jobs:
       - name: Discord notification (success)
         if: success()
         run: |
-          curl -H "Content-Type: application/json" \
-            -d '{"embeds": [{"title": "🚀 프론트 배포 완료", "description": "**urr-frontend**\nS3 업로드 + CloudFront 캐시 무효화 완료\nhttps://urr.guru", "color": 65280}]}' \
-            ${{ secrets.DISCORD_WEBHOOK_URL }}
-          curl -H "Content-Type: application/json" \
-            -d '{"embeds": [{"title": "🚀 프론트 배포 완료", "description": "**urr-frontend**\nS3 업로드 + CloudFront 캐시 무효화 완료\nhttps://urr.guru", "color": 65280}]}' \
-            ${{ secrets.DISCORD_WEBHOOK_URL_2 }}
+          MSG=$(echo '${{ github.event.head_commit.message }}' | head -1 | sed 's/"/\\"/g')
+          BODY='{"embeds": [{"title": "🚀 프론트 배포 완료", "description": "**urr-frontend** → main\n📝 '"$MSG"'\n👤 ${{ github.actor }}\n🔗 [커밋](${{ github.event.head_commit.url }})\nhttps://urr.guru", "color": 65280}]}'
+          curl -H "Content-Type: application/json" -d "$BODY" ${{ secrets.DISCORD_WEBHOOK_URL }}
+          curl -H "Content-Type: application/json" -d "$BODY" ${{ secrets.DISCORD_WEBHOOK_URL_2 }}
 
       # Discord 알림 (배포 실패)
       - name: Discord notification (failure)
