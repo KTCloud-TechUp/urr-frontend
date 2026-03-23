@@ -4,8 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Calendar, MapPin, ChevronRight, Crown, Ticket,
-  ShoppingBag, MessageCircle, Mic2, Lock,
+  Calendar,
+  MapPin,
+  ChevronRight,
+  Crown,
+  Ticket,
+  ShoppingBag,
+  MessageCircle,
+  Mic2,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui";
@@ -16,7 +23,13 @@ import { TierBadge } from "@/entities/user";
 import { getArtistGradient } from "@/shared/lib/mocks/home";
 import { formatDateFull, formatDateShort } from "@/shared/lib/format";
 import { TIER_LABELS, TIER_EMOJIS } from "@/shared/types";
-import type { Artist, Event, Membership, TransferListing, CommunityPost } from "@/shared/types";
+import type {
+  Artist,
+  Event,
+  Membership,
+  TransferListing,
+  CommunityPost,
+} from "@/shared/types";
 import type { ArtistExtendedInfo } from "@/shared/lib/mocks/artist-page";
 
 type EnrichedTransfer = TransferListing & { event: Event };
@@ -60,54 +73,65 @@ export function ArtistHomeTab({
                 </div>
                 <div>
                   <div className="flex items-center gap-2.5">
-                    <span className="text-sm font-bold">{TIER_LABELS[membership.tier]} 멤버십</span>
+                    <span className="text-sm font-bold">
+                      {TIER_LABELS[membership.tier]} 멤버십
+                    </span>
                     <TierBadge tier={membership.tier} size="sm" />
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(membership.expiresAt).toLocaleDateString("ko-KR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}{" "}
+                    {new Date(membership.expiresAt).toLocaleDateString(
+                      "ko-KR",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}{" "}
                     만료
                     <span className="mx-1.5 text-border">·</span>
                     {membership.tier === "lightning"
-                      ? "최우선 예매 · VQA 면제"
+                      ? "최우선 예매 · 양도 수수료 5%"
                       : membership.tier === "thunder"
-                        ? "우선 예매 · VQA 면제"
+                        ? "우선 예매 · 양도 수수료 5%"
                         : membership.tier === "cloud"
-                          ? "선예매 · VQA 필요"
-                          : "일반 예매 · VQA 필요"}
+                          ? "일반 예매 · 양도 수수료 10%"
+                          : "일반 예매 · 양도 수수료 10%"}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-6 text-xs text-muted-foreground">
-                {(["lightning", "thunder", "cloud", "mist"] as const).map((tier) => (
-                  <div
-                    key={tier}
-                    className={cn(
-                      "text-center",
-                      tier === membership.tier ? "text-foreground font-semibold" : "opacity-40",
-                    )}
-                  >
-                    <span className="text-base">{TIER_EMOJIS[tier]}</span>
-                    <p className="text-[10px] mt-0.5">{TIER_LABELS[tier]}</p>
-                  </div>
-                ))}
+                {(["lightning", "thunder", "cloud", "mist"] as const).map(
+                  (tier) => (
+                    <div
+                      key={tier}
+                      className={cn(
+                        "text-center",
+                        tier === membership.tier
+                          ? "text-foreground font-semibold"
+                          : "opacity-40",
+                      )}
+                    >
+                      <span className="text-base">{TIER_EMOJIS[tier]}</span>
+                      <p className="text-[10px] mt-0.5">{TIER_LABELS[tier]}</p>
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           </div>
         </section>
       ) : (
         <section>
-          <div className="rounded-xl border border-dashed border-primary/30 bg-primary/[0.03] p-6">
+          <div className="rounded-xl border border-dashed border-primary/30 bg-primary/3 p-6">
             <div className="flex items-center justify-between gap-6">
               <div className="flex items-center gap-4">
                 <div className="size-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                   <Crown size={20} className="text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold">{artist.name} 멤버십에 가입하세요</h3>
+                  <h3 className="text-sm font-bold">
+                    {artist.name} 멤버십에 가입하세요
+                  </h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     선예매 우선권, 양도 마켓, 전용 굿즈 등 다양한 혜택
                   </p>
@@ -115,16 +139,22 @@ export function ArtistHomeTab({
               </div>
               <div className="flex items-center gap-4 shrink-0">
                 <div className="hidden lg:flex items-center gap-4 text-xs text-muted-foreground">
-                  {(["lightning", "thunder", "cloud", "mist"] as const).map((tier) => (
-                    <div key={tier} className="text-center">
-                      <span className="text-base">{TIER_EMOJIS[tier]}</span>
-                      <p className="text-[10px] mt-0.5">{TIER_LABELS[tier]}</p>
-                    </div>
-                  ))}
+                  {(["lightning", "thunder", "cloud", "mist"] as const).map(
+                    (tier) => (
+                      <div key={tier} className="text-center">
+                        <span className="text-base">{TIER_EMOJIS[tier]}</span>
+                        <p className="text-[10px] mt-0.5">
+                          {TIER_LABELS[tier]}
+                        </p>
+                      </div>
+                    ),
+                  )}
                 </div>
                 <Button
                   size="sm"
-                  onClick={() => router.push(`/membership?artistId=${artist.id}`)}
+                  onClick={() =>
+                    router.push(`/membership?artistId=${artist.id}`)
+                  }
                 >
                   멤버십 가입 — 30,000원/년
                 </Button>
@@ -140,7 +170,9 @@ export function ArtistHomeTab({
           <Mic2 size={20} className="text-muted-foreground" />
           아티스트 소개
         </h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">{artist.bio}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {artist.bio}
+        </p>
         {extendedInfo && (
           <div className="flex items-center gap-6 text-sm">
             <div>
@@ -191,7 +223,11 @@ export function ArtistHomeTab({
           communityPosts.length > 0 ? (
             <div className="space-y-3">
               {[...communityPosts]
-                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .sort(
+                  (a, b) =>
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime(),
+                )
                 .slice(0, 2)
                 .map((post) => (
                   <PostCard
@@ -204,13 +240,17 @@ export function ArtistHomeTab({
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-border bg-muted/20 p-8 text-center">
-              <p className="text-sm text-muted-foreground">아직 소통 게시글이 없습니다</p>
+              <p className="text-sm text-muted-foreground">
+                아직 소통 게시글이 없습니다
+              </p>
             </div>
           )
         ) : (
           <div className="rounded-xl border border-dashed border-border bg-muted/20 p-8 text-center space-y-3">
             <Lock size={24} className="mx-auto text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">멤버십 회원만 소통 콘텐츠를 이용할 수 있습니다</p>
+            <p className="text-sm text-muted-foreground">
+              멤버십 회원만 소통 콘텐츠를 이용할 수 있습니다
+            </p>
             <Button
               size="sm"
               variant="outline"
@@ -342,8 +382,13 @@ export function ArtistHomeTab({
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-border bg-muted/20 p-10 text-center">
-            <Calendar size={32} className="mx-auto text-muted-foreground/30 mb-3" />
-            <p className="text-sm text-muted-foreground">예정된 공연이 없습니다</p>
+            <Calendar
+              size={32}
+              className="mx-auto text-muted-foreground/30 mb-3"
+            />
+            <p className="text-sm text-muted-foreground">
+              예정된 공연이 없습니다
+            </p>
           </div>
         )}
       </section>
@@ -374,13 +419,17 @@ export function ArtistHomeTab({
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-border bg-muted/20 p-8 text-center">
-              <p className="text-sm text-muted-foreground">현재 양도 가능한 티켓이 없습니다</p>
+              <p className="text-sm text-muted-foreground">
+                현재 양도 가능한 티켓이 없습니다
+              </p>
             </div>
           )
         ) : (
           <div className="rounded-xl border border-dashed border-border bg-muted/20 p-8 text-center space-y-3">
             <Lock size={24} className="mx-auto text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">멤버십 회원만 양도 마켓을 이용할 수 있습니다</p>
+            <p className="text-sm text-muted-foreground">
+              멤버십 회원만 양도 마켓을 이용할 수 있습니다
+            </p>
             <Button
               size="sm"
               variant="outline"
