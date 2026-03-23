@@ -1,10 +1,9 @@
 name: CD - Deploy Frontend
 
 on:
-  workflow_run:
-    workflows: ["CI"] # CI workflow name (정확히 일치해야 함)
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 permissions:
   id-token: write
@@ -12,23 +11,11 @@ permissions:
 
 jobs:
   deploy:
-    # 조건:
-    # 1) CI 성공
-    # 2) PR 이벤트
-    # 3) PR 대상 브랜치가 main
-    if: >
-      github.event.workflow_run.conclusion == 'success'
-      && github.event.workflow_run.event == 'pull_request'
-      && github.event.workflow_run.pull_requests != null
-      && github.event.workflow_run.pull_requests[0].base.ref == 'main'
-
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout PR commit
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -51,7 +38,9 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 sync out/ s3://urr-dev-frontend --delete
+          aws s3 sync out/ s3://urr-dev-frontend --delete --exclude "index.html" --exclude "404.html"
+          aws s3 cp out/index.html s3://urr-dev-frontend/index.html --cache-control "no-cache, no-store, must-revalidate"
+          aws s3 cp out/404.html s3://urr-dev-frontend/404.html --cache-control "no-cache, no-store, must-revalidate"
 
       - name: Invalidate CloudFront
         run: |
