@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef, forwardRef } from "react";
+import { useMemo, useState, forwardRef, useEffect, useRef } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
 import { useBooking } from "@/features/booking/model/BookingContext";
 import { cn } from "@/shared/lib/utils";
+import { SECTION_BBOXES } from "@/shared/lib/venue";
 export { SECTION_BBOXES } from "@/shared/lib/venue";
+
+const FULL_VB = { x: 0, y: 0, w: 895, h: 698 };
 
 const STAGE_PATH =
   "M543.978 299.3C539.378 299.6 535.678 299.9 530.278 300.3C560.878 338 590.578 374.5 620.578 411.5C618.578 413.4 616.378 415.6 613.978 417.6C600.978 428.3 587.978 439 574.878 449.5C572.478 451.4 569.478 452.7 566.478 453.5C551.778 457.7 536.978 461.7 522.178 465.6C518.178 466.6 513.978 467.3 509.878 467.3C466.678 467.4 423.578 467.5 380.378 467.1C373.178 467 365.978 464.7 358.978 462.8C346.878 459.7 334.878 456.2 322.978 452.6C320.478 451.9 317.878 450.7 315.978 449.1C302.178 437.8 288.578 426.2 274.878 414.8C273.878 414 272.678 413.3 271.178 412.3C301.978 374.6 331.978 337.8 362.378 300.6C358.178 300.2 354.278 299.9 349.378 299.4C351.278 296.9 352.578 294.9 354.078 293.1C376.878 265 399.778 237.1 422.478 208.9C424.078 206.9 425.078 203.9 425.178 201.3C425.378 179.8 425.178 158.3 425.378 136.8C425.378 132.3 424.078 131.2 419.678 131.2C367.878 131.3 315.978 131.3 264.178 131.2C262.278 131.2 259.478 130.8 258.578 129.5C256.678 126.6 258.778 123.8 262.478 123.8C271.478 123.7 280.478 123.8 289.478 123.9C296.178 123.9 296.278 123.9 296.278 116.9C296.278 80.1 296.378 43.2 296.178 6.40001C296.178 1.10001 297.778 0.100006 302.678 0.100006C398.678 0.200006 494.678 0.2 590.678 0C595.378 0 595.678 2.1 595.678 5.7C595.578 42 595.678 78.4 595.678 114.7C595.678 123.8 595.678 123.8 605.078 123.8C612.878 123.8 620.778 123.8 628.578 123.8C631.178 123.8 633.478 123.7 633.478 127.6C633.478 131.5 631.078 131.3 628.478 131.3C577.978 131.3 527.478 131.3 476.978 131.4C475.278 131.4 473.578 131.6 471.978 131.4C468.378 131 466.878 132.3 466.878 136.1C466.978 157.9 466.878 179.8 467.078 201.6C467.078 204 468.578 206.7 470.178 208.6C494.178 238.1 518.278 267.4 542.378 296.8C542.678 297.4 543.078 298.1 543.978 299.3ZM590.778 408.3C587.178 403.5 584.278 399.4 581.178 395.6C556.278 365 531.178 334.5 506.378 303.9C503.778 300.7 501.078 299.5 497.078 299.5C462.778 299.6 428.478 299.6 394.178 299.5C390.678 299.5 388.678 300.9 386.678 303.3C377.778 314.3 368.778 325.2 359.778 336.1C341.378 358.5 322.978 380.9 304.478 403.2C302.078 406.1 301.978 408.1 304.878 410.6C312.178 416.7 319.278 423 326.478 429.1C327.678 430.1 329.278 431 330.878 431.4C344.478 435.2 358.078 439.1 371.678 442.6C373.178 443 375.578 442.1 376.678 440.9C380.778 436.5 384.278 431.6 388.478 427.3C390.078 425.6 392.878 424.1 395.078 424.1C429.178 423.9 463.378 423.9 497.478 424.1C499.778 424.1 502.578 425.5 504.178 427.2C508.078 431.1 511.578 435.4 514.778 439.8C516.978 442.8 519.178 443.6 522.778 442.5C532.478 439.5 542.278 436.7 552.078 434.2C567.878 430.1 577.978 418 590.778 408.3Z";
@@ -150,13 +153,6 @@ const ZONE_DEFAULT_COLOR: Record<string, string> = {
   A20: "#8A9348",
 };
 
-function getAvailabilityColor(remaining: number, total: number): string {
-  if (remaining === 0) return "#9CA3AF";
-  const ratio = remaining / total;
-  if (ratio > 0.3) return "#22C55E";
-  if (ratio > 0.1) return "#F97316";
-  return "#EF4444";
-}
 
 interface VenueMapProps {
   className?: string;
@@ -165,6 +161,7 @@ interface VenueMapProps {
   selectedSectionId?: string | null;
   dimmedSectionId?: string | null;
   dimNonSelected?: boolean;
+  zoomedSectionId?: string | null;
   seatOverlay?: React.ReactNode;
   onSectionClick?: (sectionId: string) => void;
   onSectionHover?: (sectionId: string | null) => void;
@@ -179,6 +176,7 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
       selectedSectionId,
       dimmedSectionId,
       dimNonSelected = false,
+      zoomedSectionId,
       seatOverlay,
       onSectionClick,
       onSectionHover,
@@ -187,28 +185,64 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
   ) {
     const { sectionsForDate } = useBooking();
     const [hoveredId, setHoveredId] = useState<string | null>(null);
-    const svgRef = useRef<SVGSVGElement>(null);
-    const [labelCenters, setLabelCenters] = useState<
-      Record<string, { x: number; y: number }>
-    >({});
+
+    // viewBox zoom animation
+    const targetVB = useMemo(() => {
+      if (!zoomedSectionId) return FULL_VB;
+      const b = SECTION_BBOXES[zoomedSectionId];
+      if (!b) return FULL_VB;
+      const pad = Math.max(b.w, b.h) * 0.25;
+      return { x: b.x - pad, y: b.y - pad, w: b.w + 2 * pad, h: b.h + 2 * pad };
+    }, [zoomedSectionId]);
+
+    const currentVBRef = useRef(FULL_VB);
+    const [animVB, setAnimVB] = useState(FULL_VB);
+    const rafRef = useRef<number | null>(null);
 
     useEffect(() => {
-      const svg = svgRef.current;
-      if (!svg) return;
-      const centers: Record<string, { x: number; y: number }> = {};
-      svg.querySelectorAll<SVGGElement>("[data-section]").forEach((g) => {
-        const id = g.dataset.section;
-        if (!id) return;
-        const path = g.querySelector("path");
-        if (!path) return;
-        const bbox = path.getBBox();
-        centers[id] = {
-          x: bbox.x + bbox.width / 2,
-          y: bbox.y + bbox.height / 2,
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      const duration = 450;
+      const start = performance.now();
+      const from = { ...currentVBRef.current };
+
+      function tick(now: number) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        const cur = {
+          x: from.x + (targetVB.x - from.x) * ease,
+          y: from.y + (targetVB.y - from.y) * ease,
+          w: from.w + (targetVB.w - from.w) * ease,
+          h: from.h + (targetVB.h - from.h) * ease,
         };
-      });
-      setLabelCenters(centers);
-    }, [sectionsForDate]);
+        currentVBRef.current = cur;
+        setAnimVB({ ...cur });
+        if (t < 1) rafRef.current = requestAnimationFrame(tick);
+        else rafRef.current = null;
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+      return () => {
+        if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      };
+    }, [targetVB]);
+
+    const labelCenters = useMemo<Record<string, { x: number; y: number }>>(() => {
+      if (typeof document === "undefined") return {};
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.style.cssText = "position:absolute;visibility:hidden;pointer-events:none";
+      document.body.appendChild(svg);
+      const centers: Record<string, { x: number; y: number }> = {};
+      for (const [id, d] of Object.entries(ZONE_PATHS)) {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", d);
+        svg.appendChild(path);
+        const bbox = path.getBBox();
+        centers[id] = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+        svg.removeChild(path);
+      }
+      document.body.removeChild(svg);
+      return centers;
+    }, []);
 
     const sectionLookup = useMemo(() => {
       const map = new Map<
@@ -324,13 +358,8 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
 
     return (
       <svg
-        ref={(el) => {
-          svgRef.current = el;
-          if (typeof ref === "function") ref(el);
-          else if (ref)
-            (ref as React.MutableRefObject<SVGSVGElement | null>).current = el;
-        }}
-        viewBox="0 0 895 698"
+        ref={ref}
+        viewBox={`${animVB.x} ${animVB.y} ${animVB.w} ${animVB.h}`}
         className={cn("w-full h-full", className)}
         preserveAspectRatio="xMidYMid meet"
       >

@@ -9,7 +9,11 @@ import { PriceDisplay } from "@/shared/ui/PriceDisplay";
 import { Minimap } from "@/features/booking/ui/Minimap";
 import { formatPrice, parseSeatDisplay } from "@/shared/lib/format";
 import { TIER_EMOJIS, TIER_LABELS } from "@/shared/types";
-import { getAvailabilityColor, getGradeKey, GRADE_ORDER } from "@/features/booking/ui/SectionListTable";
+import {
+  getAvailabilityColor,
+  getGradeKey,
+  GRADE_ORDER,
+} from "@/features/booking/ui/SectionListTable";
 import { cn } from "@/shared/lib/utils";
 import type { Section, EventDate, TierLevel } from "@/shared/types";
 
@@ -53,11 +57,14 @@ export function BookingSidePanel({
   const toggleGrade = (grade: string) =>
     setCollapsed((prev) => ({ ...prev, [grade]: !prev[grade] }));
 
-  const grouped = GRADE_ORDER.reduce<Record<string, Section[]>>((acc, grade) => {
-    const graded = sectionsForDate.filter((s) => getGradeKey(s) === grade);
-    if (graded.length > 0) acc[grade] = graded;
-    return acc;
-  }, {});
+  const grouped = GRADE_ORDER.reduce<Record<string, Section[]>>(
+    (acc, grade) => {
+      const graded = sectionsForDate.filter((s) => getGradeKey(s) === grade);
+      if (graded.length > 0) acc[grade] = graded;
+      return acc;
+    },
+    {},
+  );
   const seatCount = selectedSeatIds.length;
   const hasSection = !!selectedSectionId && !!section;
   const tierFee =
@@ -72,7 +79,7 @@ export function BookingSidePanel({
     lastSeat && section ? parseSeatDisplay(lastSeat, section.name) : null;
 
   return (
-    <div className="w-[360px] shrink-0 border-l border-border bg-white flex flex-col h-full">
+    <div className="w-90 shrink-0 border-l border-border bg-white flex flex-col h-full">
       {/* Header: Section + Seat info */}
       <div className="px-5 py-4 border-b border-border shrink-0">
         <div className="flex items-start justify-between">
@@ -167,12 +174,20 @@ export function BookingSidePanel({
         <div className="py-2">
           <div className="flex items-center justify-between px-5 pb-2">
             <h4 className="text-sm font-semibold">잔여석</h4>
-            <p className="text-xs text-muted-foreground">좌석등급을 선택해주세요.</p>
+            <p className="text-xs text-muted-foreground">
+              좌석등급을 선택해주세요.
+            </p>
           </div>
           {Object.entries(grouped).map(([grade, gradesSections]) => {
             const isCollapsed = !!collapsed[grade];
-            const totalRemaining = gradesSections.reduce((sum, s) => sum + s.remainingSeats, 0);
-            const totalSeats = gradesSections.reduce((sum, s) => sum + s.totalSeats, 0);
+            const totalRemaining = gradesSections.reduce(
+              (sum, s) => sum + s.remainingSeats,
+              0,
+            );
+            const totalSeats = gradesSections.reduce(
+              (sum, s) => sum + s.totalSeats,
+              0,
+            );
             const gradePrice = gradesSections[0]?.price ?? 0;
             return (
               <div key={grade}>
@@ -190,13 +205,19 @@ export function BookingSidePanel({
                   <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                     {grade}
                   </span>
-                  <span className="text-[11px] text-muted-foreground/60">{formatPrice(gradePrice)}</span>
+                  <span className="text-[11px] text-muted-foreground/60">
+                    {formatPrice(gradePrice)}
+                  </span>
                   <div className="flex-1 h-px bg-border" />
                   {totalRemaining === 0 ? (
-                    <span className="text-[11px] text-muted-foreground shrink-0">매진</span>
+                    <span className="text-[11px] text-muted-foreground shrink-0">
+                      매진
+                    </span>
                   ) : (
                     <span className="text-[11px] tabular-nums text-muted-foreground shrink-0">
-                      <span className="font-medium text-foreground">{totalRemaining.toLocaleString()}</span>
+                      <span className="font-medium text-foreground">
+                        {totalRemaining.toLocaleString()}
+                      </span>
                       <span>/{totalSeats.toLocaleString()}석</span>
                     </span>
                   )}
@@ -204,20 +225,50 @@ export function BookingSidePanel({
                 {!isCollapsed && (
                   <div className="pb-1">
                     {gradesSections.map((sec) => {
-                      const color = getAvailabilityColor(sec.remainingSeats, sec.totalSeats);
-                      const isCritical = sec.remainingSeats > 0 && sec.remainingSeats / sec.totalSeats <= 0.1;
+                      const color = getAvailabilityColor(
+                        sec.remainingSeats,
+                        sec.totalSeats,
+                      );
+                      const isCritical =
+                        sec.remainingSeats > 0 &&
+                        sec.remainingSeats / sec.totalSeats <= 0.1;
                       return (
-                        <div key={sec.id} className="flex items-center gap-3 px-8 py-2 hover:bg-muted/40 transition-colors">
+                        <button
+                          key={sec.id}
+                          disabled={sec.remainingSeats === 0}
+                          onClick={() => sec.remainingSeats > 0 && onSectionClick(sec.id)}
+                          className={cn(
+                            "w-full flex items-center gap-3 px-8 py-2 transition-colors text-left",
+                            sec.remainingSeats === 0
+                              ? "cursor-not-allowed"
+                              : "hover:bg-muted/40 cursor-pointer",
+                          )}
+                        >
                           <div
                             className="size-2 rounded-full shrink-0"
                             style={{ backgroundColor: color }}
                           />
-                          <span className="text-sm font-medium flex-1">{sec.name}</span>
-                          <span className="text-xs text-muted-foreground tabular-nums">{formatPrice(sec.price)}</span>
-                          <span className={cn("text-xs tabular-nums w-14 text-right", isCritical ? "text-destructive font-semibold" : sec.remainingSeats === 0 ? "text-muted-foreground" : "text-primary font-semibold")}>
-                            {sec.remainingSeats === 0 ? "매진" : `${sec.remainingSeats.toLocaleString()}석`}
+                          <span className="text-sm font-medium flex-1">
+                            {sec.name}
                           </span>
-                        </div>
+                          <span className="text-xs text-muted-foreground tabular-nums">
+                            {formatPrice(sec.price)}
+                          </span>
+                          <span
+                            className={cn(
+                              "text-xs tabular-nums w-14 text-right",
+                              isCritical
+                                ? "text-destructive font-semibold"
+                                : sec.remainingSeats === 0
+                                  ? "text-muted-foreground"
+                                  : "text-primary font-semibold",
+                            )}
+                          >
+                            {sec.remainingSeats === 0
+                              ? "매진"
+                              : `${sec.remainingSeats.toLocaleString()}석`}
+                          </span>
+                        </button>
                       );
                     })}
                   </div>
