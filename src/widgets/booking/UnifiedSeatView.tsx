@@ -5,7 +5,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
 } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useBooking } from "@/features/booking/model/BookingContext";
@@ -14,23 +13,14 @@ import {
   generateSeatsForSection,
   getSectionLayout,
 } from "@/shared/lib/mocks/seats";
-import { VenueMap, SECTION_BBOXES } from "@/features/booking/ui/VenueMap";
+import { useSeatLockSimulation } from "@/features/booking/model/useSeatLockSimulation";
+import { VenueMap } from "@/features/booking/ui/VenueMap";
+import { SECTION_BBOXES } from "@/shared/lib/venue";
 import { SeatOverlay } from "@/features/booking/ui/SeatOverlay";
 import { BookingSidePanel } from "./BookingSidePanel";
 import { TimerExpiryModal } from "./TimerExpiryModal";
+import { formatEventDateTime } from "@/shared/lib/format";
 import type { Seat } from "@/shared/types";
-
-function formatCompactDate(isoDate: string): string {
-  const d = new Date(isoDate);
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "numeric",
-    day: "numeric",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(d);
-}
 
 export function UnifiedSeatView() {
   const {
@@ -54,7 +44,6 @@ export function UnifiedSeatView() {
   } = useBooking();
 
   const timer = useSeatTimer(seatTimerSecondsLeft ?? 180);
-  const selectedSeatIdsRef = useRef(selectedSeatIds);
 
   const [showExpiryModal, setShowExpiryModal] = useState(false);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
@@ -63,11 +52,6 @@ export function UnifiedSeatView() {
   useEffect(() => {
     setLeftPanel(false);
   }, [setLeftPanel]);
-
-  // Keep ref in sync for lock simulation
-  useEffect(() => {
-    selectedSeatIdsRef.current = selectedSeatIds;
-  }, [selectedSeatIds]);
 
   const isInSeatMode = bookingState === "seats-individual";
 
@@ -110,44 +94,8 @@ export function UnifiedSeatView() {
     }
   }, [timer.isExpired, showExpiryModal]);
 
-  // Lock simulation: every 15-30s, randomly lock 1-3 available seats
-  useEffect(() => {
-    if (!timer.isRunning) return;
-
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    function scheduleNextLock() {
-      const delay = (Math.random() * 15 + 15) * 1000;
-      timeoutId = setTimeout(() => {
-        setSeats((prev) => {
-          const selectedSet = new Set(selectedSeatIdsRef.current);
-          const available = prev
-            .map((s, i) => ({ s, i }))
-            .filter(
-              ({ s }) => s.status === "available" && !selectedSet.has(s.id),
-            );
-          if (available.length === 0) return prev;
-          const lockCount = Math.min(
-            available.length,
-            Math.floor(Math.random() * 3) + 1,
-          );
-          const toLock = new Set<number>();
-          while (toLock.size < lockCount) {
-            toLock.add(
-              available[Math.floor(Math.random() * available.length)].i,
-            );
-          }
-          return prev.map((s, i) =>
-            toLock.has(i) ? { ...s, status: "locked" as const } : s,
-          );
-        });
-        scheduleNextLock();
-      }, delay);
-    }
-
-    scheduleNextLock();
-    return () => clearTimeout(timeoutId);
-  }, [timer.isRunning]);
+  // Lock simulation: 15~30초마다 타인이 좌석을 잠그는 상황 시뮬레이션
+  useSeatLockSimulation(timer.isRunning, selectedSeatIds, setSeats);
 
   // === Handlers ===
 
@@ -232,7 +180,7 @@ export function UnifiedSeatView() {
             >
               {event?.dates.map((d) => (
                 <option key={d.id} value={d.id}>
-                  {formatCompactDate(d.date)}
+                  {formatEventDateTime(d.date)}
                 </option>
               ))}
             </select>

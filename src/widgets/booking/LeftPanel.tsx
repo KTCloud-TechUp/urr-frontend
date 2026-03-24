@@ -6,7 +6,7 @@ import { ChevronLeft, MapPin } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { useBooking } from "@/features/booking/model/BookingContext";
 import { useCountdown } from "@/features/booking/model/useCountdown";
-import { formatCountdown } from "@/shared/lib/format";
+import { formatCountdown, formatEventDateTime } from "@/shared/lib/format";
 import { TierBadge } from "@/entities/user/ui/TierBadge";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -18,17 +18,6 @@ import { LeftPanelCollapsed } from "./LeftPanelCollapsed";
 
 const TIER_ORDER: TierLevel[] = ["lightning", "thunder", "cloud", "mist"];
 
-function formatCompactDate(isoDate: string): string {
-  const d = new Date(isoDate);
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "numeric",
-    day: "numeric",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(d);
-}
 
 function formatWindowDate(isoDate: string): string {
   const d = new Date(isoDate);
@@ -45,18 +34,13 @@ function TierScheduleRow({
   tier,
   opensAt,
   isUserTier,
+  isOpen,
 }: {
   tier: TierLevel;
   opensAt: string;
   isUserTier: boolean;
+  isOpen: boolean;
 }) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const isOpen = new Date(opensAt).getTime() <= now;
-
   return (
     <div
       className={cn(
@@ -125,6 +109,12 @@ export function LeftPanel() {
   const isBookingActive = bookingState !== "idle";
   const countdownToOpen = useCountdown(isWindowOpen ? null : userWindowOpensAt);
 
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div
       className={cn(
@@ -144,7 +134,7 @@ export function LeftPanel() {
             >
               {event?.dates.map((d) => (
                 <option key={d.id} value={d.id}>
-                  {formatCompactDate(d.date)} — 잔여{" "}
+                  {formatEventDateTime(d.date)} — 잔여{" "}
                   {d.remainingSeats.toLocaleString()}석
                 </option>
               ))}
@@ -215,6 +205,7 @@ export function LeftPanel() {
                             tier={tier}
                             opensAt={window.opensAt}
                             isUserTier={tier === userTier}
+                            isOpen={new Date(window.opensAt).getTime() <= now}
                           />
                         );
                       })}
