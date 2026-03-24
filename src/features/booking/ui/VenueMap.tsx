@@ -6,7 +6,8 @@ import { useBooking } from "@/features/booking/model/BookingContext";
 import { cn } from "@/shared/lib/utils";
 export { SECTION_BBOXES } from "@/shared/lib/venue";
 
-const STAGE_PATH = "M543.978 299.3C539.378 299.6 535.678 299.9 530.278 300.3C560.878 338 590.578 374.5 620.578 411.5C618.578 413.4 616.378 415.6 613.978 417.6C600.978 428.3 587.978 439 574.878 449.5C572.478 451.4 569.478 452.7 566.478 453.5C551.778 457.7 536.978 461.7 522.178 465.6C518.178 466.6 513.978 467.3 509.878 467.3C466.678 467.4 423.578 467.5 380.378 467.1C373.178 467 365.978 464.7 358.978 462.8C346.878 459.7 334.878 456.2 322.978 452.6C320.478 451.9 317.878 450.7 315.978 449.1C302.178 437.8 288.578 426.2 274.878 414.8C273.878 414 272.678 413.3 271.178 412.3C301.978 374.6 331.978 337.8 362.378 300.6C358.178 300.2 354.278 299.9 349.378 299.4C351.278 296.9 352.578 294.9 354.078 293.1C376.878 265 399.778 237.1 422.478 208.9C424.078 206.9 425.078 203.9 425.178 201.3C425.378 179.8 425.178 158.3 425.378 136.8C425.378 132.3 424.078 131.2 419.678 131.2C367.878 131.3 315.978 131.3 264.178 131.2C262.278 131.2 259.478 130.8 258.578 129.5C256.678 126.6 258.778 123.8 262.478 123.8C271.478 123.7 280.478 123.8 289.478 123.9C296.178 123.9 296.278 123.9 296.278 116.9C296.278 80.1 296.378 43.2 296.178 6.40001C296.178 1.10001 297.778 0.100006 302.678 0.100006C398.678 0.200006 494.678 0.2 590.678 0C595.378 0 595.678 2.1 595.678 5.7C595.578 42 595.678 78.4 595.678 114.7C595.678 123.8 595.678 123.8 605.078 123.8C612.878 123.8 620.778 123.8 628.578 123.8C631.178 123.8 633.478 123.7 633.478 127.6C633.478 131.5 631.078 131.3 628.478 131.3C577.978 131.3 527.478 131.3 476.978 131.4C475.278 131.4 473.578 131.6 471.978 131.4C468.378 131 466.878 132.3 466.878 136.1C466.978 157.9 466.878 179.8 467.078 201.6C467.078 204 468.578 206.7 470.178 208.6C494.178 238.1 518.278 267.4 542.378 296.8C542.678 297.4 543.078 298.1 543.978 299.3ZM590.778 408.3C587.178 403.5 584.278 399.4 581.178 395.6C556.278 365 531.178 334.5 506.378 303.9C503.778 300.7 501.078 299.5 497.078 299.5C462.778 299.6 428.478 299.6 394.178 299.5C390.678 299.5 388.678 300.9 386.678 303.3C377.778 314.3 368.778 325.2 359.778 336.1C341.378 358.5 322.978 380.9 304.478 403.2C302.078 406.1 301.978 408.1 304.878 410.6C312.178 416.7 319.278 423 326.478 429.1C327.678 430.1 329.278 431 330.878 431.4C344.478 435.2 358.078 439.1 371.678 442.6C373.178 443 375.578 442.1 376.678 440.9C380.778 436.5 384.278 431.6 388.478 427.3C390.078 425.6 392.878 424.1 395.078 424.1C429.178 423.9 463.378 423.9 497.478 424.1C499.778 424.1 502.578 425.5 504.178 427.2C508.078 431.1 511.578 435.4 514.778 439.8C516.978 442.8 519.178 443.6 522.778 442.5C532.478 439.5 542.278 436.7 552.078 434.2C567.878 430.1 577.978 418 590.778 408.3Z";
+const STAGE_PATH =
+  "M543.978 299.3C539.378 299.6 535.678 299.9 530.278 300.3C560.878 338 590.578 374.5 620.578 411.5C618.578 413.4 616.378 415.6 613.978 417.6C600.978 428.3 587.978 439 574.878 449.5C572.478 451.4 569.478 452.7 566.478 453.5C551.778 457.7 536.978 461.7 522.178 465.6C518.178 466.6 513.978 467.3 509.878 467.3C466.678 467.4 423.578 467.5 380.378 467.1C373.178 467 365.978 464.7 358.978 462.8C346.878 459.7 334.878 456.2 322.978 452.6C320.478 451.9 317.878 450.7 315.978 449.1C302.178 437.8 288.578 426.2 274.878 414.8C273.878 414 272.678 413.3 271.178 412.3C301.978 374.6 331.978 337.8 362.378 300.6C358.178 300.2 354.278 299.9 349.378 299.4C351.278 296.9 352.578 294.9 354.078 293.1C376.878 265 399.778 237.1 422.478 208.9C424.078 206.9 425.078 203.9 425.178 201.3C425.378 179.8 425.178 158.3 425.378 136.8C425.378 132.3 424.078 131.2 419.678 131.2C367.878 131.3 315.978 131.3 264.178 131.2C262.278 131.2 259.478 130.8 258.578 129.5C256.678 126.6 258.778 123.8 262.478 123.8C271.478 123.7 280.478 123.8 289.478 123.9C296.178 123.9 296.278 123.9 296.278 116.9C296.278 80.1 296.378 43.2 296.178 6.40001C296.178 1.10001 297.778 0.100006 302.678 0.100006C398.678 0.200006 494.678 0.2 590.678 0C595.378 0 595.678 2.1 595.678 5.7C595.578 42 595.678 78.4 595.678 114.7C595.678 123.8 595.678 123.8 605.078 123.8C612.878 123.8 620.778 123.8 628.578 123.8C631.178 123.8 633.478 123.7 633.478 127.6C633.478 131.5 631.078 131.3 628.478 131.3C577.978 131.3 527.478 131.3 476.978 131.4C475.278 131.4 473.578 131.6 471.978 131.4C468.378 131 466.878 132.3 466.878 136.1C466.978 157.9 466.878 179.8 467.078 201.6C467.078 204 468.578 206.7 470.178 208.6C494.178 238.1 518.278 267.4 542.378 296.8C542.678 297.4 543.078 298.1 543.978 299.3ZM590.778 408.3C587.178 403.5 584.278 399.4 581.178 395.6C556.278 365 531.178 334.5 506.378 303.9C503.778 300.7 501.078 299.5 497.078 299.5C462.778 299.6 428.478 299.6 394.178 299.5C390.678 299.5 388.678 300.9 386.678 303.3C377.778 314.3 368.778 325.2 359.778 336.1C341.378 358.5 322.978 380.9 304.478 403.2C302.078 406.1 301.978 408.1 304.878 410.6C312.178 416.7 319.278 423 326.478 429.1C327.678 430.1 329.278 431 330.878 431.4C344.478 435.2 358.078 439.1 371.678 442.6C373.178 443 375.578 442.1 376.678 440.9C380.778 436.5 384.278 431.6 388.478 427.3C390.078 425.6 392.878 424.1 395.078 424.1C429.178 423.9 463.378 423.9 497.478 424.1C499.778 424.1 502.578 425.5 504.178 427.2C508.078 431.1 511.578 435.4 514.778 439.8C516.978 442.8 519.178 443.6 522.778 442.5C532.478 439.5 542.278 436.7 552.078 434.2C567.878 430.1 577.978 418 590.778 408.3Z";
 
 const A_PATHS: string[] = [
   "M109.268 181.934C113.344 182.762 116.105 186.577 115.614 190.707C114.308 201.691 113.026 212.346 111.879 223C111.379 228.1 111.279 233.3 111.079 238.5C110.979 242.9 109.379 244.9 104.479 244.7C76.1788 243.9 47.8788 243.5 19.5788 242.9C14.5788 242.8 9.57882 242.5 4.57881 242.7C1.07881 242.8 -0.221185 241.6 0.0788151 238.1C1.27882 224.4 1.97881 210.6 3.47881 196.9C4.57881 187 6.47881 177.2 7.97881 167.4C8.52888 164.099 11.9482 162.128 15.2259 162.8C46.8046 169.279 78.1521 175.612 109.268 181.934Z",
@@ -61,6 +62,94 @@ const R_PATHS: string[] = [
   "M629.414 422.093C632.429 419.461 636.925 419.464 639.937 422.098C654.103 434.487 668.33 446.964 682.479 459.6C683.379 460.4 683.779 463.6 683.079 464.4C670.049 478.926 655.702 492.057 639.969 504.066C636.428 506.769 631.374 505.932 628.806 502.292C624.376 496.013 620.055 489.857 615.679 483.7C609.379 474.7 602.979 465.7 596.979 456.6C596.079 455.2 595.679 452 596.579 451.2C607.243 441.489 618.058 432.004 629.414 422.093Z",
 ];
 
+/** 구역 ID → SVG path data 매핑 (시계방향: A1=우상단 시작) */
+const ZONE_PATHS: Record<string, string> = {
+  // A석 — 시계방향 우상단→우측→하단→좌측→좌상단
+  A1: A_PATHS[1],
+  A2: A_PATHS[0],
+  A3: A_PATHS[15],
+  A4: A_PATHS[16],
+  A5: A_PATHS[5],
+  A6: A_PATHS[6],
+  A7: A_PATHS[14],
+  A8: A_PATHS[12],
+  A9: A_PATHS[7],
+  A10: A_PATHS[17],
+  A11: A_PATHS[4],
+  A12: A_PATHS[3],
+  A13: A_PATHS[13],
+  A14: A_PATHS[11],
+  A15: A_PATHS[19],
+  A16: A_PATHS[8],
+  A17: A_PATHS[18],
+  A18: A_PATHS[9],
+  A19: A_PATHS[2],
+  A20: A_PATHS[10],
+  // S석 — 좌측 상→하 (S1-S4), 우측 상→하 (S8-S5)
+  S1: S_PATHS[7],
+  S2: S_PATHS[6],
+  S3: S_PATHS[5],
+  S4: S_PATHS[4],
+  S5: S_PATHS[0],
+  S6: S_PATHS[2],
+  S7: S_PATHS[3],
+  S8: S_PATHS[1],
+  // R석 — 좌→우
+  R1: R_PATHS[0],
+  R2: R_PATHS[1],
+  R3: FLOOR_R_PATHS[2],
+  R4: FLOOR_R_PATHS[1],
+  R5: FLOOR_R_PATHS[0],
+  R6: R_PATHS[2],
+  R7: R_PATHS[3],
+  // VIP — 좌→우
+  VIP1: VIP_PATHS[1],
+  VIP2: VIP_PATHS[2],
+  VIP3: VIP_PATHS[0],
+};
+
+/** 구역 ID → 데이터 없을 때 기본 색상 */
+const ZONE_DEFAULT_COLOR: Record<string, string> = {
+  VIP1: "#6171D2",
+  VIP2: "#6171D2",
+  VIP3: "#6171D2",
+  S1: "#FF8C8B",
+  S2: "#FF8C8B",
+  S3: "#FF8C8B",
+  S4: "#FF8C8B",
+  S5: "#FF8C8B",
+  S6: "#FF8C8B",
+  S7: "#FF8C8B",
+  S8: "#FF8C8B",
+  R1: "#7754C7",
+  R2: "#7754C7",
+  R3: "#7754C7",
+  R4: "#7754C7",
+  R5: "#7754C7",
+  R6: "#7754C7",
+  R7: "#7754C7",
+  A1: "#8A9348",
+  A2: "#8A9348",
+  A3: "#8A9348",
+  A4: "#8A9348",
+  A5: "#8A9348",
+  A6: "#8A9348",
+  A7: "#8A9348",
+  A8: "#8A9348",
+  A9: "#8A9348",
+  A10: "#8A9348",
+  A11: "#8A9348",
+  A12: "#8A9348",
+  A13: "#8A9348",
+  A14: "#8A9348",
+  A15: "#8A9348",
+  A16: "#8A9348",
+  A17: "#8A9348",
+  A18: "#8A9348",
+  A19: "#8A9348",
+  A20: "#8A9348",
+};
+
 function getAvailabilityColor(remaining: number, total: number): string {
   if (remaining === 0) return "#9CA3AF";
   const ratio = remaining / total;
@@ -81,117 +170,591 @@ interface VenueMapProps {
   onSectionHover?: (sectionId: string | null) => void;
 }
 
-export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(function VenueMap(
-  { className, interactive = false, miniature = false, selectedSectionId, dimmedSectionId, dimNonSelected = false, seatOverlay, onSectionClick, onSectionHover },
-  ref,
-) {
-  const { sectionsForDate } = useBooking();
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
+  function VenueMap(
+    {
+      className,
+      interactive = false,
+      miniature = false,
+      selectedSectionId,
+      dimmedSectionId,
+      dimNonSelected = false,
+      seatOverlay,
+      onSectionClick,
+      onSectionHover,
+    },
+    ref,
+  ) {
+    const { sectionsForDate } = useBooking();
+    const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  const sectionLookup = useMemo(() => {
-    const map = new Map<string, { remaining: number; total: number; name: string }>();
-    for (const s of sectionsForDate) {
-      map.set(s.id, { remaining: s.remainingSeats, total: s.totalSeats, name: s.name });
+    const sectionLookup = useMemo(() => {
+      const map = new Map<
+        string,
+        { remaining: number; total: number; name: string }
+      >();
+      for (const s of sectionsForDate) {
+        map.set(s.id, {
+          remaining: s.remainingSeats,
+          total: s.totalSeats,
+          name: s.name,
+        });
+      }
+      return map;
+    }, [sectionsForDate]);
+
+    function getColor(sectionId: string): string {
+      return ZONE_DEFAULT_COLOR[sectionId] ?? "#9CA3AF";
     }
-    return map;
-  }, [sectionsForDate]);
 
-  function getColor(sectionId: string): string {
-    const data = sectionLookup.get(sectionId);
-    if (!data) return "#9CA3AF";
-    return getAvailabilityColor(data.remaining, data.total);
-  }
+    function isSoldOut(sectionId: string): boolean {
+      const data = sectionLookup.get(sectionId);
+      return data ? data.remaining === 0 : false;
+    }
 
-  function isSoldOut(sectionId: string): boolean {
-    const data = sectionLookup.get(sectionId);
-    return data ? data.remaining === 0 : true;
-  }
+    function handleMouseEnter(sectionId: string) {
+      setHoveredId(sectionId);
+      onSectionHover?.(sectionId);
+    }
 
-  function handleMouseEnter(sectionId: string) {
-    setHoveredId(sectionId);
-    onSectionHover?.(sectionId);
-  }
+    function handleMouseLeave() {
+      setHoveredId(null);
+      onSectionHover?.(null);
+    }
 
-  function handleMouseLeave() {
-    setHoveredId(null);
-    onSectionHover?.(null);
-  }
+    function handleClick(sectionId: string) {
+      if (!interactive) return;
+      if (isSoldOut(sectionId)) return;
+      onSectionClick?.(sectionId);
+    }
 
-  function handleClick(sectionId: string) {
-    if (!interactive) return;
-    if (isSoldOut(sectionId)) return;
-    onSectionClick?.(sectionId);
-  }
+    function renderSection(sectionId: string, paths: React.ReactNode) {
+      const color = getColor(sectionId);
+      const sold = isSoldOut(sectionId);
+      const data = sectionLookup.get(sectionId);
+      const isHovered = hoveredId === sectionId;
+      const isSelected = selectedSectionId === sectionId;
+      const isDimmed = dimmedSectionId === sectionId;
+      const isDimmedByHighlight =
+        dimNonSelected && selectedSectionId && sectionId !== selectedSectionId;
+      const tooltipText = data
+        ? sold
+          ? `${data.name} — 매진`
+          : `${data.name} — 잔여 ${data.remaining.toLocaleString()}석`
+        : sectionId;
 
-  function renderSection(sectionId: string, paths: React.ReactNode) {
-    const color = getColor(sectionId);
-    const sold = isSoldOut(sectionId);
-    const data = sectionLookup.get(sectionId);
-    const isHovered = hoveredId === sectionId;
-    const isSelected = selectedSectionId === sectionId;
-    const isDimmed = dimmedSectionId === sectionId;
-    const isDimmedByHighlight = dimNonSelected && selectedSectionId && sectionId !== selectedSectionId;
-    const tooltipText = data
-      ? sold ? `${data.name} — 매진` : `${data.name} — 잔여 ${data.remaining.toLocaleString()}석`
-      : sectionId;
+      const cursor = interactive
+        ? sold
+          ? "cursor-not-allowed"
+          : "cursor-pointer"
+        : isDimmedByHighlight && !sold
+          ? "cursor-pointer"
+          : "cursor-default";
 
-    const cursor = interactive
-      ? sold ? "cursor-not-allowed" : "cursor-pointer"
-      : isDimmedByHighlight && !sold ? "cursor-pointer" : "cursor-default";
+      const sectionColor = sold ? "#C4BDB5" : color;
+      const sectionOpacity = isDimmed
+        ? 0.15
+        : sold
+          ? 0.45
+          : isDimmedByHighlight
+            ? isHovered
+              ? 0.7
+              : 0.35
+            : isHovered
+              ? 0.75
+              : 1;
+      const sectionFilter = sold
+        ? "saturate(0)"
+        : isSelected && !isDimmed
+          ? "brightness(1.1)"
+          : undefined;
 
-    const sectionColor = sold ? "#C4BDB5" : color;
-    const sectionOpacity = isDimmed ? 0.15 : sold ? 0.45 : isDimmedByHighlight ? (isHovered ? 0.7 : 0.35) : isHovered ? 0.75 : 1;
-    const sectionFilter = sold ? "saturate(0)" : isSelected && !isDimmed ? "brightness(1.1)" : undefined;
+      const gElement = (
+        <g
+          data-section={sectionId}
+          className={cn("transition-all duration-150", cursor)}
+          style={{ opacity: sectionOpacity, filter: sectionFilter }}
+          onMouseEnter={
+            isDimmed || sold ? undefined : () => handleMouseEnter(sectionId)
+          }
+          onMouseLeave={isDimmed || sold ? undefined : handleMouseLeave}
+          onClick={isDimmed ? undefined : () => handleClick(sectionId)}
+        >
+          <g style={{ "--section-color": sectionColor } as React.CSSProperties}>
+            {paths}
+          </g>
+        </g>
+      );
 
-    const gElement = (
-      <g
-        data-section={sectionId}
-        className={cn("transition-all duration-150", cursor)}
-        style={{ opacity: sectionOpacity, filter: sectionFilter }}
-        onMouseEnter={isDimmed || sold ? undefined : () => handleMouseEnter(sectionId)}
-        onMouseLeave={isDimmed || sold ? undefined : handleMouseLeave}
-        onClick={isDimmed ? undefined : () => handleClick(sectionId)}
-      >
-        <g style={{ "--section-color": sectionColor } as React.CSSProperties}>{paths}</g>
-      </g>
-    );
+      if (miniature) return gElement;
 
-    if (miniature) return gElement;
+      return (
+        <Tooltip key={sectionId}>
+          <TooltipTrigger asChild>{gElement}</TooltipTrigger>
+          <TooltipContent side="top" className="text-sm">
+            {tooltipText}
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    const sc = (id: string) => getColor(id);
 
     return (
-      <Tooltip key={sectionId}>
-        <TooltipTrigger asChild>{gElement}</TooltipTrigger>
-        <TooltipContent side="top" className="text-sm">{tooltipText}</TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  const sc = (id: string) => getColor(id);
-
-  return (
-    <svg ref={ref} viewBox="0 0 895 698" className={cn("w-full h-full", className)} preserveAspectRatio="xMidYMid meet">
-      <g style={{ pointerEvents: "none" }}>
-        <path fill="#5E5E5E" d={STAGE_PATH} />
-      </g>
-      {renderSection("sec-a", <g fill={sc("sec-a")}>{A_PATHS.map((d, i) => <path key={i} d={d} />)}</g>)}
-      {renderSection("sec-s", <g fill={sc("sec-s")}>{S_PATHS.map((d, i) => <path key={i} d={d} />)}</g>)}
-      {renderSection("sec-r", <g fill={sc("sec-r")}>{R_PATHS.map((d, i) => <path key={i} d={d} />)}</g>)}
-      {renderSection("sec-floor-r", <g fill={sc("sec-floor-r")}>{FLOOR_R_PATHS.map((d, i) => <path key={i} d={d} />)}</g>)}
-      {renderSection("sec-vip", <g fill={sc("sec-vip")}>{VIP_PATHS.map((d, i) => <path key={i} d={d} />)}</g>)}
-      {seatOverlay}
-      {!miniature && (
-        <g style={{ pointerEvents: "none" }} className="select-none">
-          <text x="447" y="200" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="16" fontWeight="700">VIP</text>
-          <text x="447" y="430" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="13" fontWeight="600">플로어R</text>
-          <text x="260" y="490" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="12" fontWeight="600">R석</text>
-          <text x="640" y="490" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="12" fontWeight="600">R석</text>
-          <text x="170" y="280" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="12" fontWeight="600">S석</text>
-          <text x="730" y="280" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="12" fontWeight="600">S석</text>
-          <text x="100" y="420" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="12" fontWeight="600">A석</text>
-          <text x="800" y="420" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="12" fontWeight="600">A석</text>
-          <text x="447" y="65" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="13" fontWeight="700" letterSpacing="2">STAGE</text>
+      <svg
+        ref={ref}
+        viewBox="0 0 895 698"
+        className={cn("w-full h-full", className)}
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <g style={{ pointerEvents: "none" }}>
+          <path fill="#5E5E5E" d={STAGE_PATH} />
         </g>
-      )}
-    </svg>
-  );
-});
+        {/* A석 — 개별 구역 */}
+        {(
+          [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6",
+            "A7",
+            "A8",
+            "A9",
+            "A10",
+            "A11",
+            "A12",
+            "A13",
+            "A14",
+            "A15",
+            "A16",
+            "A17",
+            "A18",
+            "A19",
+            "A20",
+          ] as const
+        ).map((id) =>
+          renderSection(id, <path key={id} fill={sc(id)} d={ZONE_PATHS[id]} />),
+        )}
+        {/* S석 — 개별 구역 */}
+        {(["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"] as const).map((id) =>
+          renderSection(id, <path key={id} fill={sc(id)} d={ZONE_PATHS[id]} />),
+        )}
+        {/* R석 — 개별 구역 */}
+        {(["R1", "R2", "R3", "R4", "R5", "R6", "R7"] as const).map((id) =>
+          renderSection(id, <path key={id} fill={sc(id)} d={ZONE_PATHS[id]} />),
+        )}
+        {/* VIP — 개별 구역 */}
+        {(["VIP1", "VIP2", "VIP3"] as const).map((id) =>
+          renderSection(id, <path key={id} fill={sc(id)} d={ZONE_PATHS[id]} />),
+        )}
+        {seatOverlay}
+        {!miniature && (
+          <g style={{ pointerEvents: "none" }} className="select-none">
+            {/* 섹션 타입 레이블 */}
+            <text
+              x="447"
+              y="65"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="13"
+              fontWeight="700"
+              letterSpacing="2"
+            >
+              STAGE
+            </text>
+            {/* VIP 구역 번호 */}
+            <text
+              x="314"
+              y="260"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="10"
+              fontWeight="500"
+            >
+              VIP1
+            </text>
+            <text
+              x="447"
+              y="370"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="10"
+              fontWeight="500"
+            >
+              VIP2
+            </text>
+            <text
+              x="576"
+              y="260"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="10"
+              fontWeight="500"
+            >
+              VIP3
+            </text>
+            {/* S석 구역 번호 */}
+            <text
+              x="179"
+              y="162"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              S1
+            </text>
+            <text
+              x="158"
+              y="231"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              S2
+            </text>
+            <text
+              x="159"
+              y="301"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              S3
+            </text>
+            <text
+              x="183"
+              y="364"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              S4
+            </text>
+            <text
+              x="719"
+              y="162"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              S8
+            </text>
+            <text
+              x="734"
+              y="231"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              S7
+            </text>
+            <text
+              x="729"
+              y="300"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              S6
+            </text>
+            <text
+              x="707"
+              y="367"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              S5
+            </text>
+            {/* A석 구역 번호 */}
+            <text
+              x="820"
+              y="130"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A20
+            </text>
+            <text
+              x="847"
+              y="201"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A19
+            </text>
+            <text
+              x="836"
+              y="282"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A18
+            </text>
+            <text
+              x="825"
+              y="362"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A17
+            </text>
+            <text
+              x="792"
+              y="440"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A16
+            </text>
+            <text
+              x="745"
+              y="497"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A15
+            </text>
+            <text
+              x="703"
+              y="557"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A14
+            </text>
+            <text
+              x="631"
+              y="599"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A13
+            </text>
+            <text
+              x="557"
+              y="621"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A12
+            </text>
+            <text
+              x="484"
+              y="644"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A11
+            </text>
+            <text
+              x="412"
+              y="633"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A10
+            </text>
+            <text
+              x="337"
+              y="620"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A9
+            </text>
+            <text
+              x="265"
+              y="598"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A8
+            </text>
+            <text
+              x="184"
+              y="558"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A7
+            </text>
+            <text
+              x="148"
+              y="498"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A6
+            </text>
+            <text
+              x="103"
+              y="431"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A5
+            </text>
+            <text
+              x="73"
+              y="362"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A4
+            </text>
+            <text
+              x="53"
+              y="281"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A3
+            </text>
+            <text
+              x="57"
+              y="211"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A2
+            </text>
+            <text
+              x="72"
+              y="133"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              A1
+            </text>
+            {/* R석 구역 번호 */}
+            <text
+              x="256"
+              y="464"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              R1
+            </text>
+            <text
+              x="312"
+              y="500"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              R2
+            </text>
+            <text
+              x="374"
+              y="531"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              R3
+            </text>
+            <text
+              x="443"
+              y="528"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              R4
+            </text>
+            <text
+              x="515"
+              y="527"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              R5
+            </text>
+            <text
+              x="584"
+              y="504"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              R6
+            </text>
+            <text
+              x="635"
+              y="462"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="white"
+              fontSize="9"
+            >
+              R7
+            </text>
+          </g>
+        )}
+      </svg>
+    );
+  },
+);

@@ -1,11 +1,16 @@
 import type { Section, Seat, SeatStatus, TierLevel } from "@/shared/types";
 
 const SECTION_LAYOUT: Record<string, { rows: number; seatsPerRow: number }> = {
-  "sec-vip": { rows: 40, seatsPerRow: 50 },
-  "sec-floor-r": { rows: 36, seatsPerRow: 50 },
-  "sec-r": { rows: 50, seatsPerRow: 70 },
-  "sec-s": { rows: 50, seatsPerRow: 90 },
-  "sec-a": { rows: 40, seatsPerRow: 75 },
+  VIP1: { rows: 23, seatsPerRow: 29 }, VIP2: { rows: 23, seatsPerRow: 29 }, VIP3: { rows: 23, seatsPerRow: 29 },
+  S1: { rows: 25, seatsPerRow: 22 }, S2: { rows: 25, seatsPerRow: 22 }, S3: { rows: 25, seatsPerRow: 22 }, S4: { rows: 25, seatsPerRow: 22 },
+  S5: { rows: 25, seatsPerRow: 22 }, S6: { rows: 25, seatsPerRow: 22 }, S7: { rows: 25, seatsPerRow: 22 }, S8: { rows: 25, seatsPerRow: 22 },
+  R1: { rows: 27, seatsPerRow: 28 }, R2: { rows: 27, seatsPerRow: 28 }, R3: { rows: 27, seatsPerRow: 28 }, R4: { rows: 27, seatsPerRow: 28 },
+  R5: { rows: 27, seatsPerRow: 28 }, R6: { rows: 27, seatsPerRow: 28 }, R7: { rows: 27, seatsPerRow: 28 },
+  A1:  { rows: 10, seatsPerRow: 15 }, A2:  { rows: 10, seatsPerRow: 15 }, A3:  { rows: 10, seatsPerRow: 15 }, A4:  { rows: 10, seatsPerRow: 15 },
+  A5:  { rows: 10, seatsPerRow: 15 }, A6:  { rows: 10, seatsPerRow: 15 }, A7:  { rows: 10, seatsPerRow: 15 }, A8:  { rows: 10, seatsPerRow: 15 },
+  A9:  { rows: 10, seatsPerRow: 15 }, A10: { rows: 10, seatsPerRow: 15 }, A11: { rows: 10, seatsPerRow: 15 }, A12: { rows: 10, seatsPerRow: 15 },
+  A13: { rows: 10, seatsPerRow: 15 }, A14: { rows: 10, seatsPerRow: 15 }, A15: { rows: 10, seatsPerRow: 15 }, A16: { rows: 10, seatsPerRow: 15 },
+  A17: { rows: 10, seatsPerRow: 15 }, A18: { rows: 10, seatsPerRow: 15 }, A19: { rows: 10, seatsPerRow: 15 }, A20: { rows: 10, seatsPerRow: 15 },
 };
 
 export const MAX_SEATS_PER_TIER: Record<TierLevel, number> = {
@@ -48,9 +53,7 @@ export function getSectionLayout(sectionId: string) {
 }
 
 export function generateSeatsForSection(section: Section, userTier: TierLevel): Seat[] {
-  const layout = SECTION_LAYOUT[section.id];
-  if (!layout) return [];
-
+  const layout = getSectionLayout(section.id);
   const { rows, seatsPerRow } = layout;
   const totalSeats = rows * seatsPerRow;
   const rand = seededRandom(hashString(section.id));
