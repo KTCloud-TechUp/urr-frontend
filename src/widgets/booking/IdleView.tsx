@@ -1,7 +1,6 @@
 "use client";
 
 import { VenueMap } from "@/features/booking/ui/VenueMap";
-import { SeatStatusLegend } from "@/features/booking/ui/SeatStatusLegend";
 import { SectionListTable } from "@/features/booking/ui/SectionListTable";
 import { Separator } from "@/shared/ui/separator";
 
@@ -15,7 +14,6 @@ export function IdleView() {
         <div className="flex-1 min-h-0 flex items-center justify-center">
           <VenueMap className="w-full h-full" />
         </div>
-        <SeatStatusLegend compact className="justify-center mt-2" />
       </div>
 
       <Separator />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, forwardRef } from "react";
+import { useMemo, useState, useEffect, useRef, forwardRef } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
 import { useBooking } from "@/features/booking/model/BookingContext";
 import { cn } from "@/shared/lib/utils";
@@ -187,6 +187,28 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
   ) {
     const { sectionsForDate } = useBooking();
     const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const svgRef = useRef<SVGSVGElement>(null);
+    const [labelCenters, setLabelCenters] = useState<
+      Record<string, { x: number; y: number }>
+    >({});
+
+    useEffect(() => {
+      const svg = svgRef.current;
+      if (!svg) return;
+      const centers: Record<string, { x: number; y: number }> = {};
+      svg.querySelectorAll<SVGGElement>("[data-section]").forEach((g) => {
+        const id = g.dataset.section;
+        if (!id) return;
+        const path = g.querySelector("path");
+        if (!path) return;
+        const bbox = path.getBBox();
+        centers[id] = {
+          x: bbox.x + bbox.width / 2,
+          y: bbox.y + bbox.height / 2,
+        };
+      });
+      setLabelCenters(centers);
+    }, [sectionsForDate]);
 
     const sectionLookup = useMemo(() => {
       const map = new Map<
@@ -302,7 +324,12 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
 
     return (
       <svg
-        ref={ref}
+        ref={(el) => {
+          svgRef.current = el;
+          if (typeof ref === "function") ref(el);
+          else if (ref)
+            (ref as React.MutableRefObject<SVGSVGElement | null>).current = el;
+        }}
         viewBox="0 0 895 698"
         className={cn("w-full h-full", className)}
         preserveAspectRatio="xMidYMid meet"
@@ -350,410 +377,62 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
           renderSection(id, <path key={id} fill={sc(id)} d={ZONE_PATHS[id]} />),
         )}
         {seatOverlay}
-        {!miniature && (
-          <g style={{ pointerEvents: "none" }} className="select-none">
-            {/* 섹션 타입 레이블 */}
-            <text
-              x="447"
-              y="65"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="13"
-              fontWeight="700"
-              letterSpacing="2"
-            >
-              STAGE
-            </text>
-            {/* VIP 구역 번호 */}
-            <text
-              x="314"
-              y="260"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="10"
-              fontWeight="500"
-            >
-              VIP1
-            </text>
-            <text
-              x="447"
-              y="370"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="10"
-              fontWeight="500"
-            >
-              VIP2
-            </text>
-            <text
-              x="576"
-              y="260"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="10"
-              fontWeight="500"
-            >
-              VIP3
-            </text>
-            {/* S석 구역 번호 */}
-            <text
-              x="179"
-              y="162"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              S1
-            </text>
-            <text
-              x="158"
-              y="231"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              S2
-            </text>
-            <text
-              x="159"
-              y="301"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              S3
-            </text>
-            <text
-              x="183"
-              y="364"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              S4
-            </text>
-            <text
-              x="719"
-              y="162"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              S8
-            </text>
-            <text
-              x="734"
-              y="231"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              S7
-            </text>
-            <text
-              x="729"
-              y="300"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              S6
-            </text>
-            <text
-              x="707"
-              y="367"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              S5
-            </text>
-            {/* A석 구역 번호 */}
-            <text
-              x="820"
-              y="130"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A20
-            </text>
-            <text
-              x="847"
-              y="201"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A19
-            </text>
-            <text
-              x="836"
-              y="282"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A18
-            </text>
-            <text
-              x="825"
-              y="362"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A17
-            </text>
-            <text
-              x="792"
-              y="440"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A16
-            </text>
-            <text
-              x="745"
-              y="497"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A15
-            </text>
-            <text
-              x="703"
-              y="557"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A14
-            </text>
-            <text
-              x="631"
-              y="599"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A13
-            </text>
-            <text
-              x="557"
-              y="621"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A12
-            </text>
-            <text
-              x="484"
-              y="644"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A11
-            </text>
-            <text
-              x="412"
-              y="633"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A10
-            </text>
-            <text
-              x="337"
-              y="620"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A9
-            </text>
-            <text
-              x="265"
-              y="598"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A8
-            </text>
-            <text
-              x="184"
-              y="558"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A7
-            </text>
-            <text
-              x="148"
-              y="498"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A6
-            </text>
-            <text
-              x="103"
-              y="431"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A5
-            </text>
-            <text
-              x="73"
-              y="362"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A4
-            </text>
-            <text
-              x="53"
-              y="281"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A3
-            </text>
-            <text
-              x="57"
-              y="211"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A2
-            </text>
-            <text
-              x="72"
-              y="133"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              A1
-            </text>
-            {/* R석 구역 번호 */}
-            <text
-              x="256"
-              y="464"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              R1
-            </text>
-            <text
-              x="312"
-              y="500"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              R2
-            </text>
-            <text
-              x="374"
-              y="531"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              R3
-            </text>
-            <text
-              x="443"
-              y="528"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              R4
-            </text>
-            <text
-              x="515"
-              y="527"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              R5
-            </text>
-            <text
-              x="584"
-              y="504"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              R6
-            </text>
-            <text
-              x="635"
-              y="462"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="white"
-              fontSize="9"
-            >
-              R7
-            </text>
-          </g>
-        )}
+        <g style={{ pointerEvents: "none" }} className="select-none">
+          <text
+            x="447"
+            y="65"
+            textAnchor="middle"
+            dominantBaseline="central"
+            fill="white"
+            fontSize={miniature ? 30 : 20}
+            fontWeight="700"
+            letterSpacing="2"
+          >
+            STAGE
+          </text>
+          {/* 구역 레이블 - getBBox() 기반 자동 중심 + 수동 오프셋 */}
+          {Object.entries(labelCenters).map(([id, { x, y }]) => {
+            const offsets: Record<string, { dx: number; dy: number }> = {
+              VIP1: { dx: -18, dy: -23 },
+              VIP2: { dx: 0, dy: -10 },
+              VIP3: { dx: 18, dy: -23 },
+              S3: { dx: 0, dy: -3 },
+              S6: { dx: 0, dy: -3 },
+              A1: { dx: 0, dy: 3 },
+              A2: { dx: 0, dy: 2 },
+              A3: { dx: 0, dy: -6 },
+              A4: { dx: 0, dy: -4 },
+              A5: { dx: 0, dy: -6 },
+              A8: { dx: 3, dy: 0 },
+              A9: { dx: 4, dy: 0 },
+              A10: { dx: 5, dy: 0 },
+              A11: { dx: -4, dy: 0 },
+              A12: { dx: -3, dy: 0 },
+              A16: { dx: 0, dy: -4 },
+              A17: { dx: 0, dy: -4 },
+              A18: { dx: 0, dy: -7 },
+              A19: { dx: 0, dy: 4 },
+              A20: { dx: 0, dy: 3 },
+            };
+            const off = offsets[id] ?? { dx: 0, dy: 0 };
+            const baseFontSize = id.startsWith("VIP") ? 18 : 17;
+            const fontSize = miniature ? baseFontSize * 1.7 : baseFontSize;
+            return (
+              <text
+                key={id}
+                x={x + off.dx}
+                y={y + off.dy}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill="white"
+                fontSize={fontSize}
+                fontWeight="700"
+              >
+                {id}
+              </text>
+            );
+          })}
+        </g>
       </svg>
     );
   },
