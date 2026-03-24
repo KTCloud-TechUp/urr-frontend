@@ -36,6 +36,18 @@ export function formatDateCompact(isoDate: string): string {
   })
 }
 
+/** "6월 1일 (일) 18:00" — month + day + weekday + time (예매 날짜 선택 드롭다운용) */
+export function formatEventDateTime(isoDate: string): string {
+  return new Intl.DateTimeFormat('ko-KR', {
+    month: 'numeric',
+    day: 'numeric',
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(isoDate))
+}
+
 /** "2026년 6월 1일 14:30" — year + month + day + time */
 export function formatDateWithTime(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('ko-KR', {
