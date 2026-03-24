@@ -13,9 +13,19 @@ import {
   ChevronRight,
   User,
 } from "lucide-react";
-import { StaticVenuePreview, Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui";
+import {
+  StaticVenuePreview,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/ui";
 import { TierBadge } from "@/entities/user";
-import { formatPrice, formatDateFull, formatDateWithTime } from "@/shared/lib/format";
+import {
+  formatPrice,
+  formatDateFull,
+  formatDateWithTime,
+} from "@/shared/lib/format";
 import { getSellerProfile } from "@/shared/lib/mocks/artist-page";
 import type { Event, TransferListing, TierLevel } from "@/shared/types";
 
@@ -32,14 +42,18 @@ function sectionNameToId(section: string): string | null {
 
 function getSectionDescription(section: string): string {
   if (section.includes("VIP")) return "무대 최근접 프리미엄 좌석";
-  if (section.includes("플로어") && section.includes("R")) return "플로어 스탠딩 구역";
+  if (section.includes("플로어") && section.includes("R"))
+    return "플로어 스탠딩 구역";
   if (section.includes("R")) return "무대 정면 중앙 구역";
   if (section.includes("S")) return "중간 거리 관람 구역";
   if (section.includes("A")) return "후방 관람 구역";
   return "";
 }
 
-function getSellerReliability(tier: TierLevel): { label: string; className: string } {
+function getSellerReliability(tier: TierLevel): {
+  label: string;
+  className: string;
+} {
   switch (tier) {
     case "lightning":
       return { label: "최고 신뢰 판매자", className: "text-tier-lightning" };
@@ -102,7 +116,7 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
         <div className="flex justify-center">
           <StaticVenuePreview
             highlightSectionId={highlightSection}
-            className="w-full max-w-[480px]"
+            className="w-full max-w-120"
           />
         </div>
         <div className="mt-4 text-center">
@@ -142,7 +156,9 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
           )}
           <div>
             <span className="text-muted-foreground">정가</span>
-            <p className="font-semibold mt-0.5">{formatPrice(listing.faceValue)}</p>
+            <p className="font-semibold mt-0.5">
+              {formatPrice(listing.faceValue)}
+            </p>
           </div>
           {sectionDesc && (
             <div>
@@ -171,12 +187,17 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
               <p className="text-sm font-semibold">{seller.name}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <TierBadge tier={listing.sellerTier} size="sm" />
-                <span className={`text-xs font-medium ${reliability.className}`}>
+                <span
+                  className={`text-xs font-medium ${reliability.className}`}
+                >
                   {reliability.label}
                 </span>
               </div>
             </div>
-            <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+            <ChevronRight
+              size={16}
+              className="text-muted-foreground shrink-0"
+            />
           </button>
 
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
@@ -191,7 +212,7 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
 
       {/* Seller Profile Dialog */}
       <Dialog open={showProfile} onOpenChange={setShowProfile}>
-        <DialogContent className="sm:max-w-[420px]">
+        <DialogContent className="sm:max-w-105">
           <DialogHeader>
             <DialogTitle>판매자 프로필</DialogTitle>
           </DialogHeader>
@@ -203,7 +224,9 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
               <div>
                 <p className="text-lg font-bold">{seller.name}</p>
                 {seller.bio && (
-                  <p className="text-sm text-muted-foreground mt-0.5">{seller.bio}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {seller.bio}
+                  </p>
                 )}
               </div>
             </div>
@@ -211,7 +234,9 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
             <div className="flex items-center gap-3 rounded-lg bg-muted/50 p-3">
               <TierBadge tier={listing.sellerTier} size="default" />
               <div>
-                <span className={`text-sm font-semibold ${reliability.className}`}>
+                <span
+                  className={`text-sm font-semibold ${reliability.className}`}
+                >
                   {reliability.label}
                 </span>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -222,7 +247,9 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
 
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-lg border border-border p-3 text-center">
-                <p className="text-lg font-bold">{listing.sellerTransactionCount}</p>
+                <p className="text-lg font-bold">
+                  {listing.sellerTransactionCount}
+                </p>
                 <p className="text-xs text-muted-foreground">총 거래</p>
               </div>
               <div className="rounded-lg border border-border p-3 text-center">
@@ -238,8 +265,8 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
             <div className="flex items-start gap-2 rounded-lg bg-primary/5 border border-primary/20 p-3">
               <ShieldCheck size={14} className="text-primary shrink-0 mt-0.5" />
               <p className="text-xs text-muted-foreground leading-relaxed">
-                URR은 모든 거래를 에스크로로 보호합니다.
-                판매자의 거래 이력은 플랫폼에서 검증된 실제 데이터입니다.
+                URR은 모든 거래를 에스크로로 보호합니다. 판매자의 거래 이력은
+                플랫폼에서 검증된 실제 데이터입니다.
               </p>
             </div>
           </div>
@@ -253,17 +280,24 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
           URR 안전거래
         </h3>
         <div className="flex items-center gap-2 mb-4">
-          {["결제", "에스크로 보관", "티켓 이전", "판매자 정산"].map((step, i) => (
-            <span key={step} className="contents">
-              <span className="flex items-center gap-1.5">
-                <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
-                  {i + 1}
+          {["결제", "에스크로 보관", "티켓 이전", "판매자 정산"].map(
+            (step, i) => (
+              <span key={step} className="contents">
+                <span className="flex items-center gap-1.5">
+                  <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <span className="text-xs font-medium">{step}</span>
                 </span>
-                <span className="text-xs font-medium">{step}</span>
+                {i < 3 && (
+                  <ArrowRight
+                    size={12}
+                    className="text-muted-foreground shrink-0"
+                  />
+                )}
               </span>
-              {i < 3 && <ArrowRight size={12} className="text-muted-foreground shrink-0" />}
-            </span>
-          ))}
+            ),
+          )}
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">
           결제 금액은 양도가 완료될 때까지 URR 에스크로에 안전하게 보관됩니다.

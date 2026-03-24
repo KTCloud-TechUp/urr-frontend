@@ -73,7 +73,7 @@ export function AppSidebar() {
     <aside
       className={cn(
         "fixed top-0 left-0 h-screen z-10 bg-sidebar border-r border-sidebar-border flex flex-col transition-[width] duration-250 ease-out overflow-hidden",
-        collapsed ? "w-16" : "w-[220px]",
+        collapsed ? "w-16" : "w-55",
       )}
     >
       {/* Header: Logo + Collapse Toggle */}
@@ -85,7 +85,13 @@ export function AppSidebar() {
       >
         {!collapsed && (
           <Link href="/" className="flex items-center">
-            <Image src="/logos/logo5.svg" alt="URR" width={40} height={40} />
+            <Image
+              src="/logos/logo5.svg"
+              alt="URR"
+              width={40}
+              height={40}
+              loading="eager"
+            />
           </Link>
         )}
         <button
@@ -104,7 +110,7 @@ export function AppSidebar() {
             <TooltipTrigger asChild>
               <Link
                 href="/membership"
-                className="h-[34px] w-10 flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="h-8.5 w-10 flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 <Crown size={16} />
               </Link>
@@ -114,7 +120,7 @@ export function AppSidebar() {
             </TooltipContent>
           </Tooltip>
         ) : (
-          <Button asChild size="sm" className="w-full gap-1.5 h-[34px]">
+          <Button asChild size="sm" className="w-full gap-1.5 h-8.5">
             <Link href="/membership">
               <Crown size={14} />
               멤버십 가입
