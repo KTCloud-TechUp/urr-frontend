@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import {
@@ -55,12 +55,14 @@ function OnboardingWidgetInner() {
     });
   }, [initialStep, router]);
 
+  const handleSuccess = useCallback((userName: string) => {
+    setCompletedUserName(userName);
+    setFlowState("complete");
+  }, []);
+
   const { handleAuthComplete, handleIdentityComplete, loginError, identityError } = useOnboardingAuth({
     onEmailRegister: () => setFlowState("identity"),
-    onSuccess: (userName) => {
-      setCompletedUserName(userName);
-      setFlowState("complete");
-    },
+    onSuccess: handleSuccess,
     isSocial,
   });
 

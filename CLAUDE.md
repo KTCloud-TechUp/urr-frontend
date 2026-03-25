@@ -272,13 +272,13 @@ seats-individual → seats-expired (3분 타임아웃) → seats-section 복귀
 
 ## 브랜치 전략
 
+기본 작업은 `dev`에서 직접 커밋. 브랜치는 격리가 필요할 때만 생성.
+
 ```
 main                      # 프로덕션. 직접 push 금지.
-dev                       # 통합 브랜치. PR로만 merge.
-feat/<scope>              # 기능 개발. dev에서 분기.
-fix/<scope>               # 버그 수정.
-chore/<scope>             # 설정·의존성·문서.
-review/merge-<a>-<b>      # 리뷰 에이전트 전용.
+dev                       # 일상 작업 브랜치. 직접 커밋 허용.
+feat/<scope>              # 복잡하거나 격리 필요한 작업만. dev에서 분기.
+design/<scope>            # 디자인팀 전용. UI/스타일만. 머지는 오너가 직접.
 ```
 
 ### 작업 완료 체크리스트
