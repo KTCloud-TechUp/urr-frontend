@@ -1,5 +1,12 @@
 // === 공통 API 응답 래퍼 ===
 
+export interface KakaoRejoinConfirmationResponse {
+  requiresRejoinConfirmation: true;
+  rejoinToken: string;
+  nickname: string;
+  recoveryEligible: boolean;
+}
+
 export interface ApiBaseResponse<T> {
   isSuccess: boolean;
   statusCode: number;

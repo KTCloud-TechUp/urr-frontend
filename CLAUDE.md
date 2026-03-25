@@ -25,6 +25,16 @@ npm run dev    # 개발 서버
 npm run build  # 빌드 검증
 ```
 
+### 환경변수 .env.local
+
+| 변수                             | 용도                    |
+| -------------------------------- | ----------------------- |
+| `NEXT_PUBLIC_API_BASE_URL`       | 백엔드 API URL          |
+| `NEXT_PUBLIC_KAKAO_CLIENT_ID`    | 카카오 OAuth 앱 키      |
+| `NEXT_PUBLIC_KAKAO_REDIRECT_URI` | 카카오 OAuth 리디렉션   |
+| `NEXT_PUBLIC_NAVER_CLIENT_ID`    | 네이버 OAuth 클라이언트 |
+| `NEXT_PUBLIC_NAVER_REDIRECT_URI` | 네이버 OAuth 리디렉션   |
+
 ### 상태 관리 기준
 
 | 상황                                        | 사용                       |
@@ -36,8 +46,29 @@ npm run build  # 빌드 검증
 | 앱 초기화 로직 (세션 복원, OAuth 콜백 등)   | `useEffect` 직접 사용 허용 |
 
 - **새 페이지 API 연동 시 반드시 TanStack Query 사용** (`useState + useEffect` 패턴 금지)
-- Zustand는 전역 공유 상태가 실제로 필요할 때만 도입 (현재 미사용)
+- Zustand는 예매 상태머신(Phase 9)에 사용 예정 — auth에는 사용하지 않는다
 - `apiRequest()`를 직접 호출하지 말고 `features/<domain>/api/` 함수를 통해 호출
+
+### API 클라이언트
+
+| 파일                            | 역할                                                    |
+| ------------------------------- | ------------------------------------------------------- |
+| `src/shared/api/client.ts`      | `apiRequest()` — fetch wrapper, Bearer 토큰 자동 주입   |
+| `src/shared/api/interceptor.ts` | `fetchWithAuth()` — 401 시 reissue → 재시도 (큐잉 처리) |
+| `src/shared/api/tokenStore.ts`  | `accessToken` module-level 변수 관리 + 인증 쿠키 설정   |
+
+- **일반 요청**: `apiRequest()` (토큰 자동 첨부)
+- **인증 민감 요청**: `fetchWithAuth()` (401 자동 복구)
+- `features/<domain>/api/` 파일에서 위 함수를 래핑해서 사용. 컴포넌트에서 직접 호출 금지.
+
+### 인증 / JWT 흐름
+
+- `accessToken`: `tokenStore.ts` module-level 변수 (메모리, XSS 방어)
+- `refreshToken`: httpOnly 쿠키 (서버 관리, `credentials: "include"`로 자동 전송)
+- `is_authenticated`: 클라이언트 쿠키 (24h) — 로그인 상태 힌트 용도
+- 401 발생 → `fetchWithAuth`가 `POST /api/auth/token/reissue` 호출 → 성공 시 원래 요청 재시도
+- 동시 401: 첫 reissue만 실행, 나머지는 큐에서 대기 후 새 토큰 수신
+- reissue 실패 → `onAuthFailed()` 콜백 → 로그아웃 처리
 
 ---
 
@@ -102,6 +133,13 @@ features/<domain>/<feature-name>/
 | `/search`                        | SearchPage         | 아티스트+공연 통합 검색                |
 | `/notifications`                 | NotificationPage   | 알림 목록 (UI 쉘, mock 데이터)         |
 | `/transfer/:artistId/:listingId` | TransferDetailPage | 양도 상세                              |
+
+### LayoutShell 레이아웃 예외
+
+`src/widgets/layout/LayoutShell.tsx`에서 처리:
+
+- **사이드바/TopBar 없음** (`NO_SHELL_ROUTES`): `/onboarding`, `/auth/callback` — 전체 경로 `startsWith`로 매칭
+- **풀스크린 레이아웃** (`isFullWidth`): `/events/:id/booking` — 사이드바는 있지만 컨텐츠 영역이 전체 높이 차지, Footer/스크롤 없음
 
 ---
 
@@ -188,7 +226,12 @@ seats-individual → seats-expired (3분 타임아웃) → seats-section 복귀
    - [선택] 마케팅 수신 동의
 4. 가입 완료 → **미스트 즉시 부여**
 
-**Phase 2 — 개인화** 5. 아티스트 선택 (1명 이상 필수, 카테고리 탭 + 검색) 6. 멤버십 소개: 등급 혜택 비교표 + [가입 ₩30,000/년] or [나중에] 7. 멜론 연동 (선택): "라이트닝/썬더 등급 확인" CTA — 강제 아님 8. 완료 → 개인화된 홈으로 전환
+**Phase 2 — 개인화**
+
+5. 아티스트 선택 (1명 이상 필수, 카테고리 탭 + 검색)
+6. 멤버십 소개: 등급 혜택 비교표 + [가입 ₩30,000/년] or [나중에]
+7. 멜론 연동 (선택): "라이트닝/썬더 등급 확인" CTA — 강제 아님
+8. 완료 → 홈으로 전환
 
 ---
 
@@ -270,16 +313,53 @@ seats-individual → seats-expired (3분 타임아웃) → seats-section 복귀
 
 ---
 
+## API 연동 현황
+
+| Phase | 영역                            | 상태         |
+| ----- | ------------------------------- | ------------ |
+| 1–4   | API 클라이언트, 인증 인프라     | ✅ 완료      |
+| 5     | 인증 API (카카오/네이버/이메일) | ✅ 완료      |
+| 6     | 온보딩 플로우 완성              | 🔲 진행 중   |
+| 7–8   | 예매 UI (VenueMap 인터랙션)     | ✅ 완료      |
+| 9     | 예매 Zustand store              | 🔲 다음 작업 |
+| 10    | Events/Artists API 연동         | 🔲 대기      |
+| 11    | Ticketing + Queue API 연동      | 🔲 대기      |
+| 12    | Payments API 연동               | 🔲 대기      |
+| 13–14 | User 추가기능, Community        | 🔲 대기      |
+
+**현재 mock 데이터 사용 중인 영역**: 홈페이지 섹션, 공연/아티스트 목록, 예매 좌석 데이터, 마이페이지
+
+상세 체크리스트 → `docs/CheckList.md`
+
+---
+
 ## 브랜치 전략
+
+기본 작업은 `dev`에서 직접 커밋. 브랜치는 격리가 필요할 때만 생성.
 
 ```
 main                      # 프로덕션. 직접 push 금지.
-dev                       # 통합 브랜치. PR로만 merge.
-feat/<scope>              # 기능 개발. dev에서 분기.
-fix/<scope>               # 버그 수정.
-chore/<scope>             # 설정·의존성·문서.
-review/merge-<a>-<b>      # 리뷰 에이전트 전용.
+dev                       # 일상 작업 브랜치. 직접 커밋 허용.
+feat/<scope>              # 복잡하거나 격리 필요한 작업만. dev에서 분기.
+design/<scope>            # 디자인팀 전용. UI/스타일만. 머지는 오너가 직접.
+infra/<scope>             # 인프라팀 전용. 설정/배포만. 머지는 오너가 직접.
 ```
+
+### design 브랜치 규칙 (디자인팀 AI용)
+
+> 지금 `design/` 브랜치에서 실행 중이라면:
+>
+> - 수정 가능: JSX/Tailwind 스타일, `src/shared/ui/`, `public/` 에셋, `tailwind.config.*`, `globals.css`
+> - 수정 금지: `features/*/api/`, `features/*/model/`, `src/app/`, `src/shared/api/`, `src/shared/lib/`, `package.json`, `.env*`
+> - PR은 열어도 되지만 머지는 하지 말 것. 머지는 오너가 직접 한다.
+
+### infra 브랜치 규칙 (인프라팀 AI용)
+
+> 지금 `infra/` 브랜치에서 실행 중이라면:
+>
+> - 수정 가능: `next.config.*`, `.github/` (CI/CD 워크플로우), `Dockerfile`, 배포 스크립트, `package.json` (의존성/스크립트 한정), `.env*` 템플릿
+> - 수정 금지: `src/` 하위 모든 파일 (컴포넌트, 훅, API, 타입 등)
+> - PR은 열어도 되지만 머지는 하지 말 것. 머지는 오너가 직접 한다.
 
 ### 작업 완료 체크리스트
 

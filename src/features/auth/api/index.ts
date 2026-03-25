@@ -4,6 +4,8 @@ export type { RegisterParams } from "./register";
 export { logout } from "./logout";
 export { deleteAccount } from "./deleteAccount";
 export { kakaoLogin } from "./kakaoLogin";
+export type { KakaoLoginResponse } from "./kakaoLogin";
+export { kakaoRejoin } from "./kakaoRejoin";
 export { naverLogin } from "./naverLogin";
 export { fetchMe } from "./me";
 export { socialOnboarding } from "./socialOnboarding";
