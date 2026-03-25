@@ -27,11 +27,13 @@ interface IdentityData {
 
 interface UseOnboardingAuthParams {
   onEmailRegister: () => void;
+  onSuccess?: (userName: string) => void;
   isSocial?: boolean;
 }
 
 export function useOnboardingAuth({
   onEmailRegister,
+  onSuccess,
   isSocial = false,
 }: UseOnboardingAuthParams) {
   const router = useRouter();
@@ -100,7 +102,11 @@ export function useOnboardingAuth({
             phone: identityData.phoneNumber,
             gender,
           });
-          router.push("/");
+          if (onSuccess) {
+            onSuccess(identityData.nickname);
+          } else {
+            router.push("/");
+          }
         } catch {
           setIdentityError("온보딩 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
@@ -120,7 +126,11 @@ export function useOnboardingAuth({
           gender,
         });
         tokenStore.setToken(result.tokens.accessToken);
-        router.push("/");
+        if (onSuccess) {
+          onSuccess(identityData.userName);
+        } else {
+          router.push("/");
+        }
       } catch {
         setIdentityError("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
       }

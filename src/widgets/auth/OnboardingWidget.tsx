@@ -7,12 +7,13 @@ import {
   AuthStep,
   IdentityStep,
   OnboardingHero,
+  SignupCompleteStep,
   useOnboardingAuth,
 } from "@/features/auth/onboarding";
 import { tokenStore } from "@/shared/api/tokenStore";
 import { reissueToken } from "@/features/auth/api/reissue";
 
-type FlowState = "auth" | "identity";
+type FlowState = "auth" | "identity" | "complete";
 
 function OnboardingWidgetInner() {
   const router = useRouter();
@@ -21,6 +22,7 @@ function OnboardingWidgetInner() {
   const isSocial = initialStep === "identity";
   const socialError = searchParams.get("error") as "kakao" | "naver" | null;
   const [flowState, setFlowState] = useState<FlowState>(initialStep);
+  const [completedUserName, setCompletedUserName] = useState("");
   // identity step은 소셜 신규가입 플로우 — 체크 불필요
   const [authChecked, setAuthChecked] = useState(initialStep === "identity");
 
@@ -55,12 +57,26 @@ function OnboardingWidgetInner() {
 
   const { handleAuthComplete, handleIdentityComplete, loginError, identityError } = useOnboardingAuth({
     onEmailRegister: () => setFlowState("identity"),
+    onSuccess: (userName) => {
+      setCompletedUserName(userName);
+      setFlowState("complete");
+    },
     isSocial,
   });
 
   if (!authChecked) return null;
 
   const heroStep = flowState === "auth" ? 1 : 2;
+
+  if (flowState === "complete") {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-in fade-in duration-300">
+          <SignupCompleteStep userName={completedUserName} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen">

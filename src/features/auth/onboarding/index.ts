@@ -1,2 +1,2 @@
-export { AuthStep, IdentityStep, OnboardingHero } from "./ui";
+export { AuthStep, IdentityStep, OnboardingHero, SignupCompleteStep } from "./ui";
 export { useOnboardingAuth } from "./model";
