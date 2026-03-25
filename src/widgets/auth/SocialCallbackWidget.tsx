@@ -7,12 +7,6 @@ import { tokenStore } from "@/shared/api/tokenStore";
 
 type SocialProvider = "kakao" | "naver";
 
-const loginFn = {
-  kakao: kakaoLogin,
-  naver: naverLogin,
-} as const;
-
-
 function Spinner() {
   return (
     <div className="flex h-screen items-center justify-center">
@@ -34,18 +28,35 @@ function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
 
     const redirectUri = `${window.location.origin}/auth/callback/${provider}`;
 
-    loginFn[provider](code, redirectUri)
-      .then((result) => {
-        tokenStore.setToken(result.tokens.accessToken);
-        if (result.onboardingRequired) {
-          router.replace("/onboarding?step=identity");
-        } else {
-          router.replace("/");
-        }
-      })
-      .catch(() => {
-        router.replace(`/onboarding?error=${provider}`);
-      });
+    if (provider === "kakao") {
+      kakaoLogin(code, redirectUri)
+        .then((result) => {
+          if ("requiresRejoinConfirmation" in result) {
+            const params = new URLSearchParams({
+              step: "rejoin",
+              rejoinToken: result.rejoinToken,
+              nickname: result.nickname,
+              recoveryEligible: String(result.recoveryEligible),
+            });
+            router.replace(`/onboarding?${params.toString()}`);
+            return;
+          }
+          tokenStore.setToken(result.tokens.accessToken);
+          router.replace(result.onboardingRequired ? "/onboarding?step=identity" : "/");
+        })
+        .catch(() => {
+          router.replace("/onboarding?error=kakao");
+        });
+    } else {
+      naverLogin(code, redirectUri)
+        .then((result) => {
+          tokenStore.setToken(result.tokens.accessToken);
+          router.replace(result.onboardingRequired ? "/onboarding?step=identity" : "/");
+        })
+        .catch(() => {
+          router.replace("/onboarding?error=naver");
+        });
+    }
   }, [searchParams, router, provider]);
 
   return <Spinner />;
