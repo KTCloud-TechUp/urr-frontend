@@ -21,7 +21,7 @@ export const mockNotifications: Notification[] = [
     description: "A구역 3열 15번 티켓이 성공적으로 양도되었습니다.",
     timestamp: hoursAgo(2),
     isRead: false,
-    link: "/my-page",
+    link: "/my-page/transfers",
   },
   {
     id: "noti-03",
@@ -39,7 +39,7 @@ export const mockNotifications: Notification[] = [
     description: "DETOX WORLD TOUR 티켓 결제가 완료되었습니다. (165,000원)",
     timestamp: hoursAgo(24),
     isRead: false,
-    link: "/my-page",
+    link: "/my-page/wallet",
   },
   {
     id: "noti-05",
@@ -66,7 +66,7 @@ export const mockNotifications: Notification[] = [
     description: "B구역 5열 22번 티켓이 월렛에 등록되었습니다.",
     timestamp: hoursAgo(52),
     isRead: true,
-    link: "/my-page",
+    link: "/my-page/wallet",
   },
   {
     id: "noti-08",
@@ -75,7 +75,7 @@ export const mockNotifications: Notification[] = [
     description: "결제 영수증이 등록된 이메일로 발송되었습니다.",
     timestamp: hoursAgo(72),
     isRead: true,
-    link: "/my-page",
+    link: "/my-page/wallet",
   },
   {
     id: "noti-09",

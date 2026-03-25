@@ -1,11 +1,20 @@
 import type { Event, TransferListing, TransferStatus } from '@/types'
-import posterGDragon from '@/assets/Hero_G-dragon.png'
-import posterBTS from '@/assets/공연_BTS Yet to Come in Cinema.png'
-import posterAespa from '@/assets/Hero_aespa.png'
-import posterIVE from '@/assets/공연_IVE Show What i am.png'
-import posterIVEWorldTour from '@/assets/선예매임박공연_IVE The 1ST World Tour.png'
-import posterBP from '@/assets/공연_BlackPink Born Pink.png'
-import posterBPHero from '@/assets/Hero_Blackpink.png'
+import posterGDMAMA from '@/assets/upcoming_gdragon-2026-mama.png'
+import posterGDDetox from '@/assets/upcoming_gdragon-detox-world-tour.png'
+import posterGDPower from '@/assets/upcoming_gdragon-power-concert-2025.png'
+import posterBTSArirang from '@/assets/event_bts-world-tour-arirang.png'
+import posterTWS from '@/assets/event_tws-2nd-fanmeeting-2026.png'
+import posterSVT from '@/assets/event_seventeen-world-tour.png'
+import posterDAY6 from '@/assets/event_day6-10th-anniversary-tour.png'
+import posterKwonjina from '@/assets/event_kwonjina-flower-concert.png'
+import posterPanic from '@/assets/event_panic-concert.png'
+import posterParkHyoshin from '@/assets/event_park-hyoshin-live.png'
+import posterSeoulJazz from '@/assets/event_seoul-jazz-festival-2026.png'
+import posterAespaSynk from '@/assets/event_aespa-live-synk-parallel.png'
+import posterAespaMyworld from '@/assets/event_aespa-world-tour-myworld.png'
+import posterAespaHyperline from '@/assets/event_aespa-synk-hyper-line.png'
+import posterAespaAexis from '@/assets/event_aespa-synk-aexis-line.png'
+import posterAespaMyworldEncore from '@/assets/event_aespa-world-tour-myworld-encore.png'
 
 // --- Extended artist info (agency, debut, genres) ---
 
@@ -71,7 +80,7 @@ const artistEventsMap: Record<string, Event[]> = {
         { id: 'gd-d1', date: '2026-06-01T18:00:00+09:00', bookingWindows: [], totalSeats: 15000, remainingSeats: 3200 },
         { id: 'gd-d2', date: '2026-06-02T18:00:00+09:00', bookingWindows: [], totalSeats: 15000, remainingSeats: 5100 },
       ],
-      poster: posterGDragon,
+      poster: posterGDMAMA,
       status: 'open',
     },
     {
@@ -82,7 +91,7 @@ const artistEventsMap: Record<string, Event[]> = {
       dates: [
         { id: 'gd-d3', date: '2026-09-20T19:00:00+09:00', bookingWindows: [], totalSeats: 20000, remainingSeats: 20000 },
       ],
-      poster: posterGDragon,
+      poster: posterGDDetox,
       status: 'upcoming',
     },
     {
@@ -93,7 +102,7 @@ const artistEventsMap: Record<string, Event[]> = {
       dates: [
         { id: 'gd-d4', date: '2025-12-25T18:00:00+09:00', bookingWindows: [], totalSeats: 50000, remainingSeats: 0 },
       ],
-      poster: posterGDragon,
+      poster: posterGDPower,
       status: 'closed',
     },
   ],
@@ -101,46 +110,46 @@ const artistEventsMap: Record<string, Event[]> = {
     {
       id: 'evt-bts-encore-2026',
       artistId: 'bts',
-      title: 'BTS YET TO COME ENCORE IN SEOUL',
+      title: 'BTS WORLD TOUR ARIRANG',
       venue: '잠실종합운동장 주경기장',
       dates: [
         { id: 'bts-d1', date: '2026-08-01T19:00:00+09:00', bookingWindows: [], totalSeats: 65000, remainingSeats: 12000 },
         { id: 'bts-d2', date: '2026-08-02T19:00:00+09:00', bookingWindows: [], totalSeats: 65000, remainingSeats: 18000 },
       ],
-      poster: posterBTS,
+      poster: posterBTSArirang,
       status: 'open',
     },
     {
       id: 'evt-bts-fanmeet-2026',
       artistId: 'bts',
-      title: 'BTS 2026 FAN MEETING: MAGIC SHOP',
+      title: '2026 BTS FAN MEETING: MAGIC SHOP',
       venue: 'KSPO DOME (올림픽체조경기장)',
       dates: [
         { id: 'bts-d3', date: '2026-10-15T18:00:00+09:00', bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 },
       ],
-      poster: posterBTS,
+      poster: posterTWS,
       status: 'upcoming',
     },
     {
       id: 'evt-bts-busan-2026',
       artistId: 'bts',
-      title: 'BTS PERMISSION TO DANCE - BUSAN',
+      title: 'BTS YET TO COME IN BUSAN',
       venue: '부산 아시아드 주경기장',
       dates: [
         { id: 'bts-d4', date: '2026-04-20T17:00:00+09:00', bookingWindows: [], totalSeats: 40000, remainingSeats: 0 },
       ],
-      poster: posterBTS,
+      poster: posterSVT,
       status: 'soldout',
     },
     {
       id: 'evt-bts-past-2025',
       artistId: 'bts',
-      title: 'BTS WORLD TOUR: LOVE YOURSELF 2025',
+      title: 'BTS PERMISSION TO DANCE ON STAGE',
       venue: '고척스카이돔',
       dates: [
         { id: 'bts-d5', date: '2025-11-10T18:00:00+09:00', bookingWindows: [], totalSeats: 20000, remainingSeats: 0 },
       ],
-      poster: posterBTS,
+      poster: posterDAY6,
       status: 'closed',
     },
   ],
@@ -153,29 +162,51 @@ const artistEventsMap: Record<string, Event[]> = {
       dates: [
         { id: 'ae-d1', date: '2026-09-20T18:00:00+09:00', bookingWindows: [], totalSeats: 15000, remainingSeats: 4500 },
       ],
-      poster: posterAespa,
+      poster: posterAespaSynk,
       status: 'open',
     },
     {
       id: 'evt-aespa-world-2026',
       artistId: 'aespa',
-      title: 'aespa WORLD TOUR: MYWORLD',
+      title: 'aespa WORLD TOUR : MYWORLD',
       venue: '잠실실내체육관',
       dates: [
         { id: 'ae-d2', date: '2026-11-05T19:00:00+09:00', bookingWindows: [], totalSeats: 10000, remainingSeats: 10000 },
       ],
-      poster: posterAespa,
+      poster: posterAespaMyworld,
+      status: 'upcoming',
+    },
+    {
+      id: 'evt-aespa-aexis-2026',
+      artistId: 'aespa',
+      title: 'aespa SYNK : AEXIS LINE',
+      venue: '인스파이어 아레나',
+      dates: [
+        { id: 'ae-d4', date: '2026-12-20T18:00:00+09:00', bookingWindows: [], totalSeats: 12000, remainingSeats: 12000 },
+      ],
+      poster: posterAespaAexis,
+      status: 'upcoming',
+    },
+    {
+      id: 'evt-aespa-myworld-encore-2026',
+      artistId: 'aespa',
+      title: 'aespa WORLD TOUR : MYWORLD ENCORE',
+      venue: 'KSPO DOME (올림픽체조경기장)',
+      dates: [
+        { id: 'ae-d5', date: '2027-01-15T18:00:00+09:00', bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 },
+      ],
+      poster: posterAespaMyworldEncore,
       status: 'upcoming',
     },
     {
       id: 'evt-aespa-past-2025',
       artistId: 'aespa',
-      title: 'aespa SYNK : HYPER LINE 2025',
+      title: 'aespa SYNK : HYPER LINE',
       venue: '고척스카이돔',
       dates: [
         { id: 'ae-d3', date: '2025-10-01T18:00:00+09:00', bookingWindows: [], totalSeats: 20000, remainingSeats: 0 },
       ],
-      poster: posterAespa,
+      poster: posterAespaHyperline,
       status: 'closed',
     },
   ],
@@ -188,18 +219,18 @@ const artistEventsMap: Record<string, Event[]> = {
       dates: [
         { id: 'ive-d1', date: '2026-07-12T18:00:00+09:00', bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 },
       ],
-      poster: posterIVEWorldTour,
+      poster: posterKwonjina,
       status: 'upcoming',
     },
     {
       id: 'evt-ive-fanmeet-2026',
       artistId: 'ive',
-      title: 'IVE 2nd FAN MEETING: I HAEVE',
+      title: 'IVE 2nd FAN MEETING: I HAVE',
       venue: '잠실실내체육관',
       dates: [
         { id: 'ive-d2', date: '2026-05-18T17:00:00+09:00', bookingWindows: [], totalSeats: 10000, remainingSeats: 2300 },
       ],
-      poster: posterIVE,
+      poster: posterPanic,
       status: 'open',
     },
   ],
@@ -213,7 +244,7 @@ const artistEventsMap: Record<string, Event[]> = {
         { id: 'bp-d1', date: '2026-07-15T18:30:00+09:00', bookingWindows: [], totalSeats: 20000, remainingSeats: 1800 },
         { id: 'bp-d2', date: '2026-07-16T18:30:00+09:00', bookingWindows: [], totalSeats: 20000, remainingSeats: 3200 },
       ],
-      poster: posterBP,
+      poster: posterParkHyoshin,
       status: 'open',
     },
     {
@@ -224,18 +255,18 @@ const artistEventsMap: Record<string, Event[]> = {
       dates: [
         { id: 'bp-d3', date: '2026-12-01T18:00:00+09:00', bookingWindows: [], totalSeats: 65000, remainingSeats: 65000 },
       ],
-      poster: posterBPHero,
+      poster: posterSeoulJazz,
       status: 'upcoming',
     },
     {
       id: 'evt-blackpink-past-2025',
       artistId: 'blackpink',
-      title: 'BLACKPINK WORLD TOUR 2025 ENCORE',
+      title: 'BLACKPINK THE SHOW 2025',
       venue: '고척스카이돔',
       dates: [
         { id: 'bp-d4', date: '2025-09-20T18:00:00+09:00', bookingWindows: [], totalSeats: 20000, remainingSeats: 0 },
       ],
-      poster: posterBP,
+      poster: posterSeoulJazz,
       status: 'soldout',
     },
   ],
@@ -284,6 +315,8 @@ const artistTransfersMap: Record<string, TransferListing[]> = {
     { id: 'tf-ae-03', ticketId: 'tk-ae-03', eventId: 'evt-aespa-synk-2026', sellerId: 'u-303', sellerTier: 'lightning', sellerTransactionCount: 18, price: 200000, faceValue: 176000, section: 'VIP석', seatInfo: 'A구역 1열 12번', status: 'listed', createdAt: '2026-02-26T08:30:00+09:00' },
     { id: 'tf-ae-04', ticketId: 'tk-ae-04', eventId: 'evt-aespa-synk-2026', sellerId: 'u-304', sellerTier: 'mist', sellerTransactionCount: 1, price: 95000, faceValue: 99000, section: 'A석', seatInfo: 'C구역 7열 22번', status: 'listed', createdAt: '2026-02-25T15:40:00+09:00' },
     { id: 'tf-ae-05', ticketId: 'tk-ae-05', eventId: 'evt-aespa-world-2026', sellerId: 'u-305', sellerTier: 'thunder', sellerTransactionCount: 9, price: 143000, faceValue: 143000, section: 'R석', seatInfo: 'B구역 3열 15번', status: 'listed', createdAt: '2026-02-24T13:20:00+09:00' },
+    { id: 'tf-ae-06', ticketId: 'tk-ae-06', eventId: 'evt-aespa-aexis-2026', sellerId: 'u-306', sellerTier: 'cloud', sellerTransactionCount: 4, price: 132000, faceValue: 132000, section: 'S석', seatInfo: 'B구역 6열 10번', status: 'listed', createdAt: '2026-02-23T11:00:00+09:00' },
+    { id: 'tf-ae-07', ticketId: 'tk-ae-07', eventId: 'evt-aespa-aexis-2026', sellerId: 'u-307', sellerTier: 'lightning', sellerTransactionCount: 20, price: 185000, faceValue: 176000, section: 'VIP석', seatInfo: 'A구역 2열 8번', status: 'listed', createdAt: '2026-02-22T16:30:00+09:00' },
   ],
   ive: [
     { id: 'tf-ive-01', ticketId: 'tk-ive-01', eventId: 'evt-ive-fanmeet-2026', sellerId: 'u-401', sellerTier: 'cloud', sellerTransactionCount: 3, price: 88000, faceValue: 88000, section: 'R석', seatInfo: 'A구역 6열 8번', status: 'listed', createdAt: '2026-02-28T09:00:00+09:00' },

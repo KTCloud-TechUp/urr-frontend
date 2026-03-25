@@ -1,5 +1,5 @@
 import type { Event, Section } from '@/types'
-import posterGDragon from '@/assets/Hero_G-dragon.png'
+import posterGDragon from '@/assets/hero_g-dragon.png'
 
 export const mockEvent: Event = {
   id: 'evt-gdragon-2026',

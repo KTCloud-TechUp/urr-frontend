@@ -1,7 +1,7 @@
 import type { Ticket, Event, TransferStatus } from '@/types'
-import posterGDragon from '@/assets/Hero_G-dragon.png'
-import posterBTS from '@/assets/공연_BTS Yet to Come in Cinema.png'
-import posterAespa from '@/assets/Hero_aespa.png'
+import posterGDragon from '@/assets/hero_g-dragon.png'
+import posterBTS from '@/assets/event_bts-yet-to-come-in-cinema.png'
+import posterAespa from '@/assets/hero_aespa.png'
 
 // ── Transfer Record (user perspective) ──────────────────
 

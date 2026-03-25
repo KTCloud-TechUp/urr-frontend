@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -85,13 +84,7 @@ export function AppSidebar() {
       >
         {!collapsed && (
           <Link href="/" className="flex items-center">
-            <Image
-              src="/logos/logo5.svg"
-              alt="URR"
-              width={40}
-              height={40}
-              loading="eager"
-            />
+            <img src="/logo_final.svg" alt="URR" className="h-10 w-auto" />
           </Link>
         )}
         <button

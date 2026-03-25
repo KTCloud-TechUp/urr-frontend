@@ -57,10 +57,12 @@ export function ArtistSelectStep({ artists, memberships, onSelect }: ArtistSelec
                     </span>
                   )}
                 </div>
-                <span className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                  <Users size={12} />
-                  팔로워 {formatCompactNumber(artist.followerCount)}명
-                </span>
+                {artist.followerCount !== undefined && (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                    <Users size={12} />
+                    팔로워 {formatCompactNumber(artist.followerCount)}명
+                  </span>
+                )}
               </div>
             </button>
           )

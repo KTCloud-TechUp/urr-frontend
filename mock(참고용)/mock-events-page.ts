@@ -1,41 +1,32 @@
-import type { BookingStatus } from '@/types'
+import type { EventListItem } from '@/types'
 
 // --- Asset imports (reuse existing posters) ---
-import posterBTSYTC from '@/assets/공연_BTS Yet to Come in Cinema.png'
-import posterBPBornPink from '@/assets/공연_BlackPink Born Pink.png'
-import posterIVESWIA from '@/assets/공연_IVE Show What i am.png'
-import posterNJComplexcon from '@/assets/공연_NewJeans Complexcon.png'
-import posterSVTBetheSun from '@/assets/공연_Seventeen Be the Sun.png'
-import posterSKZDomin from '@/assets/Stray Kids domin world tour.png'
-import posterGIDLE from '@/assets/선예매임박공연_(G)I-DLE World Tour.png'
-import posterTXT from '@/assets/선예매임박공연_TXT World Tour.png'
-import posterNJFanmeet from '@/assets/선예매임박공연_NewJeans Fan Meeting.png'
-import posterIVE1st from '@/assets/선예매임박공연_IVE The 1ST World Tour.png'
-import posterSVTFollow from '@/assets/선예매임박공연_Seventeen Follow Again Tour.png'
-import posterSKZDominance from '@/assets/선예매임박공연_StrayKids Dominance.png'
-
-// --- Types ---
-
-export type EventCategory =
-  | 'concert'
-  | 'fanmeeting'
-  | 'domestic'
-  | 'festival'
-  | 'musical'
-  | 'etc'
-
-export interface EventListItem {
-  id: string
-  artistId: string
-  artistName: string
-  title: string
-  venue: string
-  dateRange: string
-  status: BookingStatus
-  category: EventCategory
-  tags?: string[]
-  poster: string
-}
+import posterBTSYTC from '@/assets/event_bts-yet-to-come-in-cinema.png'
+import posterBPBornPink from '@/assets/event_blackpink-born-pink.png'
+import posterIVESWIA from '@/assets/event_ive-show-what-i-am.png'
+import posterNJComplexcon from '@/assets/event_newjeans-complexcon.png'
+import posterSVTBetheSun from '@/assets/event_seventeen-be-the-sun.png'
+import posterSKZDomin from '@/assets/event_stray-kids-domin-world-tour.png'
+import posterGIDLE from '@/assets/presale_gi-dle-world-tour.png'
+import posterTXT from '@/assets/presale_txt-world-tour.png'
+import posterNJFanmeet from '@/assets/presale_newjeans-fan-meeting.png'
+import posterIVE1st from '@/assets/presale_ive-1st-world-tour.png'
+import posterSVTFollow from '@/assets/presale_seventeen-follow-again-tour.png'
+import posterSKZDominance from '@/assets/presale_straykids-dominance.png'
+import posterBTSArirang from '@/assets/event_bts-world-tour-arirang.png'
+import posterParkHyoshin from '@/assets/event_park-hyoshin-live.png'
+import posterDAY6 from '@/assets/event_day6-10th-anniversary-tour.png'
+import posterMintFesta from '@/assets/event_mint-festa.png'
+import posterPanic from '@/assets/event_panic-concert.png'
+import posterSeoulJazz from '@/assets/event_seoul-jazz-festival-2026.png'
+import posterGiriboy from '@/assets/event_giriboy-concert.png'
+import posterPH1 from '@/assets/event_ph-1-concert.png'
+import posterIndied from '@/assets/event_indied-here-and-now.png'
+import posterKwonjina from '@/assets/event_kwonjina-flower-concert.png'
+import posterWoodz from '@/assets/event_woodz-world-tour-archive-1.png'
+import posterILLIT from '@/assets/event_illit-press-start.png'
+import posterSVTWorld from '@/assets/event_seventeen-world-tour.png'
+import posterTWS from '@/assets/event_tws-2nd-fanmeeting-2026.png'
 
 // --- Category filter options ---
 export const eventCategoryFilters = [
@@ -56,13 +47,49 @@ export const popularEvents: EventListItem[] = [
     id: 'evt-svt-bethesun-2026',
     artistId: 'seventeen',
     artistName: 'SEVENTEEN',
-    title: 'SEVENTEEN WORLD TOUR BE THE SUN',
+    title: 'SEVENTEEN WORLD TOUR',
     venue: '인천 아시아드 주경기장',
     dateRange: '2026.04.04 - 2026.04.05',
     status: 'open',
     category: 'concert',
     tags: ['단독판매'],
     poster: posterSVTBetheSun,
+  },
+  {
+    id: 'evt-kwonjina-2026',
+    artistId: 'kwonjina',
+    artistName: '권진아',
+    title: '2026 권진아 꽃말 콘서트',
+    venue: '올림픽 핸드볼 경기장',
+    dateRange: '2026.04.04 - 2026.04.05',
+    status: 'open',
+    category: 'concert',
+    tags: ['단독판매'],
+    poster: posterKwonjina,
+  },
+  {
+    id: 'evt-woodz-world-2026',
+    artistId: 'woodz',
+    artistName: 'WOODZ',
+    title: '2026 WOODZ WORLD TOUR',
+    venue: '인스파이어 아레나',
+    dateRange: '2026.03.14 - 2026.03.15',
+    status: 'open',
+    category: 'concert',
+    tags: ['단독판매'],
+    poster: posterWoodz,
+  },
+  {
+    id: 'evt-illit-press-2026',
+    artistId: 'illit',
+    artistName: 'ILLIT',
+    title: "ILLIT LIVE 'PRESS START' IN SEOUL",
+    venue: '라이브 아레나',
+    dateRange: '2026.03.14 - 2026.03.15',
+    status: 'open',
+    category: 'concert',
+    tags: ['단독판매'],
+    poster: posterILLIT,
   },
   {
     id: 'evt-bts-encore-2026',
@@ -73,7 +100,6 @@ export const popularEvents: EventListItem[] = [
     dateRange: '2026.08.01 - 2026.08.03',
     status: 'open',
     category: 'concert',
-    tags: ['단독판매'],
     poster: posterBTSYTC,
   },
   {
@@ -96,7 +122,6 @@ export const popularEvents: EventListItem[] = [
     dateRange: '2026.07.15 - 2026.07.16',
     status: 'open',
     category: 'concert',
-    tags: ['단독판매'],
     poster: posterBPBornPink,
   },
   {
@@ -119,7 +144,6 @@ export const popularEvents: EventListItem[] = [
     dateRange: '2026.07.05 - 2026.07.06',
     status: 'open',
     category: 'concert',
-    tags: ['단독판매'],
     poster: posterSKZDomin,
   },
 ]
@@ -127,15 +151,158 @@ export const popularEvents: EventListItem[] = [
 // --- All events (grid) ---
 export const allEventsData: EventListItem[] = [
   {
-    id: 'evt-bts-encore-2026',
+    id: 'evt-bts-arirang-2026',
     artistId: 'bts',
     artistName: 'BTS',
-    title: 'BTS YET TO COME IN CINEMAS',
-    venue: '잠실종합운동장 주경기장',
-    dateRange: '2026.08.01 - 2026.08.03',
+    title: 'BTS WORLD TOUR ARIRANG IN GOYANG',
+    venue: '고양종합운동장 주경기장',
+    dateRange: '2026.04.09 - 2026.04.12',
     status: 'open',
     category: 'concert',
-    poster: posterBTSYTC,
+    poster: posterBTSArirang,
+  },
+  {
+    id: 'evt-park-hyoshin-2026',
+    artistId: 'park-hyoshin',
+    artistName: '박효신',
+    title: '박효신 LIVE A & E 2026',
+    venue: '인천문학경기장 주경기장',
+    dateRange: '2026.04.04 - 2026.04.11',
+    status: 'open',
+    category: 'concert',
+    poster: posterParkHyoshin,
+  },
+  {
+    id: 'evt-day6-10th-2026',
+    artistId: 'day6',
+    artistName: 'DAY6',
+    title: 'DAY6 10th Anniversary Tour',
+    venue: '광주 김대중컨벤션센터 A-C홀',
+    dateRange: '2026.03.14 - 2026.03.15',
+    status: 'open',
+    category: 'concert',
+    poster: posterDAY6,
+  },
+  {
+    id: 'evt-mint-festa-2026',
+    artistId: 'various',
+    artistName: '민트 페스타',
+    title: '민트 페스타 MINT FESTA vol.80',
+    venue: 'KT&G 상상마당 라이브홀',
+    dateRange: '2026.02.22 - 2026.02.22',
+    status: 'open',
+    category: 'festival',
+    poster: posterMintFesta,
+  },
+  {
+    id: 'evt-panic-2026',
+    artistId: 'panic',
+    artistName: '패닉',
+    title: '2026 패닉 콘서트 PANIC IS COMING',
+    venue: 'LG아트센터 서울 LG SIGNATURE홀',
+    dateRange: '2026.04.16 - 2026.04.19',
+    status: 'open',
+    category: 'concert',
+    poster: posterPanic,
+  },
+  {
+    id: 'evt-seoul-jazz-2026',
+    artistId: 'various',
+    artistName: '서울재즈페스티벌',
+    title: '제18회 서울재즈페스티벌 2026',
+    venue: '올림픽공원',
+    dateRange: '2026.05.22 - 2026.05.24',
+    status: 'open',
+    category: 'festival',
+    poster: posterSeoulJazz,
+  },
+  {
+    id: 'evt-giriboy-2026',
+    artistId: 'giriboy',
+    artistName: '기리보이',
+    title: '기리보이 콘서트 GIRIBOY : LOG - 스탠딩',
+    venue: '명화라이브홀',
+    dateRange: '2026.03.14 - 2026.03.14',
+    status: 'open',
+    category: 'concert',
+    poster: posterGiriboy,
+  },
+  {
+    id: 'evt-ph1-2026',
+    artistId: 'ph-1',
+    artistName: 'pH-1',
+    title: '2026 pH-1 Concert : HOUSE PARTY',
+    venue: '명화라이브홀',
+    dateRange: '2026.04.18 - 2026.04.18',
+    status: 'open',
+    category: 'concert',
+    poster: posterPH1,
+  },
+  {
+    id: 'evt-indied-2026',
+    artistId: 'indied',
+    artistName: "INDIE'D",
+    title: "INDIE'D : HERE AND NOW Vol.1",
+    venue: '롤라이브홀',
+    dateRange: '2026.03.28 - 2026.03.28',
+    status: 'open',
+    category: 'domestic',
+    poster: posterIndied,
+  },
+  {
+    id: 'evt-tws-fanmeet-2026',
+    artistId: 'tws',
+    artistName: 'TWS',
+    title: 'FANMEETING <LOVE FACTORY>',
+    venue: '블루스퀘어 우리WON뱅킹홀',
+    dateRange: '2026.04.11 - 2026.04.12',
+    status: 'open',
+    category: 'fanmeeting',
+    poster: posterTWS,
+  },
+  {
+    id: 'evt-svt-world-2026',
+    artistId: 'seventeen',
+    artistName: 'SEVENTEEN',
+    title: 'SEVENTEEN WORLD TOUR',
+    venue: '인천 아시아드 주경기장',
+    dateRange: '2026.04.04 - 2026.04.05',
+    status: 'open',
+    category: 'concert',
+    poster: posterSVTWorld,
+  },
+  {
+    id: 'evt-kwonjina-2026',
+    artistId: 'kwonjina',
+    artistName: '권진아',
+    title: '2026 권진아 꽃말 콘서트',
+    venue: '올림픽 핸드볼 경기장',
+    dateRange: '2026.04.04 - 2026.04.05',
+    status: 'open',
+    category: 'concert',
+    poster: posterKwonjina,
+  },
+  {
+    id: 'evt-woodz-world-2026',
+    artistId: 'woodz',
+    artistName: 'WOODZ',
+    title: '2026 WOODZ WORLD TOUR Archive. 1',
+    venue: '인스파이어 아레나',
+    dateRange: '2026.03.14 - 2026.03.15',
+    status: 'open',
+    category: 'concert',
+    poster: posterWoodz,
+  },
+  {
+    id: 'evt-illit-press-2026',
+    artistId: 'illit',
+    artistName: 'ILLIT',
+    title: "ILLIT LIVE 'PRESS START' IN SEOUL",
+    venue: '라이브 아레나',
+    dateRange: '2026.03.14 - 2026.03.15',
+    status: 'open',
+    category: 'concert',
+    poster: posterILLIT,
   },
   {
     id: 'evt-gidle-world-2026',

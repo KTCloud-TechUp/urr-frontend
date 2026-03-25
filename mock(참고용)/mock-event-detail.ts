@@ -1,5 +1,4 @@
-import type { BookingStatus, EventDate, Section } from '@/types'
-import type { EventCategory } from './mock-events-page'
+import type { BookingStatus, EventDate, Section, EventCategory } from '@/types'
 import { mockEvent, sectionsByDate, getSectionsForDate } from './mock-events'
 import { allEventsData } from './mock-events-page'
 

@@ -76,7 +76,7 @@ export function ArtistsWidget() {
             <Link
               key={artist.id}
               href={getArtistLink(artist.id)}
-              className="group shrink-0 w-[125px]"
+              className="group shrink-0 w-31.25"
             >
               <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted">
                 <Image
@@ -113,7 +113,7 @@ export function ArtistsWidget() {
           {newArtistCards.map((card) => (
             <div
               key={card.id}
-              className="rounded-xl bg-[#F5F4F3] hover:bg-[#F0EFED] transition-colors px-5 pt-3 pb-4 flex flex-col shrink-0 w-[440px]"
+              className="rounded-xl bg-[#F5F4F3] hover:bg-[#F0EFED] transition-colors px-5 pt-3 pb-4 flex flex-col shrink-0 w-110"
             >
               <span
                 className={cn(
@@ -124,7 +124,7 @@ export function ArtistsWidget() {
                 {card.label}
               </span>
               <div className="flex gap-3">
-                <div className="relative w-[110px] h-[110px] rounded-lg overflow-hidden shrink-0 bg-muted">
+                <div className="relative w-27.5 h-27.5 rounded-lg overflow-hidden shrink-0 bg-muted">
                   <Image
                     src={card.profileImage}
                     alt={card.name}
@@ -132,7 +132,7 @@ export function ArtistsWidget() {
                     className="object-cover"
                   />
                 </div>
-                <div className="flex-1 min-w-0 flex flex-col h-[110px]">
+                <div className="flex-1 min-w-0 flex flex-col h-27.5">
                   <h3 className="text-[15px] font-semibold line-clamp-2 leading-snug">
                     {card.title}
                   </h3>
@@ -205,10 +205,12 @@ export function ArtistsWidget() {
                   {artist.bio}
                 </p>
               </div>
-              <div className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground">
-                <Users size={12} />
-                {formatCompactNumber(artist.followerCount)}
-              </div>
+              {artist.followerCount !== undefined && (
+                <div className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground">
+                  <Users size={12} />
+                  {formatCompactNumber(artist.followerCount)}
+                </div>
+              )}
               <button
                 onClick={(e) => {
                   e.preventDefault();

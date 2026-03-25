@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import { mockArtists } from "@/shared/lib/mocks/artists";
-import { homePopularArtists } from "@/shared/lib/mocks/home";
+import { getArtists } from "@/features/artist";
 import { ArtistDetailWidget } from "@/widgets/artist";
 import { ArtistPageSkeleton } from "@/widgets/artist/ArtistPageSkeleton";
 
@@ -8,12 +7,21 @@ interface ArtistPageProps {
   params: Promise<{ artistId: string }>;
 }
 
-export function generateStaticParams() {
-  const allIds = new Set([
-    ...mockArtists.map((a) => a.id),
-    ...homePopularArtists.map((a) => a.id),
-  ]);
-  return Array.from(allIds).map((id) => ({ artistId: id }));
+const FALLBACK_ARTIST_IDS = [
+  "gdragon", "bts", "aespa", "ive", "blackpink",
+  "skz", "seventeen", "newjeans", "gidle", "txt",
+];
+
+export async function generateStaticParams() {
+  try {
+    const artists = await getArtists();
+    if (artists.length > 0) {
+      return artists.map((a) => ({ artistId: String(a.id) }));
+    }
+  } catch {
+    // API not available at build time — use fallback
+  }
+  return FALLBACK_ARTIST_IDS.map((id) => ({ artistId: id }));
 }
 
 export default async function ArtistPage({ params }: ArtistPageProps) {

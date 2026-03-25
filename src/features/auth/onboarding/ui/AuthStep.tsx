@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Mail } from "lucide-react";
-import Image from "next/image";
 import { Button, Input, Checkbox } from "@/shared/ui";
 
 type AuthMode = "login" | "register";
@@ -127,14 +126,7 @@ export function AuthStep({ onComplete, socialError, loginError }: AuthStepProps)
 
   return (
     <div className="max-w-100 w-full mx-auto flex flex-col items-center">
-      <Image
-        src="/logos/logo5.svg"
-        alt="URR"
-        width={128}
-        height={64}
-        className="h-16 w-auto"
-        priority
-      />
+      <img src="/logo_final.svg" alt="URR" className="h-16 w-auto" />
       <h1 className="text-2xl font-bold mt-6">
         {mode === "login" ? "우르르에 오신 것을 환영합니다" : "회원가입"}
       </h1>

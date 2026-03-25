@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export function Footer() {
@@ -8,7 +7,7 @@ export function Footer() {
         <div className="flex items-start justify-between">
           {/* Left: Brand column */}
           <div className="shrink-0 space-y-7">
-            <Image src="/logos/logo5.svg" alt="URR" width={44} height={44} />
+            <img src="/logo_final.svg" alt="URR" className="h-11 w-auto" />
 
             {/* Social icons */}
             <div className="flex items-center gap-2.5 text-muted-foreground">

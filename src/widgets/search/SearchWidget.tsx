@@ -43,11 +43,7 @@ function formatFollowers(n: number): string {
 /*  sub-components                                                     */
 /* ------------------------------------------------------------------ */
 
-function TrendingSection({
-  onSelect,
-}: {
-  onSelect: (term: string) => void;
-}) {
+function TrendingSection({ onSelect }: { onSelect: (term: string) => void }) {
   return (
     <section className="space-y-4">
       <h2 className="text-base font-semibold flex items-center gap-2 text-muted-foreground">
@@ -81,7 +77,7 @@ function PopularArtistsSection({ artists }: { artists: Artist[] }) {
           <Link
             key={artist.id}
             href={`/artists/${artist.id}`}
-            className="flex flex-col items-center gap-2 shrink-0 w-[72px] group"
+            className="flex flex-col items-center gap-2 shrink-0 w-18 group"
           >
             {artist.avatar ? (
               <Image
@@ -173,9 +169,11 @@ function ArtistResultRow({ artist }: { artist: Artist }) {
       )}
       <div className="min-w-0 flex-1">
         <p className="font-semibold truncate">{artist.name}</p>
-        <p className="text-sm text-muted-foreground">
-          팔로워 {formatFollowers(artist.followerCount)}
-        </p>
+        {artist.followerCount !== undefined && (
+          <p className="text-sm text-muted-foreground">
+            팔로워 {formatFollowers(artist.followerCount)}
+          </p>
+        )}
       </div>
     </Link>
   );
@@ -196,11 +194,11 @@ function EventResultRow({ event }: { event: SearchableEvent }) {
           alt={event.title}
           width={60}
           height={60}
-          className="size-[60px] rounded-lg shrink-0 object-cover"
+          className="size-15 rounded-lg shrink-0 object-cover"
         />
       ) : (
         <div
-          className="size-[60px] rounded-lg shrink-0"
+          className="size-15 rounded-lg shrink-0"
           style={{ background: getArtistGradient(event.artistId) }}
         />
       )}
@@ -262,10 +260,7 @@ export function SearchWidget() {
       }
     }
     function handleClickOutside(e: MouseEvent) {
-      if (
-        filterRef.current &&
-        !filterRef.current.contains(e.target as Node)
-      ) {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
         setShowFilterDropdown(false);
       }
       if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
@@ -292,11 +287,11 @@ export function SearchWidget() {
         matchesQuery(a.bio, debouncedQuery),
     );
     if (sortBy === "name")
-      return [...results].sort((a, b) =>
-        a.name.localeCompare(b.name, "ko"),
-      );
+      return [...results].sort((a, b) => a.name.localeCompare(b.name, "ko"));
     // 'popular' = default order (by followerCount desc), 'latest' = same for artists
-    return [...results].sort((a, b) => b.followerCount - a.followerCount);
+    return [...results].sort(
+      (a, b) => (b.followerCount ?? 0) - (a.followerCount ?? 0),
+    );
   }, [allArtists, debouncedQuery, filterType, sortBy]);
 
   const filteredEvents = useMemo(() => {
@@ -308,9 +303,7 @@ export function SearchWidget() {
         matchesQuery(e.artistName, debouncedQuery),
     );
     if (sortBy === "name")
-      return [...results].sort((a, b) =>
-        a.title.localeCompare(b.title, "ko"),
-      );
+      return [...results].sort((a, b) => a.title.localeCompare(b.title, "ko"));
     if (sortBy === "latest")
       return [...results].sort((a, b) => {
         const dateA = a.dates[0]?.date ?? "";

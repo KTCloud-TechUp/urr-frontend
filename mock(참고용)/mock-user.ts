@@ -32,7 +32,7 @@ export const mockUser: User = {
       membershipNumber: 'BTS-2025-0042',
       joinedAt: '2025-03-20T00:00:00Z',
       expiresAt: '2026-06-30T23:59:59Z',
-      isActive: true,
+      isActive: false,
       tierProgress: { current: 3800, required: 5000 },
     },
     {
@@ -56,7 +56,7 @@ export const mockUser: User = {
       membershipNumber: 'IVE-2025-0085',
       joinedAt: '2025-08-10T00:00:00Z',
       expiresAt: '2026-08-10T23:59:59Z',
-      isActive: true,
+      isActive: false,
       tierProgress: { current: 350, required: 1000 },
     },
   ],
