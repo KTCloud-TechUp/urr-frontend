@@ -14,8 +14,7 @@ import {
   getSectionLayout,
 } from "@/shared/lib/mocks/seats";
 import { useSeatLockSimulation } from "@/features/booking/model/useSeatLockSimulation";
-import { VenueMap } from "@/features/booking/ui/VenueMap";
-import { SECTION_BBOXES } from "@/shared/lib/venue";
+import { VenueMap, SECTION_BBOXES } from "@/features/booking/ui/VenueMap";
 import { SeatOverlay } from "@/features/booking/ui/SeatOverlay";
 import { BookingSidePanel } from "./BookingSidePanel";
 import { TimerExpiryModal } from "./TimerExpiryModal";
@@ -78,14 +77,15 @@ export function UnifiedSeatView() {
     setSeats(initialSeats);
   }, [initialSeats]);
 
-  // Start timer when entering seat mode
+  // Start timer when entering seat mode, or restart when switching sections
   useEffect(() => {
     if (isInSeatMode) {
+      timer.reset();
       timer.start();
     }
     return () => timer.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInSeatMode]);
+  }, [isInSeatMode, selectedSectionId]);
 
   // Watch for timer expiry
   useEffect(() => {
@@ -134,7 +134,6 @@ export function UnifiedSeatView() {
     resetBooking();
   }, [resetBooking]);
 
-  // Compute standalone seat view bbox
   const bbox = selectedSectionId ? SECTION_BBOXES[selectedSectionId] : null;
 
   return (
@@ -186,60 +185,15 @@ export function UnifiedSeatView() {
             </select>
           </div>
 
-          {/* Section Map view — when NO section selected */}
-          {!isInSeatMode && (
-            <>
-              {/* Stage label at top */}
-              <div className="flex justify-center pt-4 pb-2 shrink-0 relative z-10">
-                <div className="px-5 py-1.5 rounded-full bg-secondary text-white text-[11px] font-bold tracking-widest">
-                  STAGE
-                </div>
-              </div>
-
-              {/* Map container */}
-              <div className="w-full h-[calc(100%-48px)] flex items-center justify-center">
-                <div className="w-full h-full p-4">
-                  <VenueMap
-                    interactive
-                    selectedSectionId={selectedSectionId}
-                    onSectionClick={handleSectionClick}
-                    onSectionHover={setHoveredSection}
-                  />
-                </div>
-              </div>
-
-              {/* Hovered section info tooltip at bottom */}
-              {hoveredSection && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 rounded-full bg-foreground/90 text-white text-xs font-medium backdrop-blur-sm pointer-events-none">
-                  {(() => {
-                    const sec = sectionsForDate.find(
-                      (s) => s.id === hoveredSection,
-                    );
-                    if (!sec) return hoveredSection;
-                    return `${sec.name} — 잔여 ${sec.remainingSeats.toLocaleString()}석`;
-                  })()}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Standalone Seat Grid — when section IS selected */}
-          {isInSeatMode && selectedSectionId && bbox && seats.length > 0 && (
-            <>
-              {/* Section name label */}
-              <div className="flex justify-center pt-4 pb-2 shrink-0 relative z-10">
-                <div className="px-5 py-1.5 rounded-full bg-muted text-foreground text-sm font-semibold">
-                  {section?.name ?? "FLOOR"}
-                </div>
-              </div>
-
-              {/* Seat grid */}
-              <div className="w-full h-[calc(100%-96px)] flex items-center justify-center px-6 py-2">
-                <svg
-                  viewBox={`${bbox.x - 8} ${bbox.y - 8} ${bbox.w + 16} ${bbox.h + 16}`}
-                  className="w-full h-full"
-                  preserveAspectRatio="xMidYMid meet"
-                >
+          {/* Unified venue map — zooms into selected section */}
+          <div className="w-full h-full p-4">
+            <VenueMap
+              interactive={!isInSeatMode}
+              selectedSectionId={selectedSectionId}
+              dimNonSelected={isInSeatMode}
+              zoomedSectionId={isInSeatMode ? selectedSectionId : null}
+              seatOverlay={
+                isInSeatMode && selectedSectionId && bbox && seats.length > 0 ? (
                   <SeatOverlay
                     seats={seats}
                     rows={layout.rows}
@@ -248,9 +202,24 @@ export function UnifiedSeatView() {
                     selectedSeatIds={selectedSeatIds}
                     onSeatClick={handleSeatClick}
                   />
-                </svg>
-              </div>
-            </>
+                ) : undefined
+              }
+              onSectionClick={handleSectionClick}
+              onSectionHover={!isInSeatMode ? setHoveredSection : undefined}
+            />
+          </div>
+
+          {/* Hovered section info tooltip at bottom */}
+          {!isInSeatMode && hoveredSection && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 rounded-full bg-foreground/90 text-white text-xs font-medium backdrop-blur-sm pointer-events-none">
+              {(() => {
+                const sec = sectionsForDate.find(
+                  (s) => s.id === hoveredSection,
+                );
+                if (!sec) return hoveredSection;
+                return `${sec.name} — 잔여 ${sec.remainingSeats.toLocaleString()}석`;
+              })()}
+            </div>
           )}
         </div>
 

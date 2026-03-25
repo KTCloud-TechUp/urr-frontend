@@ -11,11 +11,27 @@ import { VenueMap } from "@/features/booking/ui/VenueMap";
 import { QueueLeaveModal } from "./QueueLeaveModal";
 
 const SECTION_LABEL_POS: Record<string, { x: number; y: number }> = {
-  "sec-vip": { x: 447, y: 250 },
+  "sec-vip":     { x: 447, y: 250 },
   "sec-floor-r": { x: 447, y: 520 },
-  "sec-r": { x: 280, y: 490 },
-  "sec-s": { x: 200, y: 300 },
-  "sec-a": { x: 130, y: 450 },
+  "sec-r":       { x: 280, y: 490 },
+  "sec-s":       { x: 200, y: 300 },
+  "sec-a":       { x: 130, y: 450 },
+};
+
+/** Maps individual zone IDs → the group key used in SECTION_LABEL_POS */
+const ZONE_TO_GROUP: Record<string, string> = {
+  VIP1: "sec-vip", VIP2: "sec-vip", VIP3: "sec-vip",
+  S1: "sec-s", S2: "sec-s", S3: "sec-s", S4: "sec-s",
+  S5: "sec-s", S6: "sec-s", S7: "sec-s", S8: "sec-s",
+  R1: "sec-r", R2: "sec-r", R3: "sec-r", R4: "sec-r", R5: "sec-r", R6: "sec-r", R7: "sec-r",
+  A1:  "sec-a", A2:  "sec-a", A3:  "sec-a", A4:  "sec-a", A5:  "sec-a",
+  A6:  "sec-a", A7:  "sec-a", A8:  "sec-a", A9:  "sec-a", A10: "sec-a",
+  A11: "sec-a", A12: "sec-a", A13: "sec-a", A14: "sec-a", A15: "sec-a",
+  A16: "sec-a", A17: "sec-a", A18: "sec-a", A19: "sec-a", A20: "sec-a",
+};
+
+const GROUP_NAMES: Record<string, string> = {
+  "sec-vip": "VIP석", "sec-floor-r": "플로어R", "sec-r": "R석", "sec-s": "S석", "sec-a": "A석",
 };
 
 function QueueContent() {
@@ -74,16 +90,23 @@ function QueueContent() {
 
   const progressPercent = Math.max(0, 100 - (position / totalInQueue) * 100);
 
-  const sectionPercentages = sectionsForDate.map((sec) => {
-    const drained = Math.min(
-      sec.remainingSeats,
-      drainOffset * Math.ceil(sec.totalSeats / 200),
-    );
-    const remaining = Math.max(0, sec.remainingSeats - drained);
-    const pct =
-      sec.totalSeats > 0 ? Math.round((remaining / sec.totalSeats) * 100) : 0;
-    return { id: sec.id, name: sec.name, pct, remaining };
-  });
+  // Aggregate individual zones (VIP1-3, S1-8, R1-7, A1-20) into 5 display groups
+  const groupAcc = new Map<string, { remaining: number; total: number }>();
+  for (const sec of sectionsForDate) {
+    const groupId = ZONE_TO_GROUP[sec.id] ?? sec.id;
+    const prev = groupAcc.get(groupId) ?? { remaining: 0, total: 0 };
+    const drained = Math.min(sec.remainingSeats, drainOffset * Math.ceil(sec.totalSeats / 200));
+    groupAcc.set(groupId, {
+      remaining: prev.remaining + Math.max(0, sec.remainingSeats - drained),
+      total: prev.total + sec.totalSeats,
+    });
+  }
+  const sectionPercentages = Array.from(groupAcc.entries()).map(([id, { remaining, total }]) => ({
+    id,
+    name: GROUP_NAMES[id] ?? id,
+    pct: total > 0 ? Math.round((remaining / total) * 100) : 0,
+    remaining,
+  }));
 
   const percentageOverlay = (
     <g style={{ pointerEvents: "none" }} className="select-none">

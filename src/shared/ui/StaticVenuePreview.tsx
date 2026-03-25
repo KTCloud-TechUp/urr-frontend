@@ -3,20 +3,37 @@ import { SECTION_COLORS } from "@/shared/lib/constants";
 
 const DIMMED = "#9CA3AF";
 
+/** Map individual zone IDs (VIP1, S3, R2, A7…) → section group IDs used in this SVG */
+const ZONE_TO_GROUP: Record<string, string> = {
+  VIP1: "sec-vip", VIP2: "sec-vip", VIP3: "sec-vip",
+  S1: "sec-s", S2: "sec-s", S3: "sec-s", S4: "sec-s",
+  S5: "sec-s", S6: "sec-s", S7: "sec-s", S8: "sec-s",
+  R1: "sec-r", R2: "sec-r", R3: "sec-r", R4: "sec-r", R5: "sec-r", R6: "sec-r", R7: "sec-r",
+  A1:  "sec-a", A2:  "sec-a", A3:  "sec-a", A4:  "sec-a", A5:  "sec-a",
+  A6:  "sec-a", A7:  "sec-a", A8:  "sec-a", A9:  "sec-a", A10: "sec-a",
+  A11: "sec-a", A12: "sec-a", A13: "sec-a", A14: "sec-a", A15: "sec-a",
+  A16: "sec-a", A17: "sec-a", A18: "sec-a", A19: "sec-a", A20: "sec-a",
+};
+
 interface StaticVenuePreviewProps {
   highlightSectionId: string | null;
   className?: string;
 }
 
 export function StaticVenuePreview({ highlightSectionId, className }: StaticVenuePreviewProps) {
+  // Normalise: individual zone ID (e.g. "R3") → group ID (e.g. "sec-r")
+  const highlight = highlightSectionId
+    ? (ZONE_TO_GROUP[highlightSectionId] ?? highlightSectionId)
+    : null;
+
   function sc(sectionId: string) {
-    if (!highlightSectionId) return SECTION_COLORS[sectionId] ?? DIMMED;
-    return sectionId === highlightSectionId ? (SECTION_COLORS[sectionId] ?? DIMMED) : DIMMED;
+    if (!highlight) return SECTION_COLORS[sectionId] ?? DIMMED;
+    return sectionId === highlight ? (SECTION_COLORS[sectionId] ?? DIMMED) : DIMMED;
   }
 
   function op(sectionId: string) {
-    if (!highlightSectionId) return 1;
-    return sectionId === highlightSectionId ? 1 : 0.25;
+    if (!highlight) return 1;
+    return sectionId === highlight ? 1 : 0.25;
   }
 
   return (

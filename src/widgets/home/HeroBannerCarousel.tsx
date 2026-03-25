@@ -76,6 +76,7 @@ export function HeroBannerCarousel({ banners }: HeroBannerCarouselProps) {
                 fill
                 className="object-cover"
                 priority={index === 0}
+                loading={index === 0 ? "eager" : "lazy"}
               />
             ) : (
               <div
