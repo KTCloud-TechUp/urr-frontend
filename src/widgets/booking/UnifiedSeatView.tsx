@@ -77,14 +77,15 @@ export function UnifiedSeatView() {
     setSeats(initialSeats);
   }, [initialSeats]);
 
-  // Start timer when entering seat mode
+  // Start timer when entering seat mode, or restart when switching sections
   useEffect(() => {
     if (isInSeatMode) {
+      timer.reset();
       timer.start();
     }
     return () => timer.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInSeatMode]);
+  }, [isInSeatMode, selectedSectionId]);
 
   // Watch for timer expiry
   useEffect(() => {

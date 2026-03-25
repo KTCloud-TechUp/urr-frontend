@@ -279,8 +279,9 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
     }
 
     function handleClick(sectionId: string) {
-      if (!interactive) return;
       if (isSoldOut(sectionId)) return;
+      const isOtherDimmed = dimNonSelected && selectedSectionId && sectionId !== selectedSectionId;
+      if (!interactive && !isOtherDimmed) return;
       onSectionClick?.(sectionId);
     }
 
@@ -420,7 +421,7 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
             STAGE
           </text>
           {/* 구역 레이블 - getBBox() 기반 자동 중심 + 수동 오프셋 */}
-          {Object.entries(labelCenters).map(([id, { x, y }]) => {
+          {!zoomedSectionId && Object.entries(labelCenters).map(([id, { x, y }]) => {
             const offsets: Record<string, { dx: number; dy: number }> = {
               VIP1: { dx: -18, dy: -23 },
               VIP2: { dx: 0, dy: -10 },
