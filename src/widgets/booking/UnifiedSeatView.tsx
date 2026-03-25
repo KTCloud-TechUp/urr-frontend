@@ -9,13 +9,10 @@ import {
 import { ArrowLeft } from "lucide-react";
 import { useBooking } from "@/features/booking/model/BookingContext";
 import { useSeatTimer } from "@/features/booking/model/useSeatTimer";
-import {
-  generateSeatsForSection,
-  getSectionLayout,
-} from "@/shared/lib/mocks/seats";
+import { generateSeatsForSection } from "@/shared/lib/mocks/seats";
 import { useSeatLockSimulation } from "@/features/booking/model/useSeatLockSimulation";
-import { VenueMap, SECTION_BBOXES } from "@/features/booking/ui/VenueMap";
-import { SeatOverlay } from "@/features/booking/ui/SeatOverlay";
+import { VenueMap } from "@/features/booking/ui/VenueMap";
+import { GrapeSeatOverlay } from "@/features/booking/ui/GrapeSeatOverlay";
 import { BookingSidePanel } from "./BookingSidePanel";
 import { TimerExpiryModal } from "./TimerExpiryModal";
 import { formatEventDateTime } from "@/shared/lib/format";
@@ -59,11 +56,6 @@ export function UnifiedSeatView() {
     () => sectionsForDate.find((s) => s.id === selectedSectionId) ?? null,
     [sectionsForDate, selectedSectionId],
   );
-
-  const layout = useMemo(() => {
-    if (!selectedSectionId) return { rows: 0, seatsPerRow: 0 };
-    return getSectionLayout(selectedSectionId);
-  }, [selectedSectionId]);
 
   // Seats
   const initialSeats = useMemo(() => {
@@ -133,8 +125,6 @@ export function UnifiedSeatView() {
     resetBooking();
   }, [resetBooking]);
 
-  const bbox = selectedSectionId ? SECTION_BBOXES[selectedSectionId] : null;
-
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -192,12 +182,10 @@ export function UnifiedSeatView() {
               dimNonSelected={isInSeatMode}
               zoomedSectionId={isInSeatMode ? selectedSectionId : null}
               seatOverlay={
-                isInSeatMode && selectedSectionId && bbox && seats.length > 0 ? (
-                  <SeatOverlay
+                isInSeatMode && selectedSectionId && seats.length > 0 ? (
+                  <GrapeSeatOverlay
+                    sectionId={selectedSectionId}
                     seats={seats}
-                    rows={layout.rows}
-                    seatsPerRow={layout.seatsPerRow}
-                    bbox={bbox}
                     selectedSeatIds={selectedSeatIds}
                     onSeatClick={handleSeatClick}
                   />

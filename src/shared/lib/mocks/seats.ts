@@ -1,4 +1,5 @@
 import type { Section, Seat, SeatStatus, TierLevel } from "@/shared/types";
+import { GRAPE_SEATS } from "@/shared/lib/grapeSeats";
 
 const SECTION_LAYOUT: Record<string, { rows: number; seatsPerRow: number }> = {
   VIP1: { rows: 23, seatsPerRow: 29 }, VIP2: { rows: 23, seatsPerRow: 29 }, VIP3: { rows: 23, seatsPerRow: 29 },
@@ -55,12 +56,14 @@ export function getSectionLayout(sectionId: string) {
 export function generateSeatsForSection(section: Section, userTier: TierLevel): Seat[] {
   const layout = getSectionLayout(section.id);
   const { rows, seatsPerRow } = layout;
-  const totalSeats = rows * seatsPerRow;
+  const totalSeats = GRAPE_SEATS[section.id]?.length ?? rows * seatsPerRow;
   const rand = seededRandom(hashString(section.id));
 
-  const baseTaken = section.totalSeats - section.remainingSeats;
-  const extraTaken = Math.round(section.totalSeats * TIER_EXTRA_TAKEN_RATIO[userTier]);
-  const totalTaken = Math.min(totalSeats, baseTaken + extraTaken);
+  // Use ratio from mock data so availability is correct regardless of totalSeats vs grape count mismatch
+  const remainingRatio = section.totalSeats > 0 ? section.remainingSeats / section.totalSeats : 0;
+  const grapeRemaining = Math.round(totalSeats * remainingRatio);
+  const extraTaken = Math.round(totalSeats * TIER_EXTRA_TAKEN_RATIO[userTier]);
+  const totalTaken = Math.min(totalSeats, (totalSeats - grapeRemaining) + extraTaken);
 
   const indices = Array.from({ length: totalSeats }, (_, i) => i);
   for (let i = indices.length - 1; i > 0; i--) {
@@ -70,18 +73,17 @@ export function generateSeatsForSection(section: Section, userTier: TierLevel): 
   const takenSet = new Set(indices.slice(0, totalTaken));
 
   const seats: Seat[] = [];
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < seatsPerRow; c++) {
-      const flatIndex = r * seatsPerRow + c;
-      const status: SeatStatus = takenSet.has(flatIndex) ? "taken" : "available";
-      seats.push({
-        id: `${section.id}-${rowLabel(r)}-${c + 1}`,
-        sectionId: section.id,
-        row: rowLabel(r),
-        number: String(c + 1),
-        status,
-      });
-    }
+  for (let flatIndex = 0; flatIndex < totalSeats; flatIndex++) {
+    const r = Math.floor(flatIndex / seatsPerRow);
+    const c = flatIndex % seatsPerRow;
+    const status: SeatStatus = takenSet.has(flatIndex) ? "taken" : "available";
+    seats.push({
+      id: `${section.id}-${rowLabel(r)}-${c + 1}`,
+      sectionId: section.id,
+      row: rowLabel(r),
+      number: String(c + 1),
+      status,
+    });
   }
 
   return seats;
