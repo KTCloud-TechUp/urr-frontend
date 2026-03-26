@@ -3,7 +3,7 @@ import type { ApiBaseResponse } from "../model/types";
 
 export async function logout(): Promise<void> {
   await fetchWithAuth<ApiBaseResponse<Record<string, never>>>(
-    "/api/auth/logout",
+    "/auth/logout",
     { method: "POST" },
   );
 }

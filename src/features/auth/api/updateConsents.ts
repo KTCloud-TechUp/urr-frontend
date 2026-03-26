@@ -7,7 +7,7 @@ export interface UpdateConsentsParams {
 }
 
 export async function updateConsents(params: UpdateConsentsParams): Promise<void> {
-  await fetchWithAuth("/api/auth/me/consents", {
+  await fetchWithAuth("/auth/me/consents", {
     method: "PATCH",
     body: params,
   });

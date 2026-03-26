@@ -14,6 +14,6 @@ interface ArtistsApiResponse {
 }
 
 export async function getArtists(): Promise<ArtistSummary[]> {
-  const res = await apiRequest<ArtistsApiResponse>("/api/artists");
+  const res = await apiRequest<ArtistsApiResponse>("/artists");
   return res.data.data;
 }

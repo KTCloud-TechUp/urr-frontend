@@ -6,7 +6,7 @@ export async function kakaoRejoin(
   agree: boolean,
 ): Promise<AuthResponseData> {
   const res = await fetchWithAuth<ApiBaseResponse<AuthResponseData>>(
-    "/api/auth/oauth/kakao/rejoin",
+    "/auth/oauth/kakao/rejoin",
     {
       method: "POST",
       body: { rejoinToken, agree },

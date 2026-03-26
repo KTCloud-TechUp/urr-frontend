@@ -51,7 +51,7 @@ async function reissueToken(): Promise<string | null> {
   isReissuing = true;
   try {
     const res = await apiRequest<ApiBaseResponse<ReissueResponseData>>(
-      "/api/auth/token/reissue",
+      "/auth/token/reissue",
       { method: "POST" },
     );
     const newToken = res.data.data.tokens.accessToken;
