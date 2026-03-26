@@ -2,7 +2,7 @@ import type { Artist } from "@/shared/types";
 
 export const mockArtists: Artist[] = [
   {
-    id: "gdragon",
+    id: "1",
     name: "G-Dragon",
     avatar: "/artists/profile_gdragon_artist-home.png",
     banner: "/heroes/hero_g-dragon.png",
@@ -11,7 +11,7 @@ export const mockArtists: Artist[] = [
     category: "solo",
   },
   {
-    id: "bts",
+    id: "2",
     name: "BTS",
     avatar: "/artists/artist_bts.png",
     banner: "/heroes/hero-banner.png",
@@ -20,7 +20,7 @@ export const mockArtists: Artist[] = [
     category: "boygroup",
   },
   {
-    id: "aespa",
+    id: "3",
     name: "aespa",
     avatar: "/artists/artist_aespa.png",
     banner: "/heroes/hero_aespa.png",
@@ -29,7 +29,7 @@ export const mockArtists: Artist[] = [
     category: "girlgroup",
   },
   {
-    id: "ive",
+    id: "4",
     name: "IVE",
     avatar: "/artists/artist_ive.png",
     banner: "/events/event_ive-show-what-i-am.png",
@@ -38,7 +38,7 @@ export const mockArtists: Artist[] = [
     category: "girlgroup",
   },
   {
-    id: "blackpink",
+    id: "5",
     name: "BLACKPINK",
     avatar: "/artists/artist_blackpink.png",
     banner: "/heroes/hero_blackpink.png",
