@@ -7,7 +7,7 @@ interface ArtistPageProps {
   params: Promise<{ artistId: string }>;
 }
 
-const FALLBACK_ARTIST_IDS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
+const FALLBACK_ARTIST_IDS = Array.from({ length: 18 }, (_, i) => String(i + 1));
 
 export async function generateStaticParams() {
   try {

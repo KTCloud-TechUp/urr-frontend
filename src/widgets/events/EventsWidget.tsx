@@ -10,7 +10,7 @@ import { getEvents } from "@/features/event";
 import type { EventSummary } from "@/features/event";
 import {
   eventCategoryFilters,
-  popularEvents,
+  type EventCategory,
   type EventCategoryFilter,
   type EventListItem,
 } from "@/shared/lib/mocks/events-page";
@@ -27,12 +27,20 @@ function PopularEventCard({ event }: { event: EventListItem }) {
     >
       {/* Poster image */}
       <div className="relative w-full aspect-[3/4] bg-muted overflow-hidden">
-        <Image
-          src={event.poster}
-          alt={event.title}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        {event.poster ? (
+          <Image
+            src={event.poster}
+            alt={event.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <span className="text-muted-foreground text-xs font-medium text-center line-clamp-4">
+              {event.title}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Bottom gradient overlay */}
@@ -140,18 +148,23 @@ function EventListRow({ event }: { event: EventListItem }) {
 /*  main                                                              */
 /* ------------------------------------------------------------------ */
 
+function buildDateRange(openDate: string, endDate?: string): string {
+  if (!endDate || endDate === openDate) return openDate;
+  return `${openDate} - ${endDate}`;
+}
+
 function mapToEventListItem(e: EventSummary): EventListItem {
   return {
     id: String(e.eventId),
     artistId: String(e.artistId),
-    artistName: "",
+    artistName: e.artistName ?? "",
     title: e.title,
     venue: e.venueTemplateName,
-    dateRange: e.openDate,
+    dateRange: buildDateRange(e.openDate, e.endDate),
     status: e.active ? "open" : "closed",
-    category: "concert",
-    tags: [],
-    poster: "",
+    category: (e.category as EventCategory) ?? "concert",
+    tags: e.tags ?? [],
+    poster: e.posterImageUrl ?? "",
   };
 }
 
@@ -170,6 +183,8 @@ export function EventsWidget() {
     if (category === "all") return allEvents;
     return allEvents.filter((e) => e.category === category);
   }, [allEvents, category]);
+
+  const popularEvents = allEvents;
 
   return (
     <div className="space-y-14">

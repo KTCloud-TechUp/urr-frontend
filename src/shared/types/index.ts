@@ -27,7 +27,7 @@ export interface Artist {
   banner: string;
   bio: string;
   followerCount?: number;
-  category: "boygroup" | "girlgroup" | "solo" | "band";
+  category: "boygroup" | "girlgroup" | "coedgroup" | "solo" | "band";
 }
 
 export interface Event {

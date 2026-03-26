@@ -30,7 +30,7 @@ export const eventCategoryFilters: { value: EventCategoryFilter; label: string }
 export const popularEvents: EventListItem[] = [
   {
     id: "evt-svt-bethesun-2026",
-    artistId: "seventeen",
+    artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN WORLD TOUR",
     venue: "인천 아시아드 주경기장",
@@ -78,7 +78,7 @@ export const popularEvents: EventListItem[] = [
   },
   {
     id: "evt-bts-encore-2026",
-    artistId: "bts",
+    artistId: "2",
     artistName: "BTS",
     title: "BTS YET TO COME IN CINEMAS",
     venue: "잠실종합운동장 주경기장",
@@ -90,7 +90,7 @@ export const popularEvents: EventListItem[] = [
   },
   {
     id: "evt-ive-show-2026",
-    artistId: "ive",
+    artistId: "4",
     artistName: "IVE",
     title: "IVE WORLD TOUR SHOW WHAT I AM",
     venue: "KSPO DOME",
@@ -102,7 +102,7 @@ export const popularEvents: EventListItem[] = [
   },
   {
     id: "evt-blackpink-world-2026",
-    artistId: "blackpink",
+    artistId: "5",
     artistName: "BLACKPINK",
     title: "BLACKPINK BORN PINK WORLD TOUR",
     venue: "고척스카이돔",
@@ -114,7 +114,7 @@ export const popularEvents: EventListItem[] = [
   },
   {
     id: "evt-nj-complexcon-2026",
-    artistId: "newjeans",
+    artistId: "8",
     artistName: "NewJeans",
     title: "NewJeans × COMPLEXCON",
     venue: "Long Beach Convention Center",
@@ -126,7 +126,7 @@ export const popularEvents: EventListItem[] = [
   },
   {
     id: "evt-skz-domtour-2026",
-    artistId: "skz",
+    artistId: "6",
     artistName: "Stray Kids",
     title: "Stray Kids DOMINANCE WORLD TOUR",
     venue: "고척스카이돔",
@@ -142,7 +142,7 @@ export const popularEvents: EventListItem[] = [
 export const allEventsData: EventListItem[] = [
   {
     id: "evt-bts-arirang-2026",
-    artistId: "bts",
+    artistId: "2",
     artistName: "BTS",
     title: "BTS WORLD TOUR ARIRANG IN GOYANG",
     venue: "고양종합운동장 주경기장",
@@ -166,7 +166,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-day6-10th-2026",
-    artistId: "day6",
+    artistId: "11",
     artistName: "DAY6",
     title: "DAY6 10th Anniversary Tour",
     venue: "광주 김대중컨벤션센터 A-C홀",
@@ -262,7 +262,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-svt-world-2026",
-    artistId: "seventeen",
+    artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN WORLD TOUR",
     venue: "인천 아시아드 주경기장",
@@ -310,7 +310,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-gidle-world-2026",
-    artistId: "gidle",
+    artistId: "9",
     artistName: "(G)I-DLE",
     title: "(G)I-DLE WORLD TOUR 'iDOL'",
     venue: "KSPO DOME",
@@ -322,7 +322,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-nj-complexcon2-2026",
-    artistId: "newjeans",
+    artistId: "8",
     artistName: "NewJeans",
     title: "NewJeans × COMPLEXCON",
     venue: "Long Beach Convention Center",
@@ -334,7 +334,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-svt-follow-2026",
-    artistId: "seventeen",
+    artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN FOLLOW AGAIN TOUR",
     venue: "인천 아시아드 주경기장",
@@ -346,7 +346,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-skz-dominance-2026",
-    artistId: "skz",
+    artistId: "6",
     artistName: "Stray Kids",
     title: "Stray Kids DOMINANCE WORLD TOUR",
     venue: "고척스카이돔",
@@ -358,7 +358,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-txt-act-2026",
-    artistId: "txt",
+    artistId: "10",
     artistName: "TXT",
     title: "TXT WORLD TOUR ACT : PROMISE",
     venue: "KSPO DOME",
@@ -370,7 +370,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-nj-fanmeet-2026",
-    artistId: "newjeans",
+    artistId: "8",
     artistName: "NewJeans",
     title: "NewJeans Fan Meeting 'Bunnies Camp'",
     venue: "올림픽공원 올림픽홀",
@@ -382,7 +382,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-ive-1st-2026",
-    artistId: "ive",
+    artistId: "4",
     artistName: "IVE",
     title: "IVE THE 1ST WORLD TOUR",
     venue: "KSPO DOME",
@@ -394,7 +394,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-blackpink-born-2026",
-    artistId: "blackpink",
+    artistId: "5",
     artistName: "BLACKPINK",
     title: "BLACKPINK BORN PINK WORLD TOUR",
     venue: "고척스카이돔",
@@ -406,7 +406,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-svt-bethesun2-2026",
-    artistId: "seventeen",
+    artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN WORLD TOUR BE THE SUN",
     venue: "인천 아시아드 주경기장",

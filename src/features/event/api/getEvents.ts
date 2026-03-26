@@ -1,4 +1,19 @@
 import { apiRequest } from "@/shared/api/client";
+import type { EventTag } from "@/entities/event";
+
+export type EventApiCategory = "concert" | "fanmeeting" | "festival" | "musical" | "etc";
+
+export const eventApiCategoryLabels: Record<EventApiCategory, string> = {
+  concert: "콘서트",
+  fanmeeting: "팬미팅",
+  festival: "페스티벌",
+  musical: "뮤지컬",
+  etc: "기타",
+};
+
+export function getEventCategoryLabel(category: EventApiCategory | string): string {
+  return eventApiCategoryLabels[category as EventApiCategory] ?? category;
+}
 
 export interface EventSummary {
   eventId: number;
@@ -9,6 +24,11 @@ export interface EventSummary {
   venueTemplateName: string;
   openDate: string;
   active: boolean;
+  posterImageUrl?: string;
+  artistName?: string;
+  category?: EventApiCategory;
+  tags?: EventTag[];
+  endDate?: string;
 }
 
 interface EventsApiResponse {

@@ -2,11 +2,24 @@ import type { Event, TransferListing, TransferStatus } from "@/shared/types";
 
 // Numeric DB id → slug key used in mock data maps
 const idToSlug: Record<string, string> = {
-  "1": "gdragon",
-  "2": "bts",
-  "3": "aespa",
-  "4": "ive",
-  "5": "blackpink",
+  "1":  "gdragon",
+  "2":  "bts",
+  "3":  "aespa",
+  "4":  "ive",
+  "5":  "blackpink",
+  "6":  "skz",
+  "7":  "seventeen",
+  "8":  "newjeans",
+  "9":  "gidle",
+  "10": "txt",
+  "11": "day6",
+  "12": "brunomars",
+  "13": "akmu",
+  "14": "kwon",
+  "15": "riize",
+  "16": "iu",
+  "17": "nmixx",
+  "18": "tours",
 };
 function resolveSlug(artistId: string): string {
   return idToSlug[artistId] ?? artistId;
@@ -23,11 +36,24 @@ export interface ArtistExtendedInfo {
 }
 
 const artistExtendedInfoMap: Record<string, ArtistExtendedInfo> = {
-  gdragon: { artistId: "gdragon", debutDate: "2006.08.19", agency: "Galaxy Corporation", genres: ["K-POP", "Hip-Hop", "R&B"] },
-  bts: { artistId: "bts", debutDate: "2013.06.13", agency: "BIGHIT MUSIC", genres: ["K-POP", "Hip-Hop", "Pop"], memberCount: 7 },
-  aespa: { artistId: "aespa", debutDate: "2020.11.17", agency: "SM Entertainment", genres: ["K-POP", "Hyperpop", "EDM"], memberCount: 4 },
-  ive: { artistId: "ive", debutDate: "2021.12.01", agency: "Starship Entertainment", genres: ["K-POP", "Pop", "Dance"], memberCount: 6 },
-  blackpink: { artistId: "blackpink", debutDate: "2016.08.08", agency: "YG Entertainment", genres: ["K-POP", "Pop", "EDM"], memberCount: 4 },
+  gdragon:  { artistId: "1",  debutDate: "2006.08.19", agency: "Galaxy Corporation",      genres: ["K-POP", "Hip-Hop", "R&B"] },
+  bts:      { artistId: "2",  debutDate: "2013.06.13", agency: "BIGHIT MUSIC",             genres: ["K-POP", "Hip-Hop", "Pop"], memberCount: 7 },
+  aespa:    { artistId: "3",  debutDate: "2020.11.17", agency: "SM Entertainment",         genres: ["K-POP", "Hyperpop", "EDM"], memberCount: 4 },
+  ive:      { artistId: "4",  debutDate: "2021.12.01", agency: "Starship Entertainment",   genres: ["K-POP", "Pop", "Dance"], memberCount: 6 },
+  blackpink:{ artistId: "5",  debutDate: "2016.08.08", agency: "YG Entertainment",         genres: ["K-POP", "Pop", "EDM"], memberCount: 4 },
+  skz:      { artistId: "6",  debutDate: "2018.03.25", agency: "JYP Entertainment",        genres: ["K-POP", "Hip-Hop", "Rock"], memberCount: 8 },
+  seventeen:{ artistId: "7",  debutDate: "2015.05.26", agency: "PLEDIS Entertainment",     genres: ["K-POP", "Pop", "R&B"], memberCount: 13 },
+  newjeans: { artistId: "8",  debutDate: "2022.07.22", agency: "ADOR",                     genres: ["K-POP", "Pop", "R&B"], memberCount: 5 },
+  gidle:    { artistId: "9",  debutDate: "2018.05.02", agency: "CUBE Entertainment",        genres: ["K-POP", "Hip-Hop", "Pop"], memberCount: 5 },
+  txt:      { artistId: "10", debutDate: "2019.03.04", agency: "BIGHIT MUSIC",             genres: ["K-POP", "Pop", "Rock"], memberCount: 5 },
+  day6:     { artistId: "11", debutDate: "2015.09.07", agency: "JYP Entertainment",        genres: ["Rock", "Pop", "K-POP"], memberCount: 5 },
+  brunomars:{ artistId: "12", debutDate: "2010.01.01", agency: "Atlantic Records",         genres: ["Pop", "R&B", "Funk"] },
+  akmu:     { artistId: "13", debutDate: "2014.05.07", agency: "YG Entertainment",         genres: ["Indie Pop", "Folk", "K-POP"], memberCount: 2 },
+  kwon:     { artistId: "14", debutDate: "2012.04.09", agency: "Magic Strawberry Sound",   genres: ["Indie Pop", "Acoustic", "K-POP"] },
+  riize:    { artistId: "15", debutDate: "2023.09.04", agency: "SM Entertainment",         genres: ["K-POP", "Pop", "Dance"], memberCount: 7 },
+  iu:       { artistId: "16", debutDate: "2008.09.18", agency: "KAKAO Entertainment",      genres: ["Ballad", "Pop", "K-POP"] },
+  nmixx:    { artistId: "17", debutDate: "2022.02.22", agency: "JYP Entertainment",        genres: ["K-POP", "Mix-Pop", "Dance"], memberCount: 6 },
+  tours:    { artistId: "18", debutDate: "2023.02.01", agency: "Starship Entertainment",   genres: ["K-POP", "Pop", "Dance"], memberCount: 7 },
 };
 
 export function getArtistExtendedInfo(artistId: string): ArtistExtendedInfo | undefined {
@@ -38,31 +64,31 @@ export function getArtistExtendedInfo(artistId: string): ArtistExtendedInfo | un
 
 const artistEventsMap: Record<string, Event[]> = {
   gdragon: [
-    { id: "evt-gdragon-2026", artistId: "gdragon", title: "G-Dragon 2026 MAMA DOME TOUR", venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "gd-d1", date: "2026-06-01T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 3200 }, { id: "gd-d2", date: "2026-06-02T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 5100 }], poster: "/heroes/hero_g-dragon.png", status: "open" },
-    { id: "evt-gdragon-solo-2026", artistId: "gdragon", title: "G-Dragon DETOX WORLD TOUR", venue: "고척스카이돔", dates: [{ id: "gd-d3", date: "2026-09-20T19:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 20000 }], poster: "", status: "upcoming" },
-    { id: "evt-gdragon-past-2025", artistId: "gdragon", title: "G-Dragon POWER CONCERT 2025", venue: "잠실종합운동장 주경기장", dates: [{ id: "gd-d4", date: "2025-12-25T18:00:00+09:00", bookingWindows: [], totalSeats: 50000, remainingSeats: 0 }], poster: "", status: "closed" },
+    { id: "evt-gdragon-2026",      artistId: "1", title: "G-Dragon 2026 MAMA DOME TOUR",    venue: "KSPO DOME (올림픽체조경기장)",     dates: [{ id: "gd-d1", date: "2026-06-01T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 3200 }, { id: "gd-d2", date: "2026-06-02T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 5100 }], poster: "/heroes/hero_g-dragon.png", status: "open" },
+    { id: "evt-gdragon-solo-2026",  artistId: "1", title: "G-Dragon DETOX WORLD TOUR",       venue: "고척스카이돔",                     dates: [{ id: "gd-d3", date: "2026-09-20T19:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 20000 }], poster: "", status: "upcoming" },
+    { id: "evt-gdragon-past-2025",  artistId: "1", title: "G-Dragon POWER CONCERT 2025",     venue: "잠실종합운동장 주경기장",           dates: [{ id: "gd-d4", date: "2025-12-25T18:00:00+09:00", bookingWindows: [], totalSeats: 50000, remainingSeats: 0 }], poster: "", status: "closed" },
   ],
   bts: [
-    { id: "evt-bts-encore-2026", artistId: "bts", title: "BTS WORLD TOUR ARIRANG", venue: "잠실종합운동장 주경기장", dates: [{ id: "bts-d1", date: "2026-08-01T19:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 12000 }, { id: "bts-d2", date: "2026-08-02T19:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 18000 }], poster: "/events/event_bts-yet-to-come-in-cinema.png", status: "open" },
-    { id: "evt-bts-fanmeet-2026", artistId: "bts", title: "2026 BTS FAN MEETING: MAGIC SHOP", venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "bts-d3", date: "2026-10-15T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "", status: "upcoming" },
-    { id: "evt-bts-busan-2026", artistId: "bts", title: "BTS YET TO COME IN BUSAN", venue: "부산 아시아드 주경기장", dates: [{ id: "bts-d4", date: "2026-04-20T17:00:00+09:00", bookingWindows: [], totalSeats: 40000, remainingSeats: 0 }], poster: "", status: "soldout" },
-    { id: "evt-bts-past-2025", artistId: "bts", title: "BTS PERMISSION TO DANCE ON STAGE", venue: "고척스카이돔", dates: [{ id: "bts-d5", date: "2025-11-10T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "closed" },
+    { id: "evt-bts-encore-2026",    artistId: "2", title: "BTS WORLD TOUR ARIRANG",           venue: "잠실종합운동장 주경기장",           dates: [{ id: "bts-d1", date: "2026-08-01T19:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 12000 }, { id: "bts-d2", date: "2026-08-02T19:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 18000 }], poster: "/events/event_bts-yet-to-come-in-cinema.png", status: "open" },
+    { id: "evt-bts-fanmeet-2026",   artistId: "2", title: "2026 BTS FAN MEETING: MAGIC SHOP", venue: "KSPO DOME (올림픽체조경기장)",     dates: [{ id: "bts-d3", date: "2026-10-15T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "", status: "upcoming" },
+    { id: "evt-bts-busan-2026",     artistId: "2", title: "BTS YET TO COME IN BUSAN",          venue: "부산 아시아드 주경기장",           dates: [{ id: "bts-d4", date: "2026-04-20T17:00:00+09:00", bookingWindows: [], totalSeats: 40000, remainingSeats: 0 }], poster: "", status: "soldout" },
+    { id: "evt-bts-past-2025",      artistId: "2", title: "BTS PERMISSION TO DANCE ON STAGE", venue: "고척스카이돔",                     dates: [{ id: "bts-d5", date: "2025-11-10T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "closed" },
   ],
   aespa: [
-    { id: "evt-aespa-synk-2026", artistId: "aespa", title: "aespa LIVE SYNK : PARALLEL", venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ae-d1", date: "2026-09-20T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 4500 }], poster: "/heroes/hero_aespa.png", status: "open" },
-    { id: "evt-aespa-world-2026", artistId: "aespa", title: "aespa WORLD TOUR : MYWORLD", venue: "잠실실내체육관", dates: [{ id: "ae-d2", date: "2026-11-05T19:00:00+09:00", bookingWindows: [], totalSeats: 10000, remainingSeats: 10000 }], poster: "", status: "upcoming" },
-    { id: "evt-aespa-aexis-2026", artistId: "aespa", title: "aespa SYNK : AEXIS LINE", venue: "인스파이어 아레나", dates: [{ id: "ae-d4", date: "2026-12-20T18:00:00+09:00", bookingWindows: [], totalSeats: 12000, remainingSeats: 12000 }], poster: "", status: "upcoming" },
-    { id: "evt-aespa-myworld-encore-2026", artistId: "aespa", title: "aespa WORLD TOUR : MYWORLD ENCORE", venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ae-d5", date: "2027-01-15T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "", status: "upcoming" },
-    { id: "evt-aespa-past-2025", artistId: "aespa", title: "aespa SYNK : HYPER LINE", venue: "고척스카이돔", dates: [{ id: "ae-d3", date: "2025-10-01T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "closed" },
+    { id: "evt-aespa-synk-2026",           artistId: "3", title: "aespa LIVE SYNK : PARALLEL",        venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ae-d1", date: "2026-09-20T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 4500 }], poster: "/heroes/hero_aespa.png", status: "open" },
+    { id: "evt-aespa-world-2026",          artistId: "3", title: "aespa WORLD TOUR : MYWORLD",         venue: "잠실실내체육관",               dates: [{ id: "ae-d2", date: "2026-11-05T19:00:00+09:00", bookingWindows: [], totalSeats: 10000, remainingSeats: 10000 }], poster: "", status: "upcoming" },
+    { id: "evt-aespa-aexis-2026",          artistId: "3", title: "aespa SYNK : AEXIS LINE",            venue: "인스파이어 아레나",             dates: [{ id: "ae-d4", date: "2026-12-20T18:00:00+09:00", bookingWindows: [], totalSeats: 12000, remainingSeats: 12000 }], poster: "", status: "upcoming" },
+    { id: "evt-aespa-myworld-encore-2026", artistId: "3", title: "aespa WORLD TOUR : MYWORLD ENCORE",  venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ae-d5", date: "2027-01-15T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "", status: "upcoming" },
+    { id: "evt-aespa-past-2025",           artistId: "3", title: "aespa SYNK : HYPER LINE",            venue: "고척스카이돔",                 dates: [{ id: "ae-d3", date: "2025-10-01T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "closed" },
   ],
   ive: [
-    { id: "evt-ive-show-2026", artistId: "ive", title: "IVE THE 1ST WORLD TOUR: SHOW WHAT I HAVE", venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ive-d1", date: "2026-07-12T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "/events/event_ive-show-what-i-am.png", status: "upcoming" },
-    { id: "evt-ive-fanmeet-2026", artistId: "ive", title: "IVE 2nd FAN MEETING: I HAVE", venue: "잠실실내체육관", dates: [{ id: "ive-d2", date: "2026-05-18T17:00:00+09:00", bookingWindows: [], totalSeats: 10000, remainingSeats: 2300 }], poster: "", status: "open" },
+    { id: "evt-ive-show-2026",    artistId: "4", title: "IVE THE 1ST WORLD TOUR: SHOW WHAT I HAVE", venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ive-d1", date: "2026-07-12T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "/events/event_ive-show-what-i-am.png", status: "upcoming" },
+    { id: "evt-ive-fanmeet-2026", artistId: "4", title: "IVE 2nd FAN MEETING: I HAVE",               venue: "잠실실내체육관",               dates: [{ id: "ive-d2", date: "2026-05-18T17:00:00+09:00", bookingWindows: [], totalSeats: 10000, remainingSeats: 2300 }], poster: "", status: "open" },
   ],
   blackpink: [
-    { id: "evt-blackpink-world-2026", artistId: "blackpink", title: "BLACKPINK BORN PINK WORLD TOUR FINALE", venue: "고척스카이돔", dates: [{ id: "bp-d1", date: "2026-07-15T18:30:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 1800 }, { id: "bp-d2", date: "2026-07-16T18:30:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 3200 }], poster: "/events/event_blackpink-born-pink.png", status: "open" },
-    { id: "evt-blackpink-concert-2026", artistId: "blackpink", title: "BLACKPINK IN YOUR AREA 2026", venue: "잠실종합운동장 주경기장", dates: [{ id: "bp-d3", date: "2026-12-01T18:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 65000 }], poster: "", status: "upcoming" },
-    { id: "evt-blackpink-past-2025", artistId: "blackpink", title: "BLACKPINK THE SHOW 2025", venue: "고척스카이돔", dates: [{ id: "bp-d4", date: "2025-09-20T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "soldout" },
+    { id: "evt-blackpink-world-2026",   artistId: "5", title: "BLACKPINK BORN PINK WORLD TOUR FINALE", venue: "고척스카이돔",                 dates: [{ id: "bp-d1", date: "2026-07-15T18:30:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 1800 }, { id: "bp-d2", date: "2026-07-16T18:30:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 3200 }], poster: "/events/event_blackpink-born-pink.png", status: "open" },
+    { id: "evt-blackpink-concert-2026", artistId: "5", title: "BLACKPINK IN YOUR AREA 2026",           venue: "잠실종합운동장 주경기장",       dates: [{ id: "bp-d3", date: "2026-12-01T18:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 65000 }], poster: "", status: "upcoming" },
+    { id: "evt-blackpink-past-2025",    artistId: "5", title: "BLACKPINK THE SHOW 2025",               venue: "고척스카이돔",                 dates: [{ id: "bp-d4", date: "2025-09-20T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "soldout" },
   ],
 };
 
