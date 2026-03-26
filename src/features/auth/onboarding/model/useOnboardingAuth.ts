@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { tokenStore } from "@/shared/api/tokenStore";
-import { login, register, socialOnboarding } from "@/features/auth/api";
+import { login, register, socialOnboarding, kakaoRejoin } from "@/features/auth/api";
 import type { RegisterParams } from "@/features/auth/api";
 import { buildKakaoAuthUrl } from "../api/buildKakaoAuthUrl";
 import { buildNaverAuthUrl } from "../api/buildNaverAuthUrl";
@@ -29,12 +29,14 @@ interface UseOnboardingAuthParams {
   onEmailRegister: () => void;
   onSuccess?: (userName: string) => void;
   isSocial?: boolean;
+  rejoinToken?: string;
 }
 
 export function useOnboardingAuth({
   onEmailRegister,
   onSuccess,
   isSocial = false,
+  rejoinToken,
 }: UseOnboardingAuthParams) {
   const router = useRouter();
   const pendingRegisterRef = useRef<Pick<
@@ -89,6 +91,21 @@ export function useOnboardingAuth({
       identityData.gender === "male" ? "MALE" : "FEMALE";
 
     setIdentityError(null);
+
+    if (rejoinToken) {
+      try {
+        const result = await kakaoRejoin(rejoinToken, true);
+        tokenStore.setToken(result.tokens.accessToken);
+        if (onSuccess) {
+          onSuccess(identityData.nickname);
+        } else {
+          router.push("/");
+        }
+      } catch {
+        setIdentityError("재가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+      }
+      return;
+    }
 
     if (isSocial) {
       try {

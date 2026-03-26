@@ -51,13 +51,19 @@ export function EventDetailHero({ event }: EventDetailHeroProps) {
         {/* Poster */}
         <div className="w-[280px] shrink-0">
           <div className="relative rounded-lg overflow-hidden bg-muted aspect-[3/4]">
-            <Image
-              src={event.poster}
-              alt={event.title}
-              fill
-              className="object-cover"
-              priority
-            />
+            {event.poster ? (
+              <Image
+                src={event.poster}
+                alt={event.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted to-muted-foreground/20">
+                <span className="text-muted-foreground text-sm font-medium px-4 text-center line-clamp-3">{event.title}</span>
+              </div>
+            )}
             {/* Date overlay on poster bottom */}
             <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-3 py-2.5 space-y-0.5">
               {event.dates.map((d) => {

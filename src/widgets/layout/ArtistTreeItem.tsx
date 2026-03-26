@@ -78,7 +78,9 @@ export function ArtistTreeItem({
         )}
       >
         {avatar}
-        <span className="text-sm font-medium truncate flex-1">{artist.name}</span>
+        <span className="text-sm font-medium truncate flex-1">
+          {artist.name}
+        </span>
         <ChevronDown
           size={14}
           className={cn(
@@ -113,7 +115,7 @@ export function ArtistTreeItem({
                   )}
                 >
                   {itemActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-sidebar-primary rounded-r-full" />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.75 h-4 bg-sidebar-primary rounded-r-full" />
                   )}
                   {item.label}
                 </Link>

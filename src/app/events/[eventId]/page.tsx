@@ -1,11 +1,18 @@
 import { EventDetailWidget } from "@/widgets/event-detail";
-import { allEventsCombined } from "@/shared/lib/mocks/events-page";
+import { getEvents } from "@/features/event";
 
-export function generateStaticParams() {
-  return [
-    { eventId: "evt-gdragon-2026" },
-    ...allEventsCombined.map((event) => ({ eventId: event.id })),
-  ];
+const FALLBACK_EVENT_IDS = Array.from({ length: 20 }, (_, i) => String(201 + i));
+
+export async function generateStaticParams() {
+  try {
+    const events = await getEvents();
+    if (events.length > 0) {
+      return events.map((e) => ({ eventId: String(e.eventId) }));
+    }
+  } catch {
+    // API not available at build time — use fallback
+  }
+  return FALLBACK_EVENT_IDS.map((id) => ({ eventId: id }));
 }
 
 interface EventDetailPageProps {

@@ -3,12 +3,13 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { FilterChip, ScrollableRow, ViewToggle } from "@/shared/ui";
 import { EventTagBadge } from "@/entities/event";
+import { getEvents } from "@/features/event";
+import type { EventSummary } from "@/features/event";
 import {
-  allEventsData,
   eventCategoryFilters,
-  filterEventsByCategory,
   popularEvents,
   type EventCategoryFilter,
   type EventListItem,
@@ -71,12 +72,18 @@ function EventGridCard({ event }: { event: EventListItem }) {
   return (
     <Link href={`/events/${event.id}`} className="group min-w-0">
       <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden bg-muted">
-        <Image
-          src={event.poster}
-          alt={event.title}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        {event.poster ? (
+          <Image
+            src={event.poster}
+            alt={event.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center p-3">
+            <span className="text-muted-foreground text-xs font-medium text-center line-clamp-4">{event.title}</span>
+          </div>
+        )}
       </div>
       <div className="mt-2.5 space-y-1.5">
         <p className="text-sm font-semibold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
@@ -107,12 +114,14 @@ function EventListRow({ event }: { event: EventListItem }) {
       className="group flex items-center gap-4 py-3 px-2 -mx-2 rounded-lg hover:bg-[#F3F2F0] transition-colors"
     >
       <div className="relative w-[72px] aspect-[3/4] rounded-lg overflow-hidden bg-muted shrink-0">
-        <Image
-          src={event.poster}
-          alt={event.title}
-          fill
-          className="object-cover"
-        />
+        {event.poster && (
+          <Image
+            src={event.poster}
+            alt={event.title}
+            fill
+            className="object-cover"
+          />
+        )}
       </div>
       <div className="flex-1 min-w-0 space-y-1.5">
         <h3 className="text-base font-semibold truncate group-hover:text-primary transition-colors">
@@ -131,13 +140,36 @@ function EventListRow({ event }: { event: EventListItem }) {
 /*  main                                                              */
 /* ------------------------------------------------------------------ */
 
+function mapToEventListItem(e: EventSummary): EventListItem {
+  return {
+    id: String(e.eventId),
+    artistId: String(e.artistId),
+    artistName: "",
+    title: e.title,
+    venue: e.venueTemplateName,
+    dateRange: e.openDate,
+    status: e.active ? "open" : "closed",
+    category: "concert",
+    tags: [],
+    poster: "",
+  };
+}
+
 export function EventsWidget() {
   const [category, setCategory] = useState<EventCategoryFilter>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+  const { data: eventsData = [] } = useQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+  });
+
+  const allEvents = useMemo(() => eventsData.map(mapToEventListItem), [eventsData]);
+
   const filteredEvents = useMemo(() => {
-    return filterEventsByCategory(allEventsData, category);
-  }, [category]);
+    if (category === "all") return allEvents;
+    return allEvents.filter((e) => e.category === category);
+  }, [allEvents, category]);
 
   return (
     <div className="space-y-14">

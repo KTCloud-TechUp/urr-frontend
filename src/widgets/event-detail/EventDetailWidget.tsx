@@ -1,10 +1,70 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/shared/ui";
+import { getEvents } from "@/features/event";
+import { getShows } from "@/features/show";
+import type { EventSummary } from "@/features/event";
+import type { ShowSummary } from "@/features/show";
+import type { EventDetail } from "@/shared/lib/mocks/event-detail";
 import { EventDetailHero } from "./EventDetailHero";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventBookingSidebar } from "./EventBookingSidebar";
-import { getEventDetailById } from "@/shared/lib/mocks/event-detail";
+
+function mapToEventDetail(event: EventSummary, shows: ShowSummary[]): EventDetail {
+  const dates = shows.map((show) => ({
+    id: String(show.showId),
+    date: show.startAt,
+    bookingWindows: [],
+    totalSeats: show.capacity,
+    remainingSeats: show.capacity,
+  }));
+
+  if (dates.length === 0) {
+    dates.push({
+      id: "1",
+      date: event.openDate + "T19:00:00",
+      bookingWindows: [],
+      totalSeats: 0,
+      remainingSeats: 0,
+    });
+  }
+
+  return {
+    id: String(event.eventId),
+    artistId: String(event.artistId),
+    artistName: "",
+    title: event.title,
+    subtitle: "",
+    venue: event.venueTemplateName,
+    venueAddress: "",
+    dates,
+    poster: "",
+    status: event.active ? "open" : "closed",
+    category: "concert",
+    tags: [],
+    runtime: "미정",
+    ageRating: "전체 이용가",
+    notices: [],
+    membershipPreSaleNotice: [],
+    identityVerification: [],
+    castInfo: "",
+    performanceDescription: event.description,
+    organizer: { host: "", manager: "", contact: "", email: "" },
+    sections: [],
+    bookingFee: "미정",
+    shippingFee: "미정",
+    validityPeriod: "미정",
+    cancellationPolicy: [],
+    ticketDelivery: [],
+    mobileTicketInfo: [],
+    precautions: [],
+    sellerInfo: { name: "URR", bizNumber: "", ceo: "", address: "" },
+    escrowInfo: "",
+  };
+}
 
 function EventDetailSkeleton() {
   return (
@@ -28,11 +88,24 @@ interface EventDetailWidgetProps {
 }
 
 export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
-  const event = getEventDetailById(eventId);
+  const { data: allEvents, isLoading: eventsLoading } = useQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+  });
 
-  if (!eventId) return <EventDetailSkeleton />;
+  const eventSummary = allEvents?.find((e) => String(e.eventId) === eventId);
 
-  if (!event) {
+  const { data: shows = [], isLoading: showsLoading } = useQuery({
+    queryKey: ["shows", eventId],
+    queryFn: () => getShows(eventId),
+    enabled: !!eventSummary,
+  });
+
+  const isLoading = eventsLoading || showsLoading;
+
+  if (isLoading) return <EventDetailSkeleton />;
+
+  if (!eventSummary) {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <p className="text-lg font-medium">공연을 찾을 수 없습니다</p>
@@ -45,6 +118,8 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
       </div>
     );
   }
+
+  const event = mapToEventDetail(eventSummary, shows);
 
   return (
     <div className="space-y-6">

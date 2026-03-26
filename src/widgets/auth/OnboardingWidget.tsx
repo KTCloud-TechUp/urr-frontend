@@ -18,8 +18,10 @@ type FlowState = "auth" | "identity" | "complete";
 function OnboardingWidgetInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialStep = searchParams.get("step") === "identity" ? "identity" : "auth";
+  const stepParam = searchParams.get("step");
+  const initialStep = stepParam === "identity" || stepParam === "rejoin" ? "identity" : "auth";
   const isSocial = initialStep === "identity";
+  const rejoinToken = stepParam === "rejoin" ? (searchParams.get("rejoinToken") ?? undefined) : undefined;
   const socialError = searchParams.get("error") as "kakao" | "naver" | null;
   const [flowState, setFlowState] = useState<FlowState>(initialStep);
   const [completedUserName, setCompletedUserName] = useState("");
@@ -64,6 +66,7 @@ function OnboardingWidgetInner() {
     onEmailRegister: () => setFlowState("identity"),
     onSuccess: handleSuccess,
     isSocial,
+    rejoinToken,
   });
 
   if (!authChecked) return null;
