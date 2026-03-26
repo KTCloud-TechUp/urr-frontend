@@ -1,5 +1,13 @@
 import type { CommunityPost } from "@/shared/types";
 
+const idToSlug: Record<string, string> = {
+  "1": "gdragon",
+  "2": "bts",
+  "3": "aespa",
+  "4": "ive",
+  "5": "blackpink",
+};
+
 const artistCommunityMap: Record<string, CommunityPost[]> = {
   gdragon: [
     { id: "cp-gd-01", artistId: "gdragon", authorName: "G-Dragon 공식", authorAvatar: "/artists/profile_gdragon_artist-home.png", isOfficial: true, content: "2026 MAMA DOME TOUR 서울 공연이 6월 1일, 2일 양일간 KSPO DOME에서 진행됩니다. 많은 관심과 사랑 부탁드립니다. 예매 관련 자세한 사항은 공연 탭에서 확인해 주세요.", images: [], likeCount: 12400, commentCount: 3200, createdAt: "2026-02-25T14:00:00+09:00" },
@@ -36,5 +44,5 @@ const artistCommunityMap: Record<string, CommunityPost[]> = {
 };
 
 export function getCommunityPostsByArtistId(artistId: string): CommunityPost[] {
-  return artistCommunityMap[artistId] ?? [];
+  return artistCommunityMap[idToSlug[artistId] ?? artistId] ?? [];
 }

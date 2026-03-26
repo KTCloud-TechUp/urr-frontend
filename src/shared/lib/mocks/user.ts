@@ -13,7 +13,7 @@ export const mockUser: User = {
   memberships: [
     {
       id: "mem-001",
-      artistId: "gdragon",
+      artistId: "1",
       artistName: "G-Dragon",
       tier: "lightning",
       nickname: "지디사랑해",
@@ -25,7 +25,7 @@ export const mockUser: User = {
     },
     {
       id: "mem-002",
-      artistId: "bts",
+      artistId: "2",
       artistName: "BTS",
       tier: "thunder",
       nickname: "보라해아미",
@@ -37,7 +37,7 @@ export const mockUser: User = {
     },
     {
       id: "mem-003",
-      artistId: "aespa",
+      artistId: "3",
       artistName: "aespa",
       tier: "cloud",
       nickname: "마이윈터",
@@ -49,7 +49,7 @@ export const mockUser: User = {
     },
     {
       id: "mem-004",
-      artistId: "ive",
+      artistId: "4",
       artistName: "IVE",
       tier: "mist",
       nickname: "아이브최고",
@@ -60,5 +60,5 @@ export const mockUser: User = {
       tierProgress: { current: 350, required: 1000 },
     },
   ],
-  followedArtistIds: ["gdragon", "bts", "aespa", "ive"],
+  followedArtistIds: ["1", "2", "3", "4"],
 };

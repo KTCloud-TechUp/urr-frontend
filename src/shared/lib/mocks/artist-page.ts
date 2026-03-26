@@ -1,5 +1,17 @@
 import type { Event, TransferListing, TransferStatus } from "@/shared/types";
 
+// Numeric DB id → slug key used in mock data maps
+const idToSlug: Record<string, string> = {
+  "1": "gdragon",
+  "2": "bts",
+  "3": "aespa",
+  "4": "ive",
+  "5": "blackpink",
+};
+function resolveSlug(artistId: string): string {
+  return idToSlug[artistId] ?? artistId;
+}
+
 // --- Extended artist info ---
 
 export interface ArtistExtendedInfo {
@@ -19,7 +31,7 @@ const artistExtendedInfoMap: Record<string, ArtistExtendedInfo> = {
 };
 
 export function getArtistExtendedInfo(artistId: string): ArtistExtendedInfo | undefined {
-  return artistExtendedInfoMap[artistId];
+  return artistExtendedInfoMap[resolveSlug(artistId)];
 }
 
 // --- Artist events ---
@@ -55,7 +67,7 @@ const artistEventsMap: Record<string, Event[]> = {
 };
 
 export function getEventsByArtistId(artistId: string): Event[] {
-  return artistEventsMap[artistId] ?? [];
+  return artistEventsMap[resolveSlug(artistId)] ?? [];
 }
 
 export function categorizeEvents(events: Event[]): { upcoming: Event[]; past: Event[] } {
@@ -115,7 +127,7 @@ const artistTransfersMap: Record<string, TransferListing[]> = {
 };
 
 export function getTransfersByArtistId(artistId: string): TransferListing[] {
-  return artistTransfersMap[artistId] ?? [];
+  return artistTransfersMap[resolveSlug(artistId)] ?? [];
 }
 
 export function getTransferListingById(
@@ -131,7 +143,7 @@ export function updateTransferListingStatus(
   listingId: string,
   status: TransferStatus,
 ): void {
-  const listings = artistTransfersMap[artistId];
+  const listings = artistTransfersMap[resolveSlug(artistId)];
   if (!listings) return;
   const listing = listings.find((t) => t.id === listingId);
   if (listing) listing.status = status;
@@ -185,10 +197,11 @@ export function getSellerProfile(sellerId: string): SellerProfile {
 }
 
 export function addTransferListing(artistId: string, listing: TransferListing): void {
-  if (!artistTransfersMap[artistId]) {
-    artistTransfersMap[artistId] = [];
+  const slug = resolveSlug(artistId);
+  if (!artistTransfersMap[slug]) {
+    artistTransfersMap[slug] = [];
   }
-  artistTransfersMap[artistId].unshift(listing);
+  artistTransfersMap[slug].unshift(listing);
 }
 
 export function getTransferListingsWithEvent(
