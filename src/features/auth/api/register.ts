@@ -14,7 +14,7 @@ export async function register(
   params: RegisterParams,
 ): Promise<AuthResponseData> {
   const res = await fetchWithAuth<ApiBaseResponse<AuthResponseData>>(
-    "/api/auth/register",
+    "/auth/register",
     {
       method: "POST",
       body: params,

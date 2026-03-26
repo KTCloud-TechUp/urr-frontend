@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://urr.guru";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://urr.guru/api/v1";
 
 // External getter — injected by useAuthStore to avoid circular imports
 let getAccessToken: (() => string | null) | null = null;

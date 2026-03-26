@@ -36,7 +36,7 @@ export const mockNotifications: Notification[] = [
     id: 'noti-04',
     type: 'payment',
     title: '결제 완료',
-    description: 'DETOX ASIA TOUR 티켓 결제가 완료되었습니다. (165,000원)',
+    description: 'DETOX WORLD TOUR 티켓 결제가 완료되었습니다. (165,000원)',
     timestamp: hoursAgo(24),
     isRead: false,
     link: '/my-page/wallet',
@@ -53,7 +53,7 @@ export const mockNotifications: Notification[] = [
   {
     id: 'noti-06',
     type: 'booking',
-    title: 'BTS YET TO COME ENCORE 선예매 오픈',
+    title: 'BTS WORLD TOUR ARIRANG 선예매 오픈',
     description: '⚡ 썬더 이상 회원 선예매가 3월 10일 시작됩니다.',
     timestamp: hoursAgo(48),
     isRead: true,

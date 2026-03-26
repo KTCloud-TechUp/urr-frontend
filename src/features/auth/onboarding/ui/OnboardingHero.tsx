@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface OnboardingHeroProps {
   step: number;
 }
@@ -38,12 +36,12 @@ export function OnboardingHero({ step }: OnboardingHeroProps) {
       className={`relative h-full w-full flex flex-col justify-center items-center px-12 overflow-hidden ${content.bgClass}`}
     >
       {/* Background decorative circles */}
-      <div className="absolute top-[-10%] right-[-10%] size-[400px] rounded-full bg-white/5" />
-      <div className="absolute bottom-[-15%] left-[-10%] size-[300px] rounded-full bg-white/5" />
-      <div className="absolute top-[40%] left-[60%] size-[200px] rounded-full bg-white/5" />
+      <div className="absolute top-[-10%] right-[-10%] size-100rounded-full bg-white/5" />
+      <div className="absolute bottom-[-15%] left-[-10%] size-75 rounded-full bg-white/5" />
+      <div className="absolute top-[40%] left-[60%] size-50 rounded-full bg-white/5" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-[400px] text-center space-y-6">
+      <div className="relative z-10 max-w-100 text-center space-y-6">
         <span className="text-6xl block">{content.emoji}</span>
 
         <h2 className="text-3xl font-bold text-white leading-snug whitespace-pre-line">
@@ -71,11 +69,10 @@ export function OnboardingHero({ step }: OnboardingHeroProps) {
 
       {/* URR branding */}
       <div className="absolute bottom-8 flex items-center gap-2">
-        <Image
-          src="/logos/URR_Logo.png"
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo_final.svg"
           alt="URR"
-          width={160}
-          height={40}
           className="h-10 w-auto opacity-40 brightness-0 invert"
         />
         <span className="text-white/40 text-sm font-medium tracking-wider">

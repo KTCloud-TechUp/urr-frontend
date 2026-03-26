@@ -6,7 +6,7 @@ export async function naverLogin(
   redirectUri: string,
 ): Promise<AuthResponseData> {
   const res = await fetchWithAuth<ApiBaseResponse<AuthResponseData>>(
-    "/api/auth/oauth/naver",
+    "/auth/oauth/naver",
     {
       method: "POST",
       body: { code, redirectUri },

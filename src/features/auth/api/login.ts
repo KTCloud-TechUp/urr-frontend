@@ -6,7 +6,7 @@ export async function login(
   password: string,
 ): Promise<AuthResponseData> {
   const res = await fetchWithAuth<ApiBaseResponse<AuthResponseData>>(
-    "/api/auth/login",
+    "/auth/login",
     {
       method: "POST",
       body: { email, password },

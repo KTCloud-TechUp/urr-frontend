@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { Lock } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
-import { getArtistById } from "@/shared/lib/mocks/artists";
+import { getArtist } from "@/features/artist";
 import { mockUser } from "@/shared/lib/mocks/user";
 import {
   getArtistExtendedInfo,
@@ -13,7 +14,7 @@ import {
   getTransferListingsWithEvent,
 } from "@/shared/lib/mocks/artist-page";
 import { getCommunityPostsByArtistId } from "@/shared/lib/mocks/community";
-import { SKELETON_LOAD_DELAY } from "@/shared/lib/constants";
+import type { Artist } from "@/shared/types";
 import { ArtistHeader } from "./ArtistHeader";
 import { ArtistHomeTab } from "./ArtistHomeTab";
 import { ArtistCommunityTab } from "./ArtistCommunityTab";
@@ -38,20 +39,17 @@ interface ArtistDetailWidgetProps {
 export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [following, setFollowing] = useState(false);
+  const [following, setFollowing] = useState(
+    mockUser.followedArtistIds.includes(artistId),
+  );
 
   const tabParam = searchParams.get("tab") as Tab | null;
   const activeTab: Tab = TABS.some((t) => t.value === tabParam) ? (tabParam as Tab) : "home";
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), SKELETON_LOAD_DELAY);
-    return () => clearTimeout(timer);
-  }, [artistId]);
-
-  useEffect(() => {
-    setFollowing(mockUser.followedArtistIds.includes(artistId));
-  }, [artistId]);
+  const { data: artistData, isLoading, isError } = useQuery({
+    queryKey: ["artist", artistId],
+    queryFn: () => getArtist(artistId),
+  });
 
   const handleTabChange = (tab: Tab) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -62,9 +60,7 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
 
   if (isLoading) return <ArtistPageSkeleton />;
 
-  const artist = getArtistById(artistId);
-
-  if (!artist) {
+  if (isError || !artistData) {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <p className="text-lg font-medium">아티스트를 찾을 수 없습니다</p>
@@ -72,6 +68,15 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
       </div>
     );
   }
+
+  const artist: Artist = {
+    id: String(artistData.id),
+    name: artistData.name,
+    avatar: artistData.profileImageUrl,
+    banner: "",
+    bio: artistData.description,
+    category: "solo",
+  };
 
   const membership = mockUser.memberships.find((m) => m.artistId === artistId && m.isActive);
   const extendedInfo = getArtistExtendedInfo(artist.id);

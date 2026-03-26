@@ -34,9 +34,11 @@ export function ArtistCard({ artist, selected = false, className }: ArtistCardPr
       <span className="text-[11px] font-medium text-center leading-tight line-clamp-2 w-full">
         {artist.name}
       </span>
-      <span className="text-[10px] text-muted-foreground text-center">
-        팔로워 {formatCompactNumber(artist.followerCount)}
-      </span>
+      {artist.followerCount !== undefined && (
+        <span className="text-[10px] text-muted-foreground text-center">
+          팔로워 {formatCompactNumber(artist.followerCount)}
+        </span>
+      )}
     </div>
   );
 }

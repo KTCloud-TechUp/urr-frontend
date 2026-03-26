@@ -26,7 +26,7 @@ export interface Artist {
   avatar: string;
   banner: string;
   bio: string;
-  followerCount: number;
+  followerCount?: number;
   category: "boygroup" | "girlgroup" | "solo" | "band";
 }
 
@@ -147,6 +147,13 @@ export interface Notification {
   timestamp: string;
   isRead: boolean;
   link: string;
+}
+
+export interface VQAQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
 }
 
 export interface ConfirmationData {

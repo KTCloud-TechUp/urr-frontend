@@ -38,7 +38,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: ["단독판매"],
-    poster: "/event_seventeen-be-the-sun.png",
+    poster: "/events/event_seventeen-be-the-sun.png",
   },
   {
     id: "evt-kwonjina-2026",
@@ -50,7 +50,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: ["단독판매"],
-    poster: "/event_kwonjina-flower-concert.png",
+    poster: "/events/event_kwonjina-flower-concert.png",
   },
   {
     id: "evt-woodz-world-2026",
@@ -62,7 +62,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: ["단독판매"],
-    poster: "/event_woodz-world-tour-archive-1.png",
+    poster: "/events/event_woodz-world-tour-archive-1.png",
   },
   {
     id: "evt-illit-press-2026",
@@ -74,7 +74,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: ["단독판매"],
-    poster: "/event_illit-press-start.png",
+    poster: "/events/event_illit-press-start.png",
   },
   {
     id: "evt-bts-encore-2026",
@@ -86,7 +86,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_bts-yet-to-come-in-cinema.png",
+    poster: "/events/event_bts-yet-to-come-in-cinema.png",
   },
   {
     id: "evt-ive-show-2026",
@@ -98,7 +98,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_ive-show-what-i-am.png",
+    poster: "/events/event_ive-show-what-i-am.png",
   },
   {
     id: "evt-blackpink-world-2026",
@@ -110,7 +110,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_blackpink-born-pink.png",
+    poster: "/events/event_blackpink-born-pink.png",
   },
   {
     id: "evt-nj-complexcon-2026",
@@ -122,7 +122,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "festival",
     tags: [],
-    poster: "/event_newjeans-complexcon.png",
+    poster: "/events/event_newjeans-complexcon.png",
   },
   {
     id: "evt-skz-domtour-2026",
@@ -134,7 +134,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_stray-kids-domin-world-tour.png",
+    poster: "/events/event_stray-kids-domin-world-tour.png",
   },
 ];
 
@@ -150,7 +150,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_bts-world-tour-arirang.png",
+    poster: "/events/event_bts-world-tour-arirang.png",
   },
   {
     id: "evt-park-hyoshin-2026",
@@ -162,7 +162,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_park-hyoshin-live.png",
+    poster: "/events/event_park-hyoshin-live.png",
   },
   {
     id: "evt-day6-10th-2026",
@@ -174,7 +174,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_day6-10th-anniversary-tour.png",
+    poster: "/events/event_day6-10th-anniversary-tour.png",
   },
   {
     id: "evt-mint-festa-2026",
@@ -186,7 +186,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "festival",
     tags: [],
-    poster: "/event_mint-festa.png",
+    poster: "/events/event_mint-festa.png",
   },
   {
     id: "evt-panic-2026",
@@ -198,7 +198,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_panic-concert.png",
+    poster: "/events/event_panic-concert.png",
   },
   {
     id: "evt-seoul-jazz-2026",
@@ -210,7 +210,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "festival",
     tags: [],
-    poster: "/event_seoul-jazz-festival-2026.png",
+    poster: "/events/event_seoul-jazz-festival-2026.png",
   },
   {
     id: "evt-giriboy-2026",
@@ -222,7 +222,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_giriboy-concert.png",
+    poster: "/events/event_giriboy-concert.png",
   },
   {
     id: "evt-ph1-2026",
@@ -234,7 +234,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_ph-1-concert.png",
+    poster: "/events/event_ph-1-concert.png",
   },
   {
     id: "evt-indied-2026",
@@ -246,7 +246,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "domestic",
     tags: [],
-    poster: "/event_indied-here-and-now.png",
+    poster: "/events/event_indied-here-and-now.png",
   },
   {
     id: "evt-tws-fanmeet-2026",
@@ -258,7 +258,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "fanmeeting",
     tags: [],
-    poster: "/event_tws-2nd-fanmeeting-2026.png",
+    poster: "/events/event_tws-2nd-fanmeeting-2026.png",
   },
   {
     id: "evt-svt-world-2026",
@@ -270,7 +270,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_seventeen-world-tour.png",
+    poster: "/events/event_seventeen-world-tour.png",
   },
   {
     id: "evt-kwonjina-flower-2026",
@@ -282,7 +282,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_kwonjina-flower-concert.png",
+    poster: "/events/event_kwonjina-flower-concert.png",
   },
   {
     id: "evt-woodz-archive-2026",
@@ -294,7 +294,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_woodz-world-tour-archive-1.png",
+    poster: "/events/event_woodz-world-tour-archive-1.png",
   },
   {
     id: "evt-illit-press2-2026",
@@ -306,7 +306,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_illit-press-start.png",
+    poster: "/events/event_illit-press-start.png",
   },
   {
     id: "evt-gidle-world-2026",
@@ -318,7 +318,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/presale_gi-dle-world-tour.png",
+    poster: "/events/presale_gi-dle-world-tour.png",
   },
   {
     id: "evt-nj-complexcon2-2026",
@@ -330,7 +330,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "festival",
     tags: [],
-    poster: "/event_newjeans-complexcon.png",
+    poster: "/events/event_newjeans-complexcon.png",
   },
   {
     id: "evt-svt-follow-2026",
@@ -342,7 +342,7 @@ export const allEventsData: EventListItem[] = [
     status: "upcoming",
     category: "concert",
     tags: [],
-    poster: "/presale_seventeen-follow-again-tour.png",
+    poster: "/events/presale_seventeen-follow-again-tour.png",
   },
   {
     id: "evt-skz-dominance-2026",
@@ -354,7 +354,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/presale_straykids-dominance.png",
+    poster: "/events/presale_straykids-dominance.png",
   },
   {
     id: "evt-txt-act-2026",
@@ -366,7 +366,7 @@ export const allEventsData: EventListItem[] = [
     status: "upcoming",
     category: "concert",
     tags: [],
-    poster: "/presale_txt-world-tour.png",
+    poster: "/events/presale_txt-world-tour.png",
   },
   {
     id: "evt-nj-fanmeet-2026",
@@ -378,7 +378,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "fanmeeting",
     tags: [],
-    poster: "/presale_newjeans-fan-meeting.png",
+    poster: "/events/presale_newjeans-fan-meeting.png",
   },
   {
     id: "evt-ive-1st-2026",
@@ -390,7 +390,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/presale_ive-1st-world-tour.png",
+    poster: "/events/presale_ive-1st-world-tour.png",
   },
   {
     id: "evt-blackpink-born-2026",
@@ -402,7 +402,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_blackpink-born-pink.png",
+    poster: "/events/event_blackpink-born-pink.png",
   },
   {
     id: "evt-svt-bethesun2-2026",
@@ -414,7 +414,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/event_seventeen-be-the-sun.png",
+    poster: "/events/event_seventeen-be-the-sun.png",
   },
 ];
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/shared/lib/utils";
 import { Button, SectionHeader } from "@/shared/ui";
 import { ArtistCard } from "@/entities/artist";
@@ -11,13 +12,13 @@ import { formatCompactNumber } from "@/shared/lib/format";
 import { SKELETON_LOAD_DELAY } from "@/shared/lib/constants";
 import {
   homeBannerEvents,
-  homePopularArtists,
   homeTodayTicketing,
   homeRankingEvents,
   homePreSaleEvents,
   getArtistGradient,
 } from "@/shared/lib/mocks/home";
 import { mockUser } from "@/shared/lib/mocks/user";
+import { getArtists } from "@/features/artist";
 import { HeroBannerCarousel } from "./HeroBannerCarousel";
 import { HomePageSkeleton } from "./HomePageSkeleton";
 
@@ -28,6 +29,12 @@ export function HomeWidget() {
     const timer = setTimeout(() => setIsLoading(false), SKELETON_LOAD_DELAY);
     return () => clearTimeout(timer);
   }, []);
+
+  const { data: artists = [] } = useQuery({
+    queryKey: ["artists"],
+    queryFn: getArtists,
+    enabled: !isLoading,
+  });
 
   if (isLoading) return <HomePageSkeleton />;
 
@@ -52,12 +59,23 @@ export function HomeWidget() {
 
       {/* ===== 2. 인기 아티스트 ===== */}
       <section className="space-y-4">
-        <SectionHeader title="인기 아티스트" linkHref="/artists" linkLabel="아티스트 더보기" />
+        <SectionHeader
+          title="인기 아티스트"
+          linkHref="/artists"
+          linkLabel="아티스트 더보기"
+        />
         <div className="grid grid-cols-10 gap-2">
-          {homePopularArtists.map((artist) => (
+          {artists.map((artist) => (
             <Link key={artist.id} href={`/artists/${artist.id}`}>
               <ArtistCard
-                artist={artist}
+                artist={{
+                  id: String(artist.id),
+                  name: artist.name,
+                  avatar: artist.profileImageUrl,
+                  banner: "",
+                  bio: "",
+                  category: "solo",
+                }}
                 selected={false}
                 className="w-full border-0 bg-transparent p-2 hover:bg-[#F3F2F0]"
               />
@@ -77,7 +95,7 @@ export function HomeWidget() {
               className="group min-w-0"
             >
               {/* 포스터 + 순위 */}
-              <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden">
+              <div className="relative w-full aspect-4/5 rounded-lg overflow-hidden">
                 {event.poster ? (
                   <Image
                     src={event.poster}
@@ -91,7 +109,7 @@ export function HomeWidget() {
                     style={{ background: getArtistGradient(event.artistId) }}
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                 <span
                   className="absolute bottom-2 left-3 text-4xl font-black text-white/90"
                   style={{ textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}
@@ -104,8 +122,12 @@ export function HomeWidget() {
                 <p className="text-sm font-semibold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                   {event.title}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">{event.venue}</p>
-                <p className="text-xs text-muted-foreground">{event.dateRange}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {event.venue}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {event.dateRange}
+                </p>
                 {event.tags && event.tags.length > 0 && (
                   <div className="flex gap-1 pt-0.5 flex-wrap">
                     {event.tags.map((tag) => (
@@ -155,7 +177,9 @@ export function HomeWidget() {
                 <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
                   {event.title}
                 </p>
-                <p className="text-xs text-muted-foreground">{event.artistName}</p>
+                <p className="text-xs text-muted-foreground">
+                  {event.artistName}
+                </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs text-muted-foreground tabular-nums">
@@ -164,8 +188,10 @@ export function HomeWidget() {
                 <span
                   className={cn(
                     "text-[11px] font-semibold px-2 py-0.5 rounded-full",
-                    event.status === "open" && "bg-booking-open/10 text-booking-open",
-                    event.status === "upcoming" && "bg-booking-upcoming/10 text-booking-upcoming",
+                    event.status === "open" &&
+                      "bg-booking-open/10 text-booking-open",
+                    event.status === "upcoming" &&
+                      "bg-booking-upcoming/10 text-booking-upcoming",
                     (event.status === "soldout" || event.status === "closed") &&
                       "bg-muted text-muted-foreground",
                   )}
@@ -180,7 +206,11 @@ export function HomeWidget() {
 
       {/* ===== 5. 선예매 오픈 임박 ===== */}
       <section className="space-y-4">
-        <SectionHeader title="선예매 오픈 임박" linkHref="/events" linkLabel="공연 더보기" />
+        <SectionHeader
+          title="선예매 오픈 임박"
+          linkHref="/events"
+          linkLabel="공연 더보기"
+        />
         <div className="grid grid-cols-3 gap-4">
           {homePreSaleEvents.map((event) => (
             <Link
@@ -189,7 +219,7 @@ export function HomeWidget() {
               className="group flex gap-3 p-3 rounded-lg border border-border hover:bg-[#F3F2F0] transition-colors bg-card"
             >
               {event.poster ? (
-                <div className="relative w-[80px] h-[100px] rounded-md shrink-0 overflow-hidden">
+                <div className="relative w-20 h-25 rounded-md shrink-0 overflow-hidden">
                   <Image
                     src={event.poster}
                     alt={event.title}
@@ -199,7 +229,7 @@ export function HomeWidget() {
                 </div>
               ) : (
                 <div
-                  className="w-[80px] h-[100px] rounded-md shrink-0 flex items-center justify-center text-white text-xs font-medium"
+                  className="w-20 h-25 rounded-md shrink-0 flex items-center justify-center text-white text-xs font-medium"
                   style={{ background: getArtistGradient(event.artistId) }}
                 >
                   {event.title.split(" ")[0]}
@@ -207,11 +237,15 @@ export function HomeWidget() {
               )}
               <div className="flex-1 min-w-0 flex flex-col py-0.5">
                 <div>
-                  <p className="text-xs font-semibold text-foreground">{event.openDateTime}</p>
+                  <p className="text-xs font-semibold text-foreground">
+                    {event.openDateTime}
+                  </p>
                   <p className="text-sm font-semibold line-clamp-2 leading-tight mt-0.5 group-hover:text-primary transition-colors">
                     {event.title}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{event.ticketType}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {event.ticketType}
+                  </p>
                 </div>
                 {event.tags.length > 0 && (
                   <div className="flex gap-1 mt-auto flex-wrap">

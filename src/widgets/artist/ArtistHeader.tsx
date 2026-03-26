@@ -17,7 +17,12 @@ interface ArtistHeaderProps {
   onFollowToggle: () => void;
 }
 
-export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }: ArtistHeaderProps) {
+export function ArtistHeader({
+  artist,
+  membership,
+  isFollowing,
+  onFollowToggle,
+}: ArtistHeaderProps) {
   const router = useRouter();
 
   return (
@@ -34,7 +39,7 @@ export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }
           priority
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
 
       <div className="relative z-10 flex items-end justify-between px-8 pb-7 pt-32">
         {/* Left: Avatar + Info */}
@@ -45,12 +50,12 @@ export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }
               alt={artist.name}
               width={88}
               height={88}
-              className="size-[88px] rounded-full border-[3px] border-white/30 shrink-0 object-cover"
+              className="size-22 rounded-full border-[3px] border-white/30 shrink-0 object-cover"
               priority
             />
           ) : (
             <div
-              className="size-[88px] rounded-full border-[3px] border-white/30 flex items-center justify-center text-2xl text-white font-bold shrink-0 backdrop-blur-sm"
+              className="size-22 rounded-full border-[3px] border-white/30 flex items-center justify-center text-2xl text-white font-bold shrink-0 backdrop-blur-sm"
               style={{ background: getArtistGradient(artist.id) }}
             >
               {artist.name.charAt(0)}
@@ -59,18 +64,24 @@ export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }
 
           <div className="space-y-2 pb-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-[28px] font-bold text-white leading-tight">{artist.name}</h1>
-              {membership?.isActive && <TierBadge tier={membership.tier} size="sm" />}
+              <h1 className="text-[28px] font-bold text-white leading-tight">
+                {artist.name}
+              </h1>
+              {membership?.isActive && (
+                <TierBadge tier={membership.tier} size="sm" />
+              )}
             </div>
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1.5 text-sm text-white/70">
-                <Users size={14} />
-                팔로워 {formatCompactNumber(artist.followerCount)}명
-              </span>
+              {artist.followerCount !== undefined && (
+                <span className="flex items-center gap-1.5 text-sm text-white/70">
+                  <Users size={14} />
+                  팔로워 {formatCompactNumber(artist.followerCount)}명
+                </span>
+              )}
               {artist.bio && (
                 <>
                   <span className="text-white/30">·</span>
-                  <span className="text-sm text-white/60 line-clamp-1 max-w-[400px]">
+                  <span className="text-sm text-white/60 line-clamp-1 max-w-100">
                     {artist.bio}
                   </span>
                 </>
@@ -102,7 +113,10 @@ export function ArtistHeader({ artist, membership, isFollowing, onFollowToggle }
                 : "bg-white text-foreground hover:bg-white/90",
             )}
           >
-            <Heart size={14} className={cn(isFollowing && "fill-current text-red-400")} />
+            <Heart
+              size={14}
+              className={cn(isFollowing && "fill-current text-red-400")}
+            />
             {isFollowing ? "팔로우 중" : "팔로우"}
           </Button>
         </div>

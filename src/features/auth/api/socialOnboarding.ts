@@ -11,7 +11,7 @@ export interface SocialOnboardingParams {
 export async function socialOnboarding(
   params: SocialOnboardingParams,
 ): Promise<void> {
-  await fetchWithAuth<ApiBaseResponse<object>>("/api/auth/onboarding/social", {
+  await fetchWithAuth<ApiBaseResponse<object>>("/auth/onboarding/social", {
     method: "POST",
     body: params,
   });
