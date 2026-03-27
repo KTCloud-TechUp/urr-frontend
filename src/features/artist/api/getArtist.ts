@@ -1,10 +1,15 @@
 import { apiRequest } from "@/shared/api/client";
+import type { ArtistCategory } from "./getArtists";
 
 export interface ArtistDetail {
   id: number;
   name: string;
   profileImageUrl: string;
   description: string;
+  followerCount?: number;
+  bio?: string;
+  bannerImageUrl?: string;
+  category?: ArtistCategory;
 }
 
 interface ArtistApiResponse {

@@ -33,8 +33,9 @@ export function EventBookingSidebar({ event }: EventBookingSidebarProps) {
   const bookingWindows = selectedDate?.bookingWindows ?? [];
 
   const prices = event.sections.map((s) => s.price);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  const hasPrices = prices.length > 0;
+  const minPrice = hasPrices ? Math.min(...prices) : 0;
+  const maxPrice = hasPrices ? Math.max(...prices) : 0;
 
   const isBookable = event.status === "open";
   const isSoldOut = event.status === "soldout";
@@ -94,11 +95,15 @@ export function EventBookingSidebar({ event }: EventBookingSidebarProps) {
         {/* Price range */}
         <div className="space-y-2">
           <h4 className="text-sm font-semibold">가격</h4>
-          <div className="flex items-baseline gap-1.5">
-            <PriceDisplay amount={minPrice} size="sm" />
-            <span className="text-sm text-muted-foreground">~</span>
-            <PriceDisplay amount={maxPrice} size="sm" />
-          </div>
+          {hasPrices ? (
+            <div className="flex items-baseline gap-1.5">
+              <PriceDisplay amount={minPrice} size="sm" />
+              <span className="text-sm text-muted-foreground">~</span>
+              <PriceDisplay amount={maxPrice} size="sm" />
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">미정</p>
+          )}
         </div>
 
         {/* Separator */}

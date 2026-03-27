@@ -6,15 +6,15 @@ import { useQuery } from "@tanstack/react-query";
 import { Lock } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { getArtist } from "@/features/artist";
+import { getArtistEvents } from "@/features/event";
+import type { EventSummary } from "@/features/event";
 import { mockUser } from "@/shared/lib/mocks/user";
 import {
   getArtistExtendedInfo,
-  getEventsByArtistId,
-  categorizeEvents,
   getTransferListingsWithEvent,
 } from "@/shared/lib/mocks/artist-page";
+import type { Artist, Event } from "@/shared/types";
 import { getCommunityPostsByArtistId } from "@/shared/lib/mocks/community";
-import type { Artist } from "@/shared/types";
 import { ArtistHeader } from "./ArtistHeader";
 import { ArtistHomeTab } from "./ArtistHomeTab";
 import { ArtistCommunityTab } from "./ArtistCommunityTab";
@@ -51,6 +51,12 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
     queryFn: () => getArtist(artistId),
   });
 
+  const { data: artistEventsData = [] } = useQuery({
+    queryKey: ["artist-events", artistId],
+    queryFn: () => getArtistEvents(artistId),
+    enabled: !!artistData,
+  });
+
   const handleTabChange = (tab: Tab) => {
     const params = new URLSearchParams(searchParams.toString());
     if (tab === "home") params.delete("tab");
@@ -80,8 +86,24 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
 
   const membership = mockUser.memberships.find((m) => m.artistId === artistId && m.isActive);
   const extendedInfo = getArtistExtendedInfo(artist.id);
-  const allEvents = getEventsByArtistId(artist.id);
-  const { upcoming, past } = categorizeEvents(allEvents);
+  const allEvents: Event[] = artistEventsData.map((e: EventSummary) => ({
+    id: String(e.eventId),
+    artistId: String(e.artistId),
+    title: e.title,
+    venue: e.venueTemplateName,
+    dates: [{
+      id: String(e.eventId),
+      date: e.openDate + "T19:00:00",
+      bookingWindows: [],
+      totalSeats: 0,
+      remainingSeats: 0,
+    }],
+    poster: "",
+    status: e.active ? "open" : "closed",
+  }));
+  const now = new Date();
+  const upcoming = allEvents.filter((e) => new Date(e.dates[0]?.date ?? 0) >= now);
+  const past = allEvents.filter((e) => new Date(e.dates[0]?.date ?? 0) < now);
   const nextEvent = upcoming[0];
   const transferListings = getTransferListingsWithEvent(artist.id);
   const communityPosts = getCommunityPostsByArtistId(artist.id);

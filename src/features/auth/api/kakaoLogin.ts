@@ -1,4 +1,5 @@
 import { fetchWithAuth } from "@/shared/api";
+import { ApiError } from "@/shared/api/client";
 import type {
   ApiBaseResponse,
   AuthResponseData,
@@ -12,14 +13,30 @@ export type KakaoLoginResponse =
 export async function kakaoLogin(
   code: string,
   redirectUri: string,
-  rejoinConfirmed?: boolean,
 ): Promise<KakaoLoginResponse> {
-  const res = await fetchWithAuth<ApiBaseResponse<KakaoLoginResponse>>(
-    "/auth/oauth/kakao",
-    {
-      method: "POST",
-      body: { code, redirectUri, rejoinConfirmed },
-    },
-  );
-  return res.data.data;
+  try {
+    const res = await fetchWithAuth<ApiBaseResponse<AuthResponseData>>(
+      "/auth/oauth/kakao",
+      {
+        method: "POST",
+        body: { code, redirectUri },
+      },
+    );
+    return res.data.data;
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 409) {
+      const body = (await err.response.json()) as ApiBaseResponse<{
+        rejoinToken: string;
+        nickname?: string;
+        recoveryEligible?: boolean;
+      }>;
+      return {
+        requiresRejoinConfirmation: true,
+        rejoinToken: body.data.rejoinToken,
+        nickname: body.data.nickname ?? "",
+        recoveryEligible: body.data.recoveryEligible ?? false,
+      };
+    }
+    throw err;
+  }
 }

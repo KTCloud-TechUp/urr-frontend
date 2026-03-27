@@ -35,11 +35,17 @@ function useBreadcrumbs(): BreadcrumbItem[] {
         href: `/artists/${segments[1]}`,
       });
       if (segments[2] === "community") {
-        crumbs.push({ label: "소통", href: `/artists/${segments[1]}/community` });
+        crumbs.push({
+          label: "소통",
+          href: `/artists/${segments[1]}/community`,
+        });
       } else if (segments[2] === "events") {
         crumbs.push({ label: "공연", href: `/artists/${segments[1]}/events` });
       } else if (segments[2] === "transfers") {
-        crumbs.push({ label: "양도", href: `/artists/${segments[1]}/transfers` });
+        crumbs.push({
+          label: "양도",
+          href: `/artists/${segments[1]}/transfers`,
+        });
       }
     }
   } else if (segments[0] === "my-page") {
@@ -69,15 +75,23 @@ export function TopBar() {
   return (
     <header className="h-14 shrink-0 border-b border-border bg-background flex items-center justify-between px-6 sticky top-0 z-10">
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm min-w-0">
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center gap-1.5 text-sm min-w-0"
+      >
         {crumbs.length > 0 ? (
           crumbs.map((crumb, index) => (
             <Fragment key={crumb.href}>
               {index > 0 && (
-                <ChevronRight size={14} className="text-muted-foreground shrink-0" />
+                <ChevronRight
+                  size={14}
+                  className="text-muted-foreground shrink-0"
+                />
               )}
               {index === crumbs.length - 1 ? (
-                <span className="font-medium text-foreground truncate">{crumb.label}</span>
+                <span className="font-medium text-foreground truncate">
+                  {crumb.label}
+                </span>
               ) : (
                 <Link
                   href={crumb.href}
@@ -105,7 +119,7 @@ export function TopBar() {
           <Link href="/notifications">
             <Bell size={18} />
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 size-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 size-4.5 rounded-full bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
