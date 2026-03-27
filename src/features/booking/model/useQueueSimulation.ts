@@ -116,3 +116,16 @@ const BOOKING_CONFIG: QueueSimulationConfig = {
 export function useQueueSimulation(sectionsForDate: Section[]): UseQueueSimulationReturn {
   return useQueueSimulationCore(BOOKING_CONFIG, sectionsForDate);
 }
+
+const GENERAL_QUEUE_CONFIG: QueueSimulationConfig = {
+  initialPosition: 4588,
+  initialTotal: 6200,
+  positionDropRange: [30, 80],
+  totalDropRange: [20, 60],
+  waitMultiplier: 5,
+  intervalMs: 3_000,
+};
+
+export function useGeneralQueueSimulation(): UseQueueSimulationReturn {
+  return useQueueSimulationCore(GENERAL_QUEUE_CONFIG);
+}

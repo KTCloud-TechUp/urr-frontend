@@ -11,7 +11,7 @@ import { cn } from "@/shared/lib/utils";
 import { AuthInitializer } from "@/features/auth/ui/AuthInitializer";
 
 // Pages without sidebar/topbar
-const NO_SHELL_ROUTES = ["/onboarding", "/auth/callback"];
+const NO_SHELL_ROUTES = ["/onboarding", "/auth/callback", "/queue"];
 
 function ShellInner({ children }: { children: ReactNode }) {
   const { isSidebarExpanded } = useLayout();
@@ -20,16 +20,23 @@ function ShellInner({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <Suspense fallback={null}><AppSidebar /></Suspense>
+      <Suspense fallback={null}>
+        <AppSidebar />
+      </Suspense>
       <div
         className="flex flex-1 flex-col min-w-0 transition-[margin-left] duration-250 ease-out"
         style={{ marginLeft: isSidebarExpanded ? 220 : 64 }}
       >
         <TopBar />
-        <main className={cn("flex-1", isFullWidth ? "overflow-hidden" : "overflow-y-auto")}>
+        <main
+          className={cn(
+            "flex-1",
+            isFullWidth ? "overflow-hidden" : "overflow-y-auto",
+          )}
+        >
           <div
             className={cn(
-              !isFullWidth && "px-8 pt-10 pb-6 max-w-[1200px] mx-auto",
+              !isFullWidth && "px-8 pt-10 pb-6 max-w-300 mx-auto",
               isFullWidth && "h-full",
             )}
           >
