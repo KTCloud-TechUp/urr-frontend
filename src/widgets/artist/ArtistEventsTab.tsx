@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { Calendar, ImageOff } from "lucide-react";
 import { EmptyState } from "@/shared/ui";
 import { EventCard } from "@/entities/event";
 import type { Event } from "@/shared/types";
@@ -8,9 +8,19 @@ interface ArtistEventsTabProps {
   upcoming: Event[];
   past: Event[];
   artistName: string;
+  hasRepresentativeImage?: boolean;
 }
 
-export function ArtistEventsTab({ upcoming, past, artistName }: ArtistEventsTabProps) {
+export function ArtistEventsTab({ upcoming, past, artistName, hasRepresentativeImage }: ArtistEventsTabProps) {
+  if (hasRepresentativeImage === false) {
+    return (
+      <EmptyState
+        icon={ImageOff}
+        description="아티스트 대표 이미지가 등록되지 않아 공연 정보를 표시할 수 없습니다"
+      />
+    );
+  }
+
   if (upcoming.length === 0 && past.length === 0) {
     return <EmptyState icon={Calendar} description="등록된 공연이 없습니다" />;
   }
