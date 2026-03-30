@@ -63,7 +63,10 @@ npm run build  # 빌드 검증
 
 ### 인증 / JWT 흐름
 
-- `accessToken`: `tokenStore.ts` module-level 변수 (메모리, XSS 방어)
+- `accessToken`: `tokenStore.ts` module-level 변수 (메모리 우선) + sessionStorage 백업
+  - **아키텍처 제약(S3 정적 배포)에서 오는 불가피한 보안 트레이드오프**: OAuth 콜백 → 온보딩 페이지 전환 시 CloudFront full page reload로 JS 메모리 초기화됨 → sessionStorage 백업 필수
+  - XSS로 `sessionStorage.getItem('at')` 탈취 가능하나, refreshToken은 httpOnly 쿠키로 보호되고 accessToken 수명이 짧아(60분) 허용 가능한 트레이드오프로 판단
+  - EKS 전환(SSR 적용) 시 full page reload 문제 해소 → sessionStorage 제거하고 메모리 단독으로 복귀 가능
 - `refreshToken`: httpOnly 쿠키 (서버 관리, `credentials: "include"`로 자동 전송)
 - `is_authenticated`: 클라이언트 쿠키 (24h) — 로그인 상태 힌트 용도
 - 401 발생 → `fetchWithAuth`가 `POST /api/auth/token/reissue` 호출 → 성공 시 원래 요청 재시도

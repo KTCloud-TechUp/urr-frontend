@@ -141,17 +141,26 @@ features/<domain>/<feature-name>/
 티켓팅 플랫폼 특성상 결제·개인정보가 포함된 API를 다루기 때문에,
 XSS 공격으로부터 토큰을 보호하는 것을 최우선 기준으로 삼았습니다.
 
-| 방식                       | XSS 내성 |   새로고침 복원   | 선택 여부 |
-| -------------------------- | :------: | :---------------: | :-------: |
-| localStorage               | ❌ 취약  |      ✅ 즉시      |  미채택   |
-| sessionStorage             | ❌ 취약  | ❌ 탭 닫으면 소멸 |  미채택   |
-| **메모리 + httpOnly 쿠키** | ✅ 안전  | ✅ reissue로 복원 | **채택**  |
+| 방식                                        | XSS 내성 |   새로고침 복원   | 선택 여부 |
+| ------------------------------------------- | :------: | :---------------: | :-------: |
+| localStorage                                | ❌ 취약  |      ✅ 즉시      |  미채택   |
+| **메모리 + sessionStorage + httpOnly 쿠키** | ⚠️ 일부  | ✅ reissue로 복원 | **채택**  |
+
+> **아키텍처 제약(S3 정적 배포)에서 오는 불가피한 보안 트레이드오프**
+>
+> 원래 설계는 Access Token을 JavaScript 메모리에만 보관해 XSS 탈취를 차단하는 것이었습니다.
+> 그러나 S3+CloudFront 정적 배포 환경에서 OAuth 콜백(`/auth/callback/kakao`) → 온보딩 페이지 전환 시
+> CloudFront가 새 HTML 파일을 로드해 JS 메모리가 초기화되는 문제가 발생합니다.
+>
+> 이를 해결하기 위해 sessionStorage를 백업 저장소로 추가했습니다. XSS 공격자가 `sessionStorage.getItem('at')`으로
+> Access Token을 탈취할 수 있으나, **Refresh Token은 httpOnly 쿠키로 보호**되고 Access Token 수명이 짧아(60분)
+> 허용 가능한 트레이드오프로 판단했습니다. EKS(SSR) 전환 시 이 제약이 해소되어 메모리 단독 방식으로 복귀할 수 있습니다.
 
 ### 토큰 구조
 
 ```
-Access Token  — JavaScript 메모리 (tokenStore)에만 보관
-                → XSS로 탈취 불가
+Access Token  — JavaScript 메모리 (tokenStore) 우선 보관
+                + sessionStorage 백업 (S3 정적 배포 제약으로 인한 트레이드오프)
                 → 만료: 60분 (이후 자동 재발급)
 
 Refresh Token — httpOnly 쿠키 (백엔드가 Set-Cookie로 내려줌)
