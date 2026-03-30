@@ -20,6 +20,7 @@ export async function kakaoLogin(
       {
         method: "POST",
         body: { code, redirectUri },
+        service: "users",
       },
     );
     return res.data.data;

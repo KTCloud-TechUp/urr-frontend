@@ -1,7 +1,7 @@
 import { EventDetailWidget } from "@/widgets/event-detail";
 import { getEvents } from "@/features/event";
 
-const FALLBACK_EVENT_IDS = Array.from({ length: 20 }, (_, i) => String(201 + i));
+const FALLBACK_EVENT_IDS = Array.from({ length: 20 }, (_, i) => String(i + 1));
 
 export async function generateStaticParams() {
   try {

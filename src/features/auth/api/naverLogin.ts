@@ -10,6 +10,7 @@ export async function naverLogin(
     {
       method: "POST",
       body: { code, redirectUri },
+      service: "users",
     },
   );
   return res.data.data;

@@ -5,7 +5,7 @@ export async function reissueToken(): Promise<string | null> {
   try {
     const res = await apiRequest<ApiBaseResponse<AuthResponseData>>(
       "/auth/token/reissue",
-      { method: "POST" },
+      { method: "POST", service: "users" },
     );
     return res.data.data.tokens.accessToken;
   } catch {

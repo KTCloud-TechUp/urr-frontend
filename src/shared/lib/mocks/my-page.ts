@@ -21,7 +21,7 @@ export interface MyTransferRecord {
 
 const ticketEvents: Event[] = [
   {
-    id: "evt-gdragon-2026",
+    id: "1",
     artistId: "gdragon",
     title: "G-Dragon 2026 MAMA DOME TOUR",
     venue: "KSPO DOME (올림픽체조경기장)",
@@ -38,7 +38,7 @@ const ticketEvents: Event[] = [
     status: "open",
   },
   {
-    id: "evt-bts-encore-2026",
+    id: "2",
     artistId: "bts",
     title: "BTS YET TO COME ENCORE IN SEOUL",
     venue: "잠실종합운동장 주경기장",
@@ -55,7 +55,7 @@ const ticketEvents: Event[] = [
     status: "open",
   },
   {
-    id: "evt-aespa-synk-2026",
+    id: "4",
     artistId: "aespa",
     title: "aespa LIVE SYNK : PARALLEL",
     venue: "KSPO DOME (올림픽체조경기장)",
@@ -113,7 +113,7 @@ const myTickets: (Ticket & { event: Event })[] = [
   // Upcoming
   {
     id: "my-tk-001",
-    eventId: "evt-gdragon-2026",
+    eventId: "1",
     section: "VIP석",
     row: "3",
     seatNumber: "15",
@@ -126,7 +126,7 @@ const myTickets: (Ticket & { event: Event })[] = [
   },
   {
     id: "my-tk-002",
-    eventId: "evt-bts-encore-2026",
+    eventId: "2",
     section: "R석",
     row: "7",
     seatNumber: "22",
@@ -139,7 +139,7 @@ const myTickets: (Ticket & { event: Event })[] = [
   },
   {
     id: "my-tk-003",
-    eventId: "evt-aespa-synk-2026",
+    eventId: "4",
     section: "S석",
     row: "12",
     seatNumber: "8",
@@ -185,7 +185,7 @@ const myTransferRecords: (MyTransferRecord & { event: Event })[] = [
   {
     id: "my-tf-001",
     ticketId: "my-tk-extra-001",
-    eventId: "evt-gdragon-2026",
+    eventId: "1",
     role: "seller",
     counterpartyName: "",
     price: 180000,
@@ -215,7 +215,7 @@ const myTransferRecords: (MyTransferRecord & { event: Event })[] = [
   {
     id: "my-tf-003",
     ticketId: "my-tk-extra-003",
-    eventId: "evt-aespa-synk-2026",
+    eventId: "4",
     role: "buyer",
     counterpartyName: "박음악",
     price: 135000,

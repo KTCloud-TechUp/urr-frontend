@@ -13,6 +13,7 @@ export async function getArtistEvents(
 ): Promise<EventSummary[]> {
   const res = await apiRequest<ArtistEventsApiResponse>(
     `/artists/${artistId}/events`,
+    { service: "events" },
   );
   return res.data.data;
 }

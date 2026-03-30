@@ -39,6 +39,6 @@ interface EventsApiResponse {
 }
 
 export async function getEvents(): Promise<EventSummary[]> {
-  const res = await apiRequest<EventsApiResponse>("/events");
+  const res = await apiRequest<EventsApiResponse>("/events", { service: "events" });
   return res.data.data;
 }

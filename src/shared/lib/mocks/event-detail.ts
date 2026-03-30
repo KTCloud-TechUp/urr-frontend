@@ -274,7 +274,7 @@ export function getSectionsForDate(dateId: string): Section[] {
 }
 
 export const mockEvent = {
-  id: "evt-gdragon-2026",
+  id: "1",
   artistId: "gdragon",
   title: "G-Dragon 2026 MAMA DOME TOUR",
   venue: "KSPO DOME (올림픽체조경기장)",
@@ -286,7 +286,7 @@ export const mockEvent = {
 // --- G-Dragon Event Detail (full data) ---
 
 const gdragonDetail: EventDetail = {
-  id: "evt-gdragon-2026",
+  id: "1",
   artistId: "gdragon",
   artistName: "G-Dragon",
   title: "G-Dragon 2026 MAMA DOME TOUR",
@@ -382,7 +382,7 @@ const gdragonDetail: EventDetail = {
 // --- Detail data map ---
 
 const eventDetailMap: Record<string, EventDetail> = {
-  "evt-gdragon-2026": gdragonDetail,
+  "1": gdragonDetail,
 };
 
 // --- Fallback generator for events without explicit detail ---

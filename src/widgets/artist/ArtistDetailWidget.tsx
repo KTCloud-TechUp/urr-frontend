@@ -79,7 +79,7 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
     id: String(artistData.id),
     name: artistData.name,
     avatar: artistData.profileImageUrl,
-    banner: "",
+    banner: artistData.bannerImageUrl ?? "",
     bio: artistData.description,
     category: "solo",
   };
@@ -98,7 +98,7 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
       totalSeats: 0,
       remainingSeats: 0,
     }],
-    poster: "",
+    poster: e.posterImageUrl ?? "",
     status: e.active ? "open" : "closed",
   }));
   const now = new Date();

@@ -10,6 +10,7 @@ export async function login(
     {
       method: "POST",
       body: { email, password },
+      service: "users",
     },
   );
   return res.data.data;
