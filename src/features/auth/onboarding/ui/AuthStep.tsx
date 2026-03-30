@@ -131,7 +131,7 @@ export function AuthStep({
   return (
     <div className="max-w-100 w-full mx-auto flex flex-col items-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/logo_final.svg" alt="URR" className="h-16 w-auto" />
+      <img src="/icons/logo_final.svg" alt="URR" className="h-16 w-auto" />
       <h1 className="text-2xl font-bold mt-6">
         {mode === "login" ? "우르르에 오신 것을 환영합니다" : "회원가입"}
       </h1>
