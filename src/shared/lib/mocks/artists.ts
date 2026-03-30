@@ -112,7 +112,7 @@ export const mockArtists: Artist[] = [
   {
     id: "13",
     name: "악동뮤지션",
-    avatar: "",
+    avatar: "/recommend/recommend_akmu.png",
     banner: "",
     bio: "YG Entertainment 남매 듀오. 자작곡으로 감성을 전하는 인디-팝 아이콘.",
     followerCount: 1420000,
@@ -121,7 +121,7 @@ export const mockArtists: Artist[] = [
   {
     id: "14",
     name: "권정렬",
-    avatar: "",
+    avatar: "/recommend/recommend_kwon-jungyeol.png",
     banner: "",
     bio: "10CM의 보컬리스트. 감성 팝으로 많은 사람의 마음을 울리는 싱어송라이터.",
     followerCount: 1420000,
@@ -130,7 +130,7 @@ export const mockArtists: Artist[] = [
   {
     id: "15",
     name: "RIIZE",
-    avatar: "",
+    avatar: "/recommend/recommend_riize.png",
     banner: "",
     bio: "SM Entertainment 7인조 보이그룹. 데뷔와 동시에 음원차트 올킬.",
     followerCount: 1420000,
@@ -139,7 +139,7 @@ export const mockArtists: Artist[] = [
   {
     id: "16",
     name: "IU",
-    avatar: "",
+    avatar: "/recommend/recommend_iu.png",
     banner: "",
     bio: "카카오엔터테인먼트 솔로 아티스트. 발라드부터 팝까지, 대한민국 대표 국민 가수.",
     followerCount: 7800000,
@@ -148,7 +148,7 @@ export const mockArtists: Artist[] = [
   {
     id: "17",
     name: "NMIXX",
-    avatar: "",
+    avatar: "/recommend/recommend_nmixx.png",
     banner: "",
     bio: "JYP Entertainment 6인조 걸그룹. 믹스팝 장르를 개척하는 차세대 걸그룹.",
     followerCount: 2800000,
@@ -157,7 +157,7 @@ export const mockArtists: Artist[] = [
   {
     id: "18",
     name: "투어스",
-    avatar: "",
+    avatar: "/recommend/recommend_tours.png",
     banner: "",
     bio: "Starship Entertainment 7인조 보이그룹. 진정성 있는 감성으로 주목받는 신인.",
     followerCount: 1200000,
