@@ -10,5 +10,6 @@ export async function updateConsents(params: UpdateConsentsParams): Promise<void
   await fetchWithAuth("/auth/me/consents", {
     method: "PATCH",
     body: params,
+    service: "users",
   });
 }

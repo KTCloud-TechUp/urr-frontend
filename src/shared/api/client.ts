@@ -1,4 +1,15 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://urr.guru/api/v1";
+const DEFAULT_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://urr.guru/api/v1";
+
+export const SERVICE_URLS = {
+  users:     process.env.NEXT_PUBLIC_USERS_API_URL     ?? DEFAULT_URL,
+  events:    process.env.NEXT_PUBLIC_EVENTS_API_URL    ?? DEFAULT_URL,
+  ticketing: process.env.NEXT_PUBLIC_TICKETING_API_URL ?? DEFAULT_URL,
+  queue:     process.env.NEXT_PUBLIC_QUEUE_API_URL     ?? DEFAULT_URL,
+  payments:  process.env.NEXT_PUBLIC_PAYMENTS_API_URL  ?? DEFAULT_URL,
+  community: process.env.NEXT_PUBLIC_COMMUNITY_API_URL ?? DEFAULT_URL,
+} as const;
+
+export type ServiceName = keyof typeof SERVICE_URLS;
 
 // External getter — injected by useAuthStore to avoid circular imports
 let getAccessToken: (() => string | null) | null = null;
@@ -9,6 +20,7 @@ export function registerTokenGetter(getter: () => string | null) {
 
 export interface ApiRequestInit extends Omit<RequestInit, "body"> {
   body?: unknown;
+  service?: ServiceName;
 }
 
 export interface ApiResponse<T = unknown> {
@@ -21,7 +33,8 @@ export async function apiRequest<T = unknown>(
   path: string,
   options: ApiRequestInit = {},
 ): Promise<ApiResponse<T>> {
-  const { body, headers: customHeaders, ...rest } = options;
+  const { service, body, headers: customHeaders, ...rest } = options;
+  const baseUrl = service ? SERVICE_URLS[service] : DEFAULT_URL;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -33,7 +46,7 @@ export async function apiRequest<T = unknown>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${baseUrl}${path}`, {
     ...rest,
     headers,
     credentials: "include",

@@ -18,6 +18,7 @@ export async function register(
     {
       method: "POST",
       body: params,
+      service: "users",
     },
   );
   return res.data.data;

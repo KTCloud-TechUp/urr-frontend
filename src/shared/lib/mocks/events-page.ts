@@ -29,7 +29,7 @@ export const eventCategoryFilters: { value: EventCategoryFilter; label: string }
 // --- Popular events (carousel) ---
 export const popularEvents: EventListItem[] = [
   {
-    id: "evt-svt-bethesun-2026",
+    id: "9",
     artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN WORLD TOUR",
@@ -77,7 +77,7 @@ export const popularEvents: EventListItem[] = [
     poster: "/events/event_illit-press-start.png",
   },
   {
-    id: "evt-bts-encore-2026",
+    id: "2",
     artistId: "2",
     artistName: "BTS",
     title: "BTS YET TO COME IN CINEMAS",
@@ -89,7 +89,7 @@ export const popularEvents: EventListItem[] = [
     poster: "/events/event_bts-yet-to-come-in-cinema.png",
   },
   {
-    id: "evt-ive-show-2026",
+    id: "5",
     artistId: "4",
     artistName: "IVE",
     title: "IVE WORLD TOUR SHOW WHAT I AM",
@@ -101,7 +101,7 @@ export const popularEvents: EventListItem[] = [
     poster: "/events/event_ive-show-what-i-am.png",
   },
   {
-    id: "evt-blackpink-world-2026",
+    id: "7",
     artistId: "5",
     artistName: "BLACKPINK",
     title: "BLACKPINK BORN PINK WORLD TOUR",
@@ -113,7 +113,7 @@ export const popularEvents: EventListItem[] = [
     poster: "/events/event_blackpink-born-pink.png",
   },
   {
-    id: "evt-nj-complexcon-2026",
+    id: "11",
     artistId: "8",
     artistName: "NewJeans",
     title: "NewJeans × COMPLEXCON",
@@ -125,7 +125,7 @@ export const popularEvents: EventListItem[] = [
     poster: "/events/event_newjeans-complexcon.png",
   },
   {
-    id: "evt-skz-domtour-2026",
+    id: "8",
     artistId: "6",
     artistName: "Stray Kids",
     title: "Stray Kids DOMINANCE WORLD TOUR",
@@ -141,7 +141,7 @@ export const popularEvents: EventListItem[] = [
 // --- All events (grid) ---
 export const allEventsData: EventListItem[] = [
   {
-    id: "evt-bts-arirang-2026",
+    id: "3",
     artistId: "2",
     artistName: "BTS",
     title: "BTS WORLD TOUR ARIRANG IN GOYANG",
@@ -165,7 +165,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/event_park-hyoshin-live.png",
   },
   {
-    id: "evt-day6-10th-2026",
+    id: "15",
     artistId: "11",
     artistName: "DAY6",
     title: "DAY6 10th Anniversary Tour",
@@ -261,7 +261,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/event_tws-2nd-fanmeeting-2026.png",
   },
   {
-    id: "evt-svt-world-2026",
+    id: "9",
     artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN WORLD TOUR",
@@ -309,7 +309,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/event_illit-press-start.png",
   },
   {
-    id: "evt-gidle-world-2026",
+    id: "13",
     artistId: "9",
     artistName: "(G)I-DLE",
     title: "(G)I-DLE WORLD TOUR 'iDOL'",
@@ -321,7 +321,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/presale_gi-dle-world-tour.png",
   },
   {
-    id: "evt-nj-complexcon2-2026",
+    id: "11",
     artistId: "8",
     artistName: "NewJeans",
     title: "NewJeans × COMPLEXCON",
@@ -333,7 +333,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/event_newjeans-complexcon.png",
   },
   {
-    id: "evt-svt-follow-2026",
+    id: "10",
     artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN FOLLOW AGAIN TOUR",
@@ -345,7 +345,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/presale_seventeen-follow-again-tour.png",
   },
   {
-    id: "evt-skz-dominance-2026",
+    id: "8",
     artistId: "6",
     artistName: "Stray Kids",
     title: "Stray Kids DOMINANCE WORLD TOUR",
@@ -357,7 +357,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/presale_straykids-dominance.png",
   },
   {
-    id: "evt-txt-act-2026",
+    id: "14",
     artistId: "10",
     artistName: "TXT",
     title: "TXT WORLD TOUR ACT : PROMISE",
@@ -369,7 +369,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/presale_txt-world-tour.png",
   },
   {
-    id: "evt-nj-fanmeet-2026",
+    id: "12",
     artistId: "8",
     artistName: "NewJeans",
     title: "NewJeans Fan Meeting 'Bunnies Camp'",
@@ -381,7 +381,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/presale_newjeans-fan-meeting.png",
   },
   {
-    id: "evt-ive-1st-2026",
+    id: "6",
     artistId: "4",
     artistName: "IVE",
     title: "IVE THE 1ST WORLD TOUR",
@@ -393,7 +393,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/presale_ive-1st-world-tour.png",
   },
   {
-    id: "evt-blackpink-born-2026",
+    id: "7",
     artistId: "5",
     artistName: "BLACKPINK",
     title: "BLACKPINK BORN PINK WORLD TOUR",
@@ -405,7 +405,7 @@ export const allEventsData: EventListItem[] = [
     poster: "/events/event_blackpink-born-pink.png",
   },
   {
-    id: "evt-svt-bethesun2-2026",
+    id: "9",
     artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN WORLD TOUR BE THE SUN",

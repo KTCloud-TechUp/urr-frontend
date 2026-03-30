@@ -14,6 +14,7 @@ export async function getEventDetail(
 ): Promise<EventSummary> {
   const res = await apiRequest<EventDetailApiResponse>(
     `/artists/${artistId}/events/${eventId}`,
+    { service: "events" },
   );
   return res.data.data;
 }

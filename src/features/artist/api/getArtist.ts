@@ -22,6 +22,6 @@ interface ArtistApiResponse {
 export async function getArtist(
   artistId: string | number,
 ): Promise<ArtistDetail> {
-  const res = await apiRequest<ArtistApiResponse>(`/artists/${artistId}`);
+  const res = await apiRequest<ArtistApiResponse>(`/artists/${artistId}`, { service: "events" });
   return res.data.data;
 }

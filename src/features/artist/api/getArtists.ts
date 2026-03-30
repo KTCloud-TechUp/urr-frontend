@@ -39,6 +39,6 @@ interface ArtistsApiResponse {
 }
 
 export async function getArtists(): Promise<ArtistSummary[]> {
-  const res = await apiRequest<ArtistsApiResponse>("/artists");
+  const res = await apiRequest<ArtistsApiResponse>("/artists", { service: "events" });
   return res.data.data;
 }

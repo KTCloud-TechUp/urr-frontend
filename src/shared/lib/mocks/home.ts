@@ -43,7 +43,7 @@ export const homePopularArtists = [...mockArtists].sort(
 // --- 히어로 배너 ---
 export const homeBannerEvents: BannerEvent[] = [
   {
-    id: "evt-bts-encore-2026",
+    id: "2",
     artistId: "2",
     artistName: "BTS",
     title: "BTS YET TO COME ENCORE IN SEOUL",
@@ -53,7 +53,7 @@ export const homeBannerEvents: BannerEvent[] = [
     bannerImage: "/heroes/hero-banner.png",
   },
   {
-    id: "evt-gdragon-2026",
+    id: "1",
     artistId: "1",
     artistName: "G-Dragon",
     title: "G-Dragon 2026 DOME TOUR",
@@ -63,7 +63,7 @@ export const homeBannerEvents: BannerEvent[] = [
     bannerImage: "/heroes/hero_g-dragon.png",
   },
   {
-    id: "evt-aespa-synk-2026",
+    id: "4",
     artistId: "3",
     artistName: "aespa",
     title: "aespa LIVE SYNK : PARALLEL",
@@ -73,7 +73,7 @@ export const homeBannerEvents: BannerEvent[] = [
     bannerImage: "/heroes/hero_aespa.png",
   },
   {
-    id: "evt-blackpink-world-2026",
+    id: "7",
     artistId: "5",
     artistName: "BLACKPINK",
     title: "BLACKPINK BORN PINK WORLD TOUR FINALE",
@@ -87,7 +87,7 @@ export const homeBannerEvents: BannerEvent[] = [
 // --- 지금 뜨는 공연 ---
 export const homeTodayTicketing: TrendingEvent[] = [
   {
-    id: "evt-bts-encore-2026",
+    id: "2",
     artistId: "2",
     artistName: "BTS",
     title: "BTS Yet to Come in Cinemas",
@@ -97,7 +97,7 @@ export const homeTodayTicketing: TrendingEvent[] = [
     poster: "/events/event_bts-yet-to-come-in-cinema.png",
   },
   {
-    id: "evt-blackpink-world-2026",
+    id: "7",
     artistId: "5",
     artistName: "BLACKPINK",
     title: "BLACKPINK BORN PINK WORLD TOUR SEOUL",
@@ -108,7 +108,7 @@ export const homeTodayTicketing: TrendingEvent[] = [
     poster: "/events/event_blackpink-born-pink.png",
   },
   {
-    id: "evt-ive-show-2026",
+    id: "5",
     artistId: "4",
     artistName: "IVE",
     title: "IVE WORLD TOUR SHOW WHAT I AM",
@@ -118,7 +118,7 @@ export const homeTodayTicketing: TrendingEvent[] = [
     poster: "/events/event_ive-show-what-i-am.png",
   },
   {
-    id: "evt-newjeans-complexcon-2026",
+    id: "11",
     artistId: "8",
     artistName: "NewJeans",
     title: "NewJeans × COMPLEXCON",
@@ -128,7 +128,7 @@ export const homeTodayTicketing: TrendingEvent[] = [
     poster: "/events/event_newjeans-complexcon.png",
   },
   {
-    id: "evt-seventeen-sun-2026",
+    id: "9",
     artistId: "7",
     artistName: "SEVENTEEN",
     title: "SEVENTEEN WORLD TOUR BE THE SUN",
@@ -139,7 +139,7 @@ export const homeTodayTicketing: TrendingEvent[] = [
     poster: "/events/event_seventeen-be-the-sun.png",
   },
   {
-    id: "evt-skz-domtour-2026",
+    id: "8",
     artistId: "6",
     artistName: "Stray Kids",
     title: "Stray Kids DOMINANCE WORLD TOUR",
@@ -152,14 +152,14 @@ export const homeTodayTicketing: TrendingEvent[] = [
 
 // --- 인기 공연 랭킹 ---
 export const homeRankingEvents: RankingEvent[] = [
-  { id: "evt-gdragon-2026",       artistId: "1",  artistName: "G-Dragon",    title: "G-Dragon WORLD TOUR",           viewCount: 14200, status: "open",     profileImage: "/artists/profile_g-dragon.png" },
-  { id: "evt-aespa-synk-2026",    artistId: "3",  artistName: "aespa",       title: "aespa LIVE TOUR",               viewCount: 12800, status: "open",     profileImage: "/artists/profile_aespa.png" },
-  { id: "evt-seventeen-tour-2026",artistId: "7",  artistName: "SEVENTEEN",   title: "SEVENTEEN TOUR",                viewCount: 10500, status: "open",     profileImage: "/artists/profile_seventeen.png" },
-  { id: "evt-ive-show-2026",      artistId: "4",  artistName: "IVE",         title: "IVE Concert 2026",              viewCount: 8900,  status: "upcoming", profileImage: "/artists/profile_ive.png" },
-  { id: "evt-newjeans-fanmeet-2026",artistId: "8",artistName: "NewJeans",    title: "NewJeans Fan Meeting",          viewCount: 7200,  status: "upcoming", profileImage: "/artists/profile_newjeans.png" },
-  { id: "evt-day6-world-2026",    artistId: "11", artistName: "DAY6",        title: "DAY6 World Tour",               viewCount: 6800,  status: "open",     profileImage: "/artists/profile_day6.png" },
-  { id: "evt-blackpink-world-2026",artistId: "5", artistName: "BLACKPINK",   title: "BLACKPINK BORN PINK",           viewCount: 6100,  status: "upcoming", profileImage: "/artists/profile_blackpink.png" },
-  { id: "evt-brunomars-2026",     artistId: "12", artistName: "Bruno Mars",  title: "Bruno Mars Live in Seoul",      viewCount: 5400,  status: "upcoming", profileImage: "/artists/profile_bruno-mars.png" },
+  { id: "1",                       artistId: "1",  artistName: "G-Dragon",    title: "G-Dragon WORLD TOUR",           viewCount: 14200, status: "open",     profileImage: "/artists/profile_g-dragon.png" },
+  { id: "4",                       artistId: "3",  artistName: "aespa",       title: "aespa LIVE TOUR",               viewCount: 12800, status: "open",     profileImage: "/artists/profile_aespa.png" },
+  { id: "9",                       artistId: "7",  artistName: "SEVENTEEN",   title: "SEVENTEEN TOUR",                viewCount: 10500, status: "open",     profileImage: "/artists/profile_seventeen.png" },
+  { id: "5",                       artistId: "4",  artistName: "IVE",         title: "IVE Concert 2026",              viewCount: 8900,  status: "upcoming", profileImage: "/artists/profile_ive.png" },
+  { id: "12",                        artistId: "8",artistName: "NewJeans",    title: "NewJeans Fan Meeting",          viewCount: 7200,  status: "upcoming", profileImage: "/artists/profile_newjeans.png" },
+  { id: "15",                      artistId: "11", artistName: "DAY6",        title: "DAY6 World Tour",               viewCount: 6800,  status: "open",     profileImage: "/artists/profile_day6.png" },
+  { id: "7",                        artistId: "5", artistName: "BLACKPINK",   title: "BLACKPINK BORN PINK",           viewCount: 6100,  status: "upcoming", profileImage: "/artists/profile_blackpink.png" },
+  { id: "16",                      artistId: "12", artistName: "Bruno Mars",  title: "Bruno Mars Live in Seoul",      viewCount: 5400,  status: "upcoming", profileImage: "/artists/profile_bruno-mars.png" },
 ];
 
 // --- 추천 아티스트 ---
@@ -226,7 +226,7 @@ export const newArtistCards: NewArtistCard[] = [
 // --- 선예매 오픈 임박 ---
 export const homePreSaleEvents: PreSaleEvent[] = [
   {
-    id: "evt-skz-domtour-2026",
+    id: "8",
     artistId: "6",
     title: "Stray Kids DOMINANCE WORLD TOUR",
     openDateTime: "03.11(수) 20:00",
@@ -236,7 +236,7 @@ export const homePreSaleEvents: PreSaleEvent[] = [
     poster: "/events/presale_straykids-dominance.png",
   },
   {
-    id: "evt-gidle-world-2026",
+    id: "13",
     artistId: "9",
     title: "(G)I-DLE WORLD TOUR 'iDOL'",
     openDateTime: "03.06(금) 14:00",
@@ -245,7 +245,7 @@ export const homePreSaleEvents: PreSaleEvent[] = [
     poster: "/events/presale_gi-dle-world-tour.png",
   },
   {
-    id: "evt-seventeen-tour-2026",
+    id: "10",
     artistId: "7",
     title: "SEVENTEEN FOLLOW AGAIN TOUR",
     openDateTime: "03.06(금) 17:00",
@@ -254,7 +254,7 @@ export const homePreSaleEvents: PreSaleEvent[] = [
     poster: "/events/presale_seventeen-follow-again-tour.png",
   },
   {
-    id: "evt-txt-act-2026",
+    id: "14",
     artistId: "10",
     title: "TXT WORLD TOUR ACT : PROMISE",
     openDateTime: "내일 20:00",
@@ -263,7 +263,7 @@ export const homePreSaleEvents: PreSaleEvent[] = [
     poster: "/events/presale_txt-world-tour.png",
   },
   {
-    id: "evt-newjeans-fanmeet-2026",
+    id: "12",
     artistId: "8",
     title: "NewJeans Fan Meeting 'Bunnies Camp'",
     openDateTime: "03.09(월) 14:00",
@@ -272,7 +272,7 @@ export const homePreSaleEvents: PreSaleEvent[] = [
     poster: "/events/presale_newjeans-fan-meeting.png",
   },
   {
-    id: "evt-ive-show-2026",
+    id: "6",
     artistId: "4",
     title: "IVE THE 1ST WORLD TOUR",
     openDateTime: "03.03(화) 20:00",

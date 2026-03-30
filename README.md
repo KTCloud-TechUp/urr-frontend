@@ -321,20 +321,46 @@ npm run dev
 npm run build
 ```
 
-환경변수:
+### 환경 변수
+
+#### `.env` — 공통 설정 (저장소에 포함)
+
+프로덕션 기본값. 직접 수정하지 않는다.
+
+| 변수 | 설명 |
+|---|---|
+| `NEXT_PUBLIC_API_BASE_URL` | 백엔드 API 기본 URL (서비스별 변수 미설정 시 fallback) |
+| `NEXT_PUBLIC_KAKAO_CLIENT_ID` | 카카오 OAuth 앱 키 |
+| `NEXT_PUBLIC_KAKAO_REDIRECT_URI` | 카카오 OAuth 리디렉션 URI |
+| `NEXT_PUBLIC_NAVER_CLIENT_ID` | 네이버 OAuth 클라이언트 ID |
+| `NEXT_PUBLIC_NAVER_REDIRECT_URI` | 네이버 OAuth 리디렉션 URI |
+
+#### `.env.local` — 로컬 개발용 (git 제외)
+
+도커 컴포즈로 백엔드 서비스를 로컬에서 띄울 때 사용한다.
+저장소에 포함되지 않으므로 **개발자 각자가 직접 생성**해야 한다.
 
 ```bash
-# .env
-NEXT_PUBLIC_API_BASE_URL = http://localhost:8081/api/v1 #https://urr.guru
-
-#네이버 OAuth
-NEXT_PUBLIC_NAVER_CLIENT_ID=
-NEXT_PUBLIC_NAVER_REDIRECT_URI=http://localhost:3000/auth/callback/naver
-
-#카카오 OAuth
-NEXT_PUBLIC_KAKAO_CLIENT_ID=
-NEXT_PUBLIC_KAKAO_REDIRECT_URI=http://localhost:3000/auth/callback/kakao
+NEXT_PUBLIC_USERS_API_URL=http://localhost:8081/api/v1
+NEXT_PUBLIC_COMMUNITY_API_URL=http://localhost:8082/api/v1
+NEXT_PUBLIC_EVENTS_API_URL=http://localhost:8083/api/v1
+NEXT_PUBLIC_PAYMENTS_API_URL=http://localhost:8084/api/v1
+NEXT_PUBLIC_QUEUE_API_URL=http://localhost:8085/api/v1
+NEXT_PUBLIC_TICKETING_API_URL=http://localhost:8086/api/v1
 ```
+
+설정하지 않은 서비스는 자동으로 `NEXT_PUBLIC_API_BASE_URL`(프로덕션)로 fallback된다.
+
+#### 서비스별 포트 (도커 컴포즈 기준)
+
+| 서비스 | 포트 | 환경 변수 |
+|---|---|---|
+| auth / users | 8081 | `NEXT_PUBLIC_USERS_API_URL` |
+| community | 8082 | `NEXT_PUBLIC_COMMUNITY_API_URL` |
+| events / artists | 8083 | `NEXT_PUBLIC_EVENTS_API_URL` |
+| payments | 8084 | `NEXT_PUBLIC_PAYMENTS_API_URL` |
+| queue | 8085 | `NEXT_PUBLIC_QUEUE_API_URL` |
+| ticketing | 8086 | `NEXT_PUBLIC_TICKETING_API_URL` |
 
 ---
 

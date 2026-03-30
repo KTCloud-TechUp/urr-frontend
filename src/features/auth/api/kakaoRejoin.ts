@@ -10,6 +10,7 @@ export async function kakaoRejoin(
     {
       method: "POST",
       body: { rejoinToken, agree },
+      service: "users",
     },
   );
   return res.data.data;

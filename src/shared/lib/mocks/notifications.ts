@@ -12,7 +12,7 @@ export const mockNotifications: Notification[] = [
     description: "⚡ 라이트닝 예매가 3월 5일 09:00에 오픈됩니다.",
     timestamp: hoursAgo(0.25),
     isRead: false,
-    link: "/events/evt-gdragon-2026",
+    link: "/events/1",
   },
   {
     id: "noti-02",
@@ -57,7 +57,7 @@ export const mockNotifications: Notification[] = [
     description: "⚡ 썬더 이상 회원 선예매가 3월 10일 시작됩니다.",
     timestamp: hoursAgo(48),
     isRead: true,
-    link: "/events/evt-bts-encore-2026",
+    link: "/events/2",
   },
   {
     id: "noti-07",

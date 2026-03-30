@@ -19,6 +19,7 @@ export async function getShowDetail(
 ): Promise<ShowDetail> {
   const res = await apiRequest<ShowDetailApiResponse>(
     `/shows/${eventId}/shows/${showId}`,
+    { service: "ticketing" },
   );
   return res.data.data;
 }

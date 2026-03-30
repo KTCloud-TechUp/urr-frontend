@@ -23,6 +23,6 @@ interface ShowsApiResponse {
 }
 
 export async function getShows(eventId: string | number): Promise<ShowSummary[]> {
-  const res = await apiRequest<ShowsApiResponse>(`/shows/${eventId}/shows`);
+  const res = await apiRequest<ShowsApiResponse>(`/shows/${eventId}/shows`, { service: "ticketing" });
   return res.data.data;
 }
