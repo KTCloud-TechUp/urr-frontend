@@ -257,7 +257,7 @@ API 요청
 실시간 대기열 → 구역 선택 → 좌석 선택 → 결제 → 예매 확인
 ```
 
-- **실시간 대기열**: 폴링 기반 순번 대기. 등급별 입장 시각 차등 적용.
+- **실시간 대기열**: WebSocket 기반 순번 대기 (10초 갱신). 등급별 입장 시각 차등 적용.
 - **좌석 선택**: SVG 기반 인터랙티브 좌석도. 등급·가격·잔여 상태 색상 표시.
 - **결제**: Toss Payments 모킹.
 
@@ -336,13 +336,13 @@ npm run build
 
 프로덕션 기본값. 직접 수정하지 않는다.
 
-| 변수 | 설명 |
-|---|---|
-| `NEXT_PUBLIC_API_BASE_URL` | 백엔드 API 기본 URL (서비스별 변수 미설정 시 fallback) |
-| `NEXT_PUBLIC_KAKAO_CLIENT_ID` | 카카오 OAuth 앱 키 |
-| `NEXT_PUBLIC_KAKAO_REDIRECT_URI` | 카카오 OAuth 리디렉션 URI |
-| `NEXT_PUBLIC_NAVER_CLIENT_ID` | 네이버 OAuth 클라이언트 ID |
-| `NEXT_PUBLIC_NAVER_REDIRECT_URI` | 네이버 OAuth 리디렉션 URI |
+| 변수                             | 설명                                                   |
+| -------------------------------- | ------------------------------------------------------ |
+| `NEXT_PUBLIC_API_BASE_URL`       | 백엔드 API 기본 URL (서비스별 변수 미설정 시 fallback) |
+| `NEXT_PUBLIC_KAKAO_CLIENT_ID`    | 카카오 OAuth 앱 키                                     |
+| `NEXT_PUBLIC_KAKAO_REDIRECT_URI` | 카카오 OAuth 리디렉션 URI                              |
+| `NEXT_PUBLIC_NAVER_CLIENT_ID`    | 네이버 OAuth 클라이언트 ID                             |
+| `NEXT_PUBLIC_NAVER_REDIRECT_URI` | 네이버 OAuth 리디렉션 URI                              |
 
 #### `.env.local` — 로컬 개발용 (git 제외)
 
@@ -350,11 +350,13 @@ npm run build
 저장소에 포함되지 않으므로 **개발자 각자가 직접 생성**해야 한다.
 
 ```bash
-NEXT_PUBLIC_USERS_API_URL=http://localhost:8081/api/v1
+#NEXT_PUBLIC_API_BASE_URL=https://urr.guru/api/v1
+
+NEXT_PUBLIC_PAYMENTS_API_URL=http://localhost:8081/api/v1
 NEXT_PUBLIC_COMMUNITY_API_URL=http://localhost:8082/api/v1
-NEXT_PUBLIC_EVENTS_API_URL=http://localhost:8083/api/v1
-NEXT_PUBLIC_PAYMENTS_API_URL=http://localhost:8084/api/v1
-NEXT_PUBLIC_QUEUE_API_URL=http://localhost:8085/api/v1
+NEXT_PUBLIC_QUEUE_API_URL=http://localhost:8083/api/v1
+NEXT_PUBLIC_USERS_API_URL=http://localhost:8084/api/v1
+NEXT_PUBLIC_EVENTS_API_URL=http://localhost:8085/api/v1
 NEXT_PUBLIC_TICKETING_API_URL=http://localhost:8086/api/v1
 ```
 
@@ -362,14 +364,14 @@ NEXT_PUBLIC_TICKETING_API_URL=http://localhost:8086/api/v1
 
 #### 서비스별 포트 (도커 컴포즈 기준)
 
-| 서비스 | 포트 | 환경 변수 |
-|---|---|---|
-| auth / users | 8081 | `NEXT_PUBLIC_USERS_API_URL` |
-| community | 8082 | `NEXT_PUBLIC_COMMUNITY_API_URL` |
-| events / artists | 8083 | `NEXT_PUBLIC_EVENTS_API_URL` |
-| payments | 8084 | `NEXT_PUBLIC_PAYMENTS_API_URL` |
-| queue | 8085 | `NEXT_PUBLIC_QUEUE_API_URL` |
-| ticketing | 8086 | `NEXT_PUBLIC_TICKETING_API_URL` |
+| 서비스           | 포트 | 환경 변수                       |
+| ---------------- | ---- | ------------------------------- |
+| payments         | 8081 | `NEXT_PUBLIC_PAYMENTS_API_URL`  |
+| community        | 8082 | `NEXT_PUBLIC_COMMUNITY_API_URL` |
+| queue            | 8083 | `NEXT_PUBLIC_QUEUE_API_URL`     |
+| auth / users     | 8084 | `NEXT_PUBLIC_USERS_API_URL`     |
+| events / artists | 8085 | `NEXT_PUBLIC_EVENTS_API_URL`    |
+| ticketing        | 8086 | `NEXT_PUBLIC_TICKETING_API_URL` |
 
 ---
 

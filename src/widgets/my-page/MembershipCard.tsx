@@ -50,11 +50,13 @@ export function MembershipCard({
   const [isEditingNickname, setIsEditingNickname] = useState(false)
   const [nicknameInput, setNicknameInput] = useState(membership.nickname)
 
-  const expiryDate = new Date(membership.expiresAt).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
+  const expiryDate = membership.expiresAt
+    ? new Date(membership.expiresAt).toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })
+    : '-'
 
   const gradient = getArtistGradient(membership.artistId)
 
