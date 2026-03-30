@@ -117,23 +117,27 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
     category: "solo",
   };
 
+  const hasRepresentativeImage = Boolean(artist.avatar);
+
   const membership = mockUser.memberships.find((m) => m.artistId === artistId && m.isActive);
   const extendedInfo = getArtistExtendedInfo(artist.id);
-  const allEvents: Event[] = artistEventsData.map((e: EventSummary) => ({
-    id: String(e.eventId),
-    artistId: String(e.artistId),
-    title: e.title,
-    venue: e.venueTemplateName,
-    dates: [{
+  const allEvents: Event[] = artistEventsData
+    .filter((e: EventSummary) => String(e.artistId) === artistId)
+    .map((e: EventSummary) => ({
       id: String(e.eventId),
-      date: e.openDate + "T19:00:00",
-      bookingWindows: [],
-      totalSeats: 0,
-      remainingSeats: 0,
-    }],
-    poster: e.posterImageUrl ?? "",
-    status: e.active ? "open" : "closed",
-  }));
+      artistId: String(e.artistId),
+      title: e.title,
+      venue: e.venueTemplateName,
+      dates: [{
+        id: String(e.eventId),
+        date: e.openDate + "T19:00:00",
+        bookingWindows: [],
+        totalSeats: 0,
+        remainingSeats: 0,
+      }],
+      poster: e.posterImageUrl ?? "",
+      status: e.active ? "open" : "closed",
+    }));
   const now = new Date();
   const upcoming = allEvents.filter((e) => new Date(e.dates[0]?.date ?? 0) >= now);
   const past = allEvents.filter((e) => new Date(e.dates[0]?.date ?? 0) < now);
@@ -192,6 +196,7 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
             communityPosts={communityPosts}
             membership={membership}
             onNavigateTab={(tab) => handleTabChange(tab as Tab)}
+            hasRepresentativeImage={hasRepresentativeImage}
           />
         )}
         {activeTab === "community" && (
@@ -200,7 +205,12 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
             : <MembershipGate artistId={artist.id} artistName={artist.name} />
         )}
         {activeTab === "events" && (
-          <ArtistEventsTab upcoming={upcoming} past={past} artistName={artist.name} />
+          <ArtistEventsTab
+            upcoming={upcoming}
+            past={past}
+            artistName={artist.name}
+            hasRepresentativeImage={hasRepresentativeImage}
+          />
         )}
         {activeTab === "transfers" && (
           membership

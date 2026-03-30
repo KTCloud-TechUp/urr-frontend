@@ -43,6 +43,7 @@ interface ArtistHomeTabProps {
   communityPosts: CommunityPost[];
   membership?: Membership;
   onNavigateTab: (tab: string) => void;
+  hasRepresentativeImage?: boolean;
 }
 
 export function ArtistHomeTab({
@@ -54,6 +55,7 @@ export function ArtistHomeTab({
   communityPosts,
   membership,
   onNavigateTab,
+  hasRepresentativeImage,
 }: ArtistHomeTabProps) {
   const router = useRouter();
   const listedTransfers = transferListings.filter((t) => t.status === "listed");
@@ -262,8 +264,8 @@ export function ArtistHomeTab({
         )}
       </section>
 
-      {/* ===== 4. 공연 ===== */}
-      <section className="space-y-6">
+      {/* ===== 4. 공연 — 대표 이미지 등록 시에만 활성화 ===== */}
+      {hasRepresentativeImage !== false && <section className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Ticket size={20} className="text-muted-foreground" />
@@ -391,7 +393,7 @@ export function ArtistHomeTab({
             </p>
           </div>
         )}
-      </section>
+      </section>}
 
       {/* ===== 5. 양도 마켓 ===== */}
       <section className="space-y-6">
