@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Lock } from "lucide-react";
@@ -41,8 +41,6 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [following, setFollowing] = useState(false);
-
   const { data: currentUser } = useCurrentUser();
 
   const tabParam = searchParams.get("tab") as Tab | null;
@@ -53,9 +51,7 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
     queryFn: () => getArtist(artistId, currentUser?.userId),
   });
 
-  useEffect(() => {
-    if (artistData) setFollowing(artistData.isFollowing);
-  }, [artistData?.isFollowing]);
+  const following = artistData?.isFollowing ?? false;
 
   const toggleFollowMutation = useMutation({
     mutationFn: (nextFollowing: boolean) =>
@@ -66,18 +62,22 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
       await queryClient.cancelQueries({ queryKey: ["artist", artistId] });
       const previousArtist = queryClient.getQueryData(["artist", artistId]);
       queryClient.setQueryData(["artist", artistId], (old: typeof artistData) =>
-        old && old.followerCount !== undefined
-          ? { ...old, followerCount: old.followerCount + (nextFollowing ? 1 : -1) }
+        old
+          ? {
+              ...old,
+              isFollowing: nextFollowing,
+              followerCount: old.followerCount !== undefined
+                ? old.followerCount + (nextFollowing ? 1 : -1)
+                : undefined,
+            }
           : old,
       );
-      setFollowing(nextFollowing);
-      return { previousArtist, previousFollowing: !nextFollowing };
+      return { previousArtist };
     },
     onError: (_err, _vars, context) => {
       if (context?.previousArtist !== undefined) {
         queryClient.setQueryData(["artist", artistId], context.previousArtist);
       }
-      setFollowing(context?.previousFollowing ?? following);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["artist", artistId] });
