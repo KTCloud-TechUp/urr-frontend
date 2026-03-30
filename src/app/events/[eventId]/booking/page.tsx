@@ -1,8 +1,18 @@
 import { BookingWidget } from "@/widgets/booking";
-import { allEventsCombined } from "@/shared/lib/mocks/events-page";
+import { getEvents } from "@/features/event";
 
-export function generateStaticParams() {
-  return allEventsCombined.map((e) => ({ eventId: e.id }));
+const FALLBACK_EVENT_IDS = Array.from({ length: 20 }, (_, i) => String(i + 1));
+
+export async function generateStaticParams() {
+  try {
+    const events = await getEvents();
+    if (events.length > 0) {
+      return events.map((e) => ({ eventId: String(e.eventId) }));
+    }
+  } catch {
+    // API not available at build time — use fallback
+  }
+  return FALLBACK_EVENT_IDS.map((id) => ({ eventId: id }));
 }
 
 interface Props {

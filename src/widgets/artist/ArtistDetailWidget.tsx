@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Lock } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
-import { getArtist } from "@/features/artist";
+import { getArtist, followArtist, unfollowArtist } from "@/features/artist";
+import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { getArtistEvents } from "@/features/event";
 import type { EventSummary } from "@/features/event";
 import { mockUser } from "@/shared/lib/mocks/user";
@@ -39,16 +40,48 @@ interface ArtistDetailWidgetProps {
 export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [following, setFollowing] = useState(
-    mockUser.followedArtistIds.includes(artistId),
-  );
+  const queryClient = useQueryClient();
+  const [following, setFollowing] = useState(false);
+
+  const { data: currentUser } = useCurrentUser();
 
   const tabParam = searchParams.get("tab") as Tab | null;
   const activeTab: Tab = TABS.some((t) => t.value === tabParam) ? (tabParam as Tab) : "home";
 
   const { data: artistData, isLoading, isError } = useQuery({
     queryKey: ["artist", artistId],
-    queryFn: () => getArtist(artistId),
+    queryFn: () => getArtist(artistId, currentUser?.userId),
+  });
+
+  useEffect(() => {
+    if (artistData) setFollowing(artistData.isFollowing);
+  }, [artistData?.isFollowing]);
+
+  const toggleFollowMutation = useMutation({
+    mutationFn: (nextFollowing: boolean) =>
+      nextFollowing
+        ? followArtist(artistId, currentUser!.userId)
+        : unfollowArtist(artistId, currentUser!.userId),
+    onMutate: async (nextFollowing: boolean) => {
+      await queryClient.cancelQueries({ queryKey: ["artist", artistId] });
+      const previousArtist = queryClient.getQueryData(["artist", artistId]);
+      queryClient.setQueryData(["artist", artistId], (old: typeof artistData) =>
+        old && old.followerCount !== undefined
+          ? { ...old, followerCount: old.followerCount + (nextFollowing ? 1 : -1) }
+          : old,
+      );
+      setFollowing(nextFollowing);
+      return { previousArtist, previousFollowing: !nextFollowing };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousArtist !== undefined) {
+        queryClient.setQueryData(["artist", artistId], context.previousArtist);
+      }
+      setFollowing(context?.previousFollowing ?? following);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["artist", artistId] });
+    },
   });
 
   const { data: artistEventsData = [] } = useQuery({
@@ -114,7 +147,11 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
         artist={artist}
         membership={membership}
         isFollowing={following}
-        onFollowToggle={() => setFollowing((prev) => !prev)}
+        onFollowToggle={() => {
+          if (currentUser) {
+            toggleFollowMutation.mutate(!following);
+          }
+        }}
       />
 
       {/* Tab navigation */}

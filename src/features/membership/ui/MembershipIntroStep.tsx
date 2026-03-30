@@ -1,11 +1,13 @@
 "use client";
 
 import { ArrowLeft, Crown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { TierBadge } from "@/entities/user";
 import { cn } from "@/shared/lib/utils";
 import type { Artist, TierLevel } from "@/shared/types";
+import { getMembershipPolicies } from "../api/getMembershipPolicies";
 
 interface MembershipIntroStepProps {
   artist: Artist;
@@ -13,48 +15,44 @@ interface MembershipIntroStepProps {
   onSubscribe: () => void;
 }
 
-const tierBenefits: {
-  tier: TierLevel;
-  booking: string;
-  openTiming: string;
-  fee: string;
-  transferFee: string;
-}[] = [
-  {
-    tier: "lightning",
-    booking: "우선 예매",
-    openTiming: "개별 오픈",
-    fee: "1,000원",
-    transferFee: "5%",
-  },
-  {
-    tier: "thunder",
-    booking: "우선 예매",
-    openTiming: "라이트닝 +1시간",
-    fee: "2,000원",
-    transferFee: "5%",
-  },
-  {
-    tier: "cloud",
-    booking: "일반 예매",
-    openTiming: "썬더 +2일",
-    fee: "3,000원",
-    transferFee: "10%",
-  },
-  {
-    tier: "mist",
-    booking: "일반 예매",
-    openTiming: "클라우드 +1시간",
-    fee: "4,000원",
-    transferFee: "10%",
-  },
-];
+const TIER_ORDER: TierLevel[] = ["lightning", "thunder", "cloud", "mist"];
+
+const TIER_BOOKING_LABEL: Record<TierLevel, string> = {
+  lightning: "우선 예매",
+  thunder: "우선 예매",
+  cloud: "일반 예매",
+  mist: "일반 예매",
+};
+
+const TIER_TRANSFER_FEE: Record<TierLevel, string> = {
+  lightning: "5%",
+  thunder: "5%",
+  cloud: "10%",
+  mist: "불가",
+};
+
+function formatOffset(minutes: number): string {
+  if (minutes === 0) return "기준";
+  if (minutes < 60) return `+${minutes}분`;
+  if (minutes % (60 * 24) === 0) return `+${minutes / (60 * 24)}일`;
+  if (minutes % 60 === 0) return `+${minutes / 60}시간`;
+  return `+${minutes}분`;
+}
 
 export function MembershipIntroStep({
   artist,
   onBack,
   onSubscribe,
 }: MembershipIntroStepProps) {
+  const { data: policies } = useQuery({
+    queryKey: ["membershipPolicies", artist.id],
+    queryFn: () => getMembershipPolicies(artist.id),
+  });
+
+  const policyMap = Object.fromEntries(
+    (policies ?? []).map((p) => [p.tier, p]),
+  ) as Partial<Record<TierLevel, import("../api/getMembershipPolicies").MembershipTierPolicy>>;
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -114,26 +112,33 @@ export function MembershipIntroStep({
               </tr>
             </thead>
             <tbody>
-              {tierBenefits.map((row, idx) => (
-                <tr
-                  key={row.tier}
-                  className={cn(idx > 0 && "border-t border-border")}
-                >
-                  <td className="px-4 py-3">
-                    <TierBadge tier={row.tier} size="sm" />
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {row.booking}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {row.openTiming}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{row.fee}</td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {row.transferFee}
-                  </td>
-                </tr>
-              ))}
+              {TIER_ORDER.map((tier, idx) => {
+                const policy = policyMap[tier];
+                return (
+                  <tr
+                    key={tier}
+                    className={cn(idx > 0 && "border-t border-border")}
+                  >
+                    <td className="px-4 py-3">
+                      <TierBadge tier={tier} size="sm" />
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {TIER_BOOKING_LABEL[tier]}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {policy ? formatOffset(policy.presaleOffsetMinutes) : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {policy
+                        ? `${policy.bookingFeeWon.toLocaleString()}원`
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {TIER_TRANSFER_FEE[tier]}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

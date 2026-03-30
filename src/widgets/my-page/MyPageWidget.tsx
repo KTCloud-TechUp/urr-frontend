@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs'
 import { MyPageHeader } from './MyPageHeader'
@@ -12,6 +12,7 @@ import { MyPageSkeleton } from './MyPageSkeleton'
 import { mockUser } from '@/shared/lib/mocks/user'
 import { getMyTickets, getMyTransferRecords } from '@/shared/lib/mocks/my-page'
 import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
+import { useMemberships, useUpdateNickname, useCancelMembership } from '@/features/membership'
 import type { User } from '@/shared/types'
 
 const tickets = getMyTickets()
@@ -23,13 +24,15 @@ export function MyPageWidget() {
   const activeTab = searchParams.get('tab') ?? 'membership'
 
   const { data: meData, isLoading } = useCurrentUser()
+  const { data: memberships = [] } = useMemberships()
+  const updateNickname = useUpdateNickname()
+  const cancelMembership = useCancelMembership()
 
-  const [user, setUser] = useState<User>(() => ({ ...mockUser }))
-
-  const mergedUser: User = {
-    ...user,
-    name: meData?.nickname ?? user.name,
-    email: meData?.email ?? user.email,
+  const displayUser: User = {
+    ...mockUser,
+    name: meData?.nickname ?? mockUser.name,
+    email: meData?.email ?? mockUser.email,
+    memberships,
   }
 
   if (isLoading) return <MyPageSkeleton />
@@ -39,30 +42,24 @@ export function MyPageWidget() {
   }
 
   const handleUpdateUser = (updates: Partial<Pick<User, 'name' | 'email'>>) => {
-    setUser((prev) => ({ ...prev, ...updates }))
+    // TODO: PATCH /api/v1/user
+    void updates
   }
 
   const handleCancelMembership = (membershipId: string) => {
-    setUser((prev) => ({
-      ...prev,
-      memberships: prev.memberships.map((m) =>
-        m.id === membershipId ? { ...m, isActive: false } : m
-      ),
-    }))
+    const membership = memberships.find((m) => m.id === membershipId)
+    if (!membership?.orderId) return
+    cancelMembership.mutate(membership.orderId)
   }
 
   const handleNicknameChange = (membershipId: string, nickname: string) => {
-    setUser((prev) => ({
-      ...prev,
-      memberships: prev.memberships.map((m) =>
-        m.id === membershipId ? { ...m, nickname } : m
-      ),
-    }))
+    if (!meData) return
+    updateNickname.mutate({ membershipId, userId: meData.userId, nickname })
   }
 
   return (
     <div>
-      <MyPageHeader user={mergedUser} />
+      <MyPageHeader user={displayUser} />
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList variant="line" className="w-full justify-start mt-8 border-b border-border">
@@ -74,14 +71,14 @@ export function MyPageWidget() {
 
         <TabsContent value="membership" className="pt-6">
           <MembershipTab
-            memberships={mergedUser.memberships}
+            memberships={memberships}
             onCancelMembership={handleCancelMembership}
             onNicknameChange={handleNicknameChange}
           />
         </TabsContent>
 
         <TabsContent value="wallet" className="pt-6">
-          <TicketWalletTab tickets={tickets} user={mergedUser} />
+          <TicketWalletTab tickets={tickets} user={displayUser} />
         </TabsContent>
 
         <TabsContent value="transfers" className="pt-6">
@@ -90,7 +87,7 @@ export function MyPageWidget() {
 
         <TabsContent value="settings" className="pt-6">
           <SettingsTab
-            user={mergedUser}
+            user={displayUser}
             onUpdateUser={handleUpdateUser}
             initialConsents={meData ? {
               marketingConsent: meData.marketingConsent,
