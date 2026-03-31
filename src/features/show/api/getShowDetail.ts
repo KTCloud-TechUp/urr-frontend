@@ -1,8 +1,18 @@
 import { apiRequest } from "@/shared/api/client";
-import type { ShowSummary } from "./getShows";
+import type { ShowStatus } from "./getShows";
 
-export interface ShowDetail extends ShowSummary {
+export interface ShowDetail {
+  showId: number;
   eventId: number;
+  sessionNo: number;
+  startAt: string;
+  endAt: string;
+  capacity: number;
+  saleOpenAt: string;
+  saleCloseAt: string;
+  status: ShowStatus;
+  active: boolean;
+  seatmapVersion: number;
   seatmapJson: string;
 }
 

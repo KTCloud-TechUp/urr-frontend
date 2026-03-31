@@ -25,25 +25,15 @@ npm run dev    # 개발 서버
 npm run build  # 빌드 검증
 ```
 
-### 환경변수 .env
-
-| 변수                             | 용도                    |
-| -------------------------------- | ----------------------- |
-| `NEXT_PUBLIC_API_BASE_URL`       | 백엔드 API URL          |
-| `NEXT_PUBLIC_KAKAO_CLIENT_ID`    | 카카오 OAuth 앱 키      |
-| `NEXT_PUBLIC_KAKAO_REDIRECT_URI` | 카카오 OAuth 리디렉션   |
-| `NEXT_PUBLIC_NAVER_CLIENT_ID`    | 네이버 OAuth 클라이언트 |
-| `NEXT_PUBLIC_NAVER_REDIRECT_URI` | 네이버 OAuth 리디렉션   |
-
 ### 상태 관리 기준
 
-| 상황                                        | 사용                       |
-| ------------------------------------------- | -------------------------- |
-| API 데이터 조회 (GET)                       | `useQuery`                 |
-| API 데이터 변경 (POST/PUT/DELETE)           | `useMutation`              |
-| 모달 열림/닫힘, 탭 선택 등 UI 상태          | `useState`                 |
-| 여러 페이지에 걸쳐 공유되는 클라이언트 상태 | `Zustand`                  |
-| 앱 초기화 로직 (세션 복원, OAuth 콜백 등)   | `useEffect` 직접 사용 허용 |
+| 상황                            | 사용                       |
+| ------------------------------- | -------------------------- |
+| API 데이터 조회 (GET)           | `useQuery`                 |
+| API 데이터 변경 (POST/PUT/DELETE) | `useMutation`            |
+| 모달/탭 등 UI 상태              | `useState`                 |
+| 여러 페이지 공유 클라이언트 상태 | `Zustand`                 |
+| 앱 초기화 (세션 복원, OAuth 콜백) | `useEffect` 직접 사용 허용 |
 
 - **새 페이지 API 연동 시 반드시 TanStack Query 사용** (`useState + useEffect` 패턴 금지)
 - Zustand는 예매 상태머신(Phase 9)에 사용 예정 — auth에는 사용하지 않는다
@@ -57,21 +47,14 @@ npm run build  # 빌드 검증
 | `src/shared/api/interceptor.ts` | `fetchWithAuth()` — 401 시 reissue → 재시도 (큐잉 처리) |
 | `src/shared/api/tokenStore.ts`  | `accessToken` module-level 변수 관리 + 인증 쿠키 설정   |
 
-- **일반 요청**: `apiRequest()` (토큰 자동 첨부)
-- **인증 민감 요청**: `fetchWithAuth()` (401 자동 복구)
-- `features/<domain>/api/` 파일에서 위 함수를 래핑해서 사용. 컴포넌트에서 직접 호출 금지.
-
 ### 인증 / JWT 흐름
 
-- `accessToken`: `tokenStore.ts` module-level 변수 (메모리 우선) + sessionStorage 백업
-  - **아키텍처 제약(S3 정적 배포)에서 오는 불가피한 보안 트레이드오프**: OAuth 콜백 → 온보딩 페이지 전환 시 CloudFront full page reload로 JS 메모리 초기화됨 → sessionStorage 백업 필수
-  - XSS로 `sessionStorage.getItem('at')` 탈취 가능하나, refreshToken은 httpOnly 쿠키로 보호되고 accessToken 수명이 짧아(60분) 허용 가능한 트레이드오프로 판단
-  - EKS 전환(SSR 적용) 시 full page reload 문제 해소 → sessionStorage 제거하고 메모리 단독으로 복귀 가능
-- `refreshToken`: httpOnly 쿠키 (서버 관리, `credentials: "include"`로 자동 전송)
-- `is_authenticated`: 클라이언트 쿠키 (24h) — 로그인 상태 힌트 용도
-- 401 발생 → `fetchWithAuth`가 `POST /api/auth/token/reissue` 호출 → 성공 시 원래 요청 재시도
-- 동시 401: 첫 reissue만 실행, 나머지는 큐에서 대기 후 새 토큰 수신
-- reissue 실패 → `onAuthFailed()` 콜백 → 로그아웃 처리
+- `accessToken`: module-level 변수 (메모리) + sessionStorage 백업
+  - S3 정적 배포 → CloudFront full page reload 시 JS 메모리 초기화 → sessionStorage 백업 필수 (불가피한 트레이드오프)
+  - EKS 전환(SSR) 시 sessionStorage 제거 가능
+- `refreshToken`: httpOnly 쿠키 (`credentials: "include"` 자동 전송)
+- `is_authenticated`: 클라이언트 쿠키 (24h) — 로그인 상태 힌트
+- 401 → `fetchWithAuth`가 `POST /api/auth/token/reissue` 호출 → 성공 시 재시도 / 실패 시 `onAuthFailed()` → 로그아웃
 
 ---
 
@@ -79,70 +62,36 @@ npm run build  # 빌드 검증
 
 ```
 src/
-├── app/          # Next.js App Router (라우팅 진입점만)
-├── widgets/      # 페이지를 구성하는 큰 UI 블록 (여러 feature 조합)
-├── features/     # 단일 사용자 행동 단위 (독립적)
-├── entities/     # 도메인 모델 (User, Artist, Event, Ticket …)
-└── shared/
-    ├── api/      # API 클라이언트, fetch 유틸
-    ├── lib/      # utils.ts, format.ts, constants.ts
-    └── ui/       # shadcn 컴포넌트 (button.tsx, input.tsx …)
+├── app/       # Next.js App Router (라우팅 진입점만, 로직 없음)
+├── widgets/   # 페이지를 구성하는 큰 UI 블록 (여러 feature 조합)
+├── features/  # 단일 사용자 행동 단위 (독립적, 타 feature 의존 금지)
+├── entities/  # 도메인 타입 + 관련 UI 카드/배지 (비즈니스 로직 없음)
+└── shared/    # 전역 공용 코드 (api/, lib/, ui/)
 ```
 
-### 레이어 규칙 (상위 → 하위만 import 가능)
+**레이어 규칙**: `app → widgets → features → entities → shared` (상위→하위만 import)
 
-```
-app → widgets → features → entities → shared
-```
+**feature 내부**: `ui/` (PascalCase.tsx) / `model/` (useXxx.ts) / `api/` (camelCase.ts) / `index.ts`
 
-- **app**: 라우트 파일만. 로직 없음, Widget을 `<Page />`에서 렌더링만.
-- **widgets**: 여러 feature/entity를 조합하는 구성 레이어. `"use client"` 가능.
-- **features**: 하나의 사용자 행동 (로그인, 예매, 결제 등). 타 feature 의존 금지.
-- **entities**: 도메인 타입 + 관련 UI 카드/배지. 비즈니스 로직 없음.
-- **shared**: 프로젝트 전역 공용 코드. 도메인 개념 없음.
-
-### feature 내부 구조
-
-```
-features/<domain>/<feature-name>/
-├── ui/         # React 컴포넌트 (PascalCase.tsx)
-├── model/      # 상태, hook (useXxx.ts)
-├── api/        # fetch 함수 (camelCase.ts)
-└── index.ts    # 외부 공개 barrel export
-```
-
-### 파일 네이밍
-
-- 컴포넌트: `PascalCase.tsx`
-- 훅/유틸/api: `camelCase.ts`
-- shadcn UI 파일: `lowercase.tsx` (`button.tsx`, `input.tsx`)
-- 모든 레이어 폴더의 barrel: `index.ts`
+**파일 네이밍**: 컴포넌트 `PascalCase.tsx` / 훅·유틸·api `camelCase.ts` / shadcn `lowercase.tsx` / barrel `index.ts`
 
 ---
 
 ## 주요 라우트 & 페이지
 
-| URL                              | 페이지             | 핵심 widget                            |
-| -------------------------------- | ------------------ | -------------------------------------- |
-| `/`                              | HomePage           | 배너·인기아티스트·공연랭킹·선예매 섹션 |
-| `/artists`                       | ArtistsPage        | 아티스트 목록 그리드                   |
-| `/artists/:artistId`             | ArtistPage         | 홈/소통/공연/양도 탭 (멤버십 게이트)   |
-| `/events`                        | EventsPage         | 공연 목록                              |
-| `/events/:eventId`               | EventDetailPage    | 공연 상세                              |
-| `/events/:eventId/booking`       | BookingPage        | 예매 2-Panel 플로우                    |
-| `/membership`                    | MembershipPage     | 4단계 가입 플로우                      |
-| `/my-page`                       | MyPage             | 멤버십/티켓 월렛/양도 내역 탭          |
-| `/onboarding`                    | OnboardingPage     | 회원가입·로그인                        |
-| `/search`                        | SearchPage         | 아티스트+공연 통합 검색                |
-| `/notifications`                 | NotificationPage   | 알림 목록 (UI 쉘, mock 데이터)         |
-| `/transfer/:artistId/:listingId` | TransferDetailPage | 양도 상세                              |
+| URL                              | 페이지             | 비고                              |
+| -------------------------------- | ------------------ | --------------------------------- |
+| `/`                              | HomePage           | 배너·인기아티스트·공연랭킹·선예매 |
+| `/artists` / `/artists/:id`      | ArtistPage         | 홈/소통/공연/양도 탭 (멤버십 게이트) |
+| `/events` / `/events/:id`        | EventDetailPage    | 공연 목록 / 상세                  |
+| `/events/:id/booking`            | BookingPage        | 예매 2-Panel, 풀스크린 레이아웃   |
+| `/membership`                    | MembershipPage     | 4단계 가입 플로우                 |
+| `/my-page`                       | MyPage             | 멤버십/티켓 월렛/양도 내역        |
+| `/onboarding`                    | OnboardingPage     | 회원가입·로그인 (사이드바 없음)   |
+| `/search`                        | SearchPage         | 아티스트+공연 통합 검색           |
+| `/transfer/:artistId/:listingId` | TransferDetailPage | 양도 상세                         |
 
-### LayoutShell 레이아웃 예외
-
-`src/widgets/layout/LayoutShell.tsx`에서 처리:
-
-- **사이드바/TopBar 없음** (`NO_SHELL_ROUTES`): `/onboarding`, `/auth/callback` — 전체 경로 `startsWith`로 매칭
-- **풀스크린 레이아웃** (`isFullWidth`): `/events/:id/booking` — 사이드바는 있지만 컨텐츠 영역이 전체 높이 차지, Footer/스크롤 없음
+**LayoutShell 예외**: `/onboarding`, `/auth/callback` → 사이드바/TopBar 없음 / `/events/:id/booking` → 풀스크린 (Footer/스크롤 없음)
 
 ---
 
@@ -150,238 +99,88 @@ features/<domain>/<feature-name>/
 
 ### 멤버십 등급
 
-| 등급        | Lv. | 조건               | 예매 창       | 예매 수수료        | 양도 수수료 |
-| ----------- | --- | ------------------ | ------------- | ------------------ | ----------- |
-| 🌩️ 라이트닝 | 4   | 팬 신뢰 점수 ≥ 85  | 선예매 1순위  | +₩1,000 (기본-3천) | 5%          |
-| ⚡ 썬더     | 3   | 팬 신뢰 점수 66–84 | 2순위 (+1h)   | +₩2,000 (기본-2천) | 5%          |
-| ☁️ 클라우드 | 2   | 멤버십 가입 즉시   | 3순위 (+1day) | +₩3,000 (기본-1천) | 10%         |
-| 🌫️ 미스트   | 1   | 회원가입 즉시      | 일반예매만    | +₩4,000 (기본값)   | 양도불가    |
+| 등급        | Lv. | 조건              | 예매 창       | 예매 수수료 할인 | 양도 수수료 |
+| ----------- | --- | ----------------- | ------------- | ---------------- | ----------- |
+| 🌩️ 라이트닝 | 4   | 팬 신뢰 점수 ≥ 85 | 선예매 1순위  | -₩3,000          | 5%          |
+| ⚡ 썬더     | 3   | 66–84점           | 2순위 (+1h)   | -₩2,000          | 5%          |
+| ☁️ 클라우드 | 2   | 멤버십 가입 즉시  | 3순위 (+1day) | -₩1,000          | 10%         |
+| 🌫️ 미스트   | 1   | 회원가입 즉시     | 일반예매만    | 없음             | 양도불가    |
 
-- **양도 가능**: 클라우드 이상 (라이트닝/썬더 5%, 클라우드 10%) — 미스트는 양도게시판 접근 불가
-- **양도 구매**: 해당 아티스트 멤버십 보유자만 가능
-- **멤버십 게이트**: 아티스트 상세 홈 탭은 누구나, 공연/양도 탭은 멤버십 회원 전용
+- 양도 게시판: 클라우드 이상만 접근 / 구매: 해당 아티스트 멤버십 보유자만
+- 멤버십 게이트: 아티스트 홈 탭은 누구나, 공연/양도 탭은 멤버십 전용
+- 팬 신뢰 점수(FTS): MVP는 멜론 연동만. 미연동 시 미스트 유지.
 
-### 팬 신뢰 점수 (FTS) — MVP는 멜론 스트리밍만
-
-| 요소           | 가중치 | MVP 구현 여부 |
-| -------------- | ------ | ------------- |
-| 티켓 활동      | 30%    | ❌ Post-MVP   |
-| 스트리밍 소비  | 20%    | ✅ 멜론 연동  |
-| MD 구매        | 15%    | ❌ Post-MVP   |
-| 플랫폼 활동    | 15%    | ❌ Post-MVP   |
-| 팬 행동 신뢰도 | 10%    | ❌ Post-MVP   |
-| 멤버십 연속성  | 10%    | ❌ Post-MVP   |
-
-- MVP: 멜론 미연동 → 미스트 유지. 멜론 연동 시에만 상위 등급 가능.
-- 멜론 연동은 강제 게이트가 아닌 "상위 등급 잠금 해제" CTA 형식
-
-### 예매 플로우 — 상태머신
+### 예매 상태머신
 
 ```
-idle → [Book Now 클릭] → queue
-
-queue → seats-section → seats-individual → payment → confirmation
-                                         ↘ payment-failed (60s 재시도)
-seats-individual → seats-expired (3분 타임아웃) → seats-section 복귀
+idle → queue → seats-section → seats-individual → payment → confirmation
+                                     ↓ (3분 타임아웃)    ↘ payment-failed (60s 재시도)
+                               seats-expired → seats-section 복귀
 ```
-
-| 상태               | 설명                                                     |
-| ------------------ | -------------------------------------------------------- |
-| `idle`             | 구역 개요 + 구역별 잔여석 + [Book Now] (카운트다운/활성) |
-| `queue`            | 순번 + 예상 대기 + 성공 확률(%), 10초 WebSocket 갱신     |
-| `seats-section`    | 구역 선택 (SVG 클릭, 잔여석 컬러코딩)                    |
-| `seats-individual` | Grape-style 좌석 선택, 최대 4석, 3분 타이머              |
-| `payment`          | Toss Payments 모킹                                       |
-| `confirmation`     | QR 코드 + 티켓 월렛 저장                                 |
-| `payment-failed`   | 결제 실패 → 60초 내 재시도 가능                          |
-| `seats-expired`    | 3분 타임아웃 → 구역 선택으로 복귀                        |
 
 ### 양도 마켓
 
-- 가격 범위: 정가의 **0.5x ~ 1.5x** (암표 방지)
-- 에스크로 방식: 구매자 결제 → 플랫폼 보관 → 소유권 이전 → 판매자 지급
-- `listed` 상태만 수정/취소 가능
-- 수정: 가격 변경 → 수수료 자동 계산
-- 취소: 확인 다이얼로그 → `cancelled` 상태 변경
-- 신뢰 지표: 판매자 티어 배지 + 거래 건수 표시
-
-### 홈페이지 섹션 순서
-
-1. 히어로 배너 캐러셀 (3~5개, 5초 자동 전환)
-2. 인기 아티스트 (10열 그리드, 가로 스크롤)
-3. **지금 뜨는 공연** (≠ "오늘의 티켓팅" — 혼동 방지)
-4. 인기 공연 랭킹 (2열 8행)
-5. 선예매 오픈 임박 (3열)
-
-### 온보딩 플로우 (8단계)
-
-**Phase 1 — 가입 & 본인인증**
-
-1. 소셜 로그인 (Kakao / Naver) + 이메일 옵션
-2. **본인인증** (CI 기반 1인 1계정):
-   - 통신사 선택 (SKT / KT / LGU+ / MVNO)
-   - 이름 + 생년월일(8자리) + 성별 + 전화번호
-   - SMS 인증코드 입력 (3분 타이머)
-   - CI 중복 시 기존 계정 안내 후 차단
-3. **약관 동의**:
-   - 전체 동의 마스터 체크박스
-   - [필수] 이용약관 / [필수] 개인정보처리방침
-   - [선택] 마케팅 수신 동의
-4. 가입 완료 → **미스트 즉시 부여**
-
-**Phase 2 — 개인화**
-
-5. 아티스트 선택 (1명 이상 필수, 카테고리 탭 + 검색)
-6. 멤버십 소개: 등급 혜택 비교표 + [가입 ₩30,000/년] or [나중에]
-7. 멜론 연동 (선택): "라이트닝/썬더 등급 확인" CTA — 강제 아님
-8. 완료 → 홈으로 전환
+- 가격 범위: 정가의 0.5x ~ 1.5x / 에스크로 방식 / 클라우드 이상만 접근
+- 소유권 이전 시 기존 QR 즉시 무효화 + 신규 QR 발급 (원자적 처리)
 
 ---
 
-## 디자인 시스템 핵심
+## 디자인 시스템
 
-### 색상 토큰 (확정값)
+> 상세 스펙 → `docs/designsystem.md`
 
-| 용도           | Tailwind 클래스  | 값                 |
-| -------------- | ---------------- | ------------------ |
-| 주요 CTA       | `bg-primary`     | `#FF5E32` (오렌지) |
-| 보조 CTA       | `bg-secondary`   | `#1F2792` (네이비) |
-| 사이드바 배경  | `bg-sidebar`     | `#FBFAF8`          |
-| 메인 배경      | `bg-background`  | `#FFFEFE`          |
-| hover/selected | `bg-accent`      | `#F2F0E6`          |
-| 에러/삭제      | `bg-destructive` | oklch(0.577 …)     |
-| 성공           | `text-success`   | `#22C55E`          |
-| 경고           | `text-warning`   | `#F59E0B`          |
-
-### 티어 색상
-
-| 등급     | 텍스트 클래스         | 배경 클래스            |
-| -------- | --------------------- | ---------------------- |
-| 라이트닝 | `text-tier-lightning` | `bg-tier-lightning-bg` |
-| 썬더     | `text-tier-thunder`   | `bg-tier-thunder-bg`   |
-| 클라우드 | `text-tier-cloud`     | `bg-tier-cloud-bg`     |
-| 미스트   | `text-tier-mist`      | `bg-tier-mist-bg`      |
-
-### 좌석 상태 색상
-
-| 상태      | 색상               |
-| --------- | ------------------ |
-| 선택 가능 | `#22C55E` (green)  |
-| 내가 선택 | `#3B82F6` (blue)   |
-| 판매 완료 | `#9CA3AF` (gray)   |
-| 타인 잠금 | `#FACC15` (yellow) |
-
-### 레이아웃 치수
-
-| 요소             | 크기              |
-| ---------------- | ----------------- |
-| GNB 사이드바     | 220px (접힘 64px) |
-| 좌측 패널 (예매) | 360px (접힘 48px) |
-| 상단 바          | 56px              |
-
-### 폰트
-
-- 본문: Pretendard Variable (`font-sans`)
-- 타이머/카운트다운 전용: JetBrains Mono (`font-mono`)
-- Letter-spacing: `-0.015em` (전역)
-
-### 로고
-
-- 파일: `public/logos/logo5.svg` (146×146 정사각형)
-- 사이드바: `h-10` / 푸터: `h-11` / 로그인: `h-16` / 온보딩 히어로: `h-10`
-
-### 디자인 원칙
-
-- **Border over Shadow**: 요소 분리는 border 우선, shadow는 hover/모달에서만
-- **Selective Color**: 등급·좌석 상태·시스템 피드백에만 색상. 나머지 모노크롬
-- **Light only**: 다크 모드 미지원
-- **Desktop only**: 모바일 반응형 없음
-
-### 애니메이션 스펙
-
-| 요소                       | 애니메이션                     | 지속시간        |
-| -------------------------- | ------------------------------ | --------------- |
-| 사이드바 접기/펼치기       | width slide                    | 250ms ease-out  |
-| 좌측 패널 접기/펼치기      | width slide                    | 200ms ease-out  |
-| 페이지 전환                | fade-in                        | 150ms           |
-| 모달 열림                  | fade + scale 95%→100%          | 200ms ease-out  |
-| 모달 닫힘                  | fade + scale 100%→95%          | 150ms ease-in   |
-| 대기열 순번 변경           | digit roll 애니메이션          | 500ms           |
-| 타이머 색상 (1:00)         | → 노란색 전환                  | 300ms           |
-| 타이머 색상 + pulse (0:30) | → 빨간색 + scale 1.05 pulse    | 300ms + 1s loop |
-| 결제 성공 confetti         | canvas-confetti burst          | 800ms           |
-| 카드 hover                 | shadow 증가 + translateY(-1px) | 150ms           |
-| 스켈레톤 shimmer           | gradient sweep                 | 1.5s loop       |
-| Toast 등장                 | slide in from right            | 300ms           |
+**원칙**: Border over Shadow / Selective Color / Light only / Desktop only  
+**주요 색상**: `bg-primary` #FF5E32 / `bg-secondary` #1F2792 / `bg-accent` #F2F0E6  
+**티어 클래스**: `text-tier-{lightning|thunder|cloud|mist}` / `bg-tier-{...}-bg`  
+**폰트**: Pretendard Variable (`font-sans`) / JetBrains Mono (`font-mono`, 타이머 전용)  
+**로고**: `public/logos/logo5.svg`
 
 ---
 
 ## API 연동 현황
 
-| Phase | 영역                            | 상태         |
-| ----- | ------------------------------- | ------------ |
-| 1–4   | API 클라이언트, 인증 인프라     | ✅ 완료      |
-| 5     | 인증 API (카카오/네이버/이메일) | ✅ 완료      |
-| 6     | 온보딩 플로우 완성              | 🔲 진행 중   |
-| 7–8   | 예매 UI (VenueMap 인터랙션)     | ✅ 완료      |
-| 9     | 예매 Zustand store              | 🔲 다음 작업 |
-| 10    | Events/Artists API 연동         | 🔲 대기      |
-| 11    | Ticketing + Queue API 연동      | 🔲 대기      |
-| 12    | Payments API 연동               | 🔲 대기      |
-| 13–14 | User 추가기능, Community        | 🔲 대기      |
+> 상세 체크리스트 → `docs/CheckList.md`
 
-**현재 mock 데이터 사용 중인 영역**: 홈페이지 섹션, 공연/아티스트 목록, 예매 좌석 데이터, 마이페이지
+| Phase | 영역                            | 상태       |
+| ----- | ------------------------------- | ---------- |
+| 1–5   | API 클라이언트, 인증 인프라     | ✅ 완료    |
+| 7–8   | 예매 UI (VenueMap 인터랙션)     | ✅ 완료    |
+| 6     | 온보딩 플로우 완성              | 🔲 진행 중 |
+| 9     | 예매 Zustand store              | 🔲 다음    |
+| 10–14 | Events/Ticketing/Payments 등    | 🔲 대기    |
 
-상세 체크리스트 → `docs/CheckList.md`
+**현재 mock 데이터**: 홈페이지 섹션, 공연/아티스트 목록, 예매 좌석, 마이페이지
 
 ---
 
 ## 브랜치 전략
 
-기본 작업은 `dev`에서 직접 커밋. 브랜치는 격리가 필요할 때만 생성.
-
 ```
-main                      # 프로덕션. 직접 push 금지.
-dev                       # 일상 작업 브랜치. 직접 커밋 허용.
-feat/<scope>              # 복잡하거나 격리 필요한 작업만. dev에서 분기.
-design/<scope>            # 디자인팀 전용. UI/스타일만. 머지는 오너가 직접.
-infra/<scope>             # 인프라팀 전용. 설정/배포만. 머지는 오너가 직접.
+main          # 프로덕션. 직접 push 금지.
+dev           # 일상 작업. 직접 커밋 허용.
+feat/<scope>  # 복잡하거나 격리 필요한 작업만.
+design/<scope> # UI/스타일만. 머지는 오너가 직접.
+infra/<scope>  # 설정/배포만. 머지는 오너가 직접.
 ```
 
-### design 브랜치 규칙 (디자인팀 AI용)
-
-> 지금 `design/` 브랜치에서 실행 중이라면:
->
-> - 수정 가능: JSX/Tailwind 스타일, `src/shared/ui/`, `public/` 에셋, `tailwind.config.*`, `globals.css`
-> - 수정 금지: `features/*/api/`, `features/*/model/`, `src/app/`, `src/shared/api/`, `src/shared/lib/`, `package.json`, `.env*`
-> - PR은 열어도 되지만 머지는 하지 말 것. 머지는 오너가 직접 한다.
-
-### infra 브랜치 규칙 (인프라팀 AI용)
-
-> 지금 `infra/` 브랜치에서 실행 중이라면:
->
-> - 수정 가능: `next.config.*`, `.github/` (CI/CD 워크플로우), `Dockerfile`, 배포 스크립트, `package.json` (의존성/스크립트 한정)
-> - 수정 금지: `src/` 하위 모든 파일 (컴포넌트, 훅, API, 타입 등)
-> - PR은 열어도 되지만 머지는 하지 말 것. 머지는 오너가 직접 한다.
+- `design/` 브랜치: `src/*/api/`, `src/*/model/`, `src/app/`, `src/shared/api/lib/`, `package.json`, `.env*` 수정 금지
+- `infra/` 브랜치: `src/` 하위 모든 파일 수정 금지
 
 ### 작업 완료 체크리스트
 
-작업이 끝나면 반드시 아래 순서로 확인한다.
-
-1. pre-commit 훅 통과 확인 (커밋 시 자동 실행 — ESLint + `tsc --noEmit`)
-2. `npm run build` 실행 → 빌드 오류 없음 확인
-3. GitHub Actions CI 빌드 상태 확인 (`gh run list --limit 5` 또는 PR 페이지)
-4. 위 항목 모두 통과한 상태에서만 PR을 생성하거나 완료 보고
+1. pre-commit 훅 통과 (ESLint + `tsc --noEmit` 자동 실행)
+2. `npm run build` 빌드 오류 없음 확인
+3. GitHub Actions CI 빌드 상태 확인
+4. 위 항목 모두 통과 후에만 PR 생성
 
 ---
 
 ## ⚠️ 디자인 변경 금지 원칙
 
-> **적용 범위**: 신규 페이지 추가 시 `URR-v2` 디자인 참조할 때만 해당. 일반 API 연동 작업에는 적용 안 함.
+> 신규 페이지 추가 시 `URR-v2` 디자인 참조할 때만 해당.
 
 - 원본(`URR-v2`) 참조 시 디자인 1:1 유지
 - Tailwind 클래스 임의 교체 금지 (예: `hover:bg-[#F3F2F0]` → `hover:bg-accent` 변환 금지)
-- 원본이 `<span>`이면 `<span>`, 원본이 shadcn 컴포넌트면 그대로 사용
 - 섹션 제목, 폰트 크기, 간격, 색상, 레이아웃 Claude 판단으로 변경 금지
 - **예외 허용**: React Router → Next.js Link/useRouter, `import 이미지` → `/파일명` 문자열
 
@@ -389,9 +188,10 @@ infra/<scope>             # 인프라팀 전용. 설정/배포만. 머지는 오
 
 ## 참고 문서
 
-- `docs/PRD.md` — 비즈니스 규칙, 멤버십 등급, 온보딩 플로우, 예매 상태머신
-- `docs/ARCHITECTURE.md` — FSD 레이어 규칙, API 엔드포인트, 인프라
+- `docs/CheckList.md` — API 연동 진행 현황 및 세부 체크리스트
 - `docs/designsystem.md` — 색상 토큰, 컴포넌트 스펙, 애니메이션
+- `docs/user_flow.md` — 유저 플로우, 비즈니스 로직, 엣지 케이스
 - `docs/api.md` — JWT 전략, API 응답 타입, 카카오 OAuth 흐름
-- `docs/CheckList.md` — API 연동 진행 현황 (Phase 7 체크리스트)
-- `docs/migration.md` — 신규 페이지 추가 가이드 (**디자인팀이 새 페이지 완성했을 때만 참조**)
+- `docs/PRD.md` — 비즈니스 규칙 원본
+- `docs/ARCHITECTURE.md` — FSD 레이어 규칙, 엔드포인트, 인프라
+- `docs/migration.md` — 신규 페이지 추가 가이드 (디자인팀이 새 페이지 완성했을 때만 참조)

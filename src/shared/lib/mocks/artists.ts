@@ -154,6 +154,15 @@ export const mockArtists: Artist[] = [
     followerCount: 2800000,
     category: "girlgroup",
   },
+  {
+    id: "18",
+    name: "최예나",
+    avatar: "/artists/18/profile.jpg",
+    banner: "/artists/18/banner.jpg",
+    bio: "아이즈원 출신. 특유의 에너지와 독보적인 퍼포먼스로 팬들의 마음을 사로잡는 K-POP 아이콘.",
+    followerCount: 2800000,
+    category: "solo",
+  },
 ];
 
 export function getArtistById(id: string): Artist | undefined {
