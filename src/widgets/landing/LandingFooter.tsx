@@ -50,7 +50,7 @@ export function LandingFooter() {
           <div>
             <Link href="/landing" className="flex items-center gap-2.5 mb-4">
               <Image
-                src="/logos/logo5.svg"
+                src="/logo_final.svg"
                 alt="URR"
                 width={28}
                 height={28}

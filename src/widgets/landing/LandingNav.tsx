@@ -30,7 +30,7 @@ export function LandingNav() {
         {/* Logo */}
         <Link href="/landing" className="flex items-center gap-2.5">
           <Image
-            src="/logos/logo5.svg"
+            src="/logo_final.svg"
             alt="URR"
             width={32}
             height={32}
