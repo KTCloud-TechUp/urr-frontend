@@ -186,6 +186,13 @@ export const TIER_EMOJIS: Record<TierLevel, string> = {
   mist: "🌫️",
 };
 
+export const TIER_IMAGES: Record<TierLevel, string> = {
+  lightning: "/membership/lightning.png",
+  thunder: "/membership/thunder.png",
+  cloud: "/membership/cloud.png",
+  mist: "/membership/mist.png",
+};
+
 export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
   open: "예매 오픈",
   upcoming: "오픈 예정",

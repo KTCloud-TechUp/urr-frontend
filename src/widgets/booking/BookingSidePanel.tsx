@@ -8,7 +8,7 @@ import { TimerDisplay } from "@/features/booking/ui/TimerDisplay";
 import { PriceDisplay } from "@/shared/ui/PriceDisplay";
 import { Minimap } from "@/features/booking/ui/Minimap";
 import { formatPrice, parseSeatDisplay } from "@/shared/lib/format";
-import { TIER_EMOJIS, TIER_LABELS } from "@/shared/types";
+import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 import {
   getAvailabilityColor,
   getGradeKey,
@@ -291,7 +291,7 @@ export function BookingSidePanel({
           {tierFee > 0 && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground flex items-center gap-1">
-                <span>{TIER_EMOJIS[userTier]}</span>
+                <img src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
                 <span>{TIER_LABELS[userTier]} 수수료</span>
               </span>
               <span className="tabular-nums">

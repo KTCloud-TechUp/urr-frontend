@@ -22,7 +22,7 @@ import { PostCard } from "@/entities/community";
 import { TierBadge } from "@/entities/user";
 import { getArtistGradient } from "@/shared/lib/mocks/home";
 import { formatDateFull, formatDateShort } from "@/shared/lib/format";
-import { TIER_LABELS, TIER_EMOJIS } from "@/shared/types";
+import { TIER_LABELS, TIER_IMAGES } from "@/shared/types";
 import type {
   Artist,
   Event,
@@ -113,7 +113,7 @@ export function ArtistHomeTab({
                           : "opacity-40",
                       )}
                     >
-                      <span className="text-base">{TIER_EMOJIS[tier]}</span>
+                      <img src={TIER_IMAGES[tier]} width={18} height={18} alt="" />
                       <p className="text-[10px] mt-0.5">{TIER_LABELS[tier]}</p>
                     </div>
                   ),
@@ -144,7 +144,7 @@ export function ArtistHomeTab({
                   {(["lightning", "thunder", "cloud", "mist"] as const).map(
                     (tier) => (
                       <div key={tier} className="text-center">
-                        <span className="text-base">{TIER_EMOJIS[tier]}</span>
+                        <img src={TIER_IMAGES[tier]} width={18} height={18} alt="" />
                         <p className="text-[10px] mt-0.5">
                           {TIER_LABELS[tier]}
                         </p>

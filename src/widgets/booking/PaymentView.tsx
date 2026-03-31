@@ -12,7 +12,7 @@ import { TimerDisplay } from "@/features/booking/ui/TimerDisplay";
 import { PriceDisplay } from "@/shared/ui/PriceDisplay";
 import { formatPrice, parseSeatDisplay, formatDateDot } from "@/shared/lib/format";
 import { PAYMENT_METHODS } from "@/shared/lib/constants";
-import { TIER_EMOJIS, TIER_LABELS } from "@/shared/types";
+import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 import type { ConfirmationData } from "@/shared/types";
 import { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
 
@@ -201,7 +201,7 @@ export function PaymentView() {
                 {tierFee > 0 && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground flex items-center gap-1">
-                      <span>{TIER_EMOJIS[userTier]}</span>
+                      <img src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
                       <span>{TIER_LABELS[userTier]} 수수료</span>
                     </span>
                     <span className="tabular-nums">
