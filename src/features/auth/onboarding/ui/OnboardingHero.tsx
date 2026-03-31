@@ -71,7 +71,7 @@ export function OnboardingHero({ step }: OnboardingHeroProps) {
       <div className="absolute bottom-8 flex items-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/logo_final.svg"
+          src="/icons/logo_final.svg"
           alt="URR"
           className="h-10 w-auto opacity-40 brightness-0 invert"
         />

@@ -85,7 +85,7 @@ export function AppSidebar() {
         {!collapsed && (
           <Link href="/" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo_final.svg" alt="URR" className="h-10 w-auto" />
+            <img src="/icons/logo_final.svg" alt="URR" className="h-10 w-auto" />
           </Link>
         )}
         <button

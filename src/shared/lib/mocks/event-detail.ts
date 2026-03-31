@@ -279,7 +279,7 @@ export const mockEvent = {
   title: "G-Dragon 2026 MAMA DOME TOUR",
   venue: "KSPO DOME (올림픽체조경기장)",
   dates: gdragonDates,
-  poster: "/heroes/hero_g-dragon.png",
+  poster: "/artists/1/banner.png",
   status: "open" as const,
 };
 
@@ -294,7 +294,7 @@ const gdragonDetail: EventDetail = {
   venue: "KSPO DOME (올림픽체조경기장)",
   venueAddress: "서울특별시 송파구 올림픽로 424 올림픽공원 내",
   dates: gdragonDates,
-  poster: "/heroes/hero_g-dragon.png",
+  poster: "/artists/1/banner.png",
   status: "open",
   category: "concert",
   tags: ["단독판매", "URR 선예매"],

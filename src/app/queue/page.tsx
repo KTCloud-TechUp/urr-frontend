@@ -110,7 +110,7 @@ function QueuePageInner() {
 
       {/* Logo */}
       <Image
-        src="/logo_final.svg"
+        src="/icons/logo_final.svg"
         alt="URR"
         width={40}
         height={40}
@@ -200,7 +200,7 @@ function QueuePageInner() {
       <div className="mt-12 w-full max-w-120 rounded-xl bg-accent/60 overflow-hidden">
         <div className="px-6 py-5 flex items-center gap-4">
           <Image
-            src="/logo_final.svg"
+            src="/icons/logo_final.svg"
             alt="URR"
             width={32}
             height={32}

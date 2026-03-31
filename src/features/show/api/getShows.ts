@@ -1,6 +1,13 @@
 import { apiRequest } from "@/shared/api/client";
 
-export type ShowStatus = "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED";
+export type ShowStatus = "DRAFT" | "ON_SALE" | "OPEN" | "CLOSED" | "CANCELLED";
+export type BookingWindowTier = "LIGHTNING" | "THUNDER" | "CLOUD" | "MIST";
+
+export interface BookingWindow {
+  tier: BookingWindowTier;
+  opensAt: string;
+  fee: number;
+}
 
 export interface ShowSummary {
   showId: number;
@@ -8,8 +15,10 @@ export interface ShowSummary {
   startAt: string;
   endAt: string;
   capacity: number;
+  remainingSeats: number;
   saleOpenAt: string;
   saleCloseAt: string;
+  bookingWindows: BookingWindow[];
   status: ShowStatus;
   active: boolean;
   seatmapVersion: number;
