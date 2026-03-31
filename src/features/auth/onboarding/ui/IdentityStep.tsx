@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import {
   Button,
   Input,
@@ -10,16 +10,26 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 import { formatTimer } from "@/shared/lib/format";
 
-type VerificationState = "idle" | "sent" | "expired" | "verifying";
+type VerificationState =
+  | "idle"
+  | "sent"
+  | "expired"
+  | "verifying"
+  | "duplicate";
 
 interface IdentityStepProps {
   onComplete: (data: {
     userName: string;
-    nickname: string;
     phoneNumber: string;
     birthDate: string;
     gender: "male" | "female";
@@ -35,15 +45,6 @@ function validateName(name: string): string | null {
   return null;
 }
 
-function validateNickname(nickname: string): string | null {
-  if (!nickname) return null;
-  if (nickname.trim().length < 2) return "닉네임은 2자 이상이어야 합니다";
-  if (nickname.trim().length > 20) return "닉네임은 20자 이하여야 합니다";
-  if (!/^[가-힣a-zA-Z0-9]+$/.test(nickname.trim()))
-    return "닉네임은 한글, 영문, 숫자만 사용 가능합니다";
-  return null;
-}
-
 function validateDob(dob: string): string | null {
   if (dob.length === 0) return null;
   if (dob.length !== 8) return "생년월일 8자리를 모두 입력해주세요";
@@ -55,7 +56,6 @@ function validateDob(dob: string): string | null {
   if (month < 1 || month > 12) return "올바른 월을 입력해주세요 (01~12)";
   if (day < 1 || day > 31) return "올바른 일을 입력해주세요 (01~31)";
 
-  // 실제 존재하는 날짜 체크
   const date = new Date(year, month - 1, day);
   if (
     date.getFullYear() !== year ||
@@ -68,12 +68,11 @@ function validateDob(dob: string): string | null {
   const today = new Date();
   if (date > today) return "미래 날짜는 입력할 수 없습니다";
 
-  // 만 14세 이상
-  const age14 = new Date(today.getFullYear() - 14, today.getMonth(), today.getDate());
-  if (date > age14) return "만 14세 이상만 가입 가능합니다";
-
-  // 너무 오래된 날짜 (130세 초과)
-  const age130 = new Date(today.getFullYear() - 130, today.getMonth(), today.getDate());
+  const age130 = new Date(
+    today.getFullYear() - 130,
+    today.getMonth(),
+    today.getDate(),
+  );
   if (date < age130) return "올바른 생년월일을 입력해주세요";
 
   return null;
@@ -86,10 +85,13 @@ function validatePhone(phone: string): string | null {
   return null;
 }
 
-export function IdentityStep({ onComplete, onBack, identityError }: IdentityStepProps) {
+export function IdentityStep({
+  onComplete,
+  onBack,
+  identityError,
+}: IdentityStepProps) {
   const [carrier, setCarrier] = useState("");
   const [name, setName] = useState("");
-  const [nickname, setNickname] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState<"male" | "female" | null>(null);
   const [nationality, setNationality] = useState<"domestic" | "foreign" | null>(
@@ -98,7 +100,6 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
   const [phone, setPhone] = useState("");
 
   const [nameTouched, setNameTouched] = useState(false);
-  const [nicknameTouched, setNicknameTouched] = useState(false);
   const [dobTouched, setDobTouched] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [sendAttempted, setSendAttempted] = useState(false);
@@ -107,33 +108,31 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
     useState<VerificationState>("idle");
   const [code, setCode] = useState("");
   const [timerSeconds, setTimerSeconds] = useState(180);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
   useEffect(() => {
     if (verificationState !== "sent") return;
 
     const id = setInterval(() => {
       setTimerSeconds((prev) => {
-        const newSeconds = prev - 1;
-        if (newSeconds <= 0) {
+        const next = prev - 1;
+        if (next <= 0) {
           setVerificationState("expired");
           return 0;
         }
-        return newSeconds;
+        return next;
       });
     }, 1000);
     return () => clearInterval(id);
   }, [verificationState]);
 
   const nameError = validateName(name);
-  const nicknameError = validateNickname(nickname);
   const dobError = validateDob(dob);
   const phoneError = validatePhone(phone);
 
   const showNameError = nameError && (nameTouched || sendAttempted);
-  const showNicknameError = nicknameError && (nicknameTouched || sendAttempted);
   const showDobError = dobError && (dobTouched || sendAttempted);
   const showPhoneError = phoneError && (phoneTouched || sendAttempted);
-
   const showCarrierError = sendAttempted && !carrier;
   const showGenderError = sendAttempted && gender === null;
   const showNationalityError = sendAttempted && nationality === null;
@@ -141,8 +140,6 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
   const allFieldsValid =
     !nameError &&
     name.trim().length >= 2 &&
-    !nicknameError &&
-    nickname.trim().length >= 2 &&
     !dobError &&
     dob.length === 8 &&
     !phoneError &&
@@ -169,9 +166,14 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
     if (code.length !== 6) return;
     setVerificationState("verifying");
     setTimeout(() => {
+      // Mock: phone 01099999999 triggers duplicate account dialog
+      if (phone === "01099999999") {
+        setVerificationState("duplicate");
+        setShowDuplicateDialog(true);
+        return;
+      }
       onComplete({
         userName: name,
-        nickname,
         phoneNumber: phone,
         birthDate: dob,
         gender: gender!,
@@ -179,7 +181,8 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
     }, 1000);
   };
 
-  const isCodeValid = verificationState === "sent" && code.length === 6;
+  const isCodeValid =
+    verificationState === "sent" && code.length === 6;
 
   return (
     <div className="max-w-120 w-full mx-auto">
@@ -189,10 +192,15 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
         className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer mb-6"
       >
         <ArrowLeft size={16} />
-        로그인으로 돌아가기
+        이전으로 돌아가기
       </button>
 
-      <h1 className="text-2xl font-bold">본인 인증</h1>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <ShieldCheck size={20} className="text-primary" />
+        </div>
+        <h1 className="text-2xl font-bold">본인 인증</h1>
+      </div>
       <p className="text-sm text-muted-foreground mt-2">
         1인 1계정 인증으로 봇과 매크로를 방지합니다.
       </p>
@@ -215,7 +223,9 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
             </SelectContent>
           </Select>
           {showCarrierError && (
-            <p className="text-xs text-destructive mt-1.5">통신사를 선택해주세요</p>
+            <p className="text-xs text-destructive mt-1.5">
+              통신사를 선택해주세요
+            </p>
           )}
         </div>
 
@@ -235,25 +245,6 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
           />
           {showNameError && (
             <p className="text-xs text-destructive mt-1.5">{nameError}</p>
-          )}
-        </div>
-
-        {/* Nickname */}
-        <div>
-          <label className="text-sm font-medium mb-1.5 block">닉네임</label>
-          <Input
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            onBlur={() => setNicknameTouched(true)}
-            placeholder="2~20자, 한글·영문·숫자"
-            className={
-              showNicknameError
-                ? "border-destructive focus-visible:ring-destructive/30"
-                : ""
-            }
-          />
-          {showNicknameError && (
-            <p className="text-xs text-destructive mt-1.5">{nicknameError}</p>
           )}
         </div>
 
@@ -316,7 +307,9 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
             </button>
           </div>
           {showGenderError && (
-            <p className="text-xs text-destructive mt-1.5">성별을 선택해주세요</p>
+            <p className="text-xs text-destructive mt-1.5">
+              성별을 선택해주세요
+            </p>
           )}
         </div>
 
@@ -356,7 +349,9 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
             </button>
           </div>
           {showNationalityError && (
-            <p className="text-xs text-destructive mt-1.5">내/외국인을 선택해주세요</p>
+            <p className="text-xs text-destructive mt-1.5">
+              내/외국인을 선택해주세요
+            </p>
           )}
         </div>
 
@@ -445,19 +440,55 @@ export function IdentityStep({ onComplete, onBack, identityError }: IdentityStep
         )}
       </div>
 
-      {/* Submit — always visible, disabled until code verified */}
       <Button
         size="lg"
         className="w-full mt-16"
         disabled={!isCodeValid}
         onClick={handleVerify}
       >
-        {verificationState === "verifying" ? "확인 중..." : "시작하기"}
+        {verificationState === "verifying" ? "확인 중..." : "다음"}
       </Button>
 
       {identityError && (
-        <p className="text-xs text-destructive text-center mt-3">{identityError}</p>
+        <p className="text-xs text-destructive text-center mt-3">
+          {identityError}
+        </p>
       )}
+
+      {/* 중복 계정 팝업 */}
+      <Dialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="size-8 rounded-full bg-muted flex items-center justify-center">
+                <ShieldCheck size={16} className="text-muted-foreground" />
+              </div>
+              <DialogTitle>이미 가입된 계정이 있습니다</DialogTitle>
+            </div>
+            <DialogDescription className="text-sm leading-relaxed pt-1">
+              이 번호로 가입된 계정이 있습니다.
+              <br />
+              <span className="font-medium text-foreground">
+                가입 경로: 카카오
+              </span>
+              <br />
+              <br />
+              기존 계정으로 로그인하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              className="w-full"
+              onClick={() => {
+                setShowDuplicateDialog(false);
+                onBack();
+              }}
+            >
+              로그인 화면으로 돌아가기
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

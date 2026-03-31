@@ -39,18 +39,37 @@
 
 > 소셜/이메일 로그인 및 본인인증(IdentityStep)은 구현됨. 이하 미완성.
 
-### 6-1. 본인인증 (IdentityStep) — UI 완료, API 미연동
-- [ ] SMS 인증코드 발송 실제 API 연동 — `POST /api/auth/sms/send`
-- [ ] CI 중복 감지 → 기존 계정 안내 모달 + 가입 차단
+### 6-1. 온보딩 플로우 — UI 완료 ✅
+- [x] `AgeGateStep.tsx` — 만 14세 이상/미만 분기
+- [x] `IdentityStep.tsx` — 본인인증 폼 (ShieldCheck 헤더, 중복계정 다이얼로그)
+- [x] `GuardianIdentityStep.tsx` — 법정대리인 본인인증 폼
+- [x] `TermsStep.tsx` — 필수 2개 + 선택 1개 약관 동의 (미성년자 보호자 동의 포함)
+- [x] `OnboardingWidget` flowState 6단계 확장 (auth → age-gate → identity/guardian-identity → terms → complete)
+- [x] SMS API 함수 추가 — `smsSend`, `smsVerify` (`src/features/auth/api/`)
 
-### 6-2. 약관 동의 (TermsStep)
-- [ ] `TermsStep.tsx` — 전체 동의 마스터 체크박스 + 필수/선택 항목
-- [ ] 필수 2개 미동의 시 다음 버튼 비활성화
-- [ ] `updateConsents()` API 연동
+### 6-2. 본인인증 SMS API 미연동 ⚠️ 나중에 붙여야 함
+- [ ] `IdentityStep.tsx` `handleSendCode` — `smsSend(phone)` 실제 호출로 교체
+- [ ] `IdentityStep.tsx` `handleVerify` — `smsVerify(phone, code)` 실제 호출로 교체, `verified: false` 시 에러 표시
+- [ ] `GuardianIdentityStep.tsx` `handleSendCode` — `smsSend(phone)` 실제 호출로 교체
+- [ ] `GuardianIdentityStep.tsx` `handleVerify` — `smsVerify(phone, code)` 실제 호출로 교체
 
-### 6-3. 가입 완료
-- [ ] 회원가입 완료 시 미스트 등급 즉시 부여 확인
-- [ ] `OnboardingWidget` flowState에 `complete` 단계 추가 → 홈 redirect
+### 6-3. 약관 동의 API 미연동 ⚠️ 나중에 붙여야 함
+- [ ] `handleTermsComplete` (`useOnboardingAuth.ts`) — 가입 성공 후 `updateConsents()` 호출 (마케팅 동의 선택값 전달)
+  - TermsStep에서 `marketing` 체크 여부를 `onComplete(marketingConsent: boolean)` 으로 올려야 함
+
+### 6-4. 가입 완료
+- [x] `OnboardingWidget` `complete` 단계 → `SignupCompleteStep` 표시
+
+### 6-5. 아티스트 선택 (ArtistSelectStep)
+- [ ] 카테고리 탭 + 검색 + `GET /api/events/artists` 연동
+- [ ] 1명 이상 필수 선택 검증 + 팔로우 API 호출
+
+### 6-6. 멤버십 소개 (MembershipIntroStep)
+- [ ] 등급별 혜택 비교표
+- [ ] [가입 ₩30,000/년] CTA / [나중에] skip
+
+### 6-7. 멜론 연동 (MelonLinkStep)
+- [ ] [연동하기] / [나중에] — 강제 아님, 팬 신뢰 점수 계산 트리거 (Mock)
 
 ### 6-4. 아티스트 선택 (ArtistSelectStep)
 - [ ] 카테고리 탭 + 검색 + `GET /api/events/artists` 연동
@@ -115,6 +134,30 @@
 - [ ] Toss Payments SDK 실제 연동
 - [ ] 결제 성공 → `POST /api/payments/confirm` → `confirmation` / 실패 → `payment-failed` + 60초 재시도
 - [ ] 결제 취소 — 확인 다이얼로그 → `POST /api/payments/{paymentKey}/cancel`
+
+---
+
+## Phase 13a — 회차 선예매 정책 조회 API ✅
+
+> **엔드포인트**: `GET /api/v1/membership/events/{eventId}/shows/{showId}/presale-policy`  
+> **인증**: 불필요
+
+- [x] API 함수: `getPresalePolicy(eventId, showId)` — `src/features/membership/api/getPresalePolicy.ts`
+- [x] TanStack Query hook: `usePresalePolicy(eventId, showId)` — `src/features/membership/model/usePresalePolicy.ts`
+- 타입: `PresalePolicy` (`eventId`, `showId`, `generalOpenAt`, `tiers[]`)
+- `tiers[]`: `{ tier, openAt, presaleOffsetMinutes, bookingFeeWon }`
+
+---
+
+## Phase 13b — 아티스트 멤버십 취소 API ✅
+
+> **엔드포인트**: `POST /api/v1/artists/memberships/cancel`  
+> **인증**: 불필요
+
+- [x] API 함수: `cancelMembership(orderId, reason?)` — `src/features/membership/api/cancelMembership.ts`
+- [x] TanStack Query hook: `useCancelMembership` — `src/features/membership/model/useCancelMembership.ts`
+  - `onSuccess`: `MEMBERSHIPS_QUERY_KEY` invalidate
+- Body: `{ orderId: string, reason: string }` (기본값 `"PAYMENT_CANCELED"`)
 
 ---
 

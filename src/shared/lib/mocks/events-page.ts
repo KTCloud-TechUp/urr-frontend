@@ -1,6 +1,12 @@
 import type { BookingStatus } from "@/shared/types";
 
-export type EventCategory = "concert" | "fanmeeting" | "domestic" | "festival" | "musical" | "etc";
+export type EventCategory =
+  | "concert"
+  | "fanmeeting"
+  | "domestic"
+  | "festival"
+  | "musical"
+  | "etc";
 export type EventCategoryFilter = "all" | EventCategory;
 
 export interface EventListItem {
@@ -16,7 +22,10 @@ export interface EventListItem {
   poster: string;
 }
 
-export const eventCategoryFilters: { value: EventCategoryFilter; label: string }[] = [
+export const eventCategoryFilters: {
+  value: EventCategoryFilter;
+  label: string;
+}[] = [
   { value: "all", label: "전체" },
   { value: "concert", label: "콘서트" },
   { value: "fanmeeting", label: "팬미팅" },
@@ -251,14 +260,14 @@ export const allEventsData: EventListItem[] = [
   {
     id: "evt-tws-fanmeet-2026",
     artistId: "tws",
-    artistName: "TWS",
+    artistName: "김선호",
     title: "FANMEETING <LOVE FACTORY>",
     venue: "블루스퀘어 우리WON뱅킹홀",
     dateRange: "2026.04.11 - 2026.04.12",
     status: "open",
     category: "fanmeeting",
     tags: [],
-    poster: "",
+    poster: "/events/event_kim-seonho-fanmeet.png",
   },
   {
     id: "9",
@@ -274,7 +283,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-kwonjina-flower-2026",
-    artistId: "kwonjina",
+    artistId: "unknown",
     artistName: "권진아",
     title: "2026 권진아 꽃말 콘서트",
     venue: "올림픽 핸드볼 경기장",
@@ -286,7 +295,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-woodz-archive-2026",
-    artistId: "woodz",
+    artistId: "unknown",
     artistName: "WOODZ",
     title: "2026 WOODZ WORLD TOUR Archive. 1",
     venue: "인스파이어 아레나",
@@ -298,7 +307,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-illit-press2-2026",
-    artistId: "illit",
+    artistId: "unknown",
     artistName: "ILLIT",
     title: "ILLIT LIVE 'PRESS START' IN SEOUL",
     venue: "라이브 아레나",

@@ -13,7 +13,10 @@ import { EventDetailHero } from "./EventDetailHero";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventBookingSidebar } from "./EventBookingSidebar";
 
-function mapToEventDetail(event: EventSummary, shows: ShowSummary[]): EventDetail {
+function mapToEventDetail(
+  event: EventSummary,
+  shows: ShowSummary[],
+): EventDetail {
   const dates = shows.map((show) => ({
     id: String(show.showId),
     date: show.startAt,
@@ -72,11 +75,11 @@ function EventDetailSkeleton() {
       <Skeleton className="h-5 w-48" />
       <div className="flex gap-8 items-start">
         <div className="flex-1 space-y-6">
-          <Skeleton className="h-[400px] rounded-xl" />
-          <Skeleton className="h-[200px] rounded-xl" />
+          <Skeleton className="h-100 rounded-xl" />
+          <Skeleton className="h-50 rounded-xl" />
         </div>
-        <div className="w-[400px] shrink-0">
-          <Skeleton className="h-[500px] rounded-xl" />
+        <div className="w-100 shrink-0">
+          <Skeleton className="h-125 rounded-xl" />
         </div>
       </div>
     </div>
@@ -112,7 +115,10 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
         <p className="text-sm text-muted-foreground">
           요청하신 공연 정보가 존재하지 않거나 삭제되었습니다.
         </p>
-        <Link href="/events" className="text-sm text-primary hover:underline mt-2">
+        <Link
+          href="/events"
+          className="text-sm text-primary hover:underline mt-2"
+        >
           공연 목록으로 돌아가기
         </Link>
       </div>
@@ -141,7 +147,7 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
         </div>
 
         {/* Right: Sticky sidebar */}
-        <div className="w-[400px] shrink-0">
+        <div className="w-100 shrink-0">
           <div className="sticky top-6">
             <EventBookingSidebar event={event} />
           </div>

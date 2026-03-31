@@ -26,6 +26,28 @@ const stepContent: Record<
     emoji: "🛡️",
     features: ["실명 인증", "중복 가입 방지", "개인정보 암호화"],
   },
+  3: {
+    title: "투명하고 안전한\n서비스를 약속해요",
+    subtitle:
+      "수집한 정보는 서비스 제공 목적으로만 사용되며,\n철저히 보호됩니다",
+    bgClass: "bg-secondary",
+    emoji: "🔒",
+    features: ["최소한의 정보만 수집", "제3자 제공 없음", "언제든 철회 가능"],
+  },
+  4: {
+    title: "보호자 인증으로\n안전하게",
+    subtitle: "미성년자 보호를 위해 법정대리인의 동의가 필요합니다",
+    bgClass: "bg-secondary",
+    emoji: "👨‍👧",
+    features: ["법정대리인 본인인증", "안전한 개인정보 처리", "청소년 보호 정책 준수"],
+  },
+  5: {
+    title: "URR과 함께\n공정한 티켓팅을!",
+    subtitle: "이제 진짜 팬으로서 공정하게 티켓을 예매할 수 있어요",
+    bgClass: "bg-primary",
+    emoji: "🎉",
+    features: ["공정한 선예매 기회", "실시간 대기열 시스템", "공식 티켓 양도 마켓"],
+  },
 };
 
 export function OnboardingHero({ step }: OnboardingHeroProps) {
