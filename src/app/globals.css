@@ -1,3 +1,4 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -318,3 +319,141 @@
 .minimap-container {
   animation: minimap-in 300ms ease-out forwards;
 }
+
+/* ============================================
+   LANDING PAGE — CSS Custom Properties
+   ============================================ */
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@property --shimmer-pos {
+  syntax: "<percentage>";
+  initial-value: -100%;
+  inherits: false;
+}
+
+/* ============================================
+   LANDING PAGE — Keyframe Animations
+   ============================================ */
+@keyframes landing-border-spin {
+  to { --border-angle: 360deg; }
+}
+@keyframes landing-shimmer {
+  to { --shimmer-pos: 200%; }
+}
+@keyframes landing-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes landing-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+@keyframes landing-scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(8px); opacity: 1; }
+}
+@keyframes landing-glow-pulse {
+  0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 12px rgba(255, 94, 50, 0.3)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 20px rgba(255, 94, 50, 0.5)); }
+}
+@keyframes landing-bar-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(var(--bar-h, 1)); }
+}
+@keyframes landing-fade-line {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes landing-slide-row {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes landing-progress-fill {
+  from { width: 0; }
+  to { width: var(--progress-w, 0%); }
+}
+@keyframes landing-line-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ============================================
+   LANDING PAGE — Scroll Reveal
+   ============================================ */
+.landing-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.landing-reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+.landing-stagger .landing-child {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.landing-stagger.visible .landing-child { opacity: 1; transform: none; }
+.landing-stagger.visible .landing-child:nth-child(1) { transition-delay: 0ms; }
+.landing-stagger.visible .landing-child:nth-child(2) { transition-delay: 80ms; }
+.landing-stagger.visible .landing-child:nth-child(3) { transition-delay: 160ms; }
+.landing-stagger.visible .landing-child:nth-child(4) { transition-delay: 240ms; }
+
+/* ============================================
+   LANDING PAGE — Bento Widget Animations
+   ============================================ */
+.landing-bento-bar {
+  transform: scaleY(0);
+  transform-origin: bottom;
+}
+.landing-bento-animated .landing-bento-bar {
+  animation: landing-bar-grow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.landing-bento-animated .landing-bento-bar:nth-child(1) { animation-delay: 0.1s; }
+.landing-bento-animated .landing-bento-bar:nth-child(2) { animation-delay: 0.2s; }
+.landing-bento-animated .landing-bento-bar:nth-child(3) { animation-delay: 0.3s; }
+.landing-bento-animated .landing-bento-bar:nth-child(4) { animation-delay: 0.4s; }
+.landing-bento-animated .landing-bento-bar:nth-child(5) { animation-delay: 0.5s; }
+.landing-bento-animated .landing-bento-bar:nth-child(6) { animation-delay: 0.6s; }
+.landing-bento-animated .landing-bento-bar:nth-child(7) { animation-delay: 0.7s; }
+.landing-bento-animated .landing-bento-bar:nth-child(8) { animation-delay: 0.8s; }
+
+.landing-log-line { opacity: 0; }
+.landing-bento-animated .landing-log-line {
+  animation: landing-fade-line 0.4s ease forwards;
+}
+.landing-bento-animated .landing-log-line:nth-child(1) { animation-delay: 0.2s; }
+.landing-bento-animated .landing-log-line:nth-child(2) { animation-delay: 0.35s; }
+.landing-bento-animated .landing-log-line:nth-child(3) { animation-delay: 0.5s; }
+.landing-bento-animated .landing-log-line:nth-child(4) { animation-delay: 0.65s; }
+.landing-bento-animated .landing-log-line:nth-child(5) { animation-delay: 0.8s; }
+.landing-bento-animated .landing-log-line:nth-child(6) { animation-delay: 0.95s; }
+
+.landing-status-row { opacity: 0; transform: translateX(-12px); }
+.landing-bento-animated .landing-status-row {
+  animation: landing-slide-row 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.landing-bento-animated .landing-status-row:nth-child(1) { animation-delay: 0.15s; }
+.landing-bento-animated .landing-status-row:nth-child(2) { animation-delay: 0.25s; }
+.landing-bento-animated .landing-status-row:nth-child(3) { animation-delay: 0.35s; }
+.landing-bento-animated .landing-status-row:nth-child(4) { animation-delay: 0.45s; }
+
+.landing-progress-fill { width: 0; }
+.landing-bento-animated .landing-progress-fill {
+  animation: landing-progress-fill 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.landing-bento-animated .landing-progress-item:nth-child(1) .landing-progress-fill { animation-delay: 0.2s; }
+.landing-bento-animated .landing-progress-item:nth-child(2) .landing-progress-fill { animation-delay: 0.35s; }
+.landing-bento-animated .landing-progress-item:nth-child(3) .landing-progress-fill { animation-delay: 0.5s; }
+
+/* How it works connecting line */
+.landing-how-line {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.landing-how-line.visible { transform: scaleX(1); }
