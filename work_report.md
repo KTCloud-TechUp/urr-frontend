@@ -129,3 +129,86 @@ export const TIER_IMAGES: Record<TierLevel, string> = {
 | 예매 패널 등급 행 (`LeftPanel`) | PNG 아이콘으로 통일 |
 | 결제/확인 화면 수수료 표시 | PNG 아이콘으로 통일 |
 | 랜딩 멤버십 섹션 카드 | PNG 아이콘으로 통일 |
+
+---
+---
+
+# Work Report — 랜딩 페이지 히어로 섹션 마무리
+
+**작업 브랜치:** `design/design-handoff`
+**기준 브랜치:** `main`
+**작업일:** 2026-04-01
+**변경 파일 수:** 4개
+
+---
+
+## 배경 및 목적
+
+랜딩 페이지 히어로 섹션의 세 가지 마무리 작업:
+1. UnicornStudio 워터마크를 자연스럽게 가리기
+2. CTA 버튼 UX 라이팅을 랜딩 페이지 맥락에 맞게 수정
+3. 로고를 최종 확정 에셋으로 교체
+4. 그라디언트에 가려지는 스크롤 인디케이터 제거
+
+---
+
+## 변경 사항
+
+### 1. UnicornStudio 워터마크 그라디언트 커버
+
+**파일:** `src/widgets/landing/AuroraBackground.tsx`
+
+UnicornStudio 무료 플랜은 `freePlan: true` 플래그가 프로젝트 JSON에 서버 사이드로 내장되어 있어 클라이언트에서 배지 자체를 완전히 제거하는 것이 불가능합니다.
+대신 히어로 하단 그라디언트 커버를 배지의 `z-index: 99999999`보다 높은 `z-index: 100000000`으로 올려 시각적으로 자연스럽게 덮는 방식을 채택했습니다.
+
+```tsx
+// 추가된 레이어
+<div
+  className="absolute bottom-0 left-0 w-full pointer-events-none"
+  style={{
+    height: "180px",
+    background: "linear-gradient(to bottom, transparent 0%, #0A0A1A 50%)",
+    zIndex: 100000000,
+  }}
+/>
+```
+
+---
+
+### 2. CTA 버튼 UX 라이팅 수정
+
+**파일:** `src/widgets/landing/HeroSection.tsx`
+
+| 위치 | 변경 전 | 변경 후 |
+|------|---------|---------|
+| Primary CTA | (이전 문구) | 지금 시작하기 |
+| Ghost CTA | (이전 문구) | 더 알아보기 |
+
+---
+
+### 3. 스크롤 인디케이터 제거
+
+**파일:** `src/widgets/landing/HeroSection.tsx`
+
+히어로 하단 그라디언트 커버 영역과 겹쳐 애매하게 보이는 "scroll" 넛지 컴포넌트를 제거했습니다.
+- 제거: `scrollIndicatorRef`, `useEffect` 스크롤 이벤트 핸들러, scroll indicator div
+
+---
+
+### 4. 로고 최종 에셋 교체
+
+**파일:** `src/widgets/landing/LandingNav.tsx`, `src/widgets/landing/LandingFooter.tsx`
+
+```diff
+- src="/logos/logo5.svg"
++ src="/logo_final.svg"
+```
+
+---
+
+## 주의 사항
+
+| 항목 | 내용 |
+|------|------|
+| 워터마크 커버 방식 | CSS 그라디언트로 시각적 은폐. UnicornStudio 유료 플랜 전환 시 배지 자체가 사라지므로 그라디언트 커버도 자연스럽게 유지됨 |
+| API / 비즈니스 로직 | 변경 없음 — 렌더링 레이어만 수정 |

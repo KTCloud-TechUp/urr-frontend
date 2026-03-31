@@ -1,21 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { AuroraBackground } from "./AuroraBackground";
 
 export function HeroSection() {
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const indicator = scrollIndicatorRef.current;
-    if (!indicator) return;
-    const onScroll = () => {
-      indicator.style.opacity = String(Math.max(0, 1 - window.scrollY / 300));
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <section
@@ -137,7 +125,7 @@ export function HeroSection() {
                   backgroundPosition: "var(--shimmer-pos) center",
                 }}
               />
-              무료로 시작하기
+              지금 시작하기
             </Link>
 
             {/* Ghost CTA */}
@@ -165,32 +153,12 @@ export function HeroSection() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
-              기능 살펴보기
+              더 알아보기
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        ref={scrollIndicatorRef}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none"
-        style={{
-          color: "#4b5e78",
-          fontSize: "0.68rem",
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-        }}
-      >
-        <span>scroll</span>
-        <div
-          className="w-px h-10"
-          style={{
-            background: "linear-gradient(to bottom, #FF5E32, transparent)",
-            animation: "landing-scroll-bounce 2s ease-in-out infinite",
-          }}
-        />
-      </div>
     </section>
   );
 }
