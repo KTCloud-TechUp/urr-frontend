@@ -30,6 +30,8 @@ export function AuroraBackground() {
       window.UnicornStudio.isInitialized = true;
     }
 
+
+
     // ── Layer 2: Three.js particle mesh ────────────────────────────
     let rafId: number;
     let cleanup: (() => void) | null = null;
@@ -134,7 +136,7 @@ export function AuroraBackground() {
   }, []);
 
   return (
-    <div className="absolute inset-0" style={{ background: "#0A0A1A" }}>
+    <div className="absolute inset-0" style={{ background: "#0A0A1A", overflow: "hidden" }}>
       {/* UnicornStudio aurora/curtain layer */}
       <div
         id="bg-unicorn"
@@ -146,6 +148,16 @@ export function AuroraBackground() {
           WebkitMaskImage:
             "linear-gradient(to bottom, transparent, black 0%, black 80%, transparent)",
           pointerEvents: "none",
+          overflow: "hidden",
+        }}
+      />
+      {/* Gradient cover — hides UnicornStudio watermark (z-index > 99999999) */}
+      <div
+        className="absolute bottom-0 left-0 w-full pointer-events-none"
+        style={{
+          height: "180px",
+          background: "linear-gradient(to bottom, transparent 0%, #0A0A1A 50%)",
+          zIndex: 100000000,
         }}
       />
       {/* Three.js particle canvas */}
