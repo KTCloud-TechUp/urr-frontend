@@ -23,8 +23,8 @@ export function MyPageWidget() {
   const router = useRouter()
   const activeTab = searchParams.get('tab') ?? 'membership'
 
-  const { data: meData, isLoading } = useCurrentUser()
-  const { data: memberships = [] } = useMemberships()
+  const { data: meData, isLoading: isUserLoading } = useCurrentUser()
+  const { data: memberships = [], isLoading: isMembershipsLoading } = useMemberships()
   const updateNickname = useUpdateNickname()
   const cancelMembership = useCancelMembership()
 
@@ -35,7 +35,7 @@ export function MyPageWidget() {
     memberships,
   }
 
-  if (isLoading) return <MyPageSkeleton />
+  if (isUserLoading || isMembershipsLoading) return <MyPageSkeleton />
 
   const handleTabChange = (tab: string) => {
     router.push(`/my-page?tab=${tab}`, { scroll: false })

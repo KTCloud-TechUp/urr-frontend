@@ -11,5 +11,9 @@ export { fetchMe } from "./me";
 export { socialOnboarding } from "./socialOnboarding";
 export type { SocialOnboardingParams } from "./socialOnboarding";
 export { reissueToken } from "./reissue"
-export { updateConsents } from "./updateConsents"
+export { updateConsents } from "./updateConsents";
+export { updateName } from "./updateName";
 export type { UpdateConsentsParams } from "./updateConsents";
+export { smsSend } from "./smsSend";
+export { smsVerify } from "./smsVerify";
+export type { SmsVerifyResult } from "./smsVerify";

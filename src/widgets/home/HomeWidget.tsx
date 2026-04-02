@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/shared/lib/utils";
 import { Button, SectionHeader } from "@/shared/ui";
 import { ArtistCard } from "@/entities/artist";
@@ -18,7 +17,7 @@ import {
   getArtistGradient,
 } from "@/shared/lib/mocks/home";
 import { mockUser } from "@/shared/lib/mocks/user";
-import { getArtists } from "@/features/artist";
+import { useArtists } from "@/features/artist";
 import { HeroBannerCarousel } from "./HeroBannerCarousel";
 import { HomePageSkeleton } from "./HomePageSkeleton";
 
@@ -30,11 +29,7 @@ export function HomeWidget() {
     return () => clearTimeout(timer);
   }, []);
 
-  const { data: artists = [] } = useQuery({
-    queryKey: ["artists"],
-    queryFn: getArtists,
-    enabled: !isLoading,
-  });
+  const { data: artists = [] } = useArtists();
 
   if (isLoading) return <HomePageSkeleton />;
 
@@ -68,14 +63,7 @@ export function HomeWidget() {
           {artists.map((artist) => (
             <Link key={artist.id} href={`/artists/${artist.id}`}>
               <ArtistCard
-                artist={{
-                  id: String(artist.id),
-                  name: artist.name,
-                  avatar: artist.profileImageUrl,
-                  banner: "",
-                  bio: "",
-                  category: "solo",
-                }}
+                artist={artist}
                 selected={false}
                 className="w-full border-0 bg-transparent p-2 hover:bg-[#F3F2F0]"
               />

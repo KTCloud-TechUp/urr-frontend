@@ -23,7 +23,7 @@ import {
 } from '@/shared/ui/alert-dialog'
 import { toast } from 'sonner'
 import { AccountDeleteDialog } from './AccountDeleteDialog'
-import { logout, updateConsents } from '@/features/auth/api'
+import { logout, updateConsents, updateName } from '@/features/auth/api'
 import { tokenStore } from '@/shared/api'
 import type { User } from '@/shared/types'
 
@@ -44,10 +44,8 @@ export function SettingsTab({ user, onUpdateUser, initialConsents }: SettingsTab
   // Profile editing
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState(user.name)
-  const [editEmail, setEditEmail] = useState(user.email)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
-  const [emailError, setEmailError] = useState('')
 
   // Notification toggles
   const [marketingConsent, setMarketingConsent] = useState(initialConsents?.marketingConsent ?? false)
@@ -88,43 +86,39 @@ export function SettingsTab({ user, onUpdateUser, initialConsents }: SettingsTab
     if (!isEditing) {
       const t = setTimeout(() => {
         setEditName(user.name)
-        setEditEmail(user.email)
       }, 0)
       return () => clearTimeout(t)
     }
-  }, [user.name, user.email, isEditing])
+  }, [user.name, isEditing])
 
   const handleStartEdit = () => {
     setEditName(user.name)
-    setEditEmail(user.email)
-    setEmailError('')
     setSaveSuccess(false)
     setIsEditing(true)
   }
 
   const handleCancelEdit = () => {
     setEditName(user.name)
-    setEditEmail(user.email)
-    setEmailError('')
     setIsEditing(false)
   }
 
-  const handleSave = () => {
-    // Validate email
-    if (!/.+@.+\..+/.test(editEmail)) {
-      setEmailError('올바른 이메일 형식을 입력해주세요.')
-      return
-    }
-    setEmailError('')
+  const handleSave = async () => {
     setIsSaving(true)
 
-    setTimeout(() => {
-      onUpdateUser({ name: editName, email: editEmail })
-      setIsSaving(false)
+    try {
+      await updateName(editName)
+      queryClient.setQueryData<AuthUser>(AUTH_ME_QUERY_KEY, (prev) =>
+        prev ? { ...prev, name: editName } : prev,
+      )
+      onUpdateUser({ name: editName })
       setIsEditing(false)
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 2000)
-    }, 1000)
+    } catch {
+      toast.error('이름 저장에 실패했습니다.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -177,17 +171,10 @@ export function SettingsTab({ user, onUpdateUser, initialConsents }: SettingsTab
               <Input
                 id="edit-email"
                 type="email"
-                value={editEmail}
-                onChange={(e) => {
-                  setEditEmail(e.target.value)
-                  if (emailError) setEmailError('')
-                }}
-                aria-invalid={!!emailError}
-                disabled={isSaving}
+                value={user.email}
+                readOnly
+                className="bg-muted text-muted-foreground cursor-not-allowed"
               />
-              {emailError && (
-                <p className="text-sm text-destructive">{emailError}</p>
-              )}
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleCancelEdit} disabled={isSaving}>

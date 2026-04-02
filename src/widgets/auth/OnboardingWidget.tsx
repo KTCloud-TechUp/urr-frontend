@@ -5,7 +5,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import {
   AuthStep,
+  AgeGateStep,
   IdentityStep,
+  GuardianIdentityStep,
+  TermsStep,
   OnboardingHero,
   SignupCompleteStep,
   useOnboardingAuth,
@@ -13,31 +16,47 @@ import {
 import { tokenStore } from "@/shared/api/tokenStore";
 import { reissueToken } from "@/features/auth/api/reissue";
 
-type FlowState = "auth" | "identity" | "complete";
+type FlowState =
+  | "auth"
+  | "age-gate"
+  | "identity"
+  | "guardian-identity"
+  | "terms"
+  | "complete";
 
 function OnboardingWidgetInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const stepParam = searchParams.get("step");
-  const initialStep = stepParam === "identity" || stepParam === "rejoin" ? "identity" : "auth";
-  const isSocial = initialStep === "identity";
-  const rejoinToken = stepParam === "rejoin" ? (searchParams.get("rejoinToken") ?? undefined) : undefined;
+
+  const isSocial = stepParam === "identity";
+  const rejoinToken =
+    stepParam === "rejoin"
+      ? (searchParams.get("rejoinToken") ?? undefined)
+      : undefined;
   const socialError = searchParams.get("error") as "kakao" | "naver" | null;
+
+  // Social new-signup → start at age-gate; rejoin → start at identity directly
+  const initialStep: FlowState =
+    stepParam === "rejoin"
+      ? "identity"
+      : stepParam === "identity"
+        ? "age-gate"
+        : "auth";
+
   const [flowState, setFlowState] = useState<FlowState>(initialStep);
+  const [isMinor, setIsMinor] = useState(false);
   const [completedUserName, setCompletedUserName] = useState("");
-  // identity step은 소셜 신규가입 플로우 — 체크 불필요
-  const [authChecked, setAuthChecked] = useState(initialStep === "identity");
+  const [authChecked, setAuthChecked] = useState(initialStep !== "auth");
 
   useEffect(() => {
     if (initialStep !== "auth") return;
 
-    // 메모리에 토큰이 있으면 이미 로그인 상태
     if (tokenStore.getToken()) {
       router.replace("/");
       return;
     }
 
-    // is_authenticated 쿠키가 없으면 로그아웃/탈퇴 상태 — reissue 스킵
     const hasSession = document.cookie
       .split(";")
       .some((c) => c.trim().startsWith("is_authenticated=1"));
@@ -46,7 +65,6 @@ function OnboardingWidgetInner() {
       return;
     }
 
-    // 세션 복원 시도 (refresh_token 쿠키 유효 여부 확인)
     reissueToken().then((token) => {
       if (token) {
         tokenStore.setToken(token);
@@ -62,8 +80,16 @@ function OnboardingWidgetInner() {
     setFlowState("complete");
   }, []);
 
-  const { handleAuthComplete, handleIdentityComplete, loginError, identityError } = useOnboardingAuth({
-    onEmailRegister: () => setFlowState("identity"),
+  const {
+    handleAuthComplete,
+    handleIdentityComplete,
+    handleGuardianComplete,
+    handleTermsComplete,
+    loginError,
+    identityError,
+  } = useOnboardingAuth({
+    onEmailRegister: () => setFlowState("age-gate"),
+    onTerms: () => setFlowState("terms"),
     onSuccess: handleSuccess,
     isSocial,
     rejoinToken,
@@ -71,7 +97,14 @@ function OnboardingWidgetInner() {
 
   if (!authChecked) return null;
 
-  const heroStep = flowState === "auth" ? 1 : 2;
+  const heroStep =
+    flowState === "auth"
+      ? 1
+      : flowState === "age-gate" || flowState === "identity" || flowState === "guardian-identity"
+        ? 2
+        : flowState === "complete"
+          ? 5
+          : 3; // terms
 
   if (flowState === "complete") {
     return (
@@ -91,12 +124,46 @@ function OnboardingWidgetInner() {
           key={flowState}
           className="w-full flex justify-center animate-in fade-in duration-300"
         >
-          {flowState === "auth" && <AuthStep onComplete={handleAuthComplete} socialError={socialError} loginError={loginError} />}
+          {flowState === "auth" && (
+            <AuthStep
+              onComplete={handleAuthComplete}
+              socialError={socialError}
+              loginError={loginError}
+            />
+          )}
+          {flowState === "age-gate" && (
+            <AgeGateStep
+              onAdult={() => {
+                setIsMinor(false);
+                setFlowState("identity");
+              }}
+              onMinor={() => {
+                setIsMinor(true);
+                setFlowState("guardian-identity");
+              }}
+              onBack={() => setFlowState("auth")}
+            />
+          )}
           {flowState === "identity" && (
             <IdentityStep
               onComplete={handleIdentityComplete}
-              onBack={() => setFlowState("auth")}
+              onBack={() => setFlowState("age-gate")}
               identityError={identityError}
+            />
+          )}
+          {flowState === "guardian-identity" && (
+            <GuardianIdentityStep
+              onComplete={() => handleGuardianComplete()}
+              onBack={() => setFlowState("age-gate")}
+            />
+          )}
+          {flowState === "terms" && (
+            <TermsStep
+              onComplete={handleTermsComplete}
+              onBack={() =>
+                setFlowState(isMinor ? "guardian-identity" : "identity")
+              }
+              isMinor={isMinor}
             />
           )}
         </div>
