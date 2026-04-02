@@ -19,7 +19,6 @@ interface AuthCompleteData {
 
 interface IdentityData {
   userName: string;
-  nickname: string;
   phoneNumber: string;
   birthDate: string; // "YYYYMMDD"
   gender: "male" | "female";
@@ -27,6 +26,7 @@ interface IdentityData {
 
 interface UseOnboardingAuthParams {
   onEmailRegister: () => void;
+  onTerms: () => void;
   onSuccess?: (userName: string) => void;
   isSocial?: boolean;
   rejoinToken?: string;
@@ -34,6 +34,7 @@ interface UseOnboardingAuthParams {
 
 export function useOnboardingAuth({
   onEmailRegister,
+  onTerms,
   onSuccess,
   isSocial = false,
   rejoinToken,
@@ -43,6 +44,7 @@ export function useOnboardingAuth({
     RegisterParams,
     "email" | "password"
   > | null>(null);
+  const pendingIdentityRef = useRef<IdentityData | null>(null);
 
   const [loginError, setLoginError] = useState<string | null>(null);
   const [identityError, setIdentityError] = useState<string | null>(null);
@@ -72,7 +74,7 @@ export function useOnboardingAuth({
       return;
     }
 
-    // Email register — save partial data, proceed to identity step
+    // Email register — save partial data, proceed to age-gate
     pendingRegisterRef.current = {
       email: data.email!,
       password: data.password!,
@@ -80,15 +82,30 @@ export function useOnboardingAuth({
     onEmailRegister();
   };
 
-  const handleIdentityComplete = async (identityData: IdentityData) => {
-    const raw = identityData.birthDate;
+  // Called after IdentityStep or GuardianIdentityStep — just stores data and goes to terms
+  const handleIdentityComplete = (identityData: IdentityData) => {
+    pendingIdentityRef.current = identityData;
+    setIdentityError(null);
+    onTerms();
+  };
+
+  // Called after GuardianIdentityStep — no identity data to store, just go to terms
+  const handleGuardianComplete = () => {
+    onTerms();
+  };
+
+  // Called after TermsStep — does the actual API registration
+  const handleTermsComplete = async () => {
+    const identity = pendingIdentityRef.current;
+
+    const raw = identity?.birthDate ?? "";
     const birthDate =
       raw.length === 8
         ? `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`
         : raw;
 
     const gender: "MALE" | "FEMALE" =
-      identityData.gender === "male" ? "MALE" : "FEMALE";
+      identity?.gender === "male" ? "MALE" : "FEMALE";
 
     setIdentityError(null);
 
@@ -97,7 +114,7 @@ export function useOnboardingAuth({
         const result = await kakaoRejoin(rejoinToken, true);
         tokenStore.setToken(result.tokens.accessToken);
         if (onSuccess) {
-          onSuccess(identityData.nickname);
+          onSuccess(identity?.userName ?? "");
         } else {
           router.push("/");
         }
@@ -110,13 +127,13 @@ export function useOnboardingAuth({
     if (isSocial) {
       try {
         await socialOnboarding({
-          nickname: identityData.nickname,
+          nickname: identity?.userName ?? "",
           birthDate,
-          phone: identityData.phoneNumber,
+          phone: identity?.phoneNumber ?? "",
           gender,
         });
         if (onSuccess) {
-          onSuccess(identityData.nickname);
+          onSuccess(identity?.userName ?? "");
         } else {
           router.push("/");
         }
@@ -127,20 +144,20 @@ export function useOnboardingAuth({
     }
 
     const pending = pendingRegisterRef.current;
-    if (!pending) return;
+    if (!pending || !identity) return;
 
     try {
       const result = await register({
         email: pending.email,
         password: pending.password,
-        name: identityData.userName,
+        name: identity.userName,
         birthDate,
-        phone: identityData.phoneNumber,
+        phone: identity.phoneNumber,
         gender,
       });
       tokenStore.setToken(result.tokens.accessToken);
       if (onSuccess) {
-        onSuccess(identityData.userName);
+        onSuccess(identity.userName);
       } else {
         router.push("/");
       }
@@ -152,6 +169,8 @@ export function useOnboardingAuth({
   return {
     handleAuthComplete,
     handleIdentityComplete,
+    handleGuardianComplete,
+    handleTermsComplete,
     loginError,
     identityError,
   };

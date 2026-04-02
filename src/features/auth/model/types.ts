@@ -38,6 +38,13 @@ export interface AuthResponseData {
 
 // === /api/auth/me ===
 
+export interface MembershipInfo {
+  artistId: number;
+  artistName: string;
+  tier: string;
+  endDate: string;
+}
+
 export interface MeResponseData {
   userId: number;
   email: string;
@@ -47,6 +54,7 @@ export interface MeResponseData {
   marketingConsent: boolean;
   pushConsent: boolean;
   smsConsent: boolean;
+  memberships: MembershipInfo[];
 }
 
 // === 프론트 auth 도메인 모델 ===
@@ -61,4 +69,5 @@ export interface AuthUser {
   marketingConsent: boolean;
   pushConsent: boolean;
   smsConsent: boolean;
+  memberships: MembershipInfo[];
 }

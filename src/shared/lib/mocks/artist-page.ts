@@ -13,13 +13,12 @@ const idToSlug: Record<string, string> = {
   "9":  "gidle",
   "10": "txt",
   "11": "day6",
-  "12": "brunomars",
+  "12": "tours",
   "13": "akmu",
   "14": "kwon",
   "15": "riize",
   "16": "iu",
   "17": "nmixx",
-  "18": "tours",
 };
 function resolveSlug(artistId: string): string {
   return idToSlug[artistId] ?? artistId;
@@ -47,13 +46,12 @@ const artistExtendedInfoMap: Record<string, ArtistExtendedInfo> = {
   gidle:    { artistId: "9",  debutDate: "2018.05.02", agency: "CUBE Entertainment",        genres: ["K-POP", "Hip-Hop", "Pop"], memberCount: 5 },
   txt:      { artistId: "10", debutDate: "2019.03.04", agency: "BIGHIT MUSIC",             genres: ["K-POP", "Pop", "Rock"], memberCount: 5 },
   day6:     { artistId: "11", debutDate: "2015.09.07", agency: "JYP Entertainment",        genres: ["Rock", "Pop", "K-POP"], memberCount: 5 },
-  brunomars:{ artistId: "12", debutDate: "2010.01.01", agency: "Atlantic Records",         genres: ["Pop", "R&B", "Funk"] },
+  tours:    { artistId: "12", debutDate: "2023.02.01", agency: "Starship Entertainment",   genres: ["K-POP", "Pop", "Dance"], memberCount: 7 },
   akmu:     { artistId: "13", debutDate: "2014.05.07", agency: "YG Entertainment",         genres: ["Indie Pop", "Folk", "K-POP"], memberCount: 2 },
   kwon:     { artistId: "14", debutDate: "2012.04.09", agency: "Magic Strawberry Sound",   genres: ["Indie Pop", "Acoustic", "K-POP"] },
   riize:    { artistId: "15", debutDate: "2023.09.04", agency: "SM Entertainment",         genres: ["K-POP", "Pop", "Dance"], memberCount: 7 },
   iu:       { artistId: "16", debutDate: "2008.09.18", agency: "KAKAO Entertainment",      genres: ["Ballad", "Pop", "K-POP"] },
   nmixx:    { artistId: "17", debutDate: "2022.02.22", agency: "JYP Entertainment",        genres: ["K-POP", "Mix-Pop", "Dance"], memberCount: 6 },
-  tours:    { artistId: "18", debutDate: "2023.02.01", agency: "Starship Entertainment",   genres: ["K-POP", "Pop", "Dance"], memberCount: 7 },
 };
 
 export function getArtistExtendedInfo(artistId: string): ArtistExtendedInfo | undefined {
@@ -64,29 +62,29 @@ export function getArtistExtendedInfo(artistId: string): ArtistExtendedInfo | un
 
 const artistEventsMap: Record<string, Event[]> = {
   gdragon: [
-    { id: "1",                      artistId: "1", title: "G-Dragon 2026 MAMA DOME TOUR",    venue: "KSPO DOME (올림픽체조경기장)",     dates: [{ id: "gd-d1", date: "2026-06-01T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 3200 }, { id: "gd-d2", date: "2026-06-02T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 5100 }], poster: "/heroes/hero_g-dragon.png", status: "open" },
+    { id: "1",                      artistId: "1", title: "G-Dragon 2026 MAMA DOME TOUR",    venue: "KSPO DOME (올림픽체조경기장)",     dates: [{ id: "gd-d1", date: "2026-06-01T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 3200 }, { id: "gd-d2", date: "2026-06-02T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 5100 }], poster: "/artists/1/banner.png", status: "open" },
     { id: "evt-gdragon-solo-2026",  artistId: "1", title: "G-Dragon DETOX WORLD TOUR",       venue: "고척스카이돔",                     dates: [{ id: "gd-d3", date: "2026-09-20T19:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 20000 }], poster: "", status: "upcoming" },
     { id: "evt-gdragon-past-2025",  artistId: "1", title: "G-Dragon POWER CONCERT 2025",     venue: "잠실종합운동장 주경기장",           dates: [{ id: "gd-d4", date: "2025-12-25T18:00:00+09:00", bookingWindows: [], totalSeats: 50000, remainingSeats: 0 }], poster: "", status: "closed" },
   ],
   bts: [
-    { id: "2",                       artistId: "2", title: "BTS WORLD TOUR ARIRANG",           venue: "잠실종합운동장 주경기장",           dates: [{ id: "bts-d1", date: "2026-08-01T19:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 12000 }, { id: "bts-d2", date: "2026-08-02T19:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 18000 }], poster: "/events/event_bts-yet-to-come-in-cinema.png", status: "open" },
+    { id: "2",                       artistId: "2", title: "BTS WORLD TOUR ARIRANG",           venue: "잠실종합운동장 주경기장",           dates: [{ id: "bts-d1", date: "2026-08-01T19:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 12000 }, { id: "bts-d2", date: "2026-08-02T19:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 18000 }], poster: "/artists/2/events/event_bts-world-tour-arirang.png", status: "open" },
     { id: "evt-bts-fanmeet-2026",   artistId: "2", title: "2026 BTS FAN MEETING: MAGIC SHOP", venue: "KSPO DOME (올림픽체조경기장)",     dates: [{ id: "bts-d3", date: "2026-10-15T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "", status: "upcoming" },
     { id: "evt-bts-busan-2026",     artistId: "2", title: "BTS YET TO COME IN BUSAN",          venue: "부산 아시아드 주경기장",           dates: [{ id: "bts-d4", date: "2026-04-20T17:00:00+09:00", bookingWindows: [], totalSeats: 40000, remainingSeats: 0 }], poster: "", status: "soldout" },
     { id: "evt-bts-past-2025",      artistId: "2", title: "BTS PERMISSION TO DANCE ON STAGE", venue: "고척스카이돔",                     dates: [{ id: "bts-d5", date: "2025-11-10T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "closed" },
   ],
   aespa: [
-    { id: "4",                              artistId: "3", title: "aespa LIVE SYNK : PARALLEL",        venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ae-d1", date: "2026-09-20T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 4500 }], poster: "/heroes/hero_aespa.png", status: "open" },
+    { id: "4",                              artistId: "3", title: "aespa LIVE SYNK : PARALLEL",        venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ae-d1", date: "2026-09-20T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 4500 }], poster: "/artists/3/events/event_aespa-live-synk-parallel.png", status: "open" },
     { id: "evt-aespa-world-2026",          artistId: "3", title: "aespa WORLD TOUR : MYWORLD",         venue: "잠실실내체육관",               dates: [{ id: "ae-d2", date: "2026-11-05T19:00:00+09:00", bookingWindows: [], totalSeats: 10000, remainingSeats: 10000 }], poster: "", status: "upcoming" },
     { id: "evt-aespa-aexis-2026",          artistId: "3", title: "aespa SYNK : AEXIS LINE",            venue: "인스파이어 아레나",             dates: [{ id: "ae-d4", date: "2026-12-20T18:00:00+09:00", bookingWindows: [], totalSeats: 12000, remainingSeats: 12000 }], poster: "", status: "upcoming" },
     { id: "evt-aespa-myworld-encore-2026", artistId: "3", title: "aespa WORLD TOUR : MYWORLD ENCORE",  venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ae-d5", date: "2027-01-15T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "", status: "upcoming" },
     { id: "evt-aespa-past-2025",           artistId: "3", title: "aespa SYNK : HYPER LINE",            venue: "고척스카이돔",                 dates: [{ id: "ae-d3", date: "2025-10-01T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "closed" },
   ],
   ive: [
-    { id: "5",                    artistId: "4", title: "IVE THE 1ST WORLD TOUR: SHOW WHAT I HAVE", venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ive-d1", date: "2026-07-12T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "/events/event_ive-show-what-i-am.png", status: "upcoming" },
+    { id: "5",                    artistId: "4", title: "IVE THE 1ST WORLD TOUR: SHOW WHAT I HAVE", venue: "KSPO DOME (올림픽체조경기장)", dates: [{ id: "ive-d1", date: "2026-07-12T18:00:00+09:00", bookingWindows: [], totalSeats: 15000, remainingSeats: 15000 }], poster: "/artists/4/events/event_ive-show-what-i-am.png", status: "upcoming" },
     { id: "evt-ive-fanmeet-2026", artistId: "4", title: "IVE 2nd FAN MEETING: I HAVE",               venue: "잠실실내체육관",               dates: [{ id: "ive-d2", date: "2026-05-18T17:00:00+09:00", bookingWindows: [], totalSeats: 10000, remainingSeats: 2300 }], poster: "", status: "open" },
   ],
   blackpink: [
-    { id: "7",                           artistId: "5", title: "BLACKPINK BORN PINK WORLD TOUR FINALE", venue: "고척스카이돔",                 dates: [{ id: "bp-d1", date: "2026-07-15T18:30:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 1800 }, { id: "bp-d2", date: "2026-07-16T18:30:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 3200 }], poster: "/events/event_blackpink-born-pink.png", status: "open" },
+    { id: "7",                           artistId: "5", title: "BLACKPINK BORN PINK WORLD TOUR FINALE", venue: "고척스카이돔",                 dates: [{ id: "bp-d1", date: "2026-07-15T18:30:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 1800 }, { id: "bp-d2", date: "2026-07-16T18:30:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 3200 }], poster: "/artists/5/events/event_blackpink-born-pink.png", status: "open" },
     { id: "evt-blackpink-concert-2026", artistId: "5", title: "BLACKPINK IN YOUR AREA 2026",           venue: "잠실종합운동장 주경기장",       dates: [{ id: "bp-d3", date: "2026-12-01T18:00:00+09:00", bookingWindows: [], totalSeats: 65000, remainingSeats: 65000 }], poster: "", status: "upcoming" },
     { id: "evt-blackpink-past-2025",    artistId: "5", title: "BLACKPINK THE SHOW 2025",               venue: "고척스카이돔",                 dates: [{ id: "bp-d4", date: "2025-09-20T18:00:00+09:00", bookingWindows: [], totalSeats: 20000, remainingSeats: 0 }], poster: "", status: "soldout" },
   ],
@@ -118,19 +116,19 @@ const artistTransfersMap: Record<string, TransferListing[]> = {
     { id: "tf-gd-06", ticketId: "tk-gd-06", eventId: "evt-gdragon-solo-2026", sellerId: "u-106", sellerTier: "mist", sellerTransactionCount: 1, price: 88000, faceValue: 88000, section: "B석", seatInfo: "E구역 10열 18번", status: "listed", createdAt: "2026-02-23T20:10:00+09:00" },
   ],
   bts: [
-    { id: "tf-bts-01", ticketId: "tk-bts-01", eventId: "evt-bts-encore-2026", sellerId: "u-201", sellerTier: "lightning", sellerTransactionCount: 15, price: 250000, faceValue: 198000, section: "VIP석", seatInfo: "A구역 2열 10번", status: "listed", createdAt: "2026-03-01T08:00:00+09:00" },
-    { id: "tf-bts-02", ticketId: "tk-bts-02", eventId: "evt-bts-encore-2026", sellerId: "u-202", sellerTier: "thunder", sellerTransactionCount: 7, price: 180000, faceValue: 165000, section: "R석", seatInfo: "B구역 5열 17번", status: "listed", createdAt: "2026-03-01T09:30:00+09:00" },
-    { id: "tf-bts-03", ticketId: "tk-bts-03", eventId: "evt-bts-encore-2026", sellerId: "u-203", sellerTier: "cloud", sellerTransactionCount: 2, price: 140000, faceValue: 132000, section: "S석", seatInfo: "C구역 8열 25번", status: "listed", createdAt: "2026-02-28T14:20:00+09:00" },
+    { id: "tf-bts-01", ticketId: "tk-bts-01", eventId: "2", sellerId: "u-201", sellerTier: "lightning", sellerTransactionCount: 15, price: 250000, faceValue: 198000, section: "VIP석", seatInfo: "A구역 2열 10번", status: "listed", createdAt: "2026-03-01T08:00:00+09:00" },
+    { id: "tf-bts-02", ticketId: "tk-bts-02", eventId: "2", sellerId: "u-202", sellerTier: "thunder", sellerTransactionCount: 7, price: 180000, faceValue: 165000, section: "R석", seatInfo: "B구역 5열 17번", status: "listed", createdAt: "2026-03-01T09:30:00+09:00" },
+    { id: "tf-bts-03", ticketId: "tk-bts-03", eventId: "2", sellerId: "u-203", sellerTier: "cloud", sellerTransactionCount: 2, price: 140000, faceValue: 132000, section: "S석", seatInfo: "C구역 8열 25번", status: "listed", createdAt: "2026-02-28T14:20:00+09:00" },
     { id: "tf-bts-04", ticketId: "tk-bts-04", eventId: "evt-bts-busan-2026", sellerId: "u-204", sellerTier: "thunder", sellerTransactionCount: 10, price: 160000, faceValue: 165000, section: "R석", seatInfo: "A구역 6열 12번", status: "listed", createdAt: "2026-02-27T16:00:00+09:00" },
-    { id: "tf-bts-05", ticketId: "tk-bts-05", eventId: "evt-bts-encore-2026", sellerId: "u-205", sellerTier: "mist", sellerTransactionCount: 0, price: 110000, faceValue: 110000, section: "A석", seatInfo: "D구역 15열 3번", status: "listed", createdAt: "2026-02-26T11:45:00+09:00" },
-    { id: "tf-bts-06", ticketId: "tk-bts-06", eventId: "evt-bts-encore-2026", sellerId: "u-206", sellerTier: "lightning", sellerTransactionCount: 22, price: 280000, faceValue: 198000, section: "VIP석", seatInfo: "A구역 1열 8번", status: "listed", createdAt: "2026-02-25T07:30:00+09:00" },
+    { id: "tf-bts-05", ticketId: "tk-bts-05", eventId: "2", sellerId: "u-205", sellerTier: "mist", sellerTransactionCount: 0, price: 110000, faceValue: 110000, section: "A석", seatInfo: "D구역 15열 3번", status: "listed", createdAt: "2026-02-26T11:45:00+09:00" },
+    { id: "tf-bts-06", ticketId: "tk-bts-06", eventId: "2", sellerId: "u-206", sellerTier: "lightning", sellerTransactionCount: 22, price: 280000, faceValue: 198000, section: "VIP석", seatInfo: "A구역 1열 8번", status: "listed", createdAt: "2026-02-25T07:30:00+09:00" },
     { id: "tf-bts-07", ticketId: "tk-bts-07", eventId: "evt-bts-busan-2026", sellerId: "u-207", sellerTier: "cloud", sellerTransactionCount: 4, price: 88000, faceValue: 88000, section: "B석", seatInfo: "E구역 20열 11번", status: "listed", createdAt: "2026-02-24T19:00:00+09:00" },
   ],
   aespa: [
-    { id: "tf-ae-01", ticketId: "tk-ae-01", eventId: "evt-aespa-synk-2026", sellerId: "u-301", sellerTier: "thunder", sellerTransactionCount: 6, price: 165000, faceValue: 154000, section: "R석", seatInfo: "A구역 4열 19번", status: "listed", createdAt: "2026-02-28T12:00:00+09:00" },
-    { id: "tf-ae-02", ticketId: "tk-ae-02", eventId: "evt-aespa-synk-2026", sellerId: "u-302", sellerTier: "cloud", sellerTransactionCount: 2, price: 120000, faceValue: 121000, section: "S석", seatInfo: "B구역 9열 5번", status: "listed", createdAt: "2026-02-27T10:15:00+09:00" },
-    { id: "tf-ae-03", ticketId: "tk-ae-03", eventId: "evt-aespa-synk-2026", sellerId: "u-303", sellerTier: "lightning", sellerTransactionCount: 18, price: 200000, faceValue: 176000, section: "VIP석", seatInfo: "A구역 1열 12번", status: "listed", createdAt: "2026-02-26T08:30:00+09:00" },
-    { id: "tf-ae-04", ticketId: "tk-ae-04", eventId: "evt-aespa-synk-2026", sellerId: "u-304", sellerTier: "mist", sellerTransactionCount: 1, price: 95000, faceValue: 99000, section: "A석", seatInfo: "C구역 7열 22번", status: "listed", createdAt: "2026-02-25T15:40:00+09:00" },
+    { id: "tf-ae-01", ticketId: "tk-ae-01", eventId: "4", sellerId: "u-301", sellerTier: "thunder", sellerTransactionCount: 6, price: 165000, faceValue: 154000, section: "R석", seatInfo: "A구역 4열 19번", status: "listed", createdAt: "2026-02-28T12:00:00+09:00" },
+    { id: "tf-ae-02", ticketId: "tk-ae-02", eventId: "4", sellerId: "u-302", sellerTier: "cloud", sellerTransactionCount: 2, price: 120000, faceValue: 121000, section: "S석", seatInfo: "B구역 9열 5번", status: "listed", createdAt: "2026-02-27T10:15:00+09:00" },
+    { id: "tf-ae-03", ticketId: "tk-ae-03", eventId: "4", sellerId: "u-303", sellerTier: "lightning", sellerTransactionCount: 18, price: 200000, faceValue: 176000, section: "VIP석", seatInfo: "A구역 1열 12번", status: "listed", createdAt: "2026-02-26T08:30:00+09:00" },
+    { id: "tf-ae-04", ticketId: "tk-ae-04", eventId: "4", sellerId: "u-304", sellerTier: "mist", sellerTransactionCount: 1, price: 95000, faceValue: 99000, section: "A석", seatInfo: "C구역 7열 22번", status: "listed", createdAt: "2026-02-25T15:40:00+09:00" },
     { id: "tf-ae-05", ticketId: "tk-ae-05", eventId: "evt-aespa-world-2026", sellerId: "u-305", sellerTier: "thunder", sellerTransactionCount: 9, price: 143000, faceValue: 143000, section: "R석", seatInfo: "B구역 3열 15번", status: "listed", createdAt: "2026-02-24T13:20:00+09:00" },
     { id: "tf-ae-06", ticketId: "tk-ae-06", eventId: "evt-aespa-aexis-2026", sellerId: "u-306", sellerTier: "cloud", sellerTransactionCount: 4, price: 132000, faceValue: 132000, section: "S석", seatInfo: "B구역 6열 10번", status: "listed", createdAt: "2026-02-23T11:00:00+09:00" },
     { id: "tf-ae-07", ticketId: "tk-ae-07", eventId: "evt-aespa-aexis-2026", sellerId: "u-307", sellerTier: "lightning", sellerTransactionCount: 20, price: 185000, faceValue: 176000, section: "VIP석", seatInfo: "A구역 2열 8번", status: "listed", createdAt: "2026-02-22T16:30:00+09:00" },
@@ -138,17 +136,17 @@ const artistTransfersMap: Record<string, TransferListing[]> = {
   ive: [
     { id: "tf-ive-01", ticketId: "tk-ive-01", eventId: "evt-ive-fanmeet-2026", sellerId: "u-401", sellerTier: "cloud", sellerTransactionCount: 3, price: 88000, faceValue: 88000, section: "R석", seatInfo: "A구역 6열 8번", status: "listed", createdAt: "2026-02-28T09:00:00+09:00" },
     { id: "tf-ive-02", ticketId: "tk-ive-02", eventId: "evt-ive-fanmeet-2026", sellerId: "u-402", sellerTier: "thunder", sellerTransactionCount: 11, price: 110000, faceValue: 88000, section: "VIP석", seatInfo: "A구역 1열 3번", status: "listed", createdAt: "2026-02-27T17:30:00+09:00" },
-    { id: "tf-ive-03", ticketId: "tk-ive-03", eventId: "evt-ive-show-2026", sellerId: "u-403", sellerTier: "mist", sellerTransactionCount: 0, price: 75000, faceValue: 77000, section: "S석", seatInfo: "B구역 11열 20번", status: "listed", createdAt: "2026-02-26T14:10:00+09:00" },
-    { id: "tf-ive-04", ticketId: "tk-ive-04", eventId: "evt-ive-show-2026", sellerId: "u-404", sellerTier: "lightning", sellerTransactionCount: 14, price: 155000, faceValue: 143000, section: "VIP석", seatInfo: "A구역 2열 15번", status: "listed", createdAt: "2026-02-25T11:00:00+09:00" },
+    { id: "tf-ive-03", ticketId: "tk-ive-03", eventId: "5", sellerId: "u-403", sellerTier: "mist", sellerTransactionCount: 0, price: 75000, faceValue: 77000, section: "S석", seatInfo: "B구역 11열 20번", status: "listed", createdAt: "2026-02-26T14:10:00+09:00" },
+    { id: "tf-ive-04", ticketId: "tk-ive-04", eventId: "5", sellerId: "u-404", sellerTier: "lightning", sellerTransactionCount: 14, price: 155000, faceValue: 143000, section: "VIP석", seatInfo: "A구역 2열 15번", status: "listed", createdAt: "2026-02-25T11:00:00+09:00" },
     { id: "tf-ive-05", ticketId: "tk-ive-05", eventId: "evt-ive-fanmeet-2026", sellerId: "u-405", sellerTier: "cloud", sellerTransactionCount: 5, price: 80000, faceValue: 77000, section: "A석", seatInfo: "C구역 8열 12번", status: "listed", createdAt: "2026-02-24T08:45:00+09:00" },
   ],
   blackpink: [
-    { id: "tf-bp-01", ticketId: "tk-bp-01", eventId: "evt-blackpink-world-2026", sellerId: "u-501", sellerTier: "lightning", sellerTransactionCount: 20, price: 240000, faceValue: 198000, section: "VIP석", seatInfo: "A구역 1열 7번", status: "listed", createdAt: "2026-03-01T10:00:00+09:00" },
-    { id: "tf-bp-02", ticketId: "tk-bp-02", eventId: "evt-blackpink-world-2026", sellerId: "u-502", sellerTier: "thunder", sellerTransactionCount: 8, price: 180000, faceValue: 165000, section: "R석", seatInfo: "B구역 4열 18번", status: "listed", createdAt: "2026-02-28T13:45:00+09:00" },
-    { id: "tf-bp-03", ticketId: "tk-bp-03", eventId: "evt-blackpink-world-2026", sellerId: "u-503", sellerTier: "cloud", sellerTransactionCount: 3, price: 132000, faceValue: 132000, section: "S석", seatInfo: "C구역 10열 25번", status: "listed", createdAt: "2026-02-27T09:20:00+09:00" },
-    { id: "tf-bp-04", ticketId: "tk-bp-04", eventId: "evt-blackpink-world-2026", sellerId: "u-504", sellerTier: "thunder", sellerTransactionCount: 13, price: 99000, faceValue: 99000, section: "A석", seatInfo: "D구역 14열 6번", status: "listed", createdAt: "2026-02-26T16:30:00+09:00" },
+    { id: "tf-bp-01", ticketId: "tk-bp-01", eventId: "7", sellerId: "u-501", sellerTier: "lightning", sellerTransactionCount: 20, price: 240000, faceValue: 198000, section: "VIP석", seatInfo: "A구역 1열 7번", status: "listed", createdAt: "2026-03-01T10:00:00+09:00" },
+    { id: "tf-bp-02", ticketId: "tk-bp-02", eventId: "7", sellerId: "u-502", sellerTier: "thunder", sellerTransactionCount: 8, price: 180000, faceValue: 165000, section: "R석", seatInfo: "B구역 4열 18번", status: "listed", createdAt: "2026-02-28T13:45:00+09:00" },
+    { id: "tf-bp-03", ticketId: "tk-bp-03", eventId: "7", sellerId: "u-503", sellerTier: "cloud", sellerTransactionCount: 3, price: 132000, faceValue: 132000, section: "S석", seatInfo: "C구역 10열 25번", status: "listed", createdAt: "2026-02-27T09:20:00+09:00" },
+    { id: "tf-bp-04", ticketId: "tk-bp-04", eventId: "7", sellerId: "u-504", sellerTier: "thunder", sellerTransactionCount: 13, price: 99000, faceValue: 99000, section: "A석", seatInfo: "D구역 14열 6번", status: "listed", createdAt: "2026-02-26T16:30:00+09:00" },
     { id: "tf-bp-05", ticketId: "tk-bp-05", eventId: "evt-blackpink-concert-2026", sellerId: "u-505", sellerTier: "mist", sellerTransactionCount: 1, price: 165000, faceValue: 154000, section: "R석", seatInfo: "A구역 8열 11번", status: "listed", createdAt: "2026-02-25T20:00:00+09:00" },
-    { id: "tf-bp-06", ticketId: "tk-bp-06", eventId: "evt-blackpink-world-2026", sellerId: "u-506", sellerTier: "lightning", sellerTransactionCount: 30, price: 260000, faceValue: 198000, section: "VIP석", seatInfo: "A구역 2열 3번", status: "listed", createdAt: "2026-02-24T07:00:00+09:00" },
+    { id: "tf-bp-06", ticketId: "tk-bp-06", eventId: "7", sellerId: "u-506", sellerTier: "lightning", sellerTransactionCount: 30, price: 260000, faceValue: 198000, section: "VIP석", seatInfo: "A구역 2열 3번", status: "listed", createdAt: "2026-02-24T07:00:00+09:00" },
   ],
 };
 

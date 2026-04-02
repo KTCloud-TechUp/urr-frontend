@@ -1,6 +1,12 @@
 import type { BookingStatus } from "@/shared/types";
 
-export type EventCategory = "concert" | "fanmeeting" | "domestic" | "festival" | "musical" | "etc";
+export type EventCategory =
+  | "concert"
+  | "fanmeeting"
+  | "domestic"
+  | "festival"
+  | "musical"
+  | "etc";
 export type EventCategoryFilter = "all" | EventCategory;
 
 export interface EventListItem {
@@ -16,7 +22,10 @@ export interface EventListItem {
   poster: string;
 }
 
-export const eventCategoryFilters: { value: EventCategoryFilter; label: string }[] = [
+export const eventCategoryFilters: {
+  value: EventCategoryFilter;
+  label: string;
+}[] = [
   { value: "all", label: "전체" },
   { value: "concert", label: "콘서트" },
   { value: "fanmeeting", label: "팬미팅" },
@@ -38,7 +47,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: ["단독판매"],
-    poster: "/events/event_seventeen-be-the-sun.png",
+    poster: "/artists/7/events/event_seventeen-be-the-sun.png",
   },
   {
     id: "evt-kwonjina-2026",
@@ -86,7 +95,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/event_bts-yet-to-come-in-cinema.png",
+    poster: "/artists/2/events/event_bts-yet-to-come-in-cinema.png",
   },
   {
     id: "5",
@@ -98,7 +107,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/event_ive-show-what-i-am.png",
+    poster: "/artists/4/events/event_ive-show-what-i-am.png",
   },
   {
     id: "7",
@@ -110,7 +119,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/event_blackpink-born-pink.png",
+    poster: "/artists/5/events/event_blackpink-born-pink.png",
   },
   {
     id: "11",
@@ -122,7 +131,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "festival",
     tags: [],
-    poster: "/events/event_newjeans-complexcon.png",
+    poster: "/artists/8/events/event_newjeans-complexcon.png",
   },
   {
     id: "8",
@@ -134,7 +143,7 @@ export const popularEvents: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/event_stray-kids-domin-world-tour.png",
+    poster: "/artists/6/events/event_stray-kids-domin-world-tour.png",
   },
 ];
 
@@ -150,7 +159,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/event_bts-world-tour-arirang.png",
+    poster: "/artists/2/events/event_bts-world-tour-arirang.png",
   },
   {
     id: "evt-park-hyoshin-2026",
@@ -174,7 +183,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/event_day6-10th-anniversary-tour.png",
+    poster: "/artists/11/events/event_day6-10th-anniversary-tour.png",
   },
   {
     id: "evt-mint-festa-2026",
@@ -251,14 +260,14 @@ export const allEventsData: EventListItem[] = [
   {
     id: "evt-tws-fanmeet-2026",
     artistId: "tws",
-    artistName: "TWS",
+    artistName: "김선호",
     title: "FANMEETING <LOVE FACTORY>",
     venue: "블루스퀘어 우리WON뱅킹홀",
     dateRange: "2026.04.11 - 2026.04.12",
     status: "open",
     category: "fanmeeting",
     tags: [],
-    poster: "/events/event_tws-2nd-fanmeeting-2026.png",
+    poster: "/events/event_kim-seonho-fanmeet.png",
   },
   {
     id: "9",
@@ -270,11 +279,11 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/event_seventeen-world-tour.png",
+    poster: "/artists/7/events/event_seventeen-world-tour.png",
   },
   {
     id: "evt-kwonjina-flower-2026",
-    artistId: "kwonjina",
+    artistId: "unknown",
     artistName: "권진아",
     title: "2026 권진아 꽃말 콘서트",
     venue: "올림픽 핸드볼 경기장",
@@ -286,7 +295,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-woodz-archive-2026",
-    artistId: "woodz",
+    artistId: "unknown",
     artistName: "WOODZ",
     title: "2026 WOODZ WORLD TOUR Archive. 1",
     venue: "인스파이어 아레나",
@@ -298,7 +307,7 @@ export const allEventsData: EventListItem[] = [
   },
   {
     id: "evt-illit-press2-2026",
-    artistId: "illit",
+    artistId: "unknown",
     artistName: "ILLIT",
     title: "ILLIT LIVE 'PRESS START' IN SEOUL",
     venue: "라이브 아레나",
@@ -318,7 +327,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/presale_gi-dle-world-tour.png",
+    poster: "/artists/9/events/presale_gi-dle-world-tour.png",
   },
   {
     id: "11",
@@ -342,7 +351,7 @@ export const allEventsData: EventListItem[] = [
     status: "upcoming",
     category: "concert",
     tags: [],
-    poster: "/events/presale_seventeen-follow-again-tour.png",
+    poster: "/artists/7/events/presale_seventeen-follow-again-tour.png",
   },
   {
     id: "8",
@@ -354,7 +363,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/presale_straykids-dominance.png",
+    poster: "/artists/6/events/presale_straykids-dominance.png",
   },
   {
     id: "14",
@@ -366,7 +375,7 @@ export const allEventsData: EventListItem[] = [
     status: "upcoming",
     category: "concert",
     tags: [],
-    poster: "/events/presale_txt-world-tour.png",
+    poster: "/artists/10/events/presale_txt-world-tour.png",
   },
   {
     id: "12",
@@ -378,7 +387,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "fanmeeting",
     tags: [],
-    poster: "/events/presale_newjeans-fan-meeting.png",
+    poster: "/artists/8/events/presale_newjeans-fan-meeting.png",
   },
   {
     id: "6",
@@ -390,31 +399,7 @@ export const allEventsData: EventListItem[] = [
     status: "open",
     category: "concert",
     tags: [],
-    poster: "/events/presale_ive-1st-world-tour.png",
-  },
-  {
-    id: "7",
-    artistId: "5",
-    artistName: "BLACKPINK",
-    title: "BLACKPINK BORN PINK WORLD TOUR",
-    venue: "고척스카이돔",
-    dateRange: "2026.07.15 - 2026.07.16",
-    status: "open",
-    category: "concert",
-    tags: [],
-    poster: "/events/event_blackpink-born-pink.png",
-  },
-  {
-    id: "9",
-    artistId: "7",
-    artistName: "SEVENTEEN",
-    title: "SEVENTEEN WORLD TOUR BE THE SUN",
-    venue: "인천 아시아드 주경기장",
-    dateRange: "2026.04.04 - 2026.04.05",
-    status: "open",
-    category: "concert",
-    tags: [],
-    poster: "/events/event_seventeen-be-the-sun.png",
+    poster: "/artists/4/events/presale_ive-1st-world-tour.png",
   },
 ];
 

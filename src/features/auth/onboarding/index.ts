@@ -1,2 +1,10 @@
-export { AuthStep, IdentityStep, OnboardingHero, SignupCompleteStep } from "./ui";
+export {
+  AuthStep,
+  AgeGateStep,
+  IdentityStep,
+  GuardianIdentityStep,
+  TermsStep,
+  OnboardingHero,
+  SignupCompleteStep,
+} from "./ui";
 export { useOnboardingAuth } from "./model";

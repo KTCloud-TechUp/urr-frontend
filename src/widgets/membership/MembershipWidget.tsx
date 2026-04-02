@@ -8,9 +8,9 @@ import {
   MembershipPaymentStep,
   MembershipProfileStep,
   MembershipCompleteStep,
+  useMemberships,
 } from '@/features/membership'
-import { mockUser } from '@/shared/lib/mocks/user'
-import { mockArtists } from '@/shared/lib/mocks/artists'
+import { useArtists } from '@/features/artist'
 import type { Artist, TierLevel } from '@/shared/types'
 
 type Step = 'select' | 'intro' | 'payment' | 'profile' | 'complete'
@@ -20,12 +20,14 @@ export function MembershipWidget() {
   const [step, setStep] = useState<Step>('select')
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null)
   const [profileData, setProfileData] = useState<{ nickname: string; tier: TierLevel } | null>(null)
+  const { data: memberships = [] } = useMemberships()
+  const { data: artists = [] } = useArtists()
 
   // If artistId is provided via query param, skip to intro step
   useEffect(() => {
     const artistId = searchParams.get('artistId')
     if (artistId) {
-      const artist = mockArtists.find((a) => a.id === artistId)
+      const artist = artists.find((a) => a.id === artistId)
       if (artist) {
         const t = setTimeout(() => {
           setSelectedArtist(artist)
@@ -34,7 +36,7 @@ export function MembershipWidget() {
         return () => clearTimeout(t)
       }
     }
-  }, [searchParams])
+  }, [searchParams, artists])
 
   const handleSelectArtist = (artist: Artist) => {
     setSelectedArtist(artist)
@@ -54,8 +56,8 @@ export function MembershipWidget() {
     <div className="max-w-2xl mx-auto py-8 px-4">
       {step === 'select' && (
         <ArtistSelectStep
-          artists={mockArtists}
-          memberships={mockUser.memberships}
+          artists={artists}
+          memberships={memberships}
           onSelect={handleSelectArtist}
         />
       )}

@@ -3,10 +3,9 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/shared/lib/utils";
 import { ScrollableRow } from "@/shared/ui";
-import { getArtists } from "@/features/artist";
+import { useArtists } from "@/features/artist";
 import { getArtistGradient, newArtistCards } from "@/shared/lib/mocks/home";
 
 const labelBadgeStyle: Record<string, string> = {
@@ -22,10 +21,7 @@ function getBadgeStyle(label: string) {
 export function ArtistsWidget() {
   const router = useRouter();
 
-  const { data: artists = [], isLoading } = useQuery({
-    queryKey: ["artists"],
-    queryFn: getArtists,
-  });
+  const { data: artists = [], isLoading } = useArtists();
 
   const rankingArtists = artists.slice(0, 10);
 
@@ -53,9 +49,9 @@ export function ArtistsWidget() {
                 className="group shrink-0 w-31.25"
               >
                 <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted">
-                  {artist.profileImageUrl ? (
+                  {artist.avatar ? (
                     <Image
-                      src={artist.profileImageUrl}
+                      src={artist.avatar}
                       alt={artist.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-200"
@@ -172,9 +168,9 @@ export function ArtistsWidget() {
                   <span className="text-sm font-bold text-foreground w-5 text-center shrink-0">
                     {index + 1}
                   </span>
-                  {artist.profileImageUrl ? (
+                  {artist.avatar ? (
                     <Image
-                      src={artist.profileImageUrl}
+                      src={artist.avatar}
                       alt={artist.name}
                       width={40}
                       height={40}

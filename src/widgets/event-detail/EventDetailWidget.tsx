@@ -2,22 +2,38 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { Skeleton } from "@/shared/ui";
 import { getEvents } from "@/features/event";
 import { getShows } from "@/features/show";
+import { getPresalePolicy } from "@/features/membership";
 import type { EventSummary } from "@/features/event";
 import type { ShowSummary } from "@/features/show";
+import type { PresalePolicy } from "@/features/membership";
+import type { TierLevel, TierWindow } from "@/shared/types";
 import type { EventDetail } from "@/shared/lib/mocks/event-detail";
 import { EventDetailHero } from "./EventDetailHero";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventBookingSidebar } from "./EventBookingSidebar";
 
-function mapToEventDetail(event: EventSummary, shows: ShowSummary[]): EventDetail {
-  const dates = shows.map((show) => ({
+function mapPresalePolicyToWindows(policy: PresalePolicy | undefined): TierWindow[] {
+  if (!policy) return [];
+  return policy.tiers.map((t) => ({
+    tier: t.tier.toLowerCase() as TierLevel,
+    opensAt: t.openAt,
+    fee: t.bookingFeeWon,
+  }));
+}
+
+function mapToEventDetail(
+  event: EventSummary,
+  shows: ShowSummary[],
+  presalePolicies: (PresalePolicy | undefined)[],
+): EventDetail {
+  const dates = shows.map((show, i) => ({
     id: String(show.showId),
     date: show.startAt,
-    bookingWindows: [],
+    bookingWindows: mapPresalePolicyToWindows(presalePolicies[i]),
     totalSeats: show.capacity,
     remainingSeats: show.capacity,
   }));
@@ -72,11 +88,11 @@ function EventDetailSkeleton() {
       <Skeleton className="h-5 w-48" />
       <div className="flex gap-8 items-start">
         <div className="flex-1 space-y-6">
-          <Skeleton className="h-[400px] rounded-xl" />
-          <Skeleton className="h-[200px] rounded-xl" />
+          <Skeleton className="h-100 rounded-xl" />
+          <Skeleton className="h-50 rounded-xl" />
         </div>
-        <div className="w-[400px] shrink-0">
-          <Skeleton className="h-[500px] rounded-xl" />
+        <div className="w-100 shrink-0">
+          <Skeleton className="h-125 rounded-xl" />
         </div>
       </div>
     </div>
@@ -101,6 +117,14 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
     enabled: !!eventSummary,
   });
 
+  const presalePolicyResults = useQueries({
+    queries: shows.map((show) => ({
+      queryKey: ["presale-policy", eventId, show.showId],
+      queryFn: () => getPresalePolicy(eventId, show.showId),
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+
   const isLoading = eventsLoading || showsLoading;
 
   if (isLoading) return <EventDetailSkeleton />;
@@ -112,14 +136,18 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
         <p className="text-sm text-muted-foreground">
           요청하신 공연 정보가 존재하지 않거나 삭제되었습니다.
         </p>
-        <Link href="/events" className="text-sm text-primary hover:underline mt-2">
+        <Link
+          href="/events"
+          className="text-sm text-primary hover:underline mt-2"
+        >
           공연 목록으로 돌아가기
         </Link>
       </div>
     );
   }
 
-  const event = mapToEventDetail(eventSummary, shows);
+  const presalePolicies = presalePolicyResults.map((r) => r.data);
+  const event = mapToEventDetail(eventSummary, shows, presalePolicies);
 
   return (
     <div className="space-y-6">
@@ -141,7 +169,7 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
         </div>
 
         {/* Right: Sticky sidebar */}
-        <div className="w-[400px] shrink-0">
+        <div className="w-100 shrink-0">
           <div className="sticky top-6">
             <EventBookingSidebar event={event} />
           </div>

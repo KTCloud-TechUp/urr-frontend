@@ -13,7 +13,7 @@ export function SignupCompleteStep({ userName }: SignupCompleteStepProps) {
   const router = useRouter();
 
   return (
-    <div className="max-w-[400px] w-full mx-auto flex flex-col items-center text-center">
+    <div className="max-w-120 w-full mx-auto flex flex-col items-center text-center">
       <div className="size-16 rounded-full bg-green-100 flex items-center justify-center">
         <CheckCircle2 size={28} className="text-green-600" />
       </div>

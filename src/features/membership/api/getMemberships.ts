@@ -20,7 +20,10 @@ interface MembershipsResponse {
   isSuccess: boolean;
   statusCode: number;
   message: string;
-  data: MembershipApiItem[];
+  data: {
+    details: MembershipApiItem[];
+    memberships: { artistId: number; artistName: string; tier: string; endDate: string }[];
+  };
 }
 
 const TIER_MAP: Record<string, TierLevel> = {
@@ -35,7 +38,7 @@ export async function getMemberships(userId: number): Promise<Membership[]> {
     service: "events",
     headers: { "X-User-Id": String(userId) },
   });
-  return res.data.data.map(
+  return res.data.data.details.map(
     (item): Membership => ({
       id: String(item.membershipId),
       artistId: String(item.artistId),

@@ -22,7 +22,7 @@ export interface MyTransferRecord {
 const ticketEvents: Event[] = [
   {
     id: "1",
-    artistId: "gdragon",
+    artistId: "1",
     title: "G-Dragon 2026 MAMA DOME TOUR",
     venue: "KSPO DOME (올림픽체조경기장)",
     dates: [
@@ -34,12 +34,12 @@ const ticketEvents: Event[] = [
         remainingSeats: 4230,
       },
     ],
-    poster: "/heroes/hero_g-dragon.png",
+    poster: "/artists/1/banner.png",
     status: "open",
   },
   {
     id: "2",
-    artistId: "bts",
+    artistId: "2",
     title: "BTS YET TO COME ENCORE IN SEOUL",
     venue: "잠실종합운동장 주경기장",
     dates: [
@@ -51,12 +51,12 @@ const ticketEvents: Event[] = [
         remainingSeats: 12000,
       },
     ],
-    poster: "/events/event_bts-yet-to-come-in-cinema.png",
+    poster: "/artists/2/events/event_bts-yet-to-come-in-cinema.png",
     status: "open",
   },
   {
     id: "4",
-    artistId: "aespa",
+    artistId: "3",
     title: "aespa LIVE SYNK : PARALLEL",
     venue: "KSPO DOME (올림픽체조경기장)",
     dates: [
@@ -68,12 +68,12 @@ const ticketEvents: Event[] = [
         remainingSeats: 4500,
       },
     ],
-    poster: "/heroes/hero_aespa.png",
+    poster: "/artists/3/events/event_aespa-live-synk-parallel.png",
     status: "open",
   },
   {
     id: "evt-gdragon-past-2025",
-    artistId: "gdragon",
+    artistId: "1",
     title: "G-Dragon POWER CONCERT 2025",
     venue: "잠실종합운동장 주경기장",
     dates: [
@@ -85,12 +85,12 @@ const ticketEvents: Event[] = [
         remainingSeats: 0,
       },
     ],
-    poster: "/heroes/hero_g-dragon.png",
+    poster: "/artists/1/banner.png",
     status: "closed",
   },
   {
     id: "evt-bts-past-2025",
-    artistId: "bts",
+    artistId: "2",
     title: "BTS WORLD TOUR: LOVE YOURSELF 2025",
     venue: "고척스카이돔",
     dates: [
@@ -102,7 +102,7 @@ const ticketEvents: Event[] = [
         remainingSeats: 0,
       },
     ],
-    poster: "/events/event_bts-yet-to-come-in-cinema.png",
+    poster: "/artists/2/events/event_bts-yet-to-come-in-cinema.png",
     status: "closed",
   },
 ];

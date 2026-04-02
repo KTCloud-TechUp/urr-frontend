@@ -8,7 +8,7 @@ export function Footer() {
           {/* Left: Brand column */}
           <div className="shrink-0 space-y-7">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo_final.svg" alt="URR" className="h-11 w-auto" />
+            <img src="/icons/logo_final.svg" alt="URR" className="h-11 w-auto" />
 
             {/* Social icons */}
             <div className="flex items-center gap-2.5 text-muted-foreground">
