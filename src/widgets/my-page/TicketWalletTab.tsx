@@ -106,7 +106,7 @@ export function TicketWalletTab({ tickets, user }: TicketWalletTabProps) {
       {/* Transfer Listing Modal */}
       <TransferListingModal
         ticket={transferTicket}
-        userTier={transferTicket ? getEffectiveTier(user, transferTicket.event.artistId) : 'mist'}
+        userTier={transferTicket ? getEffectiveTier(user, transferTicket.event.artistId) : 'MIST'}
         open={!!transferTicket}
         onClose={() => setTransferTicket(null)}
         onListed={handleListed}

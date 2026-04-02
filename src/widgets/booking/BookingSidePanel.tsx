@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, ChevronDown } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
@@ -291,7 +292,7 @@ export function BookingSidePanel({
           {tierFee > 0 && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground flex items-center gap-1">
-                <img src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
+                <Image src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
                 <span>{TIER_LABELS[userTier]} 수수료</span>
               </span>
               <span className="tabular-nums">

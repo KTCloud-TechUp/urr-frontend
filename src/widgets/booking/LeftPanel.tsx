@@ -16,7 +16,7 @@ import { TIER_LABELS, TIER_IMAGES } from "@/shared/types";
 import type { TierLevel } from "@/shared/types";
 import { LeftPanelCollapsed } from "./LeftPanelCollapsed";
 
-const TIER_ORDER: TierLevel[] = ["lightning", "thunder", "cloud", "mist"];
+const TIER_ORDER: TierLevel[] = ["LIGHTNING", "THUNDER", "CLOUD", "MIST"];
 
 
 function formatWindowDate(isoDate: string): string {
@@ -49,7 +49,7 @@ function TierScheduleRow({
       )}
     >
       <span className="flex items-center gap-1.5 font-medium">
-        <img src={TIER_IMAGES[tier]} width={16} height={16} alt="" />
+        <Image src={TIER_IMAGES[tier]} width={16} height={16} alt="" />
         <span>{TIER_LABELS[tier]}</span>
       </span>
       <span

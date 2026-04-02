@@ -1,12 +1,13 @@
+import Image from "next/image";
 import { cn } from "@/shared/lib/utils";
 import type { TierLevel } from "@/shared/types";
 import { TIER_LABELS, TIER_IMAGES } from "@/shared/types";
 
 const tierStyles: Record<TierLevel, string> = {
-  lightning: "bg-tier-lightning-bg text-tier-lightning",
-  thunder: "bg-tier-thunder-bg text-tier-thunder",
-  cloud: "bg-tier-cloud-bg text-tier-cloud",
-  mist: "bg-tier-mist-bg text-tier-mist",
+  LIGHTNING: "bg-tier-lightning-bg text-tier-lightning",
+  THUNDER: "bg-tier-thunder-bg text-tier-thunder",
+  CLOUD: "bg-tier-cloud-bg text-tier-cloud",
+  MIST: "bg-tier-mist-bg text-tier-mist",
 };
 
 const sizeStyles = {
@@ -45,7 +46,7 @@ export function TierBadge({
       )}
       aria-label={`${TIER_LABELS[tier]} 등급`}
     >
-      <img src={TIER_IMAGES[tier]} width={iconSizes[size]} height={iconSizes[size]} alt="" />
+      <Image src={TIER_IMAGES[tier]} width={iconSizes[size]} height={iconSizes[size]} alt="" />
       {showLabel && <span>{TIER_LABELS[tier]}</span>}
     </span>
   );

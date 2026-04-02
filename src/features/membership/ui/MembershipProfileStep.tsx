@@ -32,7 +32,7 @@ const MOCK_MELON_RESULT = {
   totalStreams: 1247,
   artistRatio: 34.2,
   fanScore: 72,
-  tier: 'thunder' as TierLevel,
+  tier: 'THUNDER' as TierLevel,
 }
 
 export function MembershipProfileStep({ artist, onComplete }: MembershipProfileStepProps) {
@@ -61,7 +61,7 @@ export function MembershipProfileStep({ artist, onComplete }: MembershipProfileS
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [nickname])
 
-  const resultTier: TierLevel = melonState === 'done' ? MOCK_MELON_RESULT.tier : 'cloud'
+  const resultTier: TierLevel = melonState === 'done' ? MOCK_MELON_RESULT.tier : 'CLOUD'
 
   const handleMelonLink = () => {
     if (!melonId.trim()) return
@@ -200,7 +200,7 @@ export function MembershipProfileStep({ artist, onComplete }: MembershipProfileS
                 <div className="border-t border-border pt-2 mt-2 flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">부여 등급</span>
                   <div className="flex items-center gap-1.5">
-                    <TierBadge tier="cloud" size="sm" />
+                    <TierBadge tier="CLOUD" size="sm" />
                     <span className="text-xs text-muted-foreground">→</span>
                     <TierBadge tier={MOCK_MELON_RESULT.tier} size="sm" />
                   </div>

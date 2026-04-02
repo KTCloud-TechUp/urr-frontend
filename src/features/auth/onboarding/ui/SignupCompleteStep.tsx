@@ -25,7 +25,7 @@ export function SignupCompleteStep({ userName }: SignupCompleteStepProps) {
 
       <div className="mt-8 w-full rounded-xl border border-border bg-card p-6 space-y-4">
         <div className="flex items-center justify-center gap-2">
-          <TierBadge tier="mist" size="sm" />
+          <TierBadge tier="MIST" size="sm" />
           <span className="text-sm font-medium">Lv.1 미스트 등급</span>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">

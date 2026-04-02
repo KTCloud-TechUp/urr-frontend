@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 
 const BAR_HEIGHTS = [0.35, 0.72, 0.55, 0.90, 0.45, 0.82, 0.65, 0.78];
 
@@ -217,7 +218,7 @@ export function BentoFeaturesSection() {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="flex items-center gap-1.5" style={{ fontSize: "0.84rem", color: "#e8edf3" }}>
-                      <img src={`/membership/${tier.key}.svg`} width={14} height={14} alt="" style={{ objectFit: "contain" }} />
+                      <Image src={`/membership/${tier.key}.svg`} width={14} height={14} alt="" style={{ objectFit: "contain" }} />
                       {tier.name}
                     </span>
                     <span style={{ fontSize: "0.68rem", color: tier.color, fontWeight: 500 }}>

@@ -55,11 +55,11 @@ function getSellerReliability(tier: TierLevel): {
   className: string;
 } {
   switch (tier) {
-    case "lightning":
+    case "LIGHTNING":
       return { label: "최고 신뢰 판매자", className: "text-tier-lightning" };
-    case "thunder":
+    case "THUNDER":
       return { label: "우수 판매자", className: "text-tier-thunder" };
-    case "cloud":
+    case "CLOUD":
       return { label: "일반 판매자", className: "text-tier-cloud" };
     default:
       return { label: "신규 판매자", className: "text-tier-mist" };

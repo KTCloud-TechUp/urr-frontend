@@ -14,17 +14,17 @@ const SECTION_LAYOUT: Record<string, { rows: number; seatsPerRow: number }> = {
 };
 
 export const MAX_SEATS_PER_TIER: Record<TierLevel, number> = {
-  lightning: 4,
-  thunder: 4,
-  cloud: 2,
-  mist: 2,
+  LIGHTNING: 4,
+  THUNDER: 4,
+  CLOUD: 2,
+  MIST: 2,
 };
 
 const TIER_EXTRA_TAKEN_RATIO: Record<TierLevel, number> = {
-  lightning: 0,
-  thunder: 0.05,
-  cloud: 0.12,
-  mist: 0.18,
+  LIGHTNING: 0,
+  THUNDER: 0.05,
+  CLOUD: 0.12,
+  MIST: 0.18,
 };
 
 function seededRandom(seed: number): () => number {

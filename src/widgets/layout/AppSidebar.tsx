@@ -15,11 +15,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui";
 import { Separator } from "@/shared/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
-import { TierBadge } from "@/entities/user";
 import { SidebarNavItem } from "./SidebarNavItem";
 import { ArtistTreeItem } from "./ArtistTreeItem";
 import { useLayout } from "./model/useLayout";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
+import { TierBadge } from "@/entities/user";
 import { mockUser } from "@/shared/lib/mocks/user";
 import { mockArtists } from "@/shared/lib/mocks/artists";
 import { cn } from "@/shared/lib/utils";
@@ -238,7 +238,6 @@ export function AppSidebar() {
               <span className="text-sm font-medium text-sidebar-foreground truncate">
                 {displayName}
               </span>
-              <TierBadge tier={mockUser.tier} size="sm" />
             </div>
           </Link>
         )}
