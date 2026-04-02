@@ -2,25 +2,38 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { Skeleton } from "@/shared/ui";
 import { getEvents } from "@/features/event";
 import { getShows } from "@/features/show";
+import { getPresalePolicy } from "@/features/membership";
 import type { EventSummary } from "@/features/event";
 import type { ShowSummary } from "@/features/show";
+import type { PresalePolicy } from "@/features/membership";
+import type { TierLevel, TierWindow } from "@/shared/types";
 import type { EventDetail } from "@/shared/lib/mocks/event-detail";
 import { EventDetailHero } from "./EventDetailHero";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventBookingSidebar } from "./EventBookingSidebar";
 
+function mapPresalePolicyToWindows(policy: PresalePolicy | undefined): TierWindow[] {
+  if (!policy) return [];
+  return policy.tiers.map((t) => ({
+    tier: t.tier.toLowerCase() as TierLevel,
+    opensAt: t.openAt,
+    fee: t.bookingFeeWon,
+  }));
+}
+
 function mapToEventDetail(
   event: EventSummary,
   shows: ShowSummary[],
+  presalePolicies: (PresalePolicy | undefined)[],
 ): EventDetail {
-  const dates = shows.map((show) => ({
+  const dates = shows.map((show, i) => ({
     id: String(show.showId),
     date: show.startAt,
-    bookingWindows: [],
+    bookingWindows: mapPresalePolicyToWindows(presalePolicies[i]),
     totalSeats: show.capacity,
     remainingSeats: show.capacity,
   }));
@@ -104,6 +117,14 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
     enabled: !!eventSummary,
   });
 
+  const presalePolicyResults = useQueries({
+    queries: shows.map((show) => ({
+      queryKey: ["presale-policy", eventId, show.showId],
+      queryFn: () => getPresalePolicy(eventId, show.showId),
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+
   const isLoading = eventsLoading || showsLoading;
 
   if (isLoading) return <EventDetailSkeleton />;
@@ -125,7 +146,8 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
     );
   }
 
-  const event = mapToEventDetail(eventSummary, shows);
+  const presalePolicies = presalePolicyResults.map((r) => r.data);
+  const event = mapToEventDetail(eventSummary, shows, presalePolicies);
 
   return (
     <div className="space-y-6">
