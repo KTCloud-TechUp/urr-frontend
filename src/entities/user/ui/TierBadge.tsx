@@ -21,6 +21,7 @@ const iconSizes = {
   lg: 16,
 };
 
+
 interface TierBadgeProps {
   tier: TierLevel;
   size?: "sm" | "default" | "lg";

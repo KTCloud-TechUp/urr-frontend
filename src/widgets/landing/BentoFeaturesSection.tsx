@@ -13,11 +13,12 @@ const LOG_LINES = [
   { time: "13:04:26", type: "BOOK", typeColor: "#34d399", msg: "☁️ 박지훈 — SEVENTEEN 예매 성공" },
 ];
 
+
 const PRIORITY_TIERS = [
-  { emoji: "🌩️", name: "라이트닝", timing: "선예매 1순위", bar: 100, color: "#FF7A56" },
-  { emoji: "⚡", name: "썬더", timing: "선예매 +1h", bar: 75, color: "#FFA060" },
-  { emoji: "☁️", name: "클라우드", timing: "선예매 +1day", bar: 50, color: "#7E8CDA" },
-  { emoji: "🌫️", name: "미스트", timing: "일반 예매", bar: 25, color: "#4b5e78" },
+  { key: "lightning", name: "라이트닝", timing: "선예매 1순위", bar: 100, color: "#FF7A56" },
+  { key: "thunder", name: "썬더", timing: "선예매 +1h", bar: 75, color: "#FFA060" },
+  { key: "cloud", name: "클라우드", timing: "선예매 +1day", bar: 50, color: "#7E8CDA" },
+  { key: "mist", name: "미스트", timing: "일반 예매", bar: 25, color: "#4b5e78" },
 ];
 
 const PROGRESS_ITEMS = [
@@ -215,8 +216,9 @@ export function BentoFeaturesSection() {
                   }}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span style={{ fontSize: "0.84rem", color: "#e8edf3" }}>
-                      {tier.emoji} {tier.name}
+                    <span className="flex items-center gap-1.5" style={{ fontSize: "0.84rem", color: "#e8edf3" }}>
+                      <img src={`/membership/${tier.key}.svg`} width={14} height={14} alt="" style={{ objectFit: "contain" }} />
+                      {tier.name}
                     </span>
                     <span style={{ fontSize: "0.68rem", color: tier.color, fontWeight: 500 }}>
                       {tier.timing}

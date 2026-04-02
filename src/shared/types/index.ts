@@ -187,10 +187,10 @@ export const TIER_EMOJIS: Record<TierLevel, string> = {
 };
 
 export const TIER_IMAGES: Record<TierLevel, string> = {
-  lightning: "/membership/lightning.png",
-  thunder: "/membership/thunder.png",
-  cloud: "/membership/cloud.png",
-  mist: "/membership/mist.png",
+  lightning: "/membership/lightning.svg",
+  thunder: "/membership/thunder.svg",
+  cloud: "/membership/cloud.svg",
+  mist: "/membership/mist.svg",
 };
 
 export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
