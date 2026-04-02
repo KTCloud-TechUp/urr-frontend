@@ -1,6 +1,6 @@
 // === Enums & Literals ===
 
-export type TierLevel = "lightning" | "thunder" | "cloud" | "mist";
+export type TierLevel = "LIGHTNING" | "THUNDER" | "CLOUD" | "MIST";
 export type BookingStatus = "open" | "upcoming" | "soldout" | "closed";
 export type TransferStatus = "listed" | "sold" | "completed" | "cancelled";
 export type SeatStatus = "available" | "selected" | "taken" | "locked";
@@ -173,24 +173,24 @@ export interface ConfirmationData {
 // === Label Constants ===
 
 export const TIER_LABELS: Record<TierLevel, string> = {
-  lightning: "라이트닝",
-  thunder: "썬더",
-  cloud: "클라우드",
-  mist: "미스트",
+  LIGHTNING: "라이트닝",
+  THUNDER: "썬더",
+  CLOUD: "클라우드",
+  MIST: "미스트",
 };
 
 export const TIER_EMOJIS: Record<TierLevel, string> = {
-  lightning: "🌩️",
-  thunder: "⚡",
-  cloud: "☁️",
-  mist: "🌫️",
+  LIGHTNING: "🌩️",
+  THUNDER: "⚡",
+  CLOUD: "☁️",
+  MIST: "🌫️",
 };
 
 export const TIER_IMAGES: Record<TierLevel, string> = {
-  lightning: "/membership/lightning.svg",
-  thunder: "/membership/thunder.svg",
-  cloud: "/membership/cloud.svg",
-  mist: "/membership/mist.svg",
+  LIGHTNING: "/membership/lightning.svg",
+  THUNDER: "/membership/thunder.svg",
+  CLOUD: "/membership/cloud.svg",
+  MIST: "/membership/mist.svg",
 };
 
 export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {

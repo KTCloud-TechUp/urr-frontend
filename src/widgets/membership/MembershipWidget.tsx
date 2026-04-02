@@ -92,7 +92,7 @@ export function MembershipWidget() {
         <MembershipCompleteStep
           artist={selectedArtist}
           nickname={profileData?.nickname ?? ''}
-          tier={profileData?.tier ?? 'cloud'}
+          tier={profileData?.tier ?? 'CLOUD'}
         />
       )}
     </div>

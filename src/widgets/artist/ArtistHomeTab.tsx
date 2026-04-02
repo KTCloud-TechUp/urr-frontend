@@ -91,18 +91,18 @@ export function ArtistHomeTab({
                     )}{" "}
                     만료
                     <span className="mx-1.5 text-border">·</span>
-                    {membership.tier === "lightning"
+                    {membership.tier === "LIGHTNING"
                       ? "최우선 예매 · 양도 수수료 5%"
-                      : membership.tier === "thunder"
+                      : membership.tier === "THUNDER"
                         ? "우선 예매 · 양도 수수료 5%"
-                        : membership.tier === "cloud"
+                        : membership.tier === "CLOUD"
                           ? "일반 예매 · 양도 수수료 10%"
                           : "일반 예매 · 양도 수수료 10%"}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-6 text-xs text-muted-foreground">
-                {(["lightning", "thunder", "cloud", "mist"] as const).map(
+                {(["LIGHTNING", "THUNDER", "CLOUD", "MIST"] as const).map(
                   (tier) => (
                     <div
                       key={tier}
@@ -113,7 +113,7 @@ export function ArtistHomeTab({
                           : "opacity-40",
                       )}
                     >
-                      <img src={TIER_IMAGES[tier]} width={18} height={18} alt="" />
+                      <Image src={TIER_IMAGES[tier]} width={18} height={18} alt="" />
                       <p className="text-[10px] mt-0.5">{TIER_LABELS[tier]}</p>
                     </div>
                   ),
@@ -141,10 +141,10 @@ export function ArtistHomeTab({
               </div>
               <div className="flex items-center gap-4 shrink-0">
                 <div className="hidden lg:flex items-center gap-4 text-xs text-muted-foreground">
-                  {(["lightning", "thunder", "cloud", "mist"] as const).map(
+                  {(["LIGHTNING", "THUNDER", "CLOUD", "MIST"] as const).map(
                     (tier) => (
                       <div key={tier} className="text-center">
-                        <img src={TIER_IMAGES[tier]} width={18} height={18} alt="" />
+                        <Image src={TIER_IMAGES[tier]} width={18} height={18} alt="" />
                         <p className="text-[10px] mt-0.5">
                           {TIER_LABELS[tier]}
                         </p>

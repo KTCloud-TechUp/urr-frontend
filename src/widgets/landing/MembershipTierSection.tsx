@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const TIERS = [
@@ -200,7 +201,7 @@ export function MembershipTierSection() {
 
               {/* Tier name */}
               <div className="flex items-center gap-2 mb-2">
-                <img src={`/membership/${tier.englishName.toLowerCase()}.svg`} width={24} height={24} alt={tier.name} />
+                <Image src={`/membership/${tier.englishName.toLowerCase()}.svg`} width={24} height={24} alt={tier.name} />
                 <div>
                   <div style={{ fontSize: "0.88rem", fontWeight: 500, color: "#e8edf3" }}>{tier.name}</div>
                   <div style={{ fontSize: "0.68rem", color: "#4b5e78" }}>{tier.condition}</div>

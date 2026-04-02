@@ -15,20 +15,20 @@ interface MembershipIntroStepProps {
   onSubscribe: () => void;
 }
 
-const TIER_ORDER: TierLevel[] = ["lightning", "thunder", "cloud", "mist"];
+const TIER_ORDER: TierLevel[] = ["LIGHTNING", "THUNDER", "CLOUD", "MIST"];
 
 const TIER_BOOKING_LABEL: Record<TierLevel, string> = {
-  lightning: "우선 예매",
-  thunder: "우선 예매",
-  cloud: "일반 예매",
-  mist: "일반 예매",
+  LIGHTNING: "우선 예매",
+  THUNDER: "우선 예매",
+  CLOUD: "일반 예매",
+  MIST: "일반 예매",
 };
 
 const TIER_TRANSFER_FEE: Record<TierLevel, string> = {
-  lightning: "5%",
-  thunder: "5%",
-  cloud: "10%",
-  mist: "불가",
+  LIGHTNING: "5%",
+  THUNDER: "5%",
+  CLOUD: "10%",
+  MIST: "불가",
 };
 
 function formatOffset(minutes: number): string {

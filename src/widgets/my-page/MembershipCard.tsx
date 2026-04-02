@@ -11,17 +11,17 @@ import type { Membership, TierLevel } from '@/shared/types'
 import { TIER_LABELS } from '@/shared/types'
 
 const NEXT_TIER: Record<TierLevel, TierLevel | null> = {
-  mist: 'cloud',
-  cloud: 'thunder',
-  thunder: 'lightning',
-  lightning: null,
+  MIST: 'CLOUD',
+  CLOUD: 'THUNDER',
+  THUNDER: 'LIGHTNING',
+  LIGHTNING: null,
 }
 
 const TIER_COLORS: Record<TierLevel, string> = {
-  mist: 'var(--tier-mist)',
-  cloud: 'var(--tier-cloud)',
-  thunder: 'var(--tier-thunder)',
-  lightning: 'var(--tier-lightning)',
+  MIST: 'var(--tier-mist)',
+  CLOUD: 'var(--tier-cloud)',
+  THUNDER: 'var(--tier-thunder)',
+  LIGHTNING: 'var(--tier-lightning)',
 }
 
 interface MembershipCardProps {

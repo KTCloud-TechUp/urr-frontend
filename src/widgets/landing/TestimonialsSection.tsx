@@ -1,9 +1,10 @@
+import Image from "next/image";
 
 const FEATURED = {
   quote:
     "작년까지는 매크로 때문에 티켓을 한 번도 못 샀어요. URR은 달라요. 팬 점수가 높을수록 먼저 들어가는 게 진짜 공평하고, 대기 시간에 긴장은 해도 불안하지 않아요.",
   name: "이수연",
-  tier: "lightning" as const,
+  tier: "LIGHTNING" as const,
   tierLabel: "라이트닝 멤버",
   fanLabel: "IVE 팬",
   initials: "이수",
@@ -13,7 +14,7 @@ const CARDS = [
   {
     quote: "선예매 1순위 됐을 때 소리 질렀어요. 3년 동안 aespa 콘서트 못 갔는데 드디어 가게 됐어요.",
     name: "김민준",
-    tier: "thunder" as const,
+    tier: "THUNDER" as const,
     tierLabel: "썬더 멤버",
     fanLabel: "aespa 팬",
     initials: "김민",
@@ -21,7 +22,7 @@ const CARDS = [
   {
     quote: "양도 마켓에서 정가보다 30% 비싼 티켓을 에스크로로 안전하게 샀어요. 사기 걱정 없어서 너무 좋아요.",
     name: "박지훈",
-    tier: "cloud" as const,
+    tier: "CLOUD" as const,
     tierLabel: "클라우드 멤버",
     fanLabel: "BTS 팬",
     initials: "박지",
@@ -29,7 +30,7 @@ const CARDS = [
   {
     quote: "멜론 연동하고 FTS 점수 올라가는 거 보면 진짜 내 팬심이 수치화되는 느낌. 열심히 스트리밍하게 돼요.",
     name: "최유나",
-    tier: "thunder" as const,
+    tier: "THUNDER" as const,
     tierLabel: "썬더 멤버",
     fanLabel: "BLACKPINK 팬",
     initials: "최유",
@@ -130,7 +131,7 @@ export function TestimonialsSection() {
             <div>
               <div style={{ fontSize: "0.84rem", fontWeight: 500, color: "#e8edf3" }}>{FEATURED.name}</div>
               <div className="flex items-center gap-1" style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 300 }}>
-                <img src={`/membership/${FEATURED.tier}.svg`} width={14} height={14} alt="" style={{ objectFit: "contain" }} />
+                <Image src={`/membership/${FEATURED.tier}.svg`} width={14} height={14} alt="" style={{ objectFit: "contain" }} />
                 {FEATURED.tierLabel} · {FEATURED.fanLabel}
               </div>
             </div>
@@ -184,7 +185,7 @@ export function TestimonialsSection() {
                 <div>
                   <div style={{ fontSize: "0.84rem", fontWeight: 500, color: "#e8edf3" }}>{card.name}</div>
                   <div className="flex items-center gap-1" style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 300 }}>
-                    <img src={`/membership/${card.tier}.svg`} width={14} height={14} alt="" style={{ objectFit: "contain" }} />
+                    <Image src={`/membership/${card.tier}.svg`} width={14} height={14} alt="" style={{ objectFit: "contain" }} />
                     {card.tierLabel} · {card.fanLabel}
                   </div>
                 </div>

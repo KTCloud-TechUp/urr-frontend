@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useCallback } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MapPin, Calendar } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -159,7 +160,7 @@ export function ConfirmationView() {
             {feeSubtotal > 0 && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground flex items-center gap-1">
-                  <img src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
+                  <Image src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
                   <span>{TIER_LABELS[userTier]} 수수료</span>
                 </span>
                 <span className="tabular-nums">

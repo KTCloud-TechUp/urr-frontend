@@ -26,13 +26,6 @@ interface MembershipsResponse {
   };
 }
 
-const TIER_MAP: Record<string, TierLevel> = {
-  LIGHTNING: "lightning",
-  THUNDER: "thunder",
-  CLOUD: "cloud",
-  MIST: "mist",
-};
-
 export async function getMemberships(userId: number): Promise<Membership[]> {
   const res = await fetchWithAuth<MembershipsResponse>("/membership", {
     service: "events",
@@ -43,7 +36,7 @@ export async function getMemberships(userId: number): Promise<Membership[]> {
       id: String(item.membershipId),
       artistId: String(item.artistId),
       artistName: item.artistName,
-      tier: TIER_MAP[item.tier] ?? "mist",
+      tier: (item.tier as TierLevel) ?? "MIST",
       nickname: item.nickname,
       membershipNumber: String(item.membershipId),
       joinedAt: item.startDate ?? "",
