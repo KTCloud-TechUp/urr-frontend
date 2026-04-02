@@ -12,7 +12,7 @@ import { useLayout } from "@/widgets/layout/model/useLayout";
 import { formatPrice } from "@/shared/lib/format";
 import { TierBadge } from "@/entities/user/ui/TierBadge";
 import { PriceDisplay } from "@/shared/ui/PriceDisplay";
-import { TIER_EMOJIS, TIER_LABELS } from "@/shared/types";
+import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 
 function formatEventDate(isoDate: string): string {
   const d = new Date(isoDate);
@@ -159,7 +159,7 @@ export function ConfirmationView() {
             {feeSubtotal > 0 && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground flex items-center gap-1">
-                  <span>{TIER_EMOJIS[userTier]}</span>
+                  <img src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
                   <span>{TIER_LABELS[userTier]} 수수료</span>
                 </span>
                 <span className="tabular-nums">

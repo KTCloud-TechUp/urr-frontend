@@ -11,7 +11,7 @@ import { cn } from "@/shared/lib/utils";
 import { AuthInitializer } from "@/features/auth/ui/AuthInitializer";
 
 // Pages without sidebar/topbar
-const NO_SHELL_ROUTES = ["/onboarding", "/auth/callback", "/queue"];
+const NO_SHELL_ROUTES = ["/onboarding", "/auth/callback", "/queue", "/landing"];
 
 function ShellInner({ children }: { children: ReactNode }) {
   const { isSidebarExpanded } = useLayout();

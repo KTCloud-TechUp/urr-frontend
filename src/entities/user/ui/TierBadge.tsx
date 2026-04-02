@@ -1,21 +1,12 @@
-import { Haze, Cloud, CloudLightning, Zap } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import type { TierLevel } from "@/shared/types";
-import { TIER_LABELS } from "@/shared/types";
+import { TIER_LABELS, TIER_IMAGES } from "@/shared/types";
 
 const tierStyles: Record<TierLevel, string> = {
   lightning: "bg-tier-lightning-bg text-tier-lightning",
   thunder: "bg-tier-thunder-bg text-tier-thunder",
   cloud: "bg-tier-cloud-bg text-tier-cloud",
   mist: "bg-tier-mist-bg text-tier-mist",
-};
-
-const tierIcons: Record<TierLevel, LucideIcon> = {
-  mist: Haze,
-  cloud: Cloud,
-  thunder: CloudLightning,
-  lightning: Zap,
 };
 
 const sizeStyles = {
@@ -30,6 +21,7 @@ const iconSizes = {
   lg: 16,
 };
 
+
 interface TierBadgeProps {
   tier: TierLevel;
   size?: "sm" | "default" | "lg";
@@ -43,8 +35,6 @@ export function TierBadge({
   showLabel = true,
   className,
 }: TierBadgeProps) {
-  const Icon = tierIcons[tier];
-
   return (
     <span
       className={cn(
@@ -55,7 +45,7 @@ export function TierBadge({
       )}
       aria-label={`${TIER_LABELS[tier]} 등급`}
     >
-      <Icon size={iconSizes[size]} />
+      <img src={TIER_IMAGES[tier]} width={iconSizes[size]} height={iconSizes[size]} alt="" />
       {showLabel && <span>{TIER_LABELS[tier]}</span>}
     </span>
   );

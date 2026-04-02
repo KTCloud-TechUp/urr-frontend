@@ -12,7 +12,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { TIER_LABELS, TIER_EMOJIS } from "@/shared/types";
+import { TIER_LABELS, TIER_IMAGES } from "@/shared/types";
 import type { TierLevel } from "@/shared/types";
 import { LeftPanelCollapsed } from "./LeftPanelCollapsed";
 
@@ -49,7 +49,7 @@ function TierScheduleRow({
       )}
     >
       <span className="flex items-center gap-1.5 font-medium">
-        <span>{TIER_EMOJIS[tier]}</span>
+        <img src={TIER_IMAGES[tier]} width={16} height={16} alt="" />
         <span>{TIER_LABELS[tier]}</span>
       </span>
       <span
