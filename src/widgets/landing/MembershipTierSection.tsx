@@ -104,18 +104,21 @@ export function MembershipTierSection() {
   return (
     <section
       id="membership"
-      className="relative py-[120px]"
+      className="relative py-30"
       style={{ background: "#0D0D1F" }}
     >
       {/* Top border */}
       <div
         className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: "linear-gradient(90deg, transparent, rgba(255,94,50,0.08), transparent)" }}
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,94,50,0.08), transparent)",
+        }}
       />
 
-      <div className="max-w-[1200px] mx-auto px-6">
+      <div className="max-w-300 mx-auto px-6">
         {/* Header */}
-        <div className="text-center mb-[60px] landing-reveal">
+        <div className="text-center mb-15 landing-reveal">
           <div
             className="flex items-center justify-center gap-2.5 mb-4"
             style={{
@@ -131,12 +134,27 @@ export function MembershipTierSection() {
           </div>
           <h2
             className="font-light mb-4"
-            style={{ fontSize: "clamp(1.8rem, 3vw, 2.4rem)", color: "#e8edf3", letterSpacing: "-0.03em", fontWeight: 200 }}
+            style={{
+              fontSize: "clamp(1.8rem, 3vw, 2.4rem)",
+              color: "#e8edf3",
+              letterSpacing: "-0.03em",
+              fontWeight: 200,
+            }}
           >
             나의 팬심이 등급이 됩니다
           </h2>
-          <p style={{ fontSize: "0.88rem", color: "#94a3b8", maxWidth: "520px", margin: "0 auto", fontWeight: 300, lineHeight: 1.7 }}>
-            활동이 많을수록 더 높은 등급. 연간 ₩30,000으로 공정한 티켓팅을 시작하세요.
+          <p
+            style={{
+              fontSize: "0.88rem",
+              color: "#94a3b8",
+              maxWidth: "520px",
+              margin: "0 auto",
+              fontWeight: 300,
+              lineHeight: 1.7,
+            }}
+          >
+            활동이 많을수록 더 높은 등급. 연간 ₩30,000으로 공정한 티켓팅을
+            시작하세요.
           </p>
         </div>
 
@@ -193,7 +211,9 @@ export function MembershipTierSection() {
               {tier.badge && (
                 <div
                   className="inline-block px-3 py-1 rounded-full text-[0.64rem] font-semibold uppercase tracking-[0.05em] text-white mb-4"
-                  style={{ background: "linear-gradient(135deg, #FF5E32, #FF8060)" }}
+                  style={{
+                    background: "linear-gradient(135deg, #FF5E32, #FF8060)",
+                  }}
                 >
                   {tier.badge}
                 </div>
@@ -201,10 +221,25 @@ export function MembershipTierSection() {
 
               {/* Tier name */}
               <div className="flex items-center gap-2 mb-2">
-                <Image src={`/membership/${tier.englishName.toLowerCase()}.svg`} width={24} height={24} alt={tier.name} />
+                <Image
+                  src={`/membership/${tier.englishName.toLowerCase()}.svg`}
+                  width={24}
+                  height={24}
+                  alt={tier.name}
+                />
                 <div>
-                  <div style={{ fontSize: "0.88rem", fontWeight: 500, color: "#e8edf3" }}>{tier.name}</div>
-                  <div style={{ fontSize: "0.68rem", color: "#4b5e78" }}>{tier.condition}</div>
+                  <div
+                    style={{
+                      fontSize: "0.88rem",
+                      fontWeight: 500,
+                      color: "#e8edf3",
+                    }}
+                  >
+                    {tier.name}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "#4b5e78" }}>
+                    {tier.condition}
+                  </div>
                 </div>
               </div>
 
@@ -222,13 +257,27 @@ export function MembershipTierSection() {
                   {tier.price}
                 </span>
                 {tier.priceNote && (
-                  <span style={{ fontSize: "0.88rem", color: "#94a3b8", fontWeight: 300 }}>
+                  <span
+                    style={{
+                      fontSize: "0.88rem",
+                      color: "#94a3b8",
+                      fontWeight: 300,
+                    }}
+                  >
                     {tier.priceNote}
                   </span>
                 )}
               </div>
 
-              <div style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 300, marginBottom: "24px", lineHeight: 1.6 }}>
+              <div
+                style={{
+                  fontSize: "0.72rem",
+                  color: "#94a3b8",
+                  fontWeight: 300,
+                  marginBottom: "24px",
+                  lineHeight: 1.6,
+                }}
+              >
                 예매 창: {tier.booking} · 수수료: {tier.fee}
                 <br />
                 양도: {tier.transfer}
@@ -237,8 +286,23 @@ export function MembershipTierSection() {
               {/* Features */}
               <div className="flex flex-col gap-2.5 mb-7">
                 {tier.features.map((f, i) => (
-                  <div key={i} className="flex items-center gap-2.5" style={{ fontSize: "0.78rem", color: "#94a3b8", fontWeight: 300 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF7A56" strokeWidth="2.5">
+                  <div
+                    key={i}
+                    className="flex items-center gap-2.5"
+                    style={{
+                      fontSize: "0.78rem",
+                      color: "#94a3b8",
+                      fontWeight: 300,
+                    }}
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#FF7A56"
+                      strokeWidth="2.5"
+                    >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     {f}

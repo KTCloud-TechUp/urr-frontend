@@ -2,22 +2,22 @@
 
 ## 전체 진행 현황
 
-| 순위 | Phase | 영역                             | 상태                    |
-| ---- | ----- | -------------------------------- | ----------------------- |
-| —    | 1     | 패키지 + API 클라이언트          | ✅ 완료                 |
-| —    | 2     | tokenStore + auth 타입           | ✅ 완료                 |
-| —    | 3     | TanStack Query + AuthInitializer | ✅ 완료                 |
-| —    | 4     | 라우트 보호                      | ✅ 완료                 |
-| —    | 5     | 인증 API 연동 (카카오/네이버)    | ✅ 완료                 |
-| —    | 7     | 예매 UI 리팩토링                 | ✅ 완료                 |
-| —    | 8     | 예매 VenueMap 인터랙션 UI        | ✅ 완료                 |
-| 1    | 9     | 예매 Zustand store               | 🔲 진행 예정            |
-| 2    | 10    | Events API 연동                  | 🔲 대기 (9과 병행 가능) |
-| 3    | 6     | 온보딩 플로우 완성               | 🔲 진행 중 (부분 완료)  |
-| 4    | 11    | Ticketing + Queue 연동           | 🔲 대기                 |
-| 5    | 12    | Payments 연동                    | 🔲 대기                 |
-| 6    | 13    | User 추가 기능                   | 🔲 대기                 |
-| 7    | 14    | Community 연동                   | 🔲 대기                 |
+| 순위 | Phase | 영역                             | 상태                       |
+| ---- | ----- | -------------------------------- | -------------------------- |
+| —    | 1     | 패키지 + API 클라이언트          | ✅ 완료                    |
+| —    | 2     | tokenStore + auth 타입           | ✅ 완료                    |
+| —    | 3     | TanStack Query + AuthInitializer | ✅ 완료                    |
+| —    | 4     | 라우트 보호                      | ✅ 완료                    |
+| —    | 5     | 인증 API 연동 (카카오/네이버)    | ✅ 완료                    |
+| —    | 7     | 예매 UI 리팩토링                 | ✅ 완료                    |
+| —    | 8     | 예매 VenueMap 인터랙션 UI        | ✅ 완료                    |
+| 1    | 9     | 예매 Zustand store               | 🔲 진행 예정               |
+| 2    | 10    | Events API 연동                  | 🔲 진행 중 (9과 병행 가능) |
+| 3    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료 (휴대폰 인증) |
+| 4    | 11    | Ticketing + Queue 연동           | 🔲 대기                    |
+| 5    | 12    | Payments 연동                    | 🔲 대기                    |
+| 6    | 13    | User 추가 기능                   | 🔲 대기                    |
+| 7    | 14    | Community 연동                   | 🔶 부분 완료 (양도 API)    |
 
 ---
 
@@ -40,6 +40,7 @@
 > 소셜/이메일 로그인 및 본인인증(IdentityStep)은 구현됨. 이하 미완성.
 
 ### 6-1. 온보딩 플로우 — UI 완료 ✅
+
 - [x] `AgeGateStep.tsx` — 만 14세 이상/미만 분기
 - [x] `IdentityStep.tsx` — 본인인증 폼 (ShieldCheck 헤더, 중복계정 다이얼로그)
 - [x] `GuardianIdentityStep.tsx` — 법정대리인 본인인증 폼
@@ -48,38 +49,47 @@
 - [x] SMS API 함수 추가 — `smsSend`, `smsVerify` (`src/features/auth/api/`)
 
 ### 6-2. 본인인증 SMS API 미연동 ⚠️ 나중에 붙여야 함
+
 - [ ] `IdentityStep.tsx` `handleSendCode` — `smsSend(phone)` 실제 호출로 교체
 - [ ] `IdentityStep.tsx` `handleVerify` — `smsVerify(phone, code)` 실제 호출로 교체, `verified: false` 시 에러 표시
 - [ ] `GuardianIdentityStep.tsx` `handleSendCode` — `smsSend(phone)` 실제 호출로 교체
 - [ ] `GuardianIdentityStep.tsx` `handleVerify` — `smsVerify(phone, code)` 실제 호출로 교체
 
 ### 6-3. 약관 동의 API 미연동 ⚠️ 나중에 붙여야 함
+
 - [ ] `handleTermsComplete` (`useOnboardingAuth.ts`) — 가입 성공 후 `updateConsents()` 호출 (마케팅 동의 선택값 전달)
   - TermsStep에서 `marketing` 체크 여부를 `onComplete(marketingConsent: boolean)` 으로 올려야 함
 
 ### 6-4. 가입 완료
+
 - [x] `OnboardingWidget` `complete` 단계 → `SignupCompleteStep` 표시
 
 ### 6-5. 아티스트 선택 (ArtistSelectStep)
+
 - [ ] 카테고리 탭 + 검색 + `GET /api/events/artists` 연동
 - [ ] 1명 이상 필수 선택 검증 + 팔로우 API 호출
 
 ### 6-6. 멤버십 소개 (MembershipIntroStep)
+
 - [ ] 등급별 혜택 비교표
 - [ ] [가입 ₩30,000/년] CTA / [나중에] skip
 
 ### 6-7. 멜론 연동 (MelonLinkStep)
+
 - [ ] [연동하기] / [나중에] — 강제 아님, 팬 신뢰 점수 계산 트리거 (Mock)
 
 ### 6-4. 아티스트 선택 (ArtistSelectStep)
+
 - [ ] 카테고리 탭 + 검색 + `GET /api/events/artists` 연동
 - [ ] 1명 이상 필수 선택 검증 + 팔로우 API 호출
 
 ### 6-5. 멤버십 소개 (MembershipIntroStep)
+
 - [ ] 등급별 혜택 비교표
 - [ ] [가입 ₩30,000/년] CTA / [나중에] skip
 
 ### 6-6. 멜론 연동 (MelonLinkStep)
+
 - [ ] [연동하기] / [나중에] — 강제 아님, 팬 신뢰 점수 계산 트리거 (Mock)
 
 ---
@@ -172,7 +182,39 @@
 
 ## Phase 14 — Community API 연동 🔲
 
-> **선행 조건**: Phase 10
+> **선행 조건**: Phase 10  
+> **서비스**: `NEXT_PUBLIC_COMMUNITY_API_URL` (port 8082)
+
+### 14-1. 양도 게시글 CRUD ✅
+
+- [x] `1-1` `POST /api/v1/transfers/posts` — 양도 게시글 등록  
+       → `createTransferPost(userId, artistId, showId, seatId)` — `getTransferPosts.ts`  
+       → `TransferListingModal` 등록하기 버튼 연결 완료
+- [x] `1-4` `DELETE /api/v1/transfers/posts/{id}` — 양도 게시글 삭제  
+       → `deleteTransferPost(id, userId)` — `getTransferPosts.ts`  
+       → `TransferHistoryTab` 취소 다이얼로그 연결 완료
+- [x] `1-7` `PATCH /api/v1/transfers/posts/{id}` — 양도 게시글 수정  
+       → `updateTransferPost(id, userId, sellingPrice)` — `getTransferPosts.ts`  
+       → `TransferHistoryTab` 수정 모달 연결 완료
+
+### 14-2. 양도 예매·결제 ✅
+
+- [x] `1-5` `POST /api/v1/transfers/posts/{id}/reserve?artistId=` — 양도 예매(결제 요청)  
+       → `reserveTransferPost(postId, artistId, userId)` → `ReserveResult { orderId, paymentId, amount }`  
+       → `TransferPurchaseSidebar` 결제하기 버튼 클릭 시 호출
+- [x] `1-6` `POST /api/v1/transfers/posts/confirm` — 양도 예매 확정(결제 확정)  
+       → `confirmTransferPost(orderId, paymentKey, userId)`  
+       → `PaymentDialog.onComplete` 후 호출  
+       ⚠️ `paymentKey`는 Toss 실결제 연동 전까지 `mock_${timestamp}` 사용 중
+
+### 14-3. 마이페이지 양도 내역 ✅
+
+- [x] `GET /api/v1/transfers/me/sales` — 판매 내역 조회  
+       → `getMySales(userId)` — `getMyTransfers.ts` (service: community)
+- [x] `GET /api/v1/transfers/me/purchases` — 구매 내역 조회  
+       → `getMyPurchases(userId)` — `getMyTransfers.ts` (service: community)
+
+### 14-4. 소통 탭 게시글 🔲
 
 - [ ] `getPosts`, `createPost`, `createComment` API 함수
 - [ ] 아티스트 상세 소통 탭 — 게시글 목록/작성 연동

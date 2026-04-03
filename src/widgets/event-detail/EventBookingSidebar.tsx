@@ -8,6 +8,8 @@ import { Button } from "@/shared/ui";
 import { BookingStatusBadge } from "@/entities/event";
 import { TierBadge } from "@/entities/user";
 import { PriceDisplay } from "@/shared/ui";
+import { BookingProvider, useBooking } from "@/features/booking/model/BookingContext";
+import { BookingModal } from "@/widgets/booking/BookingModal";
 import type { EventDetail } from "@/shared/lib/mocks/event-detail";
 
 interface EventBookingSidebarProps {
@@ -25,8 +27,9 @@ function formatTierTime(isoDate: string): string {
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-export function EventBookingSidebar({ event }: EventBookingSidebarProps) {
+function EventBookingSidebarInner({ event }: EventBookingSidebarProps) {
   const router = useRouter();
+  const { bookingState, startBooking, resetBooking } = useBooking();
   const [selectedDateId, setSelectedDateId] = useState(event.dates[0]?.id ?? "");
 
   const selectedDate = event.dates.find((d) => d.id === selectedDateId);
@@ -40,6 +43,20 @@ export function EventBookingSidebar({ event }: EventBookingSidebarProps) {
   const isBookable = event.status === "open";
   const isSoldOut = event.status === "soldout";
   const isClosed = event.status === "closed";
+
+  const handleBookingClick = () => {
+    startBooking();
+  };
+
+  const handleQueuePassed = (_token: string | null) => {
+    sessionStorage.setItem("urr:booking:startPhase", "seats-section");
+    resetBooking();
+    router.push(`/events/${event.id}/booking`);
+  };
+
+  const handleModalClose = () => {
+    resetBooking();
+  };
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -129,7 +146,7 @@ export function EventBookingSidebar({ event }: EventBookingSidebarProps) {
         <Button
           className="w-full h-12 text-base font-semibold"
           disabled={!isBookable}
-          onClick={() => router.push(`/events/${event.id}/booking`)}
+          onClick={handleBookingClick}
         >
           {isBookable
             ? "예매하기"
@@ -148,6 +165,22 @@ export function EventBookingSidebar({ event }: EventBookingSidebarProps) {
           </p>
         </div>
       </div>
+
+      {/* Queue modal rendered on the event detail page */}
+      {bookingState === "queue" && (
+        <BookingModal
+          onQueuePassed={handleQueuePassed}
+          onClose={handleModalClose}
+        />
+      )}
     </div>
+  );
+}
+
+export function EventBookingSidebar({ event }: EventBookingSidebarProps) {
+  return (
+    <BookingProvider eventId={event.id}>
+      <EventBookingSidebarInner event={event} />
+    </BookingProvider>
   );
 }

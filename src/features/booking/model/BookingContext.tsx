@@ -31,6 +31,7 @@ interface BookingInternalState {
   selectedSeatIds: string[];
   confirmationData: ConfirmationData | null;
   seatTimerSecondsLeft: number | null;
+  queueToken: string | null;
 }
 
 type BookingAction =
@@ -43,9 +44,11 @@ type BookingAction =
   | { type: "TOGGLE_SEAT"; payload: { seatId: string; maxSeats: number } }
   | { type: "RESET_BOOKING" }
   | { type: "SET_CONFIRMATION_DATA"; payload: ConfirmationData }
-  | { type: "SET_SEAT_TIMER"; payload: number };
+  | { type: "SET_SEAT_TIMER"; payload: number }
+  | { type: "SET_QUEUE_TOKEN"; payload: string | null };
 
 export interface BookingContextValue {
+  eventId: string;
   bookingState: BookingState;
   event: typeof mockEvent | null;
   selectedDateId: string | null;
@@ -62,6 +65,7 @@ export interface BookingContextValue {
   maxSeats: number;
   confirmationData: ConfirmationData | null;
   seatTimerSecondsLeft: number | null;
+  queueToken: string | null;
   selectDate: (dateId: string) => void;
   toggleLeftPanel: () => void;
   setLeftPanel: (expanded: boolean) => void;
@@ -72,6 +76,7 @@ export interface BookingContextValue {
   resetBooking: () => void;
   setConfirmationData: (data: ConfirmationData) => void;
   setSeatTimerSecondsLeft: (seconds: number) => void;
+  setQueueToken: (token: string | null) => void;
 }
 
 const initialState: BookingInternalState = {
@@ -83,6 +88,7 @@ const initialState: BookingInternalState = {
   selectedSeatIds: [],
   confirmationData: null,
   seatTimerSecondsLeft: null,
+  queueToken: null,
 };
 
 function bookingReducer(
@@ -127,6 +133,8 @@ function bookingReducer(
       return { ...state, confirmationData: action.payload };
     case "SET_SEAT_TIMER":
       return { ...state, seatTimerSecondsLeft: action.payload };
+    case "SET_QUEUE_TOKEN":
+      return { ...state, queueToken: action.payload };
     default:
       return state;
   }
@@ -149,6 +157,11 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
         type: "SET_EVENT_LOADED",
         payload: { dateId: mockEvent.dates[0]?.id ?? "" },
       });
+      const startPhase = sessionStorage.getItem("urr:booking:startPhase") as BookingState | null;
+      if (startPhase) {
+        sessionStorage.removeItem("urr:booking:startPhase");
+        dispatch({ type: "TRANSITION_STATE", payload: startPhase });
+      }
     }, 400);
     return () => clearTimeout(timer);
   }, [eventId]);
@@ -231,8 +244,13 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     dispatch({ type: "SET_SEAT_TIMER", payload: seconds });
   }, []);
 
+  const setQueueToken = useCallback((token: string | null) => {
+    dispatch({ type: "SET_QUEUE_TOKEN", payload: token });
+  }, []);
+
   const value: BookingContextValue = useMemo(
     () => ({
+      eventId,
       bookingState: state.bookingState,
       event: state.isLoading ? null : mockEvent,
       selectedDateId: state.selectedDateId,
@@ -249,6 +267,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       maxSeats,
       confirmationData: state.confirmationData,
       seatTimerSecondsLeft: state.seatTimerSecondsLeft,
+      queueToken: state.queueToken,
       selectDate,
       toggleLeftPanel,
       setLeftPanel,
@@ -259,8 +278,10 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       resetBooking,
       setConfirmationData,
       setSeatTimerSecondsLeft,
+      setQueueToken,
     }),
     [
+      eventId,
       state.bookingState,
       state.selectedDateId,
       state.isLeftPanelExpanded,
@@ -269,6 +290,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       state.selectedSeatIds,
       state.confirmationData,
       state.seatTimerSecondsLeft,
+      state.queueToken,
       userTier,
       selectedDate,
       sectionsForDate,
@@ -286,6 +308,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       resetBooking,
       setConfirmationData,
       setSeatTimerSecondsLeft,
+      setQueueToken,
     ],
   );
 
