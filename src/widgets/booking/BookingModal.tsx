@@ -5,7 +5,7 @@ import { Clock, X } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
 import { useBooking } from "@/features/booking/model/BookingContext";
-import { useQueueSimulation } from "@/features/booking/model/useQueueSimulation";
+import { useQueue } from "@/features/booking/model/useQueue";
 import { useNavigationBlock } from "@/features/booking/model/useNavigationBlock";
 import { VenueMap } from "@/features/booking/ui/VenueMap";
 import { QueueLeaveModal } from "./QueueLeaveModal";
@@ -34,8 +34,9 @@ const GROUP_NAMES: Record<string, string> = {
   "sec-vip": "VIP석", "sec-floor-r": "플로어R", "sec-r": "R석", "sec-s": "S석", "sec-a": "A석",
 };
 
-function QueueContent() {
-  const { sectionsForDate, transitionTo, resetBooking } = useBooking();
+function QueueContent({ onQueuePassed }: { onQueuePassed?: (token: string | null) => void }) {
+  const { eventId, sectionsForDate, transitionTo, resetBooking, setQueueToken } = useBooking();
+
   const {
     position,
     totalInQueue,
@@ -44,7 +45,14 @@ function QueueContent() {
     phase,
     previousPosition,
     stayInQueue,
-  } = useQueueSimulation(sectionsForDate);
+  } = useQueue(eventId, sectionsForDate, (token, _remainMs) => {
+    setQueueToken(token);
+    if (onQueuePassed) {
+      onQueuePassed(token);
+    } else {
+      transitionTo("seats-section");
+    }
+  });
   const { showPrompt, cancelLeave, confirmLeave } = useNavigationBlock(
     phase === "waiting",
   );
@@ -70,11 +78,6 @@ function QueueContent() {
       };
     }
   }, [previousPosition, position]);
-
-  useEffect(() => {
-    if (phase !== "promoted") return;
-    transitionTo("seats-section");
-  }, [phase, transitionTo]);
 
   const handleLeaveQueue = useCallback(() => {
     confirmLeave();
@@ -294,8 +297,18 @@ function QueueContent() {
   );
 }
 
-export function BookingModal() {
+interface BookingModalProps {
+  onQueuePassed?: (token: string | null) => void;
+  onClose?: () => void;
+}
+
+export function BookingModal({ onQueuePassed, onClose }: BookingModalProps = {}) {
   const { resetBooking } = useBooking();
+
+  const handleClose = () => {
+    resetBooking();
+    onClose?.();
+  };
 
   return (
     <div className="fixed inset-0 z-40">
@@ -308,13 +321,13 @@ export function BookingModal() {
           )}
         >
           <button
-            onClick={resetBooking}
+            onClick={handleClose}
             className="absolute top-4 right-4 z-10 p-1.5 rounded-md hover:bg-accent transition-colors"
             aria-label="닫기"
           >
             <X size={18} className="text-muted-foreground" />
           </button>
-          <QueueContent />
+          <QueueContent onQueuePassed={onQueuePassed} />
         </div>
       </div>
     </div>

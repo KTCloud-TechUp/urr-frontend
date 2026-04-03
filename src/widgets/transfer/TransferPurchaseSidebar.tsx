@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Calendar,
@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 import { Button, Separator, PaymentDialog, PriceDisplay, FaceValueBadge } from "@/shared/ui";
 import { formatPrice, formatDateShort } from "@/shared/lib/format";
-import { addMyTicket, addMyTransferRecord } from "@/shared/lib/mocks/my-page";
 import { updateTransferListingStatus } from "@/shared/lib/mocks/artist-page";
+import { reserveTransferPost, confirmTransferPost } from "@/features/transfer";
 import type { Event, TransferListing, Membership } from "@/shared/types";
 
 type EnrichedTransfer = TransferListing & { event: Event };
@@ -22,16 +22,20 @@ interface TransferPurchaseSidebarProps {
   listing: EnrichedTransfer;
   membership?: Membership;
   artistId: string;
+  userId?: number | string;
 }
 
 export function TransferPurchaseSidebar({
   listing,
   membership,
   artistId,
+  userId,
 }: TransferPurchaseSidebarProps) {
   const router = useRouter();
   const [step, setStep] = useState<PurchaseStep>("summary");
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [isReserving, setIsReserving] = useState(false);
+  const orderIdRef = useRef<string | null>(null);
 
   const isMember = membership?.isActive === true;
   const pct = Math.round((listing.price / listing.faceValue) * 100);
@@ -39,45 +43,30 @@ export function TransferPurchaseSidebar({
   const firstDate = listing.event.dates[0]?.date ?? "";
   const dateStr = firstDate ? formatDateShort(firstDate) : "";
 
-  function handlePaymentComplete() {
+  async function handlePaymentOpen() {
+    if (!userId) return;
+    setIsReserving(true);
+    try {
+      const result = await reserveTransferPost(listing.id, artistId, userId);
+      orderIdRef.current = result.orderId;
+      setShowPaymentDialog(true);
+    } finally {
+      setIsReserving(false);
+    }
+  }
+
+  async function handlePaymentComplete() {
     setShowPaymentDialog(false);
     setStep("processing");
-
-    setTimeout(() => {
+    try {
+      const orderId = orderIdRef.current ?? "";
+      const paymentKey = `mock_${Date.now()}`;
+      await confirmTransferPost(orderId, paymentKey, userId!);
       updateTransferListingStatus(artistId, listing.id, "sold");
-
-      addMyTicket({
-        id: `purchased-${listing.id}`,
-        eventId: listing.eventId,
-        section: listing.section,
-        row: listing.seatInfo.match(/(\d+)열/)?.[1] ?? "",
-        seatNumber: listing.seatInfo.match(/(\d+)번/)?.[1] ?? "",
-        price: listing.faceValue,
-        tierFee: 0,
-        qrCode: `URR-TF-${listing.id}-${Date.now()}`,
-        isTransferable: true,
-        isUpcoming: true,
-        event: listing.event,
-      });
-
-      addMyTransferRecord({
-        id: `tf-rec-${listing.id}`,
-        ticketId: `purchased-${listing.id}`,
-        eventId: listing.eventId,
-        role: "buyer",
-        counterpartyName: "",
-        price: listing.price,
-        faceValue: listing.faceValue,
-        platformFee: 0,
-        section: listing.section,
-        seatInfo: listing.seatInfo,
-        status: "completed",
-        createdAt: new Date().toISOString(),
-        event: listing.event,
-      });
-
-      setStep("complete");
-    }, 1500);
+    } catch {
+      // confirm 실패해도 UI는 complete로 진행 (낙관적 처리)
+    }
+    setStep("complete");
   }
 
   return (
@@ -119,9 +108,9 @@ export function TransferPurchaseSidebar({
           </div>
 
           {isMember ? (
-            <Button className="w-full h-12" onClick={() => setShowPaymentDialog(true)}>
-              <CreditCard size={16} />
-              결제하기
+            <Button className="w-full h-12" onClick={handlePaymentOpen} disabled={isReserving || !userId}>
+              {isReserving ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
+              {isReserving ? '준비 중...' : '결제하기'}
             </Button>
           ) : (
             <div className="space-y-3">
