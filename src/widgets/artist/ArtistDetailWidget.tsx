@@ -12,8 +12,8 @@ import type { EventSummary } from "@/features/event";
 import { mockUser } from "@/shared/lib/mocks/user";
 import {
   getArtistExtendedInfo,
-  getTransferListingsWithEvent,
 } from "@/shared/lib/mocks/artist-page";
+import { getTransferPosts } from "@/features/transfer";
 import type { Artist, Event } from "@/shared/types";
 import { getCommunityPostsByArtistId } from "@/shared/lib/mocks/community";
 import { ArtistHeader } from "./ArtistHeader";
@@ -90,6 +90,12 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
     enabled: !!artistData,
   });
 
+  const { data: transferListings = [] } = useQuery({
+    queryKey: ["transfer-posts", artistId],
+    queryFn: () => getTransferPosts(artistId, currentUser?.userId),
+    enabled: !!artistData,
+  });
+
   const handleTabChange = (tab: Tab) => {
     const params = new URLSearchParams(searchParams.toString());
     if (tab === "home") params.delete("tab");
@@ -142,7 +148,6 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
   const upcoming = allEvents.filter((e) => new Date(e.dates[0]?.date ?? 0) >= now);
   const past = allEvents.filter((e) => new Date(e.dates[0]?.date ?? 0) < now);
   const nextEvent = upcoming[0];
-  const transferListings = getTransferListingsWithEvent(artist.id);
   const communityPosts = getCommunityPostsByArtistId(artist.id);
 
   return (

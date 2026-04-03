@@ -1,7 +1,7 @@
 'use client'
 
-
 import { useSearchParams, useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs'
 import { MyPageHeader } from './MyPageHeader'
 import { MembershipTab } from './MembershipTab'
@@ -10,13 +10,13 @@ import { TransferHistoryTab } from './TransferHistoryTab'
 import { SettingsTab } from './SettingsTab'
 import { MyPageSkeleton } from './MyPageSkeleton'
 import { mockUser } from '@/shared/lib/mocks/user'
-import { getMyTickets, getMyTransferRecords } from '@/shared/lib/mocks/my-page'
+import { getMyTickets } from '@/shared/lib/mocks/my-page'
 import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
 import { useMemberships, useUpdateNickname, useCancelMembership } from '@/features/membership'
+import { getMySales, getMyPurchases } from '@/features/transfer'
 import type { User } from '@/shared/types'
 
 const tickets = getMyTickets()
-const transferRecords = getMyTransferRecords()
 
 export function MyPageWidget() {
   const searchParams = useSearchParams()
@@ -27,6 +27,20 @@ export function MyPageWidget() {
   const { data: memberships = [], isLoading: isMembershipsLoading } = useMemberships()
   const updateNickname = useUpdateNickname()
   const cancelMembership = useCancelMembership()
+
+  const { data: salesRecords = [] } = useQuery({
+    queryKey: ['my-transfer-sales', meData?.userId],
+    queryFn: () => getMySales(meData?.userId),
+    enabled: !!meData,
+  })
+
+  const { data: purchaseRecords = [] } = useQuery({
+    queryKey: ['my-transfer-purchases', meData?.userId],
+    queryFn: () => getMyPurchases(meData?.userId),
+    enabled: !!meData,
+  })
+
+  const transferRecords = [...salesRecords, ...purchaseRecords]
 
   const displayUser: User = {
     ...mockUser,
