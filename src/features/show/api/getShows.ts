@@ -32,6 +32,6 @@ interface ShowsApiResponse {
 }
 
 export async function getShows(eventId: string | number): Promise<ShowSummary[]> {
-  const res = await apiRequest<ShowsApiResponse>(`/shows/${eventId}/shows`, { service: "ticketing" });
+  const res = await apiRequest<ShowsApiResponse>(`/shows/${eventId}/shows`, { service: "events" });
   return res.data.data;
 }

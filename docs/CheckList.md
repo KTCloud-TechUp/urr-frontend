@@ -14,7 +14,7 @@
 | 1    | 9     | 예매 Zustand store               | 🔲 진행 예정               |
 | 2    | 10    | Events API 연동                  | 🔲 진행 중 (9과 병행 가능) |
 | 3    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료 (휴대폰 인증) |
-| 4    | 11    | Ticketing + Queue 연동           | 🔲 대기                    |
+| 4    | 11    | Ticketing + Queue 연동           | 🔶 부분 완료               |
 | 5    | 12    | Payments 연동                    | 🔲 대기                    |
 | 6    | 13    | User 추가 기능                   | 🔲 대기                    |
 | 7    | 14    | Community 연동                   | 🔶 부분 완료 (양도 API)    |
@@ -121,14 +121,34 @@
 
 ---
 
-## Phase 11 — Ticketing + Queue API 연동 🔲
+## Phase 11 — Ticketing + Queue API 연동 🔶 부분 완료
 
-> **선행 조건**: Phase 9, 10  
-> **엔드포인트**: `GET /api/ticketing/:eventId`, `POST /api/ticketing/book`, `GET /api/ticketing/my-tickets`, `GET /api/ticketing/queue/status`
+> **선행 조건**: Phase 9, 10
 
-- [ ] API 함수 + 서버 응답 타입
-- [ ] `idle` 상태 — 구역 정보·잔여석 연동
-- [ ] Queue 연동 — WebSocket 또는 polling(`refetchInterval: 10000`), 순번 digit roll 애니메이션
+### 11-1. Queue API ✅
+
+- [x] `POST /queue/check/{showId}` — 대기열 진입  
+       → `checkQueue(showId)` — `src/features/booking/api/queue.ts` (service: queue)
+- [x] `GET /queue/{showId}` — 대기열 상태 폴링 (3초 interval)  
+       → `pollQueue(showId)` — `src/features/booking/api/queue.ts`
+- [x] `useQueue(showId, sectionsForDate, onActive)` hook — `src/features/booking/model/useQueue.ts`
+  - WAIT → 폴링, ACTIVE → `onActive(token, remainMs)` 콜백, NOT_WAIT → 자동 재진입
+  - `queueToken` 상태 → `BookingContext.setQueueToken()` 연결
+
+### 11-2. 회차 목록 + 좌석 요약 API ✅
+
+- [x] `GET /shows/{eventId}/shows` — 회차 목록  
+       → `getShows(eventId)` — `src/features/show/api/getShows.ts` (service: events)  
+       → `BookingContext` — `useQuery`로 조회, `EventDate[]`로 변환해 날짜 드롭다운 연동
+- [x] `GET /shows/{eventId}/shows/{showId}/seats/summary` — 잔여석 전체 요약 (#30)  
+       → `getSeatsSummary(eventId, showId)` — `src/features/booking/api/getSeatsSummary.ts`  
+       → `BookingContext.sectionsForDate` — tier zones → `Section[]` 매핑 (가격: 정적 tier 맵)
+- [x] `GET /shows/{eventId}/shows/{showId}/seats/availability?tier=&zoneNo=` — 구역 내 좌석 조회 (#31)  
+       → `getSeatsAvailability(eventId, showId, tier, zoneNo)` — `src/features/booking/api/getSeatsAvailability.ts`  
+       → `UnifiedSeatView` — `seats-individual` 진입 시 `useQuery`로 조회, `Seat[]` 매핑 + 레이아웃 자동 계산
+
+### 11-3. 예매 확정 + 마이티켓 🔲
+
 - [ ] `POST /api/ticketing/book` — 좌석 선택 + 결제 완료 후 호출 → `confirmation` + QR 데이터
 - [ ] 마이페이지 티켓 월렛 — `GET /api/ticketing/my-tickets` + QR 모달 (`qrcode.react`)
 
