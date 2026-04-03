@@ -92,11 +92,11 @@ export function MyPageWidget() {
         </TabsContent>
 
         <TabsContent value="wallet" className="pt-6">
-          <TicketWalletTab tickets={tickets} user={displayUser} />
+          <TicketWalletTab tickets={tickets} user={displayUser} userId={meData?.userId} />
         </TabsContent>
 
         <TabsContent value="transfers" className="pt-6">
-          <TransferHistoryTab records={transferRecords} />
+          <TransferHistoryTab records={transferRecords} userId={meData?.userId} />
         </TabsContent>
 
         <TabsContent value="settings" className="pt-6">

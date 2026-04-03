@@ -76,6 +76,80 @@ function mapToEnrichedTransfer(item: TransferPostItem): EnrichedTransfer {
   };
 }
 
+export interface ReserveResult {
+  postId: number;
+  orderId: string;
+  paymentId: number;
+  amount: number;
+}
+
+export async function reserveTransferPost(
+  postId: number | string,
+  artistId: number | string,
+  userId: number | string,
+): Promise<ReserveResult> {
+  const res = await apiRequest<{ isSuccess: boolean; data: ReserveResult }>(
+    `/transfers/posts/${postId}/reserve?artistId=${artistId}`,
+    {
+      method: "POST",
+      service: "community",
+      headers: { "X-User-Id": String(userId) },
+    },
+  );
+  return res.data.data;
+}
+
+export async function confirmTransferPost(
+  orderId: string,
+  paymentKey: string,
+  userId: number | string,
+): Promise<void> {
+  await apiRequest("/transfers/posts/confirm", {
+    method: "POST",
+    service: "community",
+    headers: { "X-User-Id": String(userId) },
+    body: { orderId, paymentKey },
+  });
+}
+
+export async function createTransferPost(
+  userId: number | string,
+  artistId: number | string,
+  showId: number | string,
+  seatId: number | string,
+): Promise<void> {
+  await apiRequest("/transfers/posts", {
+    method: "POST",
+    service: "community",
+    headers: { "X-User-Id": String(userId) },
+    body: { artistId: Number(artistId), showId: Number(showId), seatId: Number(seatId) },
+  });
+}
+
+export async function updateTransferPost(
+  id: number | string,
+  userId: number | string,
+  sellingPrice: number,
+): Promise<void> {
+  await apiRequest(`/transfers/posts/${id}`, {
+    method: "PATCH",
+    service: "community",
+    headers: { "X-User-Id": String(userId) },
+    body: { sellingPrice },
+  });
+}
+
+export async function deleteTransferPost(
+  id: number | string,
+  userId: number | string,
+): Promise<void> {
+  await apiRequest(`/transfers/posts/${id}`, {
+    method: "DELETE",
+    service: "community",
+    headers: { "X-User-Id": String(userId) },
+  });
+}
+
 export async function getTransferPosts(
   artistId: string | number,
   userId?: number | string,

@@ -13,6 +13,7 @@ import type { Ticket, Event, TierLevel, User } from '@/shared/types'
 interface TicketWalletTabProps {
   tickets: (Ticket & { event: Event })[]
   user: User
+  userId?: number | string
 }
 
 function getEffectiveTier(user: User, artistId: string): TierLevel {
@@ -22,7 +23,7 @@ function getEffectiveTier(user: User, artistId: string): TierLevel {
   return membership?.tier ?? user.tier
 }
 
-export function TicketWalletTab({ tickets, user }: TicketWalletTabProps) {
+export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps) {
   const [selectedTicket, setSelectedTicket] = useState<(Ticket & { event: Event }) | null>(null)
   const [transferTicket, setTransferTicket] = useState<(Ticket & { event: Event }) | null>(null)
   const [listedTicketIds, setListedTicketIds] = useState<Set<string>>(new Set())
@@ -107,6 +108,7 @@ export function TicketWalletTab({ tickets, user }: TicketWalletTabProps) {
       <TransferListingModal
         ticket={transferTicket}
         userTier={transferTicket ? getEffectiveTier(user, transferTicket.event.artistId) : 'MIST'}
+        userId={userId}
         open={!!transferTicket}
         onClose={() => setTransferTicket(null)}
         onListed={handleListed}

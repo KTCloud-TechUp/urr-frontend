@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/shared/ui";
 import { getTransferListingById } from "@/shared/lib/mocks/artist-page";
 import { mockUser } from "@/shared/lib/mocks/user";
+import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { TransferInfoPanel } from "./TransferInfoPanel";
 import { TransferPurchaseSidebar } from "./TransferPurchaseSidebar";
 
@@ -34,6 +35,7 @@ interface TransferDetailWidgetProps {
 
 export function TransferDetailWidget({ artistId, listingId }: TransferDetailWidgetProps) {
   const router = useRouter();
+  const { data: meData } = useCurrentUser();
 
   const listing = getTransferListingById(artistId, listingId);
   const membership = mockUser.memberships.find((m) => m.artistId === artistId && m.isActive);
@@ -76,6 +78,7 @@ export function TransferDetailWidget({ artistId, listingId }: TransferDetailWidg
               listing={listing}
               membership={membership}
               artistId={artistId}
+              userId={meData?.userId}
             />
           </div>
         </div>

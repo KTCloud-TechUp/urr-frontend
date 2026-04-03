@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeftRight, Calendar, Pencil, X } from 'lucide-react'
+import { deleteTransferPost, updateTransferPost } from '@/features/transfer'
 import { TransferStatusBadge } from '@/shared/ui/TransferStatusBadge'
 import { PriceDisplay } from '@/shared/ui/PriceDisplay'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -24,11 +26,11 @@ interface TransferEditModalProps {
   open: boolean
   onClose: () => void
   onSave: (id: string, newPrice: number) => void
+  isPending?: boolean
 }
 
-function TransferEditModal({ record, open, onClose, onSave }: TransferEditModalProps) {
+function TransferEditModal({ record, open, onClose, onSave, isPending }: TransferEditModalProps) {
   const [price, setPrice] = useState('')
-  const [saving, setSaving] = useState(false)
 
   function handleOpen() {
     if (record) setPrice(String(record.price))
@@ -38,12 +40,7 @@ function TransferEditModal({ record, open, onClose, onSave }: TransferEditModalP
     if (!record) return
     const newPrice = parseInt(price, 10)
     if (isNaN(newPrice) || newPrice <= 0) return
-    setSaving(true)
-    setTimeout(() => {
-      onSave(record.id, newPrice)
-      setSaving(false)
-      onClose()
-    }, 500)
+    onSave(record.id, newPrice)
   }
 
   const faceValue = record?.faceValue ?? 0
@@ -105,10 +102,10 @@ function TransferEditModal({ record, open, onClose, onSave }: TransferEditModalP
               </Button>
               <Button
                 className="flex-1"
-                disabled={numPrice <= 0 || saving}
+                disabled={numPrice <= 0 || isPending}
                 onClick={handleSave}
               >
-                {saving ? '저장 중...' : '수정 완료'}
+                {isPending ? '저장 중...' : '수정 완료'}
               </Button>
             </div>
           </div>
@@ -125,19 +122,13 @@ interface TransferCancelDialogProps {
   open: boolean
   onClose: () => void
   onConfirm: (id: string) => void
+  isPending?: boolean
 }
 
-function TransferCancelDialog({ record, open, onClose, onConfirm }: TransferCancelDialogProps) {
-  const [cancelling, setCancelling] = useState(false)
-
+function TransferCancelDialog({ record, open, onClose, onConfirm, isPending }: TransferCancelDialogProps) {
   function handleConfirm() {
     if (!record) return
-    setCancelling(true)
-    setTimeout(() => {
-      onConfirm(record.id)
-      setCancelling(false)
-      onClose()
-    }, 500)
+    onConfirm(record.id)
   }
 
   return (
@@ -166,10 +157,10 @@ function TransferCancelDialog({ record, open, onClose, onConfirm }: TransferCanc
               <Button
                 variant="destructive"
                 className="flex-1"
-                disabled={cancelling}
+                disabled={isPending}
                 onClick={handleConfirm}
               >
-                {cancelling ? '취소 중...' : '등록 취소'}
+                {isPending ? '취소 중...' : '등록 취소'}
               </Button>
             </div>
           </div>
@@ -294,9 +285,11 @@ function TransferHistoryCard({ record, onEdit, onCancel }: TransferHistoryCardPr
 
 interface TransferHistoryTabProps {
   records: (MyTransferRecord & { event: Event })[]
+  userId?: number | string
 }
 
-export function TransferHistoryTab({ records }: TransferHistoryTabProps) {
+export function TransferHistoryTab({ records, userId }: TransferHistoryTabProps) {
+  const queryClient = useQueryClient()
   const [editTarget, setEditTarget] = useState<(MyTransferRecord & { event: Event }) | null>(null)
   const [cancelTarget, setCancelTarget] = useState<(MyTransferRecord & { event: Event }) | null>(null)
   const [localRecords, setLocalRecords] = useState(records)
@@ -304,22 +297,38 @@ export function TransferHistoryTab({ records }: TransferHistoryTabProps) {
   const sellerRecords = localRecords.filter((r) => r.role === 'seller')
   const buyerRecords = localRecords.filter((r) => r.role === 'buyer')
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, price }: { id: string; price: number }) =>
+      updateTransferPost(id, userId!, price),
+    onSuccess: (_, { id, price }) => {
+      setLocalRecords((prev) =>
+        prev.map((r) =>
+          r.id === id ? { ...r, price, platformFee: Math.round(price * 0.05) } : r,
+        ),
+      )
+      setEditTarget(null)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteTransferPost(id, userId!),
+    onSuccess: (_, id) => {
+      setLocalRecords((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: 'cancelled' as const } : r)),
+      )
+      setCancelTarget(null)
+      queryClient.invalidateQueries({ queryKey: ['my-transfer-sales'] })
+    },
+  })
+
   function handleSave(id: string, newPrice: number) {
-    setLocalRecords((prev) =>
-      prev.map((r) =>
-        r.id === id
-          ? { ...r, price: newPrice, platformFee: Math.round(newPrice * 0.05) }
-          : r,
-      ),
-    )
+    if (!userId) return
+    updateMutation.mutate({ id, price: newPrice })
   }
 
   function handleCancel(id: string) {
-    setLocalRecords((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, status: 'cancelled' as const } : r,
-      ),
-    )
+    if (!userId) return
+    deleteMutation.mutate(id)
   }
 
   if (localRecords.length === 0) {
@@ -359,6 +368,7 @@ export function TransferHistoryTab({ records }: TransferHistoryTabProps) {
         open={!!editTarget}
         onClose={() => setEditTarget(null)}
         onSave={handleSave}
+        isPending={updateMutation.isPending}
       />
 
       <TransferCancelDialog
@@ -366,6 +376,7 @@ export function TransferHistoryTab({ records }: TransferHistoryTabProps) {
         open={!!cancelTarget}
         onClose={() => setCancelTarget(null)}
         onConfirm={handleCancel}
+        isPending={deleteMutation.isPending}
       />
     </>
   )

@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useMutation } from '@tanstack/react-query'
 import { Calendar, MapPin, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react'
+import { createTransferPost } from '@/features/transfer'
 import {
   Dialog,
   DialogContent,
@@ -18,6 +20,7 @@ import type { Ticket, Event, TierLevel } from '@/shared/types'
 interface TransferListingModalProps {
   ticket: (Ticket & { event: Event }) | null
   userTier: TierLevel
+  userId?: number | string
   open: boolean
   onClose: () => void
   onListed: (ticketId: string, price: number) => void
@@ -33,11 +36,19 @@ function parseNumber(str: string): number {
   return Number(str.replace(/,/g, '')) || 0
 }
 
-export function TransferListingModal({ ticket, userTier, open, onClose, onListed }: TransferListingModalProps) {
+export function TransferListingModal({ ticket, userTier, userId, open, onClose, onListed }: TransferListingModalProps) {
   const router = useRouter()
   const [step, setStep] = useState<Step>('price-input')
   const [priceStr, setPriceStr] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const createMutation = useMutation({
+    mutationFn: () =>
+      createTransferPost(userId!, ticket!.event.artistId, ticket!.eventId, ticket!.id),
+    onSuccess: () => {
+      onListed(ticket!.id, price)
+      setStep('success')
+    },
+  })
 
   // Reset state when ticket changes or modal opens
   useEffect(() => {
@@ -45,7 +56,7 @@ export function TransferListingModal({ ticket, userTier, open, onClose, onListed
       const t = setTimeout(() => {
         setStep('price-input')
         setPriceStr(formatNumberWithComma(ticket.price))
-        setIsSubmitting(false)
+
       }, 0)
       return () => clearTimeout(t)
     }
@@ -99,12 +110,8 @@ export function TransferListingModal({ ticket, userTier, open, onClose, onListed
   }
 
   function handleSubmit() {
-    setIsSubmitting(true)
-    setTimeout(() => {
-      onListed(ticket!.id, price)
-      setIsSubmitting(false)
-      setStep('success')
-    }, 1000)
+    if (!userId) return
+    createMutation.mutate()
   }
 
   function handleViewListing() {
@@ -236,16 +243,16 @@ export function TransferListingModal({ ticket, userTier, open, onClose, onListed
                 variant="ghost"
                 className="flex-1"
                 onClick={() => setStep('price-input')}
-                disabled={isSubmitting}
+                disabled={createMutation.isPending}
               >
                 이전
               </Button>
               <Button
                 className="flex-1"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={createMutation.isPending}
               >
-                {isSubmitting ? (
+                {createMutation.isPending ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
                     등록 중...
