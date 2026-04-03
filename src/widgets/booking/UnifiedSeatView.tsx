@@ -6,23 +6,30 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useBooking } from "@/features/booking/model/BookingContext";
 import { useSeatTimer } from "@/features/booking/model/useSeatTimer";
-import {
-  generateSeatsForSection,
-  getSectionLayout,
-} from "@/shared/lib/mocks/seats";
 import { useSeatLockSimulation } from "@/features/booking/model/useSeatLockSimulation";
 import { VenueMap, SECTION_BBOXES } from "@/features/booking/ui/VenueMap";
 import { SeatOverlay } from "@/features/booking/ui/SeatOverlay";
+import { getSeatsAvailability } from "@/features/booking/api/getSeatsAvailability";
 import { BookingSidePanel } from "./BookingSidePanel";
 import { TimerExpiryModal } from "./TimerExpiryModal";
 import { formatEventDateTime } from "@/shared/lib/format";
-import type { Seat } from "@/shared/types";
+import type { Seat, SeatStatus } from "@/shared/types";
+
+function parseSectionCode(sectionCode: string): { tier: string; zoneNo: number } {
+  const match = sectionCode.match(/^([A-Z]+)(\d+)$/);
+  return {
+    tier: match?.[1] ?? "",
+    zoneNo: Number(match?.[2]) ?? 0,
+  };
+}
 
 export function UnifiedSeatView() {
   const {
+    eventId,
     bookingState,
     event,
     selectedDateId,
@@ -60,22 +67,48 @@ export function UnifiedSeatView() {
     [sectionsForDate, selectedSectionId],
   );
 
-  const layout = useMemo(() => {
-    if (!selectedSectionId) return { rows: 0, seatsPerRow: 0 };
-    return getSectionLayout(selectedSectionId);
+  // Parse tier and zoneNo from sectionCode (e.g. "VIP1" → tier="VIP", zoneNo=1)
+  const { tier: sectionTier, zoneNo } = useMemo(() => {
+    if (!selectedSectionId) return { tier: "", zoneNo: 0 };
+    return parseSectionCode(selectedSectionId);
   }, [selectedSectionId]);
 
-  // Seats
-  const initialSeats = useMemo(() => {
-    if (!section) return [];
-    return generateSeatsForSection(section, userTier);
-  }, [section, userTier]);
+  const showId = selectedDateId ? Number(selectedDateId) : null;
 
-  const [seats, setSeats] = useState<Seat[]>(initialSeats);
+  // Fetch real seat availability for the selected section
+  const { data: availabilityData } = useQuery({
+    queryKey: ["seats-availability", eventId, showId, sectionTier, zoneNo],
+    queryFn: () => getSeatsAvailability(eventId, showId!, sectionTier, zoneNo),
+    enabled: isInSeatMode && showId !== null && sectionTier !== "" && zoneNo > 0,
+    staleTime: 30_000,
+  });
+
+  // Map API response to Seat[] and derive grid layout
+  const apiSeats: Seat[] = useMemo(() => {
+    if (!availabilityData) return [];
+    return availabilityData.seats.map((s) => ({
+      id: s.seatId,
+      sectionId: availabilityData.sectionCode,
+      row: s.row,
+      number: String(s.number),
+      status: (s.bookable ? "available" : "taken") as SeatStatus,
+    }));
+  }, [availabilityData]);
+
+  const layout = useMemo(() => {
+    if (!availabilityData || availabilityData.seats.length === 0) {
+      return { rows: 0, seatsPerRow: 0 };
+    }
+    const seatsPerRow = Math.max(...availabilityData.seats.map((s) => s.number));
+    const rows = Math.round(availabilityData.seats.length / seatsPerRow);
+    return { rows, seatsPerRow };
+  }, [availabilityData]);
+
+  const [seats, setSeats] = useState<Seat[]>([]);
 
   useEffect(() => {
-    setSeats(initialSeats);
-  }, [initialSeats]);
+    setSeats(apiSeats);
+  }, [apiSeats]);
 
   // Start timer when entering seat mode, or restart when switching sections
   useEffect(() => {

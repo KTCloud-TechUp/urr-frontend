@@ -10,6 +10,7 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
+import { useQuery } from "@tanstack/react-query";
 import type {
   BookingState,
   TierLevel,
@@ -17,11 +18,31 @@ import type {
   EventDate,
   ConfirmationData,
 } from "@/shared/types";
-import { mockEvent, getSectionsForDate } from "@/shared/lib/mocks/event-detail";
+import { mockEvent } from "@/shared/lib/mocks/event-detail";
 import { mockUser } from "@/shared/lib/mocks/user";
 import { MAX_SEATS_PER_TIER } from "@/shared/lib/mocks/seats";
+import { getShows } from "@/features/show/api/getShows";
+import { getSeatsSummary } from "@/features/booking/api/getSeatsSummary";
+
+// Static tier price map (pricing API not yet available)
+const TIER_PRICES: Record<string, number> = {
+  VIP: 198000,
+  S: 132000,
+  R: 110000,
+  A: 99000,
+};
 
 // --- Types ---
+
+export interface BookingEvent {
+  id: string;
+  title: string;
+  venue: string;
+  poster: string;
+  dates: EventDate[];
+  status: string;
+}
+
 interface BookingInternalState {
   bookingState: BookingState;
   selectedDateId: string | null;
@@ -50,7 +71,7 @@ type BookingAction =
 export interface BookingContextValue {
   eventId: string;
   bookingState: BookingState;
-  event: typeof mockEvent | null;
+  event: BookingEvent | null;
   selectedDateId: string | null;
   isLeftPanelExpanded: boolean;
   isLoading: boolean;
@@ -150,21 +171,79 @@ interface BookingProviderProps {
 export function BookingProvider({ eventId, children }: BookingProviderProps) {
   const [state, dispatch] = useReducer(bookingReducer, initialState);
 
+  // Fetch shows for this event
+  const { data: shows, isLoading: showsLoading } = useQuery({
+    queryKey: ["shows", eventId],
+    queryFn: () => getShows(eventId),
+  });
+
+  // Map shows to EventDate[] format
+  const eventDates: EventDate[] = useMemo(() => {
+    if (!shows) return [];
+    return shows.map((show) => ({
+      id: String(show.showId),
+      date: show.startAt,
+      bookingWindows: show.bookingWindows.map((bw) => ({
+        tier: bw.tier as TierLevel,
+        opensAt: bw.opensAt,
+        fee: bw.fee,
+      })),
+      totalSeats: show.capacity,
+      remainingSeats: show.remainingSeats,
+    }));
+  }, [shows]);
+
+  // Initialize selectedDateId once shows are loaded
   useEffect(() => {
-    const timer = setTimeout(() => {
-      void eventId;
+    if (!showsLoading && eventDates.length > 0 && state.isLoading) {
       dispatch({
         type: "SET_EVENT_LOADED",
-        payload: { dateId: mockEvent.dates[0]?.id ?? "" },
+        payload: { dateId: eventDates[0].id },
       });
       const startPhase = sessionStorage.getItem("urr:booking:startPhase") as BookingState | null;
       if (startPhase) {
         sessionStorage.removeItem("urr:booking:startPhase");
         dispatch({ type: "TRANSITION_STATE", payload: startPhase });
       }
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [eventId]);
+    }
+  }, [showsLoading, eventDates, state.isLoading]);
+
+  // showId derived from selectedDateId
+  const showId = state.selectedDateId ? Number(state.selectedDateId) : null;
+
+  // Fetch seats summary for currently selected show
+  const { data: seatsSummary } = useQuery({
+    queryKey: ["seats-summary", eventId, showId],
+    queryFn: () => getSeatsSummary(eventId, showId!),
+    enabled: showId !== null,
+  });
+
+  // Map summary zones to Section[]
+  const sectionsForDate: Section[] = useMemo(() => {
+    if (!seatsSummary) return [];
+    return seatsSummary.tiers.flatMap((tier) =>
+      tier.zones.map((zone) => ({
+        id: zone.sectionCode,
+        name: zone.sectionCode,
+        price: TIER_PRICES[tier.tier] ?? 99000,
+        totalSeats: zone.totalSeats,
+        remainingSeats: zone.bookableSeats,
+      })),
+    );
+  }, [seatsSummary]);
+
+  // Build event object with real dates (keep mock metadata until event detail API is integrated)
+  const event: BookingEvent | null = useMemo(() => {
+    if (showsLoading || eventDates.length === 0) return null;
+    return {
+      id: mockEvent.id,
+      title: mockEvent.title,
+      venue: mockEvent.venue,
+      poster: mockEvent.poster,
+      status: mockEvent.status,
+      dates: eventDates,
+    };
+  }, [showsLoading, eventDates]);
 
   const userTier = mockUser.tier;
   const maxSeats = MAX_SEATS_PER_TIER[userTier];
@@ -177,13 +256,8 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
 
   const selectedDate = useMemo(() => {
     if (!state.selectedDateId) return null;
-    return mockEvent.dates.find((d) => d.id === state.selectedDateId) ?? null;
-  }, [state.selectedDateId]);
-
-  const sectionsForDate = useMemo(() => {
-    if (!state.selectedDateId) return [];
-    return getSectionsForDate(state.selectedDateId);
-  }, [state.selectedDateId]);
+    return eventDates.find((d) => d.id === state.selectedDateId) ?? null;
+  }, [state.selectedDateId, eventDates]);
 
   const userWindowOpensAt = useMemo(() => {
     if (!selectedDate) return null;
@@ -252,7 +326,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     () => ({
       eventId,
       bookingState: state.bookingState,
-      event: state.isLoading ? null : mockEvent,
+      event,
       selectedDateId: state.selectedDateId,
       isLeftPanelExpanded: state.isLeftPanelExpanded,
       isLoading: state.isLoading,
@@ -291,6 +365,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       state.confirmationData,
       state.seatTimerSecondsLeft,
       state.queueToken,
+      event,
       userTier,
       selectedDate,
       sectionsForDate,
