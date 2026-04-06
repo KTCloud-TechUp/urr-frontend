@@ -7,12 +7,12 @@
 | GET | `/api/v1/ticket/events/{eventId}/shows/{showId}/seats` | 🔲 미착수 |
 | POST | `/api/v1/ticket/reservations` | ✅ 완료 (단일 좌석) |
 | POST | `/api/v1/ticket/reservations/bulk` | 🔲 서버 미완성 대기 중 |
-| POST | `/api/v1/ticket/reservations/{reservationId}/confirm` | 🔲 미착수 (결제 후 호출 필요) |
+| POST | `/api/v1/ticket/reservations/{reservationId}/confirm` | ✅ 완료 (`confirmReservation.ts`, Toss 콜백 후 호출) |
 | POST | `/api/v1/ticket/reservations/{reservationId}/expire` | — 서버 스케줄러 (프론트 직접 호출 X) |
 | GET | `/api/v1/ticket/reservations/{reservationId}/hold-status` | 🔲 미착수 |
 | POST | `/api/v1/ticket/reservations/{reservationId}/cancel` | 🔲 미착수 |
 | POST | `/api/v1/ticket/reservations/{reservationId}/refund` | — 서버 내부 처리 |
-| GET | `/api/v1/ticket/users/{userId}/reservations` | 🔲 미착수 (마이티켓 mock 중) |
+| GET | `/api/v1/ticket/users/{userId}/reservations` | ✅ 완료 (`getMyReservations.ts`, 마이티켓 실제 연동) |
 | GET | `/api/v1/ticket/internal/transfers/{reservationId}/eligibility` | — 서버 내부 (양도 서비스용) |
 | POST | `/api/v1/ticket/internal/transfers/{reservationId}/complete` | — 서버 내부 (양도 서비스용) |
 

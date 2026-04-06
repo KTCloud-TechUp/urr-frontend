@@ -177,7 +177,17 @@ export function EventsWidget() {
     queryFn: getEvents,
   });
 
-  const allEvents = useMemo(() => eventsData.map(mapToEventListItem), [eventsData]);
+  const allEvents = useMemo(() => {
+    const seen = new Set<string>();
+    return eventsData
+      .filter((e) => {
+        const id = String(e.eventId);
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      })
+      .map(mapToEventListItem);
+  }, [eventsData]);
 
   const filteredEvents = useMemo(() => {
     if (category === "all") return allEvents;

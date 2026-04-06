@@ -193,22 +193,26 @@ export function LeftPanel() {
                     등급별 예매 일정
                   </h4>
                   <div className="space-y-0.5">
-                    {tierWindows.length > 0 &&
-                      TIER_ORDER.map((tier) => {
-                        const window = tierWindows.find(
-                          (w) => w.tier === tier,
-                        );
-                        if (!window) return null;
-                        return (
-                          <TierScheduleRow
-                            key={tier}
-                            tier={tier}
-                            opensAt={window.opensAt}
-                            isUserTier={tier === userTier}
-                            isOpen={new Date(window.opensAt).getTime() <= now}
-                          />
-                        );
-                      })}
+                    {tierWindows.length > 0
+                      ? TIER_ORDER.map((tier) => {
+                          const window = tierWindows.find(
+                            (w) => w.tier === tier,
+                          );
+                          if (!window) return null;
+                          return (
+                            <TierScheduleRow
+                              key={tier}
+                              tier={tier}
+                              opensAt={window.opensAt}
+                              isUserTier={tier === userTier}
+                              isOpen={new Date(window.opensAt).getTime() <= now}
+                            />
+                          );
+                        })
+                      : <p className="text-xs text-muted-foreground px-2.5 py-1">
+                          예매 일정 정보가 없습니다
+                        </p>
+                    }
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-muted-foreground">

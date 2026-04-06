@@ -4,15 +4,11 @@
 
 | 순서 | 작업 | 이유 |
 | ---- | ---- | ---- |
-| 1 | **Phase 11 `bookTicket` 버그픽스** | 잘못된 엔드포인트(`/api/ticketing/book`) 사용 중 — 예매 플로우 전체가 깨진 상태 |
-| 2 | **Phase 9 예매 Zustand store** | `reservationId`를 store에 저장해야 결제 confirm 호출 가능 — 나머지 예매 작업의 전제조건 |
-| 3 | **Phase 11-3 마이티켓 연동** | Phase 9 완료 후 자연스럽게 이어짐. `TicketWalletTab` mock → 실제 API 교체 |
-| 3 | **Phase 12 결제 취소** | Phase 9와 독립적. 작은 작업으로 병렬 처리 가능 |
-| 4 | **Phase 6 온보딩 완성** | SMS 인증 + 약관 동의 연동 — 유저 유입 첫 관문 |
-| 5 | **Phase 13 User 설정** | 동의 수정(`/api/v1/auth/me/consents`) + 회원탈퇴 — 작은 작업들 |
-| 6 | **Phase 14 소통탭** | UI 완성, API만 연결. 의존성 없어 나중에 처리 가능 |
-
-> **핵심 의존성**: Phase 11 bugfix → Phase 9 store → Phase 11-3 마이티켓 확인
+| ✅ | **Phase 11 Ticketing + Queue** | 완료 |
+| ✅ | **Phase 12 Payments** | 완료 |
+| 1 | **Phase 6 온보딩 완성** | SMS 인증 + 약관 동의 + 소셜 온보딩 완료 API 연동 — 유저 유입 첫 관문 |
+| 2 | **Phase 13 User 설정** | 동의 수정(`/api/v1/auth/me/consents`) + 회원탈퇴(`DELETE /api/v1/auth/me`) — 작은 작업들 |
+| 3 | **Phase 14 소통탭** | UI 완성, API만 연결. 의존성 없어 나중에 처리 가능 |
 
 ---
 
@@ -29,13 +25,13 @@
 | —    | 8     | 예매 VenueMap 인터랙션 UI        | ✅ 완료                               |
 | —    | 13a   | 선예매 정책 조회 API             | ✅ 완료                               |
 | —    | 13b   | 아티스트 멤버십 취소 API         | ✅ 완료                               |
-| 1    | 9     | 예매 Zustand store               | 🔲 미착수                             |
+| —    | 9     | 예매 Zustand store               | ✅ 완료                               |
 | —    | 10    | Events/Artists API 연동          | ✅ 완료                               |
-| 3    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료                          |
-| 4    | 11    | Ticketing + Queue 연동           | 🔶 부분 완료                          |
-| 5    | 12    | Payments 연동                    | 🔶 부분 완료 (Toss SDK 완료, 취소 미구현) |
-| 6    | 13    | User 추가 기능                   | 🔶 부분 완료 (닉네임만)               |
-| 7    | 14    | Community 연동                   | 🔶 부분 완료 (양도 완료, 소통 미착수) |
+| —    | 11    | Ticketing + Queue 연동           | ✅ 완료                               |
+| —    | 12    | Payments 연동                    | ✅ 완료                               |
+| 1    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료                          |
+| 2    | 13    | User 추가 기능                   | 🔶 부분 완료 (닉네임만)               |
+| 3    | 14    | Community 연동                   | 🔶 부분 완료 (양도 완료, 소통 미착수) |
 
 ---
 
@@ -84,10 +80,12 @@
 - [ ] `handleTermsComplete` (`useOnboardingAuth.ts`) — `updateConsents()` 호출 (마케팅 동의 선택값 전달)
   - TermsStep에서 `marketing` 체크 여부를 `onComplete(marketingConsent: boolean)` 으로 올려야 함
 
-### 6-5b. 소셜 온보딩 완료 API 미확인
+### 6-5b. 소셜 온보딩 완료 API 미연동 🔲
 
 > 엔드포인트: `POST /api/v1/auth/onboarding/social` (body: `{ nickname, birthDate, phone, gender }`)  
-> 소셜 로그인 후 추가 정보 입력 완료 시 호출 — 현재 연동 여부 확인 필요
+> 소셜 로그인 후 추가 정보 입력 완료 시 호출 — 온보딩 마지막 스텝에서 연동 필요
+
+- [ ] `useOnboardingAuth.ts` — 온보딩 완료 시 `POST /api/v1/auth/onboarding/social` 호출 후 홈으로 리다이렉트
 
 ### 6-4. 아티스트 선택 (ArtistSelectStep) ✅
 
@@ -108,15 +106,20 @@
 
 ---
 
-## Phase 9 — 예매 Zustand store 🔲
+## Phase 9 — 예매 Zustand store ✅
 
 > **선행 조건**: Phase 8 완료 ✅
 
-- [ ] `src/features/booking/model/useBookingStore.ts`
-  - [ ] `bookingState`: `idle | queue | seats-section | seats-individual | payment | confirmation | payment-failed | seats-expired`
-  - [ ] `selectedSeats: Seat[]` (최대 4석), `queueInfo`, `seatTimer` (180초)
-  - [ ] 액션: `enterQueue`, `selectSection`, `selectSeat`, `removeSeat`, `enterPayment`, `confirmPayment`, `failPayment`, `expireSeats`, `reset`
-- [ ] `BookingContext` → Zustand store로 마이그레이션
+- [x] `src/features/booking/model/useBookingStore.ts`
+  - [x] `bookingState`: `idle | queue | seats-section | seats-individual | payment | confirmation | payment-failed | seats-expired`
+  - [x] `selectedSeatIds: string[]` (최대 maxSeats), `seatTimerSecondsLeft`, `queueToken`
+  - [x] `reservationIds: string[]` + `orderId: string | null` — confirmReservation 체인에 사용
+  - [x] 액션: `transitionTo`, `selectSection`, `toggleSeat`, `setReservations`, `reset` 등
+- [x] `BookingContext` → `useReducer` 제거, Zustand store 사용으로 마이그레이션
+- [x] `src/features/booking/api/confirmReservation.ts` — `POST /api/v1/ticket/reservations/{id}/confirm`
+- [x] `PaymentView.tsx` — `bookTicket()` 완료 후 `setReservations()` 호출 + sessionStorage 백업
+- [x] `BookingContext` Toss 콜백 — `confirmPayment` 성공 후 `confirmReservation()` 체인 호출
+- [x] `shared/types/index.ts` — `BookingState`에 `payment-failed`, `seats-expired` 추가
 
 ---
 
@@ -152,7 +155,7 @@
 
 ---
 
-## Phase 11 — Ticketing + Queue API 연동 🔶 부분 완료
+## Phase 11 — Ticketing + Queue API 연동 ✅ 완료
 
 > **선행 조건**: Phase 9, 10
 
@@ -170,7 +173,7 @@
 - [x] `GET /shows/{eventId}/shows/{showId}/seats/summary` → `getSeatsSummary(eventId, showId)` — `src/features/booking/api/getSeatsSummary.ts`
 - [x] `GET /shows/{eventId}/shows/{showId}/seats/availability?tier=&zoneNo=` → `getSeatsAvailability(eventId, showId, tier, zoneNo)` — `src/features/booking/api/getSeatsAvailability.ts`
 
-### 11-3. 예매 확정 + 마이티켓 🔶
+### 11-3. 예매 확정 + 마이티켓 ✅
 
 > **실제 티켓 API 엔드포인트** (ticket_api.md 확인):
 > - 좌석 목록: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
@@ -184,16 +187,21 @@
       Request: `{ eventId, showId, artistId, seatId, holdSeconds: 180 }`
       Response: `{ reservationId, status, paymentStatus, expiresAt }`
       ⚠️ 다중 좌석은 각각 개별 호출 (bulk API 미완성 대기 중)
-- [ ] 예약 확정: `POST /api/v1/ticket/reservations/{reservationId}/confirm` 호출 (결제 후)
-- [ ] 마이페이지 티켓 월렛 — `GET /api/v1/ticket/users/{userId}/reservations?status=CONFIRMED` 연동
-  - 현재 `TicketWalletTab`이 `getMyTickets()` mock 사용 중 → 실제 데이터로 교체
+- [x] 예약 확정 API 함수 — `POST /api/v1/ticket/reservations/{reservationId}/confirm`
+  - `src/features/booking/api/confirmReservation.ts` 생성 완료
+  - `BookingContext` Toss 결제 성공 콜백에서 `Promise.allSettled(restoredIds.map(confirmReservation))` 호출
+- [x] 마이페이지 티켓 월렛 — `GET /api/v1/ticket/users/{userId}/reservations?status=CONFIRMED` 연동
+  - `getMyReservations(userId, status?)` — `src/features/reservation/api/getMyReservations.ts`
+  - `useMyReservations(userId)` — `src/features/reservation/model/useMyReservations.ts`
+  - `MyPageWidget`에서 `useMyReservations` 사용 → `TicketWalletTab`에 실제 데이터 전달
+  - ⚠️ `seatId` 파싱 제한: API 응답의 `seatId` 필드만으로 section/row/number 분리 불가 → 현재 seatId 그대로 표시 (좌석 API 추가 호출 시 개선 가능)
 
 ---
 
-## Phase 12 — Payments API 연동 🔶
+## Phase 12 — Payments API 연동 ✅ 완료
 
-> **프론트 직접 호출 엔드포인트**: `POST /api/v1/payments/confirm`, `GET /api/v1/payments/order/{orderId}`  
-> **서버 내부 자동 처리 (프론트 직접 호출 X)**: `POST /api/v1/payments/create`, `POST /api/v1/payments/{paymentKey}/cancel`  
+> **프론트 직접 호출 엔드포인트**: `POST /api/v1/payments/confirm`, `GET /api/v1/payments/order/{orderId}`, `POST /api/v1/payments/{paymentKey}/cancel`  
+> **서버 내부 자동 처리 (프론트 직접 호출 X)**: `POST /api/v1/payments/create`  
 > — 각 서비스(양도 reserve, 멤버십 구독, 티켓 예약) 구매 API 호출 시 내부에서 자동 생성
 
 - [x] API 함수 + 타입 — `src/features/payment/api/confirmPayment.ts`, `getPayment.ts`
@@ -204,7 +212,11 @@
   - 예매: `PaymentView` → Toss 리다이렉트 → `BookingContext` 콜백 처리
   - 양도: `TransferPurchaseSidebar` → Toss 리다이렉트 → 사이드바 콜백 처리
   - 멤버십: `MembershipPaymentStep` → Toss 리다이렉트 → `MembershipWidget` 콜백 처리
-- [ ] 결제 취소 — 확인 다이얼로그 → `POST /api/v1/payments/{paymentKey}/cancel` (body: `{ cancelReason: string }`)
+- [x] 결제 취소 — `POST /api/v1/payments/{paymentKey}/cancel` (body: `{ cancelReason: string }`)
+  - `cancelPayment(paymentKey, cancelReason)` — `src/features/payment/api/cancelPayment.ts`
+  - `CancelBookingDialog` — `src/widgets/my-page/CancelBookingDialog.tsx` (취소 사유 셀렉트 + AlertDialog)
+  - `TicketWalletTab` — `useMutation(cancelPayment)` 연결, 성공 시 `my-reservations` 쿼리 invalidate
+  - ⚠️ `paymentKey` 제한: 예약 목록 API(`GET /ticket/users/{userId}/reservations`)가 `paymentKey`를 미반환 → `Ticket.paymentKey`가 undefined인 경우 alert 표시 후 중단. 백엔드에서 paymentKey 필드 추가 시 자동 활성화
 
 ---
 

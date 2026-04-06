@@ -1,4 +1,5 @@
 export { BookingProvider, useBooking } from "./model/BookingContext";
+export { useBookingStore } from "./model/useBookingStore";
 export type { BookingContextValue } from "./model/BookingContext";
 export { useQueueSimulation, useGeneralQueueSimulation } from "./model/useQueueSimulation";
 export type { UseQueueSimulationReturn, QueuePhase } from "./model/useQueueSimulation";

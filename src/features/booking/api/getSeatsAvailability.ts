@@ -27,6 +27,7 @@ export async function getSeatsAvailability(
 ): Promise<SeatAvailability[]> {
   const res = await apiRequest<SeatsApiResponse>(
     `/ticket/events/${eventId}/shows/${showId}/seats`,
+    { service: "ticketing" },
   );
   return res.data.data;
 }

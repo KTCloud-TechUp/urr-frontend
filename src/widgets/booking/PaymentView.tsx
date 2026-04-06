@@ -17,6 +17,7 @@ import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 import { bookTicket } from "@/features/booking/api/bookTicket";
 import { createPaymentRecord } from "@/features/payment/api/createPaymentRecord";
 import { getTossPayments, TOSS_METHOD_MAP } from "@/features/payment/lib/toss";
+import { useBookingStore } from "@/features/booking/model/useBookingStore";
 import type { ConfirmationData } from "@/shared/types";
 import { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
 
@@ -40,6 +41,8 @@ export function PaymentView() {
     transitionTo,
     resetBooking,
   } = useBooking();
+
+  const { setReservations } = useBookingStore();
 
   const [phase, setPhase] = useState<PaymentPhase>("confirm-seats");
   const retryTimer = useSeatTimer(60);
@@ -107,7 +110,8 @@ export function PaymentView() {
         ),
       );
 
-      const primaryReservationId = reservations[0].reservationId;
+      const reservationIdList = reservations.map((r) => r.reservationId);
+      const primaryReservationId = reservationIdList[0];
 
       // 결제 레코드 생성 (Toss orderId 등록)
       const orderId = `ORD-${Date.now()}`;
@@ -116,6 +120,11 @@ export function PaymentView() {
         orderId,
         amount: total,
       });
+
+      // reservationIds를 store와 sessionStorage에 저장
+      // — Toss 리다이렉트 후 JS 메모리 초기화되므로 sessionStorage 백업 필수
+      setReservations(reservationIdList, orderId);
+      sessionStorage.setItem("urr:toss:reservations", JSON.stringify(reservationIdList));
 
       // Toss 리다이렉트 복귀 후 ConfirmationData 복원에 사용
       const confirmationData: ConfirmationData = {
@@ -167,6 +176,7 @@ export function PaymentView() {
     section,
     tierFee,
     retryTimer,
+    setReservations,
   ]);
 
   const handleCancel = useCallback(() => {

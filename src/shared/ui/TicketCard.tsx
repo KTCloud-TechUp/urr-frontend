@@ -15,10 +15,11 @@ interface TicketCardProps {
   onViewQR?: () => void
   onTransfer?: () => void
   onCancelTransfer?: () => void
+  onCancelBooking?: () => void
   className?: string
 }
 
-export function TicketCard({ ticket, variant = 'upcoming', isListed, onViewQR, onTransfer, onCancelTransfer, className }: TicketCardProps) {
+export function TicketCard({ ticket, variant = 'upcoming', isListed, onViewQR, onTransfer, onCancelTransfer, onCancelBooking, className }: TicketCardProps) {
   const firstDate = ticket.event.dates[0]?.date ?? ''
   const dateStr = firstDate ? formatDateShort(firstDate) : ''
 
@@ -72,6 +73,12 @@ export function TicketCard({ ticket, variant = 'upcoming', isListed, onViewQR, o
             <Button size="sm" variant="outline" className="text-danger border-danger/30 hover:bg-danger/10 hover:text-danger" onClick={onCancelTransfer}>
               <XCircle size={14} />
               양도 취소
+            </Button>
+          )}
+          {!isListed && (
+            <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={onCancelBooking}>
+              <XCircle size={14} />
+              예매 취소
             </Button>
           )}
         </div>

@@ -10,7 +10,9 @@ export type BookingState =
   | "seats-section"
   | "seats-individual"
   | "payment"
-  | "confirmation";
+  | "confirmation"
+  | "payment-failed"
+  | "seats-expired";
 export type NotificationType =
   | "booking"
   | "transfer"
@@ -81,6 +83,8 @@ export interface Ticket {
   qrCode: string;
   isTransferable: boolean;
   isUpcoming: boolean;
+  /** Toss paymentKey — 예약 API가 반환 시 결제 취소에 사용. 현재는 별도 조회 필요 */
+  paymentKey?: string;
 }
 
 export interface TransferListing {

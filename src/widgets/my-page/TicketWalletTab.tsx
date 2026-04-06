@@ -2,12 +2,15 @@
 
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Ticket as TicketIcon } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { TicketCard } from '@/shared/ui/TicketCard'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { QRCodeModal } from './QRCodeModal'
 import { TransferListingModal } from './TransferListingModal'
+import { CancelBookingDialog } from './CancelBookingDialog'
+import { cancelPayment } from '@/features/payment'
 import type { Ticket, Event, TierLevel, User } from '@/shared/types'
 
 interface TicketWalletTabProps {
@@ -24,12 +27,24 @@ function getEffectiveTier(user: User, artistId: string): TierLevel {
 }
 
 export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps) {
+  const queryClient = useQueryClient()
+
   const [selectedTicket, setSelectedTicket] = useState<(Ticket & { event: Event }) | null>(null)
   const [transferTicket, setTransferTicket] = useState<(Ticket & { event: Event }) | null>(null)
+  const [cancelTicket, setCancelTicket] = useState<(Ticket & { event: Event }) | null>(null)
   const [listedTicketIds, setListedTicketIds] = useState<Set<string>>(new Set())
 
   const upcoming = tickets.filter((t) => t.isUpcoming)
   const past = tickets.filter((t) => !t.isUpcoming)
+
+  const cancelMutation = useMutation({
+    mutationFn: ({ paymentKey, reason }: { paymentKey: string; reason: string }) =>
+      cancelPayment(paymentKey, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-reservations', userId, 'CONFIRMED'] })
+      setCancelTicket(null)
+    },
+  })
 
   const handleListed = useCallback((ticketId: string, _: number) => {
     setListedTicketIds((prev) => new Set(prev).add(ticketId))
@@ -44,6 +59,16 @@ export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps)
       })
     }
   }, [])
+
+  const handleCancelBookingConfirm = useCallback((reason: string) => {
+    if (!cancelTicket) return
+    if (!cancelTicket.paymentKey) {
+      alert('결제 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.')
+      setCancelTicket(null)
+      return
+    }
+    cancelMutation.mutate({ paymentKey: cancelTicket.paymentKey, reason })
+  }, [cancelTicket, cancelMutation])
 
   if (tickets.length === 0) {
     return (
@@ -74,6 +99,7 @@ export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps)
                   onViewQR={() => setSelectedTicket(ticket)}
                   onTransfer={() => setTransferTicket(ticket)}
                   onCancelTransfer={() => handleCancelTransfer(ticket.id)}
+                  onCancelBooking={() => setCancelTicket(ticket)}
                 />
               ))}
             </div>
@@ -112,6 +138,15 @@ export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps)
         open={!!transferTicket}
         onClose={() => setTransferTicket(null)}
         onListed={handleListed}
+      />
+
+      {/* Cancel Booking Dialog */}
+      <CancelBookingDialog
+        ticket={cancelTicket}
+        open={!!cancelTicket}
+        isPending={cancelMutation.isPending}
+        onClose={() => setCancelTicket(null)}
+        onConfirm={handleCancelBookingConfirm}
       />
     </>
   )
