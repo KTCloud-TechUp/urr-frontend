@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
+    "@tosspayments/payment-sdk": "^1.9.2",
     "@types/canvas-confetti": "^1.9.0",
     "@types/three": "^0.183.1",
     "canvas-confetti": "^1.9.4",

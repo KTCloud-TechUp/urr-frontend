@@ -19,13 +19,6 @@ import { TimerExpiryModal } from "./TimerExpiryModal";
 import { formatEventDateTime } from "@/shared/lib/format";
 import type { Seat, SeatStatus } from "@/shared/types";
 
-function parseSectionCode(sectionCode: string): { tier: string; zoneNo: number } {
-  const match = sectionCode.match(/^([A-Z]+)(\d+)$/);
-  return {
-    tier: match?.[1] ?? "",
-    zoneNo: Number(match?.[2]) ?? 0,
-  };
-}
 
 export function UnifiedSeatView() {
   const {
@@ -67,42 +60,37 @@ export function UnifiedSeatView() {
     [sectionsForDate, selectedSectionId],
   );
 
-  // Parse tier and zoneNo from sectionCode (e.g. "VIP1" → tier="VIP", zoneNo=1)
-  const { tier: sectionTier, zoneNo } = useMemo(() => {
-    if (!selectedSectionId) return { tier: "", zoneNo: 0 };
-    return parseSectionCode(selectedSectionId);
-  }, [selectedSectionId]);
-
   const showId = selectedDateId ? Number(selectedDateId) : null;
 
   // Fetch real seat availability for the selected section
-  const { data: availabilityData } = useQuery({
-    queryKey: ["seats-availability", eventId, showId, sectionTier, zoneNo],
-    queryFn: () => getSeatsAvailability(eventId, showId!, sectionTier, zoneNo),
-    enabled: isInSeatMode && showId !== null && sectionTier !== "" && zoneNo > 0,
+  const { data: seatsData } = useQuery({
+    queryKey: ["seats-availability", eventId, showId],
+    queryFn: () => getSeatsAvailability(eventId, showId!),
+    enabled: isInSeatMode && showId !== null,
     staleTime: 30_000,
   });
 
-  // Map API response to Seat[] and derive grid layout
+  // Filter to selected section and map to Seat[]
   const apiSeats: Seat[] = useMemo(() => {
-    if (!availabilityData) return [];
-    return availabilityData.seats.map((s) => ({
+    if (!seatsData) return [];
+    const sectionSeats = selectedSectionId
+      ? seatsData.filter((s) => s.section === selectedSectionId)
+      : seatsData;
+    return sectionSeats.map((s) => ({
       id: s.seatId,
-      sectionId: availabilityData.sectionCode,
+      sectionId: s.section,
       row: s.row,
-      number: String(s.number),
-      status: (s.bookable ? "available" : "taken") as SeatStatus,
+      number: s.number,
+      status: (s.status === "AVAILABLE" ? "available" : "taken") as SeatStatus,
     }));
-  }, [availabilityData]);
+  }, [seatsData, selectedSectionId]);
 
   const layout = useMemo(() => {
-    if (!availabilityData || availabilityData.seats.length === 0) {
-      return { rows: 0, seatsPerRow: 0 };
-    }
-    const seatsPerRow = Math.max(...availabilityData.seats.map((s) => s.number));
-    const rows = Math.round(availabilityData.seats.length / seatsPerRow);
+    if (apiSeats.length === 0) return { rows: 0, seatsPerRow: 0 };
+    const seatsPerRow = Math.max(...apiSeats.map((s) => Number(s.number)));
+    const rows = Math.round(apiSeats.length / seatsPerRow);
     return { rows, seatsPerRow };
-  }, [availabilityData]);
+  }, [apiSeats]);
 
   const [seats, setSeats] = useState<Seat[]>([]);
 

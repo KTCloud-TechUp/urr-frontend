@@ -14,6 +14,9 @@ import { PriceDisplay } from "@/shared/ui/PriceDisplay";
 import { formatPrice, parseSeatDisplay, formatDateDot } from "@/shared/lib/format";
 import { PAYMENT_METHODS } from "@/shared/lib/constants";
 import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
+import { bookTicket } from "@/features/booking/api/bookTicket";
+import { createPaymentRecord } from "@/features/payment/api/createPaymentRecord";
+import { getTossPayments, TOSS_METHOD_MAP } from "@/features/payment/lib/toss";
 import type { ConfirmationData } from "@/shared/types";
 import { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
 
@@ -27,6 +30,8 @@ type PaymentPhase =
 export function PaymentView() {
   const {
     event,
+    eventId,
+    artistId,
     selectedDate,
     selectedSeatIds,
     selectedSectionId,
@@ -34,7 +39,6 @@ export function PaymentView() {
     userTier,
     transitionTo,
     resetBooking,
-    setConfirmationData,
   } = useBooking();
 
   const [phase, setPhase] = useState<PaymentPhase>("confirm-seats");
@@ -86,45 +90,82 @@ export function PaymentView() {
     setPhase("confirm-seats");
   }, []);
 
-  const handleSubmitPayment = useCallback(() => {
+  const handleSubmitPayment = useCallback(async () => {
+    if (!selectedDate || !artistId) return;
     setPhase("processing");
 
-    const timeout = setTimeout(() => {
-      const isSuccess = Math.random() > 0.1; // 90% success for demo
-
-      if (isSuccess && section) {
-        const confirmationData: ConfirmationData = {
-          bookingId: `URR-${Date.now().toString(36).toUpperCase()}`,
-          tickets: selectedSeatIds.map((seatId) => {
-            const parts = seatId.split("-");
-            return {
-              seatId,
-              sectionName: section.name,
-              row: parts[parts.length - 2],
-              seatNumber: parts[parts.length - 1],
-              price: section.price,
-              tierFee,
-            };
+    try {
+      // 각 좌석별 예약 생성 (단일 엔드포인트 — bulk API 미완성)
+      const reservations = await Promise.all(
+        selectedSeatIds.map((seatId) =>
+          bookTicket({
+            eventId,
+            showId: selectedDate.id,
+            artistId,
+            seatId,
           }),
-          totalAmount: total,
-          bookedAt: new Date().toISOString(),
-        };
-        setConfirmationData(confirmationData);
-        transitionTo("confirmation");
-      } else {
-        setPhase("failed");
-        retryTimer.start();
-      }
-    }, 1500);
+        ),
+      );
 
-    return () => clearTimeout(timeout);
+      const primaryReservationId = reservations[0].reservationId;
+
+      // 결제 레코드 생성 (Toss orderId 등록)
+      const orderId = `ORD-${Date.now()}`;
+      await createPaymentRecord({
+        referenceId: primaryReservationId,
+        orderId,
+        amount: total,
+      });
+
+      // Toss 리다이렉트 복귀 후 ConfirmationData 복원에 사용
+      const confirmationData: ConfirmationData = {
+        bookingId: primaryReservationId,
+        tickets: selectedSeatIds.map((id) => {
+          const parts = id.split("-");
+          return {
+            seatId: id,
+            sectionName: section?.name ?? "",
+            row: parts.length >= 2 ? parts[parts.length - 2] : id,
+            seatNumber: parts.length >= 1 ? parts[parts.length - 1] : id,
+            price: section?.price ?? 0,
+            tierFee,
+          };
+        }),
+        totalAmount: total,
+        bookedAt: new Date().toISOString(),
+      };
+      sessionStorage.setItem("urr:toss:booking", JSON.stringify(confirmationData));
+
+      const tossPayments = await getTossPayments();
+      await tossPayments.requestPayment(TOSS_METHOD_MAP[selectedMethod], {
+        amount: total,
+        orderId,
+        orderName: `${event?.title ?? "티켓"} ${seatCount}매`,
+        successUrl: `${window.location.origin}${window.location.pathname}`,
+        failUrl: `${window.location.origin}${window.location.pathname}?paymentFail=1`,
+        customerName: buyerName,
+        customerMobilePhone: buyerPhone.replace(/-/g, ""),
+      });
+      // requestPayment 는 성공 시 successUrl?paymentKey=...&orderId=...&amount=... 로 리다이렉트
+      // — 이 이후 코드는 실행되지 않음
+    } catch {
+      sessionStorage.removeItem("urr:toss:booking");
+      setPhase("failed");
+      retryTimer.start();
+    }
   }, [
-    section,
+    selectedDate,
+    artistId,
+    eventId,
     selectedSeatIds,
-    tierFee,
+    buyerName,
+    buyerPhone,
+    selectedMethod,
     total,
-    setConfirmationData,
-    transitionTo,
+    event,
+    seatCount,
+    section,
+    tierFee,
     retryTimer,
   ]);
 

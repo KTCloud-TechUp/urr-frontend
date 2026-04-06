@@ -23,6 +23,10 @@ import { mockUser } from "@/shared/lib/mocks/user";
 import { MAX_SEATS_PER_TIER } from "@/shared/lib/mocks/seats";
 import { getShows } from "@/features/show/api/getShows";
 import { getSeatsSummary } from "@/features/booking/api/getSeatsSummary";
+import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
+import { confirmPayment } from "@/features/payment/api/confirmPayment";
+import { getEvents } from "@/features/event/api/getEvents";
+import type { TierWindow } from "@/shared/types";
 
 // Static tier price map (pricing API not yet available)
 const TIER_PRICES: Record<string, number> = {
@@ -70,6 +74,7 @@ type BookingAction =
 
 export interface BookingContextValue {
   eventId: string;
+  artistId: string | null;
   bookingState: BookingState;
   event: BookingEvent | null;
   selectedDateId: string | null;
@@ -77,6 +82,7 @@ export interface BookingContextValue {
   isLoading: boolean;
   userTier: TierLevel;
   selectedDate: EventDate | null;
+  tierWindows: TierWindow[];
   sectionsForDate: Section[];
   isWindowOpen: boolean;
   isSoldOut: boolean;
@@ -171,6 +177,19 @@ interface BookingProviderProps {
 export function BookingProvider({ eventId, children }: BookingProviderProps) {
   const [state, dispatch] = useReducer(bookingReducer, initialState);
 
+  // Fetch events list to derive artistId for this event
+  const { data: events } = useQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const artistId = useMemo(() => {
+    if (!events) return null;
+    const ev = events.find((e) => String(e.eventId) === String(eventId));
+    return ev ? String(ev.artistId) : null;
+  }, [events, eventId]);
+
   // Fetch shows for this event
   const { data: shows, isLoading: showsLoading } = useQuery({
     queryKey: ["shows", eventId],
@@ -208,6 +227,43 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     }
   }, [showsLoading, eventDates, state.isLoading]);
 
+  // Toss 결제 콜백 처리: successUrl 복귀 시 paymentKey URL 파라미터 감지
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const paymentKey = params.get("paymentKey");
+    const orderId = params.get("orderId");
+    const amount = params.get("amount");
+    const paymentFail = params.get("paymentFail");
+
+    if (paymentFail) {
+      // 결제 실패: URL 파라미터만 제거하고 idle 상태 유지
+      window.history.replaceState({}, "", window.location.pathname);
+      sessionStorage.removeItem("urr:toss:booking");
+      return;
+    }
+
+    if (!paymentKey || !orderId || !amount) return;
+
+    const raw = sessionStorage.getItem("urr:toss:booking");
+    if (!raw) return;
+
+    sessionStorage.removeItem("urr:toss:booking");
+    window.history.replaceState({}, "", window.location.pathname);
+
+    const confirmationData = JSON.parse(raw) as ConfirmationData;
+
+    confirmPayment({ paymentKey, orderId, amount: Number(amount) })
+      .then(() => {
+        dispatch({ type: "SET_CONFIRMATION_DATA", payload: confirmationData });
+        dispatch({ type: "TRANSITION_STATE", payload: "confirmation" });
+      })
+      .catch(() => {
+        // confirm 실패 시 idle로 복귀 (좌석 재선택 필요)
+        dispatch({ type: "RESET_BOOKING" });
+      });
+  }, []);
+
   // showId derived from selectedDateId
   const showId = state.selectedDateId ? Number(state.selectedDateId) : null;
 
@@ -215,6 +271,13 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   const { data: seatsSummary } = useQuery({
     queryKey: ["seats-summary", eventId, showId],
     queryFn: () => getSeatsSummary(eventId, showId!),
+    enabled: showId !== null,
+  });
+
+  // Fetch authoritative booking windows for the selected show
+  const { data: bookingWindowsData } = useQuery({
+    queryKey: ["booking-windows", eventId, showId],
+    queryFn: () => getBookingWindows(eventId, showId!),
     enabled: showId !== null,
   });
 
@@ -259,11 +322,22 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     return eventDates.find((d) => d.id === state.selectedDateId) ?? null;
   }, [state.selectedDateId, eventDates]);
 
+  // Merge: prefer API booking-windows data; fall back to getShows() data
+  const tierWindows: TierWindow[] = useMemo(() => {
+    if (bookingWindowsData?.tierPolicies?.length) {
+      return bookingWindowsData.tierPolicies.map((tp) => ({
+        tier: tp.tier as TierLevel,
+        opensAt: tp.openAt,
+        fee: tp.bookingFeeWon,
+      }));
+    }
+    return selectedDate?.bookingWindows ?? [];
+  }, [bookingWindowsData, selectedDate]);
+
   const userWindowOpensAt = useMemo(() => {
-    if (!selectedDate) return null;
-    const window = selectedDate.bookingWindows.find((w) => w.tier === userTier);
+    const window = tierWindows.find((w) => w.tier === userTier);
     return window?.opensAt ?? null;
-  }, [selectedDate, userTier]);
+  }, [tierWindows, userTier]);
 
   const isWindowOpen = useMemo(() => {
     if (!userWindowOpensAt) return false;
@@ -325,6 +399,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   const value: BookingContextValue = useMemo(
     () => ({
       eventId,
+      artistId,
       bookingState: state.bookingState,
       event,
       selectedDateId: state.selectedDateId,
@@ -332,6 +407,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       isLoading: state.isLoading,
       userTier,
       selectedDate,
+      tierWindows,
       sectionsForDate,
       isWindowOpen,
       isSoldOut,
@@ -356,6 +432,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     }),
     [
       eventId,
+      artistId,
       state.bookingState,
       state.selectedDateId,
       state.isLeftPanelExpanded,
@@ -368,6 +445,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       event,
       userTier,
       selectedDate,
+      tierWindows,
       sectionsForDate,
       isWindowOpen,
       isSoldOut,

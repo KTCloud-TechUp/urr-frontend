@@ -72,7 +72,7 @@ npm run build  # 빌드 검증
   - EKS 전환(SSR) 시 sessionStorage 제거 가능
 - `refreshToken`: httpOnly 쿠키 (`credentials: "include"` 자동 전송)
 - `is_authenticated`: 클라이언트 쿠키 (24h) — 로그인 상태 힌트
-- 401 → `fetchWithAuth`가 `POST /api/auth/token/reissue` 호출 → 성공 시 재시도 / 실패 시 `onAuthFailed()` → 로그아웃
+- 401 → `fetchWithAuth`가 `POST /api/v1/auth/token/reissue` 호출 → 성공 시 재시도 / 실패 시 `onAuthFailed()` → 로그아웃
 
 ---
 
@@ -159,15 +159,20 @@ idle → queue → seats-section → seats-individual → payment → confirmati
 
 > 상세 체크리스트 → `docs/CheckList.md`
 
-| Phase | 영역                            | 상태       |
-| ----- | ------------------------------- | ---------- |
-| 1–5   | API 클라이언트, 인증 인프라     | ✅ 완료    |
-| 7–8   | 예매 UI (VenueMap 인터랙션)     | ✅ 완료    |
-| 6     | 온보딩 플로우 완성              | 🔲 진행 중 |
-| 9     | 예매 Zustand store              | 🔲 다음    |
-| 10–14 | Events/Ticketing/Payments 등    | 🔲 대기    |
+| Phase | 영역                                      | 상태            |
+| ----- | ----------------------------------------- | --------------- |
+| 1–5   | API 클라이언트, 인증 인프라               | ✅ 완료         |
+| 7–8   | 예매 UI (VenueMap 인터랙션)               | ✅ 완료         |
+| 10    | Events / Artists API 연동                 | ✅ 완료         |
+| 13a   | 선예매 정책 조회 / 멤버십 취소 API        | ✅ 완료         |
+| 11    | Ticketing + Queue API 연동                | 🔶 부분 완료    |
+| 12    | Payments (Toss SDK) 연동                  | 🔶 부분 완료    |
+| 13    | User 추가 기능                            | 🔶 부분 완료    |
+| 14    | Community (양도 완료 / 소통 미착수)       | 🔶 부분 완료    |
+| 6     | 온보딩 플로우 완성                        | 🔶 부분 완료    |
+| 9     | 예매 Zustand store                        | 🔲 미착수       |
 
-**현재 mock 데이터**: 홈페이지 섹션, 공연/아티스트 목록, 예매 좌석, 마이페이지
+**현재 mock 데이터**: 홈 배너 섹션(`HeroBannerCarousel`), 커뮤니티 소통 탭
 
 ---
 
@@ -209,7 +214,7 @@ infra/<scope>  # 설정/배포만. 머지는 오너가 직접.
 - `docs/CheckList.md` — API 연동 진행 현황 및 세부 체크리스트
 - `docs/designsystem.md` — 색상 토큰, 컴포넌트 스펙, 애니메이션
 - `docs/user_flow.md` — 유저 플로우, 비즈니스 로직, 엣지 케이스
-- `docs/api.md` — JWT 전략, API 응답 타입, 카카오 OAuth 흐름
+- `docs/api/` — 도메인별 API 명세 (auth_api, event_api, ticket_api, payment_api, queue_api, community_api, payment_guide)
 - `docs/PRD.md` — 비즈니스 규칙 원본
 - `docs/ARCHITECTURE.md` — FSD 레이어 규칙, 엔드포인트, 인프라
 - `docs/migration.md` — 신규 페이지 추가 가이드 (디자인팀이 새 페이지 완성했을 때만 참조)

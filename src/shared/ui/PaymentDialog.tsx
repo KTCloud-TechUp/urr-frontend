@@ -10,6 +10,7 @@ import { formatPrice } from '@/shared/lib/format'
 import { PAYMENT_METHODS } from '@/shared/lib/constants'
 import { usePaymentForm } from '@/shared/lib/usePaymentForm'
 import { PaymentProcessingOverlay } from '@/shared/ui/PaymentProcessingOverlay'
+import { getTossPayments, TOSS_METHOD_MAP } from '@/features/payment/lib/toss'
 
 type Phase = 'form' | 'processing'
 
@@ -18,15 +19,32 @@ interface OrderItem {
   amount: number
 }
 
+/** Toss SDK 리다이렉트 옵션. 제공 시 Toss PG로 이동하며 onComplete는 호출되지 않음. */
+export interface TossConfig {
+  /** 결제 고유 주문 ID (서비스 예약 API에서 수신) */
+  orderId: string
+  /** Toss 결제창에 표시할 주문명 */
+  orderName: string
+  /** 결제 성공 후 리다이렉트할 URL */
+  successUrl: string
+  /** 결제 실패 후 리다이렉트할 URL */
+  failUrl: string
+  /** sessionStorage에 저장할 콜백 복원 데이터 (JSON serializable) */
+  storageKey: string
+  storageData: unknown
+}
+
 interface PaymentDialogProps {
   open: boolean
   title: string
   orderItems: OrderItem[]
   totalAmount: number
-  onComplete: () => void
+  onComplete: () => Promise<void> | void
   onCancel: () => void
   /** Optional extra info displayed below order items */
   orderDescription?: string
+  /** 제공 시 Toss PG 리다이렉트 플로우 사용. 미제공 시 mock 1.5s 처리 */
+  tossConfig?: TossConfig
 }
 
 export function PaymentDialog({
@@ -37,6 +55,7 @@ export function PaymentDialog({
   onComplete,
   onCancel,
   orderDescription,
+  tossConfig,
 }: PaymentDialogProps) {
   const [phase, setPhase] = useState<Phase>('form')
   const {
@@ -44,12 +63,36 @@ export function PaymentDialog({
     handleNameChange, handlePhoneChange, setSelectedMethod, toggleTerms, resetForm,
   } = usePaymentForm()
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     setPhase('processing')
-    setTimeout(() => {
-      onComplete()
+
+    if (tossConfig) {
+      // Toss PG 리다이렉트 플로우
+      try {
+        sessionStorage.setItem(tossConfig.storageKey, JSON.stringify(tossConfig.storageData))
+        const tossPayments = await getTossPayments()
+        await tossPayments.requestPayment(TOSS_METHOD_MAP[selectedMethod], {
+          amount: totalAmount,
+          orderId: tossConfig.orderId,
+          orderName: tossConfig.orderName,
+          successUrl: tossConfig.successUrl,
+          failUrl: tossConfig.failUrl,
+          customerName: buyerName,
+          customerMobilePhone: buyerPhone.replace(/-/g, ''),
+        })
+        // 성공 시 리다이렉트 — 이후 코드 실행 안 됨
+      } catch {
+        sessionStorage.removeItem(tossConfig.storageKey)
+        setPhase('form')
+      }
+      return
+    }
+
+    // mock 플로우 (tossConfig 미제공 시)
+    setTimeout(async () => {
+      await onComplete()
     }, 1500)
-  }, [onComplete])
+  }, [tossConfig, selectedMethod, totalAmount, buyerName, buyerPhone, onComplete])
 
   const handleCancel = useCallback(() => {
     resetForm()

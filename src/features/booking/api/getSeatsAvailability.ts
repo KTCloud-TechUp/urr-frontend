@@ -1,44 +1,32 @@
 import { apiRequest } from "@/shared/api/client";
 
-export type TicketStatus = "AVAILABLE" | "RESERVED" | "SOLD";
+export type SeatApiStatus = "AVAILABLE" | "LOCKED" | "RESERVED" | "SOLD";
 
 export interface SeatAvailability {
   seatId: string;
+  status: SeatApiStatus;
+  lockedUntil: string | null;
+  section: string;
   row: string;
-  number: number;
+  number: string;
+  price: number;
   sellable: boolean;
-  ticketStatus: TicketStatus;
-  bookable: boolean;
+  seatVersion: number;
 }
 
-export interface SeatsAvailabilityData {
-  eventId: number;
-  showId: number;
-  tier: string;
-  zoneNo: number;
-  sectionCode: string;
-  totalSeats: number;
-  sellableSeats: number;
-  bookableSeats: number;
-  seats: SeatAvailability[];
-}
-
-interface SeatsAvailabilityApiResponse {
+interface SeatsApiResponse {
   isSuccess: boolean;
   statusCode: number;
   message: string;
-  data: SeatsAvailabilityData;
+  data: SeatAvailability[];
 }
 
 export async function getSeatsAvailability(
   eventId: string | number,
   showId: string | number,
-  tier: string,
-  zoneNo: number,
-): Promise<SeatsAvailabilityData> {
-  const res = await apiRequest<SeatsAvailabilityApiResponse>(
-    `/shows/${eventId}/shows/${showId}/seats/availability?tier=${tier}&zoneNo=${zoneNo}`,
-    { service: "events" },
+): Promise<SeatAvailability[]> {
+  const res = await apiRequest<SeatsApiResponse>(
+    `/ticket/events/${eventId}/shows/${showId}/seats`,
   );
   return res.data.data;
 }

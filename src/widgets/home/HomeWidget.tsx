@@ -1,44 +1,75 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/shared/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { Button, SectionHeader } from "@/shared/ui";
 import { ArtistCard } from "@/entities/artist";
-import { EventTagBadge, BOOKING_STATUS_LABELS } from "@/entities/event";
-import { formatCompactNumber } from "@/shared/lib/format";
-import { SKELETON_LOAD_DELAY } from "@/shared/lib/constants";
-import {
-  homeBannerEvents,
-  homeTodayTicketing,
-  homeRankingEvents,
-  homePreSaleEvents,
-  getArtistGradient,
-} from "@/shared/lib/mocks/home";
+import { getArtistGradient } from "@/shared/lib/mocks/home";
 import { mockUser } from "@/shared/lib/mocks/user";
+import { getHome } from "@/features/home/api/getHome";
 import { useArtists } from "@/features/artist";
+import type { Artist } from "@/shared/types";
+import type { BannerEvent } from "@/entities/event";
 import { HeroBannerCarousel } from "./HeroBannerCarousel";
 import { HomePageSkeleton } from "./HomePageSkeleton";
 
-export function HomeWidget() {
-  const [isLoading, setIsLoading] = useState(true);
+function formatDateRange(openDate: string, endDate: string | null): string {
+  const open = new Date(openDate);
+  const openStr = `${open.getMonth() + 1}.${open.getDate()}`;
+  if (!endDate || endDate === openDate) return openStr;
+  const end = new Date(endDate);
+  return `${openStr} ~ ${end.getMonth() + 1}.${end.getDate()}`;
+}
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), SKELETON_LOAD_DELAY);
-    return () => clearTimeout(timer);
-  }, []);
+function deriveStatus(openDate: string, endDate: string | null): BannerEvent["status"] {
+  const today = new Date().toISOString().split("T")[0];
+  if (openDate > today) return "upcoming";
+  if (!endDate || endDate >= today) return "open";
+  return "closed";
+}
+
+export function HomeWidget() {
+  const { data: homeData, isLoading: homeLoading } = useQuery({
+    queryKey: ["home"],
+    queryFn: getHome,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const { data: artists = [] } = useArtists();
 
-  if (isLoading) return <HomePageSkeleton />;
+  if (homeLoading || !homeData) return <HomePageSkeleton />;
 
   const hasFollowedArtists = mockUser.followedArtistIds.length > 0;
+
+  const popularArtists: Artist[] = homeData.popularArtists.map((a) => ({
+    id: String(a.artistId),
+    name: a.artistName,
+    avatar: a.profileImageUrl ?? "",
+    banner: "",
+    bio: "",
+    followerCount: a.followerCount,
+    category: (a.category as Artist["category"]) ?? "solo",
+  }));
+
+  const banners: BannerEvent[] = homeData.trendingEvents.slice(0, 4).map((e) => {
+    const artist = artists.find((a) => a.id === String(e.artistId));
+    return {
+      id: String(e.eventId),
+      artistId: String(e.artistId),
+      artistName: e.artistName,
+      title: e.eventTitle,
+      venue: e.venueAddress ?? "",
+      date: e.openDate + "T19:00:00",
+      status: deriveStatus(e.openDate, e.endDate),
+      bannerImage: artist?.banner || undefined,
+    };
+  });
 
   return (
     <div className="space-y-14">
       {/* ===== 1. 히어로 배너 캐러셀 ===== */}
-      <HeroBannerCarousel banners={homeBannerEvents} />
+      <HeroBannerCarousel banners={banners} />
 
       {/* 팔로우 아티스트 없을 때 CTA */}
       {!hasFollowedArtists && (
@@ -60,7 +91,7 @@ export function HomeWidget() {
           linkLabel="아티스트 더보기"
         />
         <div className="grid grid-cols-10 gap-2">
-          {artists.map((artist) => (
+          {popularArtists.map((artist) => (
             <Link key={artist.id} href={`/artists/${artist.id}`}>
               <ArtistCard
                 artist={artist}
@@ -76,25 +107,24 @@ export function HomeWidget() {
       <section className="space-y-4">
         <h2 className="text-xl font-bold">지금 뜨는 공연</h2>
         <div className="grid grid-cols-6 gap-3">
-          {homeTodayTicketing.map((event, index) => (
+          {homeData.trendingEvents.map((event, index) => (
             <Link
-              key={event.id}
-              href={`/events/${event.id}`}
+              key={event.eventId}
+              href={`/events/${event.eventId}`}
               className="group min-w-0"
             >
-              {/* 포스터 + 순위 */}
               <div className="relative w-full aspect-4/5 rounded-lg overflow-hidden">
-                {event.poster ? (
+                {event.posterImageUrl ? (
                   <Image
-                    src={event.poster}
-                    alt={event.title}
+                    src={event.posterImageUrl}
+                    alt={event.eventTitle}
                     fill
                     className="object-cover"
                   />
                 ) : (
                   <div
                     className="absolute inset-0"
-                    style={{ background: getArtistGradient(event.artistId) }}
+                    style={{ background: getArtistGradient(String(event.artistId)) }}
                   />
                 )}
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
@@ -105,24 +135,16 @@ export function HomeWidget() {
                   {index + 1}
                 </span>
               </div>
-              {/* 정보 */}
               <div className="mt-2.5 space-y-1.5">
                 <p className="text-sm font-semibold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                  {event.title}
+                  {event.eventTitle}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {event.venue}
+                  {event.venueAddress ?? ""}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {event.dateRange}
+                  {formatDateRange(event.openDate, event.endDate)}
                 </p>
-                {event.tags && event.tags.length > 0 && (
-                  <div className="flex gap-1 pt-0.5 flex-wrap">
-                    {event.tags.map((tag) => (
-                      <EventTagBadge key={tag} tag={tag} />
-                    ))}
-                  </div>
-                )}
               </div>
             </Link>
           ))}
@@ -136,18 +158,18 @@ export function HomeWidget() {
           <span className="text-xs text-muted-foreground">이번 주</span>
         </div>
         <div className="grid grid-cols-2 grid-rows-4 grid-flow-col gap-x-8 gap-y-0">
-          {homeRankingEvents.map((event, index) => (
+          {homeData.popularEventRanking.map((event) => (
             <Link
-              key={event.id}
-              href={`/events/${event.id}`}
+              key={event.eventId}
+              href={`/events/${event.eventId}`}
               className="group flex items-center gap-3 py-3 border-b border-border hover:bg-[#F3F2F0] transition-colors rounded-sm px-1 -mx-1"
             >
               <span className="text-sm font-bold text-foreground w-5 text-center shrink-0">
-                {index + 1}
+                {event.rank}
               </span>
-              {event.profileImage ? (
+              {event.posterImageUrl ? (
                 <Image
-                  src={event.profileImage}
+                  src={event.posterImageUrl}
                   alt={event.artistName}
                   width={40}
                   height={40}
@@ -156,36 +178,18 @@ export function HomeWidget() {
               ) : (
                 <div
                   className="size-10 rounded-full shrink-0 flex items-center justify-center text-xs text-white font-medium"
-                  style={{ background: getArtistGradient(event.artistId) }}
+                  style={{ background: getArtistGradient(String(event.artistId)) }}
                 >
                   {event.artistName.charAt(0)}
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
-                  {event.title}
+                  {event.eventTitle}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {event.artistName}
                 </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs text-muted-foreground tabular-nums">
-                  조 {formatCompactNumber(event.viewCount)}
-                </span>
-                <span
-                  className={cn(
-                    "text-[11px] font-semibold px-2 py-0.5 rounded-full",
-                    event.status === "open" &&
-                      "bg-booking-open/10 text-booking-open",
-                    event.status === "upcoming" &&
-                      "bg-booking-upcoming/10 text-booking-upcoming",
-                    (event.status === "soldout" || event.status === "closed") &&
-                      "bg-muted text-muted-foreground",
-                  )}
-                >
-                  {BOOKING_STATUS_LABELS[event.status]}
-                </span>
               </div>
             </Link>
           ))}
@@ -193,60 +197,51 @@ export function HomeWidget() {
       </section>
 
       {/* ===== 5. 선예매 오픈 임박 ===== */}
-      <section className="space-y-4">
-        <SectionHeader
-          title="선예매 오픈 임박"
-          linkHref="/events"
-          linkLabel="공연 더보기"
-        />
-        <div className="grid grid-cols-3 gap-4">
-          {homePreSaleEvents.map((event) => (
-            <Link
-              key={`${event.id}-${event.openDateTime}`}
-              href={`/events/${event.id}`}
-              className="group flex gap-3 p-3 rounded-lg border border-border hover:bg-[#F3F2F0] transition-colors bg-card"
-            >
-              {event.poster ? (
-                <div className="relative w-20 h-25 rounded-md shrink-0 overflow-hidden">
-                  <Image
-                    src={event.poster}
-                    alt={event.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ) : (
-                <div
-                  className="w-20 h-25 rounded-md shrink-0 flex items-center justify-center text-white text-xs font-medium"
-                  style={{ background: getArtistGradient(event.artistId) }}
-                >
-                  {event.title.split(" ")[0]}
-                </div>
-              )}
-              <div className="flex-1 min-w-0 flex flex-col py-0.5">
-                <div>
-                  <p className="text-xs font-semibold text-foreground">
-                    {event.openDateTime}
-                  </p>
-                  <p className="text-sm font-semibold line-clamp-2 leading-tight mt-0.5 group-hover:text-primary transition-colors">
-                    {event.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {event.ticketType}
-                  </p>
-                </div>
-                {event.tags.length > 0 && (
-                  <div className="flex gap-1 mt-auto flex-wrap">
-                    {event.tags.map((tag) => (
-                      <EventTagBadge key={tag} tag={tag} />
-                    ))}
+      {homeData.presaleOpeningSoon.length > 0 && (
+        <section className="space-y-4">
+          <SectionHeader
+            title="선예매 오픈 임박"
+            linkHref="/events"
+            linkLabel="공연 더보기"
+          />
+          <div className="grid grid-cols-3 gap-4">
+            {homeData.presaleOpeningSoon.map((event) => (
+              <Link
+                key={event.eventId}
+                href={`/events/${event.eventId}`}
+                className="group flex gap-3 p-3 rounded-lg border border-border hover:bg-[#F3F2F0] transition-colors bg-card"
+              >
+                {event.posterImageUrl ? (
+                  <div className="relative w-20 h-25 rounded-md shrink-0 overflow-hidden">
+                    <Image
+                      src={event.posterImageUrl}
+                      alt={event.eventTitle}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="w-20 h-25 rounded-md shrink-0 flex items-center justify-center text-white text-xs font-medium"
+                    style={{ background: getArtistGradient(String(event.artistId)) }}
+                  >
+                    {event.eventTitle.split(" ")[0]}
                   </div>
                 )}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+                <div className="flex-1 min-w-0 flex flex-col py-0.5">
+                  <p className="text-xs font-semibold text-foreground">
+                    {formatDateRange(event.openDate, event.endDate)}
+                  </p>
+                  <p className="text-sm font-semibold line-clamp-2 leading-tight mt-0.5 group-hover:text-primary transition-colors">
+                    {event.eventTitle}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">선예매</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
