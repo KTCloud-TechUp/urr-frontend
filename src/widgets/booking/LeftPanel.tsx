@@ -96,6 +96,7 @@ export function LeftPanel() {
     isLoading,
     selectedDateId,
     selectedDate,
+    tierWindows,
     userTier,
     bookingState,
     isWindowOpen,
@@ -193,9 +194,9 @@ export function LeftPanel() {
                     등급별 예매 일정
                   </h4>
                   <div className="space-y-0.5">
-                    {selectedDate &&
+                    {tierWindows.length > 0 &&
                       TIER_ORDER.map((tier) => {
-                        const window = selectedDate.bookingWindows.find(
+                        const window = tierWindows.find(
                           (w) => w.tier === tier,
                         );
                         if (!window) return null;

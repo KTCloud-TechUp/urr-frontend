@@ -11,13 +11,15 @@
 | —    | 5     | 인증 API 연동 (카카오/네이버)    | ✅ 완료                    |
 | —    | 7     | 예매 UI 리팩토링                 | ✅ 완료                    |
 | —    | 8     | 예매 VenueMap 인터랙션 UI        | ✅ 완료                    |
-| 1    | 9     | 예매 Zustand store               | 🔲 진행 예정               |
-| 2    | 10    | Events API 연동                  | 🔲 진행 중 (9과 병행 가능) |
-| 3    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료 (휴대폰 인증) |
+| —    | 13a   | 선예매 정책 조회 API             | ✅ 완료                    |
+| —    | 13b   | 아티스트 멤버십 취소 API         | ✅ 완료                    |
+| 1    | 9     | 예매 Zustand store               | 🔲 미착수                  |
+| —    | 10    | Events/Artists API 연동          | ✅ 완료                    |
+| 3    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료               |
 | 4    | 11    | Ticketing + Queue 연동           | 🔶 부분 완료               |
-| 5    | 12    | Payments 연동                    | 🔲 대기                    |
-| 6    | 13    | User 추가 기능                   | 🔲 대기                    |
-| 7    | 14    | Community 연동                   | 🔶 부분 완료 (양도 API)    |
+| 5    | 12    | Payments 연동                    | 🔲 미착수                  |
+| 6    | 13    | User 추가 기능                   | 🔶 부분 완료 (닉네임만)    |
+| 7    | 14    | Community 연동                   | 🔶 부분 완료 (양도 완료, 소통 미착수) |
 
 ---
 
@@ -35,62 +37,48 @@
 
 ---
 
-## Phase 6 — 온보딩 플로우 완성 🔲 진행 중
+## Phase 6 — 온보딩 플로우 완성 🔶 부분 완료
 
-> 소셜/이메일 로그인 및 본인인증(IdentityStep)은 구현됨. 이하 미완성.
+> UI 전체 완성. SMS·약관 API 연동 및 후속 스텝 미구현.
 
-### 6-1. 온보딩 플로우 — UI 완료 ✅
+### 6-1. 온보딩 플로우 — UI ✅
 
 - [x] `AgeGateStep.tsx` — 만 14세 이상/미만 분기
-- [x] `IdentityStep.tsx` — 본인인증 폼 (ShieldCheck 헤더, 중복계정 다이얼로그)
+- [x] `IdentityStep.tsx` — 본인인증 폼
 - [x] `GuardianIdentityStep.tsx` — 법정대리인 본인인증 폼
-- [x] `TermsStep.tsx` — 필수 2개 + 선택 1개 약관 동의 (미성년자 보호자 동의 포함)
-- [x] `OnboardingWidget` flowState 6단계 확장 (auth → age-gate → identity/guardian-identity → terms → complete)
-- [x] SMS API 함수 추가 — `smsSend`, `smsVerify` (`src/features/auth/api/`)
+- [x] `TermsStep.tsx` — 필수 2개 + 선택 1개 약관 동의
+- [x] `SignupCompleteStep.tsx` — 가입 완료
+- [x] `OnboardingWidget` flowState 6단계 확장
+- [x] SMS API 함수: `smsSend`, `smsVerify` (`src/features/auth/api/`)
+- [x] `updateConsents` API 함수 존재
 
-### 6-2. 본인인증 SMS API 미연동 ⚠️ 나중에 붙여야 함
+### 6-2. 본인인증 SMS API 미연동 🔲
 
-- [ ] `IdentityStep.tsx` `handleSendCode` — `smsSend(phone)` 실제 호출로 교체
-- [ ] `IdentityStep.tsx` `handleVerify` — `smsVerify(phone, code)` 실제 호출로 교체, `verified: false` 시 에러 표시
-- [ ] `GuardianIdentityStep.tsx` `handleSendCode` — `smsSend(phone)` 실제 호출로 교체
-- [ ] `GuardianIdentityStep.tsx` `handleVerify` — `smsVerify(phone, code)` 실제 호출로 교체
+- [ ] `IdentityStep.tsx` `handleSendCode` → `smsSend(phone)` 실제 호출
+- [ ] `IdentityStep.tsx` `handleVerify` → `smsVerify(phone, code)` 실제 호출, `verified: false` 시 에러 표시
+- [ ] `GuardianIdentityStep.tsx` `handleSendCode` → `smsSend(phone)` 실제 호출
+- [ ] `GuardianIdentityStep.tsx` `handleVerify` → `smsVerify(phone, code)` 실제 호출
 
-### 6-3. 약관 동의 API 미연동 ⚠️ 나중에 붙여야 함
+### 6-3. 약관 동의 API 미연동 🔲
 
-- [ ] `handleTermsComplete` (`useOnboardingAuth.ts`) — 가입 성공 후 `updateConsents()` 호출 (마케팅 동의 선택값 전달)
+- [ ] `handleTermsComplete` (`useOnboardingAuth.ts`) — `updateConsents()` 호출 (마케팅 동의 선택값 전달)
   - TermsStep에서 `marketing` 체크 여부를 `onComplete(marketingConsent: boolean)` 으로 올려야 함
 
-### 6-4. 가입 완료
+### 6-4. 아티스트 선택 (ArtistSelectStep) 🔶
 
-- [x] `OnboardingWidget` `complete` 단계 → `SignupCompleteStep` 표시
-
-### 6-5. 아티스트 선택 (ArtistSelectStep)
-
-- [ ] 카테고리 탭 + 검색 + `GET /api/events/artists` 연동
+- [x] `ArtistSelectStep.tsx` UI 존재 (`src/features/membership/ui/`)
+- [ ] `GET /api/events/artists` 실제 연동 (현재 mock)
 - [ ] 1명 이상 필수 선택 검증 + 팔로우 API 호출
 
-### 6-6. 멤버십 소개 (MembershipIntroStep)
+### 6-5. 멤버십 소개 (MembershipIntroStep) 🔶
 
-- [ ] 등급별 혜택 비교표
-- [ ] [가입 ₩30,000/년] CTA / [나중에] skip
+- [x] `MembershipIntroStep.tsx` UI 존재 (`src/features/membership/ui/`)
+- [ ] 온보딩 플로우 스텝에 연결 확인
 
-### 6-7. 멜론 연동 (MelonLinkStep)
+### 6-6. 멜론 연동 (MelonLinkStep) 🔲
 
-- [ ] [연동하기] / [나중에] — 강제 아님, 팬 신뢰 점수 계산 트리거 (Mock)
-
-### 6-4. 아티스트 선택 (ArtistSelectStep)
-
-- [ ] 카테고리 탭 + 검색 + `GET /api/events/artists` 연동
-- [ ] 1명 이상 필수 선택 검증 + 팔로우 API 호출
-
-### 6-5. 멤버십 소개 (MembershipIntroStep)
-
-- [ ] 등급별 혜택 비교표
-- [ ] [가입 ₩30,000/년] CTA / [나중에] skip
-
-### 6-6. 멜론 연동 (MelonLinkStep)
-
-- [ ] [연동하기] / [나중에] — 강제 아님, 팬 신뢰 점수 계산 트리거 (Mock)
+- [ ] UI 미구현
+- [ ] [연동하기] / [나중에] — 팬 신뢰 점수 계산 트리거 (Mock)
 
 ---
 
@@ -106,18 +94,35 @@
 
 ---
 
-## Phase 10 — Events API 연동 🔲
+## Phase 10 — Events/Artists API 연동 🔶 부분 완료
 
-> **선행 조건**: Phase 3 완료 ✅  
-> **엔드포인트**: `GET /api/events`, `GET /api/events/:id`, `GET /api/events/artists`, `GET /api/events/artists/:id`
+> **선행 조건**: Phase 3 완료 ✅
 
-- [ ] API 함수: `getEvents`, `getEvent`, `getArtists`, `getArtist`
-- [ ] TanStack Query hooks: `useEvents`, `useEvent`, `useArtists`, `useArtist`
-- [ ] 홈페이지 5개 섹션 연동 (배너, 인기 아티스트, 뜨는 공연, 랭킹, 선예매) + 스켈레톤/에러 처리
-- [ ] `/events` 목록 페이지 — 필터/정렬 + 무한 스크롤 or 페이지네이션
-- [ ] `/events/:eventId` 상세 페이지 연동
-- [ ] `/artists` 목록 + `/artists/:artistId` 상세 연동
-- [ ] 아티스트 상세 — 해당 아티스트 공연 목록 + 멤버십 게이트
+### 10-1. API 함수 + 훅 ✅
+
+- [x] `getEvents()` — `src/features/event/api/getEvents.ts`
+- [x] `getEventDetail(artistId, eventId)` — `src/features/event/api/getEventDetail.ts`
+- [x] `getArtistEvents(artistId)` — `src/features/event/api/getArtistEvents.ts`
+- [x] `getVenues()`, `getVenueDetail()` — `src/features/event/api/getVenues.ts`
+- [x] `getArtists()` — `src/features/artist/api/getArtists.ts`
+- [x] `getArtist(artistId, userId?)` — `src/features/artist/api/getArtist.ts`
+- [x] `useArtists()` hook — `src/features/artist/model/useArtists.ts`
+
+### 10-2. 페이지 연동 ✅
+
+- [x] `/events` 목록 — `EventsWidget`: `getEvents` 실제 연동, 카테고리 필터 + 그리드/리스트 뷰
+- [x] `/events/:eventId` 상세 — `EventDetailWidget`: `getEvents` + `getShows` + `getPresalePolicy` 연동
+- [x] `/artists` 목록 — `ArtistsWidget`: `useArtists` 실제 연동
+- [x] `/artists/:artistId` 상세 — `ArtistDetailWidget`: `getArtist` + `getArtistEvents` + follow/unfollow 연동
+
+### 10-3. 홈페이지 섹션 연동 ✅
+
+- [x] `HomeWidget` — 지금 뜨는 공연 → `getHome().trendingEvents` 연동
+- [x] `HomeWidget` — 인기 공연 랭킹 → `getHome().popularEventRanking` 연동
+- [x] `HomeWidget` — 선예매 오픈 임박 → `getHome().presaleOpeningSoon` 연동 (빈 배열이면 섹션 숨김)
+- [x] `HomeWidget` — 인기 아티스트 → `getHome().popularArtists` 사용
+- [x] 스켈레톤 교체: `useState + useEffect` 타이머 → `useQuery` `isLoading` 기반으로 교체
+- ⚠️ 배너 섹션(`HeroBannerCarousel`)은 API 미지원 → `homeBannerEvents` mock 유지
 
 ---
 
@@ -127,30 +132,23 @@
 
 ### 11-1. Queue API ✅
 
-- [x] `POST /queue/check/{showId}` — 대기열 진입  
-       → `checkQueue(showId)` — `src/features/booking/api/queue.ts` (service: queue)
-- [x] `GET /queue/{showId}` — 대기열 상태 폴링 (3초 interval)  
-       → `pollQueue(showId)` — `src/features/booking/api/queue.ts`
+- [x] `POST /queue/check/{showId}` → `checkQueue(showId)` — `src/features/booking/api/queue.ts`
+- [x] `GET /queue/{showId}` → `pollQueue(showId)` — 3초 interval 폴링
 - [x] `useQueue(showId, sectionsForDate, onActive)` hook — `src/features/booking/model/useQueue.ts`
   - WAIT → 폴링, ACTIVE → `onActive(token, remainMs)` 콜백, NOT_WAIT → 자동 재진입
   - `queueToken` 상태 → `BookingContext.setQueueToken()` 연결
 
 ### 11-2. 회차 목록 + 좌석 요약 API ✅
 
-- [x] `GET /shows/{eventId}/shows` — 회차 목록  
-       → `getShows(eventId)` — `src/features/show/api/getShows.ts` (service: events)  
-       → `BookingContext` — `useQuery`로 조회, `EventDate[]`로 변환해 날짜 드롭다운 연동
-- [x] `GET /shows/{eventId}/shows/{showId}/seats/summary` — 잔여석 전체 요약 (#30)  
-       → `getSeatsSummary(eventId, showId)` — `src/features/booking/api/getSeatsSummary.ts`  
-       → `BookingContext.sectionsForDate` — tier zones → `Section[]` 매핑 (가격: 정적 tier 맵)
-- [x] `GET /shows/{eventId}/shows/{showId}/seats/availability?tier=&zoneNo=` — 구역 내 좌석 조회 (#31)  
-       → `getSeatsAvailability(eventId, showId, tier, zoneNo)` — `src/features/booking/api/getSeatsAvailability.ts`  
-       → `UnifiedSeatView` — `seats-individual` 진입 시 `useQuery`로 조회, `Seat[]` 매핑 + 레이아웃 자동 계산
+- [x] `GET /shows/{eventId}/shows` → `getShows(eventId)` — `src/features/show/api/getShows.ts`
+- [x] `GET /shows/{eventId}/shows/{showId}/seats/summary` → `getSeatsSummary(eventId, showId)` — `src/features/booking/api/getSeatsSummary.ts`
+- [x] `GET /shows/{eventId}/shows/{showId}/seats/availability?tier=&zoneNo=` → `getSeatsAvailability(eventId, showId, tier, zoneNo)` — `src/features/booking/api/getSeatsAvailability.ts`
 
 ### 11-3. 예매 확정 + 마이티켓 🔲
 
 - [ ] `POST /api/ticketing/book` — 좌석 선택 + 결제 완료 후 호출 → `confirmation` + QR 데이터
-- [ ] 마이페이지 티켓 월렛 — `GET /api/ticketing/my-tickets` + QR 모달 (`qrcode.react`)
+- [ ] 마이페이지 티켓 월렛 — `GET /api/ticketing/my-tickets` 연동
+  - 현재 `TicketWalletTab`이 `getMyTickets()` mock 사용 중 → 실제 데이터로 교체
 
 ---
 
@@ -161,7 +159,7 @@
 
 - [ ] API 함수 + 타입 (`createPayment`, `confirmPayment`, `getPayment`, `cancelPayment`)
 - [ ] `payment` 상태 → `POST /api/payments/create` → `orderId`, `paymentKey` 수신
-- [ ] Toss Payments SDK 실제 연동
+- [ ] Toss Payments SDK 실제 연동 (현재 양도 `paymentKey`는 `mock_${timestamp}` 사용 중)
 - [ ] 결제 성공 → `POST /api/payments/confirm` → `confirmation` / 실패 → `payment-failed` + 60초 재시도
 - [ ] 결제 취소 — 확인 다이얼로그 → `POST /api/payments/{paymentKey}/cancel`
 
@@ -169,75 +167,55 @@
 
 ## Phase 13a — 회차 선예매 정책 조회 API ✅
 
-> **엔드포인트**: `GET /api/v1/membership/events/{eventId}/shows/{showId}/presale-policy`  
-> **인증**: 불필요
-
-- [x] API 함수: `getPresalePolicy(eventId, showId)` — `src/features/membership/api/getPresalePolicy.ts`
-- [x] TanStack Query hook: `usePresalePolicy(eventId, showId)` — `src/features/membership/model/usePresalePolicy.ts`
-- 타입: `PresalePolicy` (`eventId`, `showId`, `generalOpenAt`, `tiers[]`)
-- `tiers[]`: `{ tier, openAt, presaleOffsetMinutes, bookingFeeWon }`
+- [x] `getPresalePolicy(eventId, showId)` — `src/features/membership/api/getPresalePolicy.ts`
+- [x] `usePresalePolicy(eventId, showId)` — `src/features/membership/model/usePresalePolicy.ts`
 
 ---
 
 ## Phase 13b — 아티스트 멤버십 취소 API ✅
 
-> **엔드포인트**: `POST /api/v1/artists/memberships/cancel`  
-> **인증**: 불필요
-
-- [x] API 함수: `cancelMembership(orderId, reason?)` — `src/features/membership/api/cancelMembership.ts`
-- [x] TanStack Query hook: `useCancelMembership` — `src/features/membership/model/useCancelMembership.ts`
-  - `onSuccess`: `MEMBERSHIPS_QUERY_KEY` invalidate
-- Body: `{ orderId: string, reason: string }` (기본값 `"PAYMENT_CANCELED"`)
+- [x] `cancelMembership(orderId, reason?)` — `src/features/membership/api/cancelMembership.ts`
+- [x] `useCancelMembership` — `onSuccess`: `MEMBERSHIPS_QUERY_KEY` invalidate
 
 ---
 
-## Phase 13 — User 추가 기능 🔲
+## Phase 13 — User 추가 기능 🔶 부분 완료
 
-> ⚠️ 엔드포인트 미확정 — 백엔드 스펙 확인 후 업데이트
-
-- [ ] 비밀번호 찾기 / 변경
-- [ ] 회원정보 수정 (닉네임, 마케팅 동의) → `useCurrentUser` invalidate
+- [x] 닉네임 변경 — `updateNickname` + `useUpdateNickname` 연동 완료 (`MyPageWidget`)
+- [ ] 비밀번호 찾기 / 변경 — 엔드포인트 미확정
+- [ ] 회원정보 수정 (마케팅 동의) → `useCurrentUser` invalidate
+  - `SettingsTab`의 `handleUpdateUser` 현재 TODO 상태
 
 ---
 
-## Phase 14 — Community API 연동 🔲
+## Phase 14 — Community API 연동 🔶 부분 완료
 
-> **선행 조건**: Phase 10  
 > **서비스**: `NEXT_PUBLIC_COMMUNITY_API_URL` (port 8082)
 
 ### 14-1. 양도 게시글 CRUD ✅
 
-- [x] `1-1` `POST /api/v1/transfers/posts` — 양도 게시글 등록  
-       → `createTransferPost(userId, artistId, showId, seatId)` — `getTransferPosts.ts`  
-       → `TransferListingModal` 등록하기 버튼 연결 완료
-- [x] `1-4` `DELETE /api/v1/transfers/posts/{id}` — 양도 게시글 삭제  
-       → `deleteTransferPost(id, userId)` — `getTransferPosts.ts`  
-       → `TransferHistoryTab` 취소 다이얼로그 연결 완료
-- [x] `1-7` `PATCH /api/v1/transfers/posts/{id}` — 양도 게시글 수정  
-       → `updateTransferPost(id, userId, sellingPrice)` — `getTransferPosts.ts`  
-       → `TransferHistoryTab` 수정 모달 연결 완료
+- [x] `POST /api/v1/transfers/posts` → `createTransferPost` — `TransferListingModal` 연결
+- [x] `DELETE /api/v1/transfers/posts/{id}` → `deleteTransferPost` — `TransferHistoryTab` 연결
+- [x] `PATCH /api/v1/transfers/posts/{id}` → `updateTransferPost` — `TransferHistoryTab` 연결
 
 ### 14-2. 양도 예매·결제 ✅
 
-- [x] `1-5` `POST /api/v1/transfers/posts/{id}/reserve?artistId=` — 양도 예매(결제 요청)  
-       → `reserveTransferPost(postId, artistId, userId)` → `ReserveResult { orderId, paymentId, amount }`  
-       → `TransferPurchaseSidebar` 결제하기 버튼 클릭 시 호출
-- [x] `1-6` `POST /api/v1/transfers/posts/confirm` — 양도 예매 확정(결제 확정)  
-       → `confirmTransferPost(orderId, paymentKey, userId)`  
-       → `PaymentDialog.onComplete` 후 호출  
-       ⚠️ `paymentKey`는 Toss 실결제 연동 전까지 `mock_${timestamp}` 사용 중
+- [x] `POST /api/v1/transfers/posts/{id}/reserve?artistId=` → `reserveTransferPost` — `TransferPurchaseSidebar` 연결
+- [x] `POST /api/v1/transfers/posts/confirm` → `confirmTransferPost` — `PaymentDialog.onComplete` 후 호출  
+  ⚠️ `paymentKey`는 Toss 실결제 연동 전까지 `mock_${timestamp}` 사용 중
 
 ### 14-3. 마이페이지 양도 내역 ✅
 
-- [x] `GET /api/v1/transfers/me/sales` — 판매 내역 조회  
-       → `getMySales(userId)` — `getMyTransfers.ts` (service: community)
-- [x] `GET /api/v1/transfers/me/purchases` — 구매 내역 조회  
-       → `getMyPurchases(userId)` — `getMyTransfers.ts` (service: community)
+- [x] `GET /api/v1/transfers/me/sales` → `getMySales(userId)` — `MyPageWidget` 연동
+- [x] `GET /api/v1/transfers/me/purchases` → `getMyPurchases(userId)` — `MyPageWidget` 연동
 
 ### 14-4. 소통 탭 게시글 🔲
 
-- [ ] `getPosts`, `createPost`, `createComment` API 함수
-- [ ] 아티스트 상세 소통 탭 — 게시글 목록/작성 연동
+> UI(`ArtistCommunityTab`, `PostCard`) 완성. 현재 `getCommunityPostsByArtistId()` mock 사용 중.
+
+- [ ] `getPosts(artistId)`, `createPost`, `createComment` API 함수 (`src/features/community/api/`)
+- [ ] `ArtistDetailWidget` — `getCommunityPostsByArtistId()` mock → 실제 API 교체
+- [ ] 게시글 작성 UI 연동 (현재 없음)
 
 ---
 

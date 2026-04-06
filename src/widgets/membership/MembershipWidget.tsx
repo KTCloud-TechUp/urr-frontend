@@ -10,7 +10,8 @@ import {
   MembershipCompleteStep,
   useMemberships,
 } from '@/features/membership'
-import { useArtists } from '@/features/artist'
+import { useArtists, followArtist } from '@/features/artist'
+import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
 import type { Artist, TierLevel } from '@/shared/types'
 
 type Step = 'select' | 'intro' | 'payment' | 'profile' | 'complete'
@@ -22,6 +23,7 @@ export function MembershipWidget() {
   const [profileData, setProfileData] = useState<{ nickname: string; tier: TierLevel } | null>(null)
   const { data: memberships = [] } = useMemberships()
   const { data: artists = [] } = useArtists()
+  const { data: currentUser } = useCurrentUser()
 
   // If artistId is provided via query param, skip to intro step
   useEffect(() => {
@@ -39,6 +41,11 @@ export function MembershipWidget() {
   }, [searchParams, artists])
 
   const handleSelectArtist = (artist: Artist) => {
+    if (currentUser) {
+      followArtist(artist.id, currentUser.userId).catch(() => {
+        // 이미 팔로우 중이거나 실패해도 멤버십 플로우는 계속 진행
+      })
+    }
     setSelectedArtist(artist)
     setStep('intro')
   }

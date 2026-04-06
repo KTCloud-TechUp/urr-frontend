@@ -23,6 +23,8 @@ import { mockUser } from "@/shared/lib/mocks/user";
 import { MAX_SEATS_PER_TIER } from "@/shared/lib/mocks/seats";
 import { getShows } from "@/features/show/api/getShows";
 import { getSeatsSummary } from "@/features/booking/api/getSeatsSummary";
+import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
+import type { TierWindow } from "@/shared/types";
 
 // Static tier price map (pricing API not yet available)
 const TIER_PRICES: Record<string, number> = {
@@ -77,6 +79,7 @@ export interface BookingContextValue {
   isLoading: boolean;
   userTier: TierLevel;
   selectedDate: EventDate | null;
+  tierWindows: TierWindow[];
   sectionsForDate: Section[];
   isWindowOpen: boolean;
   isSoldOut: boolean;
@@ -218,6 +221,13 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     enabled: showId !== null,
   });
 
+  // Fetch authoritative booking windows for the selected show
+  const { data: bookingWindowsData } = useQuery({
+    queryKey: ["booking-windows", eventId, showId],
+    queryFn: () => getBookingWindows(eventId, showId!),
+    enabled: showId !== null,
+  });
+
   // Map summary zones to Section[]
   const sectionsForDate: Section[] = useMemo(() => {
     if (!seatsSummary) return [];
@@ -259,11 +269,22 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     return eventDates.find((d) => d.id === state.selectedDateId) ?? null;
   }, [state.selectedDateId, eventDates]);
 
+  // Merge: prefer API booking-windows data; fall back to getShows() data
+  const tierWindows: TierWindow[] = useMemo(() => {
+    if (bookingWindowsData?.tierPolicies?.length) {
+      return bookingWindowsData.tierPolicies.map((tp) => ({
+        tier: tp.tier as TierLevel,
+        opensAt: tp.openAt,
+        fee: tp.bookingFeeWon,
+      }));
+    }
+    return selectedDate?.bookingWindows ?? [];
+  }, [bookingWindowsData, selectedDate]);
+
   const userWindowOpensAt = useMemo(() => {
-    if (!selectedDate) return null;
-    const window = selectedDate.bookingWindows.find((w) => w.tier === userTier);
+    const window = tierWindows.find((w) => w.tier === userTier);
     return window?.opensAt ?? null;
-  }, [selectedDate, userTier]);
+  }, [tierWindows, userTier]);
 
   const isWindowOpen = useMemo(() => {
     if (!userWindowOpensAt) return false;
@@ -332,6 +353,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       isLoading: state.isLoading,
       userTier,
       selectedDate,
+      tierWindows,
       sectionsForDate,
       isWindowOpen,
       isSoldOut,
@@ -368,6 +390,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       event,
       userTier,
       selectedDate,
+      tierWindows,
       sectionsForDate,
       isWindowOpen,
       isSoldOut,
