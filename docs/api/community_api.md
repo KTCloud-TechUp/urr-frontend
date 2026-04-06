@@ -1,0 +1,460 @@
+# community api 명세
+
+## 프론트 연동 현황
+
+| 메서드 | 엔드포인트 | 연동 상태 |
+| ------ | ---------- | --------- |
+| POST | `/api/v1/transfers/posts` | ✅ 완료 (`TransferListingModal`) |
+| GET | `/api/v1/transfers/posts/{id}` | ✅ 완료 (`TransferDetailPage`) |
+| GET | `/api/v1/transfers/posts` | ✅ 완료 (아티스트 양도 탭) |
+| DELETE | `/api/v1/transfers/posts/{id}` | ✅ 완료 (`TransferHistoryTab`) |
+| POST | `/api/v1/transfers/posts/{id}/reserve` | ✅ 완료 (`TransferPurchaseSidebar`) |
+| POST | `/api/v1/transfers/posts/confirm` | ✅ 완료 (`PaymentDialog.onComplete` 후) |
+| PATCH | `/api/v1/transfers/posts/{id}` | ✅ 완료 (`TransferHistoryTab`) |
+| GET | `/api/v1/transfers/me/sales` | ✅ 완료 (`MyPageWidget`) |
+| GET | `/api/v1/transfers/me/purchases` | ✅ 완료 (`MyPageWidget`) |
+
+---
+
+## **1-1. 양도 게시글 등록**
+
+### **API**
+
+```
+POST /api/v1/transfers/posts
+```
+
+### **설명**
+
+사용자가 보유한 좌석에 대한 양도 게시글을 등록합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 사용자 ID
+
+### **요청 예시**
+
+```json
+{
+  "artistId": 10,
+  "showId": 20,
+  "seatId": 30
+}
+```
+
+### **응답 예시**
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "id": 1,
+    "artistId": 10,
+    "sellerUserId": 100,
+    "showName": "G-Dragon 2026 MAMA DOME TOUR",
+    "showDate": "2026-04-10T19:00:00",
+    "showVenue": "고척 스카이돔",
+    "section": "VIP",
+    "rowInfo": "A",
+    "seatNumber": "15",
+    "faceValue": 150000,
+    "sellingPrice": 145000,
+    "status": "LISTED",
+    "sellerExpectedAmount": 140000,
+    "feeAmount": 5000,
+    "feeRate": 5,
+    "createdAt": "2026-03-26T20:00:00"
+  }
+}
+```
+
+---
+
+## **1-2. 양도 게시글 상세 조회(단일 조회)**
+
+### **API**
+
+```
+GET /api/v1/transfers/posts/{id}
+```
+
+### **설명**
+
+특정 양도 게시글의 상세 정보를 조회합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 사용자 ID
+
+### **요청 예시**
+
+```
+GET /api/v1/transfers/posts/1
+```
+
+### **응답 예시**
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "id": 1,
+    "artistId": 10,
+    "sellerUserId": 100,
+    "showName": "G-Dragon 2026 MAMA DOME TOUR",
+    "showDate": "2026-04-10T19:00:00",
+    "showVenue": "고척 스카이돔",
+    "section": "VIP",
+    "rowInfo": "A",
+    "seatNumber": "15",
+    "faceValue": 150000,
+    "sellingPrice": 145000,
+    "sellerTier": "PLATINUM",
+    "sellerTradeCount": 5,
+    "status": "LISTED",
+    "sellerExpectedAmount": 140000,
+    "feeAmount": 5000,
+    "createdAt": "2026-03-26T20:00:00"
+  }
+}
+```
+
+---
+
+## **1-3. 양도 게시글 목록 조회**
+
+### **API**
+
+```
+GET /api/v1/transfers/posts
+```
+
+### **설명**
+
+아티스트별 판매 중인 양도 게시글 목록을 조회합니다. `showId`를 포함하면 특정 공연의 게시글만 조회할 수 있으며 페이징 기능을 지원합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 사용자 ID
+
+### **요청 파라미터(Query)**
+
+- `artistId` (필수): 아티스트 ID
+- `showId` (선택): 특정 공연 ID
+- `page` (선택, 기본: 0): 페이지 번호
+- `size` (선택, 기본: 10): 페이지 크기
+- `sort` (선택, 기본: createdAt,desc): 정렬 조건
+
+### **요청 예시**
+
+```
+GET /api/v1/transfers/posts?artistId=10&showId=20&page=0&size=10
+```
+
+### **응답 예시**
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "content": [
+      {
+        "id": 1,
+        "artistId": 10,
+        "showId": 20,
+        "showName": "G-Dragon 2026 MAMA DOME TOUR",
+        "showDate": "2026-04-10T19:00:00",
+        "section": "VIP",
+        "rowInfo": "A",
+        "faceValue": 150000,
+        "sellingPrice": 145000,
+        "sellerTier": "PLATINUM",
+        "status": "LISTED",
+        "createdAt": "2026-03-26T20:00:00"
+      }
+    ],
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalElements": 1,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+## **1-4. 양도 게시글 삭제**
+
+### **API**
+
+```
+DELETE /api/v1/transfers/posts/{id}
+```
+
+### **설명**
+
+판매자가 본인의 양도 게시글을 취소/삭제합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 사용자 ID
+
+### **요청 예시**
+
+```
+DELETE /api/v1/transfers/posts/1
+```
+
+### **응답 예시**
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": null
+}
+```
+
+---
+
+## **1-5. 양도 게시글 예매(결제요청) - 04.02 업데이트**
+
+### **API**
+
+```
+POST /api/v1/transfers/posts/{id}/reserve
+```
+
+### **설명**
+
+구매자가 특정 양도 게시글에 대해 예매(결제 요청)를 진행합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 구매자 ID
+
+### **요청 파라미터(Query)**
+
+- `artistId` (필수): 아티스트 ID
+
+### **요청 예시**
+
+```
+POST /api/v1/transfers/posts/1/reserve?artistId=10
+```
+
+### **응답 예시**
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "postId": 1,
+    "orderId": "ord_882910ab301",
+    "paymentId": 9901,
+    "amount": 145000
+  }
+}
+```
+
+---
+
+## **1-6. 양도 게시글 예매 확정(결제 확정)**
+
+### **API**
+
+```
+POST /api/v1/transfers/posts/confirm
+```
+
+### **설명**
+
+결제 승인이 완료된 후 프론트엔드에서 호출하는 양도 거래 확정 API입니다. 티켓 소유권을 구매자에게 이전하고, 게시글 상태를 거래 완료(COMPLETED)로 변경합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 구매자 ID
+
+### **요청 예시**
+
+```java
+{
+	"orderId":"ord_882910ab301",
+	"paymentKey":"toss_abcdef1234567890"
+}
+```
+
+### **응답 예시**
+
+```java
+{
+	"isSuccess":true,
+	"statusCode":200,
+	"message":"OK",
+	"data": {
+			"postId":1,
+			"orderId":"ord_882910ab301",
+			"sellerUserId":100,
+			"buyerUserId":200,
+			"faceValue":150000,
+			"feeAmount":5000,
+			"sellerExpectedAmount":140000,
+			"status":"COMPLETED",
+			"completedAt":"2026-04-10T20:15:00"
+		}
+}
+```
+
+---
+
+## **1-7. 양도 게시글 수정**
+
+### **API**
+
+```
+PATCH /api/v1/transfers/posts/{id}
+```
+
+### **설명**
+
+판매자가 본인의 양도 게시글 판매가를 수정합니다. 결제 진행 중이거나 양도 완료 상태에서는 수정이 불가능합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 사용자 ID
+
+### **요청 예시**
+
+```
+PATCH /api/v1/transfers/posts/1
+```
+
+```java
+{
+	"sellingPrice":140000
+}
+```
+
+### **응답 예시**
+
+```java
+{
+	"isSuccess":true,
+	"statusCode":200,
+	"message":"OK",
+	"data": {
+			"id":1,
+			"sellingPrice":140000,
+			"feeRate":5,
+			"feeAmount":7000,
+			"sellerExpectedAmount":133000,
+			"status":"LISTED"
+		}
+}
+```
+
+---
+
+## **1-8. 나의 판매 내역 조회**
+
+### **API**
+
+```
+GET /api/v1/transfers/me/sales
+```
+
+### **설명**
+
+현재 로그인한 사용자의 양도 게시글 판매 내역 전체를 조회합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 사용자 ID
+
+### **요청 예시**
+
+```
+GET /api/v1/transfers/me/sales
+```
+
+### **응답 예시**
+
+```java
+{
+	"isSuccess":true,
+	"statusCode":200,
+	"message":"OK",
+	"data": [
+			{
+				"id":1,
+				"showName":"G-Dragon 2026 MAMA DOME TOUR",
+				"showDate":"2026-04-10T19:00:00",
+				"section":"VIP",
+				"rowInfo":"A",
+				"seatNumber":"15",
+				"sellingPrice":145000,
+				"feeAmount":5000,
+				"sellerExpectedAmount":140000,
+				"status":"COMPLETED",
+				"createdAt":"2026-03-26T20:00:00"
+			}
+		]
+}
+```
+
+---
+
+## **1-9. 나의 구매 내역 조회**
+
+### **API**
+
+```
+GET /api/v1/transfers/me/purchases
+```
+
+### **설명**
+
+현재 로그인한 사용자의 양도 티켓 구매 내역 전체를 조회합니다.
+
+### **요청 헤더**
+
+- `X-User-Id`: (Long) 현재 로그인한 사용자 ID
+
+### **요청 예시**
+
+```
+GET /api/v1/transfers/me/purchases
+```
+
+### **응답 예시**
+
+```java
+{
+	"isSuccess":true,
+	"statusCode":200,
+	"message":"OK",
+	"data": [
+			{
+			"id":1,
+			"showName":"G-Dragon 2026 MAMA DOME TOUR",
+			"showDate":"2026-04-10T19:00:00",
+			"section":"VIP",
+			"rowInfo":"A",
+			"seatNumber":"15",
+			"sellingPrice":145000,
+			"sellerUserId":100,
+			"status":"COMPLETED",
+			"updatedAt":"2026-04-10T20:15:00"
+			}
+		]
+}
+```

@@ -19,7 +19,7 @@ import { EventBookingSidebar } from "./EventBookingSidebar";
 function mapPresalePolicyToWindows(policy: PresalePolicy | undefined): TierWindow[] {
   if (!policy) return [];
   return policy.tiers.map((t) => ({
-    tier: t.tier.toLowerCase() as TierLevel,
+    tier: t.tier.toUpperCase() as TierLevel,
     opensAt: t.openAt,
     fee: t.bookingFeeWon,
   }));

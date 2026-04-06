@@ -1,5 +1,14 @@
 # 결제 연동 가이드 (프론트엔드)
 
+## 프론트 연동 현황
+
+| 흐름 | 연동 파일 | 상태 |
+| ---- | --------- | ---- |
+| 양도 티켓 구매 (`reserve` → `confirm`) | `TransferPurchaseSidebar.tsx` | ✅ 완료 |
+| 멤버십 구독 (`membership` → `payments/confirm`) | `MembershipPaymentStep.tsx` | ✅ 완료 |
+| 티켓 예매 결제 | `PaymentView.tsx` | ⚠️ mock 시뮬레이션 → Phase 9 Zustand store 완성 후 실 연동 |
+| Toss Payments SDK | `src/features/payment/lib/toss.ts` | ✅ 완료 |
+
 ### ⚠️ 참고사항
 
 현재(26.04.04) 결제 서비스에 `POST /api/v1/payments/create` API가 존재하지만 프론트에서 직접 호출하지 않습니다.

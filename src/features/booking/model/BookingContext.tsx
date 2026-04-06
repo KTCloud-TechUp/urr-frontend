@@ -25,8 +25,7 @@ import { getShows } from "@/features/show/api/getShows";
 import { getSeatsSummary } from "@/features/booking/api/getSeatsSummary";
 import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
 import { confirmPayment } from "@/features/payment/api/confirmPayment";
-import { toConfirmationData } from "@/features/booking/api/bookTicket";
-import type { BookTicketResponse } from "@/features/booking/api/bookTicket";
+import { getEvents } from "@/features/event/api/getEvents";
 import type { TierWindow } from "@/shared/types";
 
 // Static tier price map (pricing API not yet available)
@@ -75,6 +74,7 @@ type BookingAction =
 
 export interface BookingContextValue {
   eventId: string;
+  artistId: string | null;
   bookingState: BookingState;
   event: BookingEvent | null;
   selectedDateId: string | null;
@@ -177,6 +177,19 @@ interface BookingProviderProps {
 export function BookingProvider({ eventId, children }: BookingProviderProps) {
   const [state, dispatch] = useReducer(bookingReducer, initialState);
 
+  // Fetch events list to derive artistId for this event
+  const { data: events } = useQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const artistId = useMemo(() => {
+    if (!events) return null;
+    const ev = events.find((e) => String(e.eventId) === String(eventId));
+    return ev ? String(ev.artistId) : null;
+  }, [events, eventId]);
+
   // Fetch shows for this event
   const { data: shows, isLoading: showsLoading } = useQuery({
     queryKey: ["shows", eventId],
@@ -238,11 +251,11 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     sessionStorage.removeItem("urr:toss:booking");
     window.history.replaceState({}, "", window.location.pathname);
 
-    const bookingData = JSON.parse(raw) as BookTicketResponse;
+    const confirmationData = JSON.parse(raw) as ConfirmationData;
 
     confirmPayment({ paymentKey, orderId, amount: Number(amount) })
       .then(() => {
-        dispatch({ type: "SET_CONFIRMATION_DATA", payload: toConfirmationData(bookingData) });
+        dispatch({ type: "SET_CONFIRMATION_DATA", payload: confirmationData });
         dispatch({ type: "TRANSITION_STATE", payload: "confirmation" });
       })
       .catch(() => {
@@ -386,6 +399,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   const value: BookingContextValue = useMemo(
     () => ({
       eventId,
+      artistId,
       bookingState: state.bookingState,
       event,
       selectedDateId: state.selectedDateId,
@@ -418,6 +432,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     }),
     [
       eventId,
+      artistId,
       state.bookingState,
       state.selectedDateId,
       state.isLeftPanelExpanded,

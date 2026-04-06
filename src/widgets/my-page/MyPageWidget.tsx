@@ -10,13 +10,11 @@ import { TransferHistoryTab } from './TransferHistoryTab'
 import { SettingsTab } from './SettingsTab'
 import { MyPageSkeleton } from './MyPageSkeleton'
 import { mockUser } from '@/shared/lib/mocks/user'
-import { getMyTickets } from '@/shared/lib/mocks/my-page'
 import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
 import { useMemberships, useUpdateNickname, useCancelMembership } from '@/features/membership'
 import { getMySales, getMyPurchases } from '@/features/transfer'
+import { useMyReservations } from '@/features/reservation'
 import type { User } from '@/shared/types'
-
-const tickets = getMyTickets()
 
 export function MyPageWidget() {
   const searchParams = useSearchParams()
@@ -25,6 +23,7 @@ export function MyPageWidget() {
 
   const { data: meData, isLoading: isUserLoading } = useCurrentUser()
   const { data: memberships = [], isLoading: isMembershipsLoading } = useMemberships()
+  const { tickets, isLoading: isTicketsLoading } = useMyReservations(meData?.userId)
   const updateNickname = useUpdateNickname()
   const cancelMembership = useCancelMembership()
 
@@ -49,7 +48,7 @@ export function MyPageWidget() {
     memberships,
   }
 
-  if (isUserLoading || isMembershipsLoading) return <MyPageSkeleton />
+  if (isUserLoading || isMembershipsLoading || isTicketsLoading) return <MyPageSkeleton />
 
   const handleTabChange = (tab: string) => {
     router.push(`/my-page?tab=${tab}`, { scroll: false })

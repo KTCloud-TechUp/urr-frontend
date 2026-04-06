@@ -1,31 +1,18 @@
 import { apiRequest } from "@/shared/api/client";
-import type { ConfirmationData } from "@/shared/types";
-
-// ⚠️ 요청/응답 타입은 백엔드 스펙 미확정으로 가정. 실제 스펙 수신 후 타입 조정 필요.
 
 export interface BookTicketParams {
-  showId: string | number;
-  seatIds: string[];
-  buyerName: string;
-  buyerPhone: string;
-  paymentMethod: string;
-}
-
-interface BookTicketTicket {
+  eventId: number | string;
+  showId: number | string;
+  artistId: number | string;
   seatId: string;
-  sectionName: string;
-  row: string;
-  seatNumber: string;
-  price: number;
-  tierFee: number;
+  holdSeconds?: number;
 }
 
 export interface BookTicketResponse {
-  bookingId: string;
-  orderId: string;
-  tickets: BookTicketTicket[];
-  totalAmount: number;
-  bookedAt: string;
+  reservationId: string;
+  status: string;
+  paymentStatus: string;
+  expiresAt: string;
 }
 
 interface BookTicketApiResponse {
@@ -38,19 +25,16 @@ interface BookTicketApiResponse {
 export async function bookTicket(
   params: BookTicketParams,
 ): Promise<BookTicketResponse> {
-  const res = await apiRequest<BookTicketApiResponse>("/ticketing/book", {
+  const res = await apiRequest<BookTicketApiResponse>("/ticket/reservations", {
     method: "POST",
     service: "ticketing",
-    body: params,
+    body: {
+      eventId: params.eventId,
+      showId: params.showId,
+      artistId: params.artistId,
+      seatId: params.seatId,
+      holdSeconds: params.holdSeconds ?? 180,
+    },
   });
   return res.data.data;
-}
-
-export function toConfirmationData(booking: BookTicketResponse): ConfirmationData {
-  return {
-    bookingId: booking.bookingId,
-    tickets: booking.tickets,
-    totalAmount: booking.totalAmount,
-    bookedAt: booking.bookedAt,
-  };
 }

@@ -15,7 +15,9 @@ import { formatPrice, parseSeatDisplay, formatDateDot } from "@/shared/lib/forma
 import { PAYMENT_METHODS } from "@/shared/lib/constants";
 import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 import { bookTicket } from "@/features/booking/api/bookTicket";
+import { createPaymentRecord } from "@/features/payment/api/createPaymentRecord";
 import { getTossPayments, TOSS_METHOD_MAP } from "@/features/payment/lib/toss";
+import type { ConfirmationData } from "@/shared/types";
 import { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
 
 type PaymentPhase =
@@ -28,6 +30,8 @@ type PaymentPhase =
 export function PaymentView() {
   const {
     event,
+    eventId,
+    artistId,
     selectedDate,
     selectedSeatIds,
     selectedSectionId,
@@ -87,25 +91,55 @@ export function PaymentView() {
   }, []);
 
   const handleSubmitPayment = useCallback(async () => {
-    if (!selectedDate) return;
+    if (!selectedDate || !artistId) return;
     setPhase("processing");
 
     try {
-      const booking = await bookTicket({
-        showId: selectedDate.id,
-        seatIds: selectedSeatIds,
-        buyerName,
-        buyerPhone,
-        paymentMethod: selectedMethod,
+      // 각 좌석별 예약 생성 (단일 엔드포인트 — bulk API 미완성)
+      const reservations = await Promise.all(
+        selectedSeatIds.map((seatId) =>
+          bookTicket({
+            eventId,
+            showId: selectedDate.id,
+            artistId,
+            seatId,
+          }),
+        ),
+      );
+
+      const primaryReservationId = reservations[0].reservationId;
+
+      // 결제 레코드 생성 (Toss orderId 등록)
+      const orderId = `ORD-${Date.now()}`;
+      await createPaymentRecord({
+        referenceId: primaryReservationId,
+        orderId,
+        amount: total,
       });
 
-      // Toss 리다이렉트 복귀 후 confirmPayment + ConfirmationData 복원에 사용
-      sessionStorage.setItem("urr:toss:booking", JSON.stringify(booking));
+      // Toss 리다이렉트 복귀 후 ConfirmationData 복원에 사용
+      const confirmationData: ConfirmationData = {
+        bookingId: primaryReservationId,
+        tickets: selectedSeatIds.map((id) => {
+          const parts = id.split("-");
+          return {
+            seatId: id,
+            sectionName: section?.name ?? "",
+            row: parts.length >= 2 ? parts[parts.length - 2] : id,
+            seatNumber: parts.length >= 1 ? parts[parts.length - 1] : id,
+            price: section?.price ?? 0,
+            tierFee,
+          };
+        }),
+        totalAmount: total,
+        bookedAt: new Date().toISOString(),
+      };
+      sessionStorage.setItem("urr:toss:booking", JSON.stringify(confirmationData));
 
       const tossPayments = await getTossPayments();
       await tossPayments.requestPayment(TOSS_METHOD_MAP[selectedMethod], {
         amount: total,
-        orderId: booking.orderId,
+        orderId,
         orderName: `${event?.title ?? "티켓"} ${seatCount}매`,
         successUrl: `${window.location.origin}${window.location.pathname}`,
         failUrl: `${window.location.origin}${window.location.pathname}?paymentFail=1`,
@@ -121,6 +155,8 @@ export function PaymentView() {
     }
   }, [
     selectedDate,
+    artistId,
+    eventId,
     selectedSeatIds,
     buyerName,
     buyerPhone,
@@ -128,6 +164,8 @@ export function PaymentView() {
     total,
     event,
     seatCount,
+    section,
+    tierFee,
     retryTimer,
   ]);
 

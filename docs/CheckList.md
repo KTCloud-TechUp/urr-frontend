@@ -1,5 +1,21 @@
 # URR 전체 진행 체크리스트
 
+## 권장 작업 순서 (2026-04-06 기준)
+
+| 순서 | 작업 | 이유 |
+| ---- | ---- | ---- |
+| 1 | **Phase 11 `bookTicket` 버그픽스** | 잘못된 엔드포인트(`/api/ticketing/book`) 사용 중 — 예매 플로우 전체가 깨진 상태 |
+| 2 | **Phase 9 예매 Zustand store** | `reservationId`를 store에 저장해야 결제 confirm 호출 가능 — 나머지 예매 작업의 전제조건 |
+| 3 | **Phase 11-3 마이티켓 연동** | Phase 9 완료 후 자연스럽게 이어짐. `TicketWalletTab` mock → 실제 API 교체 |
+| 3 | **Phase 12 결제 취소** | Phase 9와 독립적. 작은 작업으로 병렬 처리 가능 |
+| 4 | **Phase 6 온보딩 완성** | SMS 인증 + 약관 동의 연동 — 유저 유입 첫 관문 |
+| 5 | **Phase 13 User 설정** | 동의 수정(`/api/v1/auth/me/consents`) + 회원탈퇴 — 작은 작업들 |
+| 6 | **Phase 14 소통탭** | UI 완성, API만 연결. 의존성 없어 나중에 처리 가능 |
+
+> **핵심 의존성**: Phase 11 bugfix → Phase 9 store → Phase 11-3 마이티켓 확인
+
+---
+
 ## 전체 진행 현황
 
 | 순위 | Phase | 영역                             | 상태                                  |
@@ -17,7 +33,7 @@
 | —    | 10    | Events/Artists API 연동          | ✅ 완료                               |
 | 3    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료                          |
 | 4    | 11    | Ticketing + Queue 연동           | 🔶 부분 완료                          |
-| 5    | 12    | Payments 연동                    | 🔲 미착수                             |
+| 5    | 12    | Payments 연동                    | 🔶 부분 완료 (Toss SDK 완료, 취소 미구현) |
 | 6    | 13    | User 추가 기능                   | 🔶 부분 완료 (닉네임만)               |
 | 7    | 14    | Community 연동                   | 🔶 부분 완료 (양도 완료, 소통 미착수) |
 
@@ -54,6 +70,8 @@
 
 ### 6-2. 본인인증 SMS API 미연동 🔲
 
+> 엔드포인트: `POST /api/v1/auth/sms/send` (body: `{ phoneNumber }`), `POST /api/v1/auth/sms/verify` (body: `{ phoneNumber, code }` → `{ verified: boolean }`)
+
 - [ ] `IdentityStep.tsx` `handleSendCode` → `smsSend(phone)` 실제 호출
 - [ ] `IdentityStep.tsx` `handleVerify` → `smsVerify(phone, code)` 실제 호출, `verified: false` 시 에러 표시
 - [ ] `GuardianIdentityStep.tsx` `handleSendCode` → `smsSend(phone)` 실제 호출
@@ -61,8 +79,15 @@
 
 ### 6-3. 약관 동의 API 미연동 🔲
 
+> 엔드포인트: `PATCH /api/v1/auth/me/consents` (body: `{ marketingConsent, pushConsent, smsConsent }`)
+
 - [ ] `handleTermsComplete` (`useOnboardingAuth.ts`) — `updateConsents()` 호출 (마케팅 동의 선택값 전달)
   - TermsStep에서 `marketing` 체크 여부를 `onComplete(marketingConsent: boolean)` 으로 올려야 함
+
+### 6-5b. 소셜 온보딩 완료 API 미확인
+
+> 엔드포인트: `POST /api/v1/auth/onboarding/social` (body: `{ nickname, birthDate, phone, gender }`)  
+> 소셜 로그인 후 추가 정보 입력 완료 시 호출 — 현재 연동 여부 확인 필요
 
 ### 6-4. 아티스트 선택 (ArtistSelectStep) ✅
 
@@ -147,17 +172,29 @@
 
 ### 11-3. 예매 확정 + 마이티켓 🔶
 
-- [x] `POST /api/ticketing/book` → `bookTicket()` — `src/features/booking/api/bookTicket.ts`
-      ⚠️ 요청/응답 타입 가정 기반 — 백엔드 실제 스펙 수신 후 타입 조정 필요
-- [ ] 마이페이지 티켓 월렛 — `GET /api/ticketing/my-tickets` 연동
+> **실제 티켓 API 엔드포인트** (ticket_api.md 확인):
+> - 좌석 목록: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
+> - 단일 좌석 선점+예약: `POST /api/v1/ticket/reservations`
+> - 다중 좌석 원자 선점: `POST /api/v1/ticket/reservations/bulk` (미완성)
+> - 예약 확정: `POST /api/v1/ticket/reservations/{reservationId}/confirm`
+> - 선점 상태 조회: `GET /api/v1/ticket/reservations/{reservationId}/hold-status`
+> - 예약 취소: `POST /api/v1/ticket/reservations/{reservationId}/cancel`
+
+- [x] `bookTicket()` 함수 — `POST /api/v1/ticket/reservations` 연동 완료
+      Request: `{ eventId, showId, artistId, seatId, holdSeconds: 180 }`
+      Response: `{ reservationId, status, paymentStatus, expiresAt }`
+      ⚠️ 다중 좌석은 각각 개별 호출 (bulk API 미완성 대기 중)
+- [ ] 예약 확정: `POST /api/v1/ticket/reservations/{reservationId}/confirm` 호출 (결제 후)
+- [ ] 마이페이지 티켓 월렛 — `GET /api/v1/ticket/users/{userId}/reservations?status=CONFIRMED` 연동
   - 현재 `TicketWalletTab`이 `getMyTickets()` mock 사용 중 → 실제 데이터로 교체
 
 ---
 
 ## Phase 12 — Payments API 연동 🔶
 
-> **엔드포인트**: `POST /api/payments/confirm`, `GET /api/payments/order/{orderId}`  
-> (`POST /api/payments/create`, `POST /api/payments/{paymentKey}/cancel` 는 서버 내부 자동 처리 — 프론트 직접 호출 없음)
+> **프론트 직접 호출 엔드포인트**: `POST /api/v1/payments/confirm`, `GET /api/v1/payments/order/{orderId}`  
+> **서버 내부 자동 처리 (프론트 직접 호출 X)**: `POST /api/v1/payments/create`, `POST /api/v1/payments/{paymentKey}/cancel`  
+> — 각 서비스(양도 reserve, 멤버십 구독, 티켓 예약) 구매 API 호출 시 내부에서 자동 생성
 
 - [x] API 함수 + 타입 — `src/features/payment/api/confirmPayment.ts`, `getPayment.ts`
 - [x] `PaymentView` — `bookTicket()` + `confirmPayment()` 실제 연동 (mock setTimeout 제거)
@@ -167,7 +204,7 @@
   - 예매: `PaymentView` → Toss 리다이렉트 → `BookingContext` 콜백 처리
   - 양도: `TransferPurchaseSidebar` → Toss 리다이렉트 → 사이드바 콜백 처리
   - 멤버십: `MembershipPaymentStep` → Toss 리다이렉트 → `MembershipWidget` 콜백 처리
-- [ ] 결제 취소 — 확인 다이얼로그 → `POST /api/payments/{paymentKey}/cancel`
+- [ ] 결제 취소 — 확인 다이얼로그 → `POST /api/v1/payments/{paymentKey}/cancel` (body: `{ cancelReason: string }`)
 
 ---
 
@@ -187,10 +224,11 @@
 
 ## Phase 13 — User 추가 기능 🔶 부분 완료
 
-- [x] 닉네임 변경 — `updateNickname` + `useUpdateNickname` 연동 완료 (`MyPageWidget`)
+- [x] 닉네임 변경 — `PATCH /api/v1/auth/me/name` (body: `{ name }`) → `updateNickname` + `useUpdateNickname` 연동 완료 (`MyPageWidget`)
 - [ ] 비밀번호 찾기 / 변경 — 엔드포인트 미확정
-- [ ] 회원정보 수정 (마케팅 동의) → `useCurrentUser` invalidate
-  - `SettingsTab`의 `handleUpdateUser` 현재 TODO 상태
+- [ ] 회원정보 수정 (마케팅/푸시/SMS 동의) — `PATCH /api/v1/auth/me/consents` (body: `{ marketingConsent, pushConsent, smsConsent }`)
+  - `SettingsTab`의 `handleUpdateUser` 현재 TODO 상태 → `useCurrentUser` invalidate 필요
+- [ ] 회원 탈퇴 — `DELETE /api/v1/auth/me` (UI 없음)
 
 ---
 
