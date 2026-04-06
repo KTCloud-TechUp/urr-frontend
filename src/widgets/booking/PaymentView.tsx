@@ -14,7 +14,8 @@ import { PriceDisplay } from "@/shared/ui/PriceDisplay";
 import { formatPrice, parseSeatDisplay, formatDateDot } from "@/shared/lib/format";
 import { PAYMENT_METHODS } from "@/shared/lib/constants";
 import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
-import type { ConfirmationData } from "@/shared/types";
+import { bookTicket } from "@/features/booking/api/bookTicket";
+import { getTossPayments, TOSS_METHOD_MAP } from "@/features/payment/lib/toss";
 import { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
 
 type PaymentPhase =
@@ -34,7 +35,6 @@ export function PaymentView() {
     userTier,
     transitionTo,
     resetBooking,
-    setConfirmationData,
   } = useBooking();
 
   const [phase, setPhase] = useState<PaymentPhase>("confirm-seats");
@@ -86,45 +86,48 @@ export function PaymentView() {
     setPhase("confirm-seats");
   }, []);
 
-  const handleSubmitPayment = useCallback(() => {
+  const handleSubmitPayment = useCallback(async () => {
+    if (!selectedDate) return;
     setPhase("processing");
 
-    const timeout = setTimeout(() => {
-      const isSuccess = Math.random() > 0.1; // 90% success for demo
+    try {
+      const booking = await bookTicket({
+        showId: selectedDate.id,
+        seatIds: selectedSeatIds,
+        buyerName,
+        buyerPhone,
+        paymentMethod: selectedMethod,
+      });
 
-      if (isSuccess && section) {
-        const confirmationData: ConfirmationData = {
-          bookingId: `URR-${Date.now().toString(36).toUpperCase()}`,
-          tickets: selectedSeatIds.map((seatId) => {
-            const parts = seatId.split("-");
-            return {
-              seatId,
-              sectionName: section.name,
-              row: parts[parts.length - 2],
-              seatNumber: parts[parts.length - 1],
-              price: section.price,
-              tierFee,
-            };
-          }),
-          totalAmount: total,
-          bookedAt: new Date().toISOString(),
-        };
-        setConfirmationData(confirmationData);
-        transitionTo("confirmation");
-      } else {
-        setPhase("failed");
-        retryTimer.start();
-      }
-    }, 1500);
+      // Toss 리다이렉트 복귀 후 confirmPayment + ConfirmationData 복원에 사용
+      sessionStorage.setItem("urr:toss:booking", JSON.stringify(booking));
 
-    return () => clearTimeout(timeout);
+      const tossPayments = await getTossPayments();
+      await tossPayments.requestPayment(TOSS_METHOD_MAP[selectedMethod], {
+        amount: total,
+        orderId: booking.orderId,
+        orderName: `${event?.title ?? "티켓"} ${seatCount}매`,
+        successUrl: `${window.location.origin}${window.location.pathname}`,
+        failUrl: `${window.location.origin}${window.location.pathname}?paymentFail=1`,
+        customerName: buyerName,
+        customerMobilePhone: buyerPhone.replace(/-/g, ""),
+      });
+      // requestPayment 는 성공 시 successUrl?paymentKey=...&orderId=...&amount=... 로 리다이렉트
+      // — 이 이후 코드는 실행되지 않음
+    } catch {
+      sessionStorage.removeItem("urr:toss:booking");
+      setPhase("failed");
+      retryTimer.start();
+    }
   }, [
-    section,
+    selectedDate,
     selectedSeatIds,
-    tierFee,
+    buyerName,
+    buyerPhone,
+    selectedMethod,
     total,
-    setConfirmationData,
-    transitionTo,
+    event,
+    seatCount,
     retryTimer,
   ]);
 

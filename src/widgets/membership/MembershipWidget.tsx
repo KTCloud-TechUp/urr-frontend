@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
   ArtistSelectStep,
@@ -10,8 +10,9 @@ import {
   MembershipCompleteStep,
   useMemberships,
 } from '@/features/membership'
-import { useArtists, followArtist } from '@/features/artist'
-import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
+import { useArtists } from '@/features/artist'
+import { confirmPayment } from '@/features/payment/api/confirmPayment'
+import { activateMembership } from '@/features/membership/api/activateMembership'
 import type { Artist, TierLevel } from '@/shared/types'
 
 type Step = 'select' | 'intro' | 'payment' | 'profile' | 'complete'
@@ -23,7 +24,44 @@ export function MembershipWidget() {
   const [profileData, setProfileData] = useState<{ nickname: string; tier: TierLevel } | null>(null)
   const { data: memberships = [] } = useMemberships()
   const { data: artists = [] } = useArtists()
-  const { data: currentUser } = useCurrentUser()
+  const callbackHandled = useRef(false)
+
+  // Toss 결제 성공 콜백: /membership?paymentKey=...&orderId=...&amount=... 감지
+  useEffect(() => {
+    if (callbackHandled.current) return
+    if (typeof window === 'undefined') return
+
+    const params = new URLSearchParams(window.location.search)
+    const paymentKey = params.get('paymentKey')
+    const orderId = params.get('orderId')
+    const amount = params.get('amount')
+    const paymentFail = params.get('paymentFail')
+
+    if (paymentFail) {
+      window.history.replaceState({}, '', window.location.pathname)
+      sessionStorage.removeItem('urr:toss:membership')
+      return
+    }
+
+    if (!paymentKey || !orderId || !amount) return
+
+    const raw = sessionStorage.getItem('urr:toss:membership')
+    if (!raw) return
+
+    callbackHandled.current = true
+    sessionStorage.removeItem('urr:toss:membership')
+    window.history.replaceState({}, '', window.location.pathname)
+
+    const { paymentId } = JSON.parse(raw) as { orderId: string; paymentId: string }
+
+    confirmPayment({ paymentKey, orderId, amount: Number(amount) })
+      .then(() => activateMembership(orderId, paymentId))
+      .then(() => setStep('profile'))
+      .catch(() => {
+        // 실패 시 payment 단계로 복귀
+        setStep('payment')
+      })
+  }, [])
 
   // If artistId is provided via query param, skip to intro step
   useEffect(() => {
@@ -41,11 +79,6 @@ export function MembershipWidget() {
   }, [searchParams, artists])
 
   const handleSelectArtist = (artist: Artist) => {
-    if (currentUser) {
-      followArtist(artist.id, currentUser.userId).catch(() => {
-        // 이미 팔로우 중이거나 실패해도 멤버십 플로우는 계속 진행
-      })
-    }
     setSelectedArtist(artist)
     setStep('intro')
   }

@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Button, SectionHeader } from "@/shared/ui";
 import { ArtistCard } from "@/entities/artist";
-import { homeBannerEvents, getArtistGradient } from "@/shared/lib/mocks/home";
+import { getArtistGradient } from "@/shared/lib/mocks/home";
 import { mockUser } from "@/shared/lib/mocks/user";
 import { getHome } from "@/features/home/api/getHome";
+import { useArtists } from "@/features/artist";
 import type { Artist } from "@/shared/types";
+import type { BannerEvent } from "@/entities/event";
 import { HeroBannerCarousel } from "./HeroBannerCarousel";
 import { HomePageSkeleton } from "./HomePageSkeleton";
 
@@ -20,14 +22,23 @@ function formatDateRange(openDate: string, endDate: string | null): string {
   return `${openStr} ~ ${end.getMonth() + 1}.${end.getDate()}`;
 }
 
+function deriveStatus(openDate: string, endDate: string | null): BannerEvent["status"] {
+  const today = new Date().toISOString().split("T")[0];
+  if (openDate > today) return "upcoming";
+  if (!endDate || endDate >= today) return "open";
+  return "closed";
+}
+
 export function HomeWidget() {
-  const { data: homeData, isLoading } = useQuery({
+  const { data: homeData, isLoading: homeLoading } = useQuery({
     queryKey: ["home"],
     queryFn: getHome,
     staleTime: 5 * 60 * 1000,
   });
 
-  if (isLoading || !homeData) return <HomePageSkeleton />;
+  const { data: artists = [] } = useArtists();
+
+  if (homeLoading || !homeData) return <HomePageSkeleton />;
 
   const hasFollowedArtists = mockUser.followedArtistIds.length > 0;
 
@@ -41,10 +52,24 @@ export function HomeWidget() {
     category: (a.category as Artist["category"]) ?? "solo",
   }));
 
+  const banners: BannerEvent[] = homeData.trendingEvents.slice(0, 4).map((e) => {
+    const artist = artists.find((a) => a.id === String(e.artistId));
+    return {
+      id: String(e.eventId),
+      artistId: String(e.artistId),
+      artistName: e.artistName,
+      title: e.eventTitle,
+      venue: e.venueAddress ?? "",
+      date: e.openDate + "T19:00:00",
+      status: deriveStatus(e.openDate, e.endDate),
+      bannerImage: artist?.banner || undefined,
+    };
+  });
+
   return (
     <div className="space-y-14">
       {/* ===== 1. 히어로 배너 캐러셀 ===== */}
-      <HeroBannerCarousel banners={homeBannerEvents} />
+      <HeroBannerCarousel banners={banners} />
 
       {/* 팔로우 아티스트 없을 때 CTA */}
       {!hasFollowedArtists && (
@@ -88,7 +113,6 @@ export function HomeWidget() {
               href={`/events/${event.eventId}`}
               className="group min-w-0"
             >
-              {/* 포스터 + 순위 */}
               <div className="relative w-full aspect-4/5 rounded-lg overflow-hidden">
                 {event.posterImageUrl ? (
                   <Image
@@ -111,7 +135,6 @@ export function HomeWidget() {
                   {index + 1}
                 </span>
               </div>
-              {/* 정보 */}
               <div className="mt-2.5 space-y-1.5">
                 <p className="text-sm font-semibold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                   {event.eventTitle}

@@ -2,23 +2,23 @@
 
 ## 전체 진행 현황
 
-| 순위 | Phase | 영역                             | 상태                       |
-| ---- | ----- | -------------------------------- | -------------------------- |
-| —    | 1     | 패키지 + API 클라이언트          | ✅ 완료                    |
-| —    | 2     | tokenStore + auth 타입           | ✅ 완료                    |
-| —    | 3     | TanStack Query + AuthInitializer | ✅ 완료                    |
-| —    | 4     | 라우트 보호                      | ✅ 완료                    |
-| —    | 5     | 인증 API 연동 (카카오/네이버)    | ✅ 완료                    |
-| —    | 7     | 예매 UI 리팩토링                 | ✅ 완료                    |
-| —    | 8     | 예매 VenueMap 인터랙션 UI        | ✅ 완료                    |
-| —    | 13a   | 선예매 정책 조회 API             | ✅ 완료                    |
-| —    | 13b   | 아티스트 멤버십 취소 API         | ✅ 완료                    |
-| 1    | 9     | 예매 Zustand store               | 🔲 미착수                  |
-| —    | 10    | Events/Artists API 연동          | ✅ 완료                    |
-| 3    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료               |
-| 4    | 11    | Ticketing + Queue 연동           | 🔶 부분 완료               |
-| 5    | 12    | Payments 연동                    | 🔲 미착수                  |
-| 6    | 13    | User 추가 기능                   | 🔶 부분 완료 (닉네임만)    |
+| 순위 | Phase | 영역                             | 상태                                  |
+| ---- | ----- | -------------------------------- | ------------------------------------- |
+| —    | 1     | 패키지 + API 클라이언트          | ✅ 완료                               |
+| —    | 2     | tokenStore + auth 타입           | ✅ 완료                               |
+| —    | 3     | TanStack Query + AuthInitializer | ✅ 완료                               |
+| —    | 4     | 라우트 보호                      | ✅ 완료                               |
+| —    | 5     | 인증 API 연동 (카카오/네이버)    | ✅ 완료                               |
+| —    | 7     | 예매 UI 리팩토링                 | ✅ 완료                               |
+| —    | 8     | 예매 VenueMap 인터랙션 UI        | ✅ 완료                               |
+| —    | 13a   | 선예매 정책 조회 API             | ✅ 완료                               |
+| —    | 13b   | 아티스트 멤버십 취소 API         | ✅ 완료                               |
+| 1    | 9     | 예매 Zustand store               | 🔲 미착수                             |
+| —    | 10    | Events/Artists API 연동          | ✅ 완료                               |
+| 3    | 6     | 온보딩 플로우 완성               | 🔶 부분 완료                          |
+| 4    | 11    | Ticketing + Queue 연동           | 🔶 부분 완료                          |
+| 5    | 12    | Payments 연동                    | 🔲 미착수                             |
+| 6    | 13    | User 추가 기능                   | 🔶 부분 완료 (닉네임만)               |
 | 7    | 14    | Community 연동                   | 🔶 부분 완료 (양도 완료, 소통 미착수) |
 
 ---
@@ -64,11 +64,12 @@
 - [ ] `handleTermsComplete` (`useOnboardingAuth.ts`) — `updateConsents()` 호출 (마케팅 동의 선택값 전달)
   - TermsStep에서 `marketing` 체크 여부를 `onComplete(marketingConsent: boolean)` 으로 올려야 함
 
-### 6-4. 아티스트 선택 (ArtistSelectStep) 🔶
+### 6-4. 아티스트 선택 (ArtistSelectStep) ✅
 
 - [x] `ArtistSelectStep.tsx` UI 존재 (`src/features/membership/ui/`)
-- [ ] `GET /api/events/artists` 실제 연동 (현재 mock)
-- [ ] 1명 이상 필수 선택 검증 + 팔로우 API 호출
+- [x] `GET /api/events/artists` 실제 연동 — `MembershipWidget`에서 `useArtists()` 사용 중
+- [x] 1명 이상 필수 선택 검증 — 단일 선택 UI 구조상 클릭 자체가 강제
+- [x] 팔로우 API 호출 — `handleSelectArtist`에서 `followArtist()` fire-and-forget 호출
 
 ### 6-5. 멤버십 소개 (MembershipIntroStep) 🔶
 
@@ -144,23 +145,28 @@
 - [x] `GET /shows/{eventId}/shows/{showId}/seats/summary` → `getSeatsSummary(eventId, showId)` — `src/features/booking/api/getSeatsSummary.ts`
 - [x] `GET /shows/{eventId}/shows/{showId}/seats/availability?tier=&zoneNo=` → `getSeatsAvailability(eventId, showId, tier, zoneNo)` — `src/features/booking/api/getSeatsAvailability.ts`
 
-### 11-3. 예매 확정 + 마이티켓 🔲
+### 11-3. 예매 확정 + 마이티켓 🔶
 
-- [ ] `POST /api/ticketing/book` — 좌석 선택 + 결제 완료 후 호출 → `confirmation` + QR 데이터
+- [x] `POST /api/ticketing/book` → `bookTicket()` — `src/features/booking/api/bookTicket.ts`
+      ⚠️ 요청/응답 타입 가정 기반 — 백엔드 실제 스펙 수신 후 타입 조정 필요
 - [ ] 마이페이지 티켓 월렛 — `GET /api/ticketing/my-tickets` 연동
   - 현재 `TicketWalletTab`이 `getMyTickets()` mock 사용 중 → 실제 데이터로 교체
 
 ---
 
-## Phase 12 — Payments API 연동 🔲
+## Phase 12 — Payments API 연동 🔶
 
-> **선행 조건**: Phase 11  
-> **엔드포인트**: `POST /api/payments/create`, `POST /api/payments/confirm`, `GET /api/payments/{orderId}`, `POST /api/payments/{paymentKey}/cancel`
+> **엔드포인트**: `POST /api/payments/confirm`, `GET /api/payments/order/{orderId}`  
+> (`POST /api/payments/create`, `POST /api/payments/{paymentKey}/cancel` 는 서버 내부 자동 처리 — 프론트 직접 호출 없음)
 
-- [ ] API 함수 + 타입 (`createPayment`, `confirmPayment`, `getPayment`, `cancelPayment`)
-- [ ] `payment` 상태 → `POST /api/payments/create` → `orderId`, `paymentKey` 수신
-- [ ] Toss Payments SDK 실제 연동 (현재 양도 `paymentKey`는 `mock_${timestamp}` 사용 중)
-- [ ] 결제 성공 → `POST /api/payments/confirm` → `confirmation` / 실패 → `payment-failed` + 60초 재시도
+- [x] API 함수 + 타입 — `src/features/payment/api/confirmPayment.ts`, `getPayment.ts`
+- [x] `PaymentView` — `bookTicket()` + `confirmPayment()` 실제 연동 (mock setTimeout 제거)
+  - 성공 → `confirmation` / 실패(catch) → `payment-failed` + 60초 재시도
+- [x] `MembershipPaymentStep` — `subscribeMembership()` → `confirmPayment()` → `activateMembership()` 연동
+- [x] Toss Payments SDK 연동 (`src/features/payment/lib/toss.ts`)
+  - 예매: `PaymentView` → Toss 리다이렉트 → `BookingContext` 콜백 처리
+  - 양도: `TransferPurchaseSidebar` → Toss 리다이렉트 → 사이드바 콜백 처리
+  - 멤버십: `MembershipPaymentStep` → Toss 리다이렉트 → `MembershipWidget` 콜백 처리
 - [ ] 결제 취소 — 확인 다이얼로그 → `POST /api/payments/{paymentKey}/cancel`
 
 ---
@@ -202,7 +208,7 @@
 
 - [x] `POST /api/v1/transfers/posts/{id}/reserve?artistId=` → `reserveTransferPost` — `TransferPurchaseSidebar` 연결
 - [x] `POST /api/v1/transfers/posts/confirm` → `confirmTransferPost` — `PaymentDialog.onComplete` 후 호출  
-  ⚠️ `paymentKey`는 Toss 실결제 연동 전까지 `mock_${timestamp}` 사용 중
+      ⚠️ `paymentKey`는 Toss 실결제 연동 전까지 `mock_${timestamp}` 사용 중
 
 ### 14-3. 마이페이지 양도 내역 ✅
 

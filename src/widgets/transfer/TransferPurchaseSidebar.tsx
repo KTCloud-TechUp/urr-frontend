@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Calendar,
@@ -37,6 +37,41 @@ export function TransferPurchaseSidebar({
   const [isReserving, setIsReserving] = useState(false);
   const orderIdRef = useRef<string | null>(null);
 
+  // Toss 결제 성공 콜백: ?paymentKey=... 파라미터 감지 후 양도 confirm
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const paymentKey = params.get("paymentKey");
+    const paymentFail = params.get("paymentFail");
+
+    if (paymentFail) {
+      window.history.replaceState({}, "", window.location.pathname);
+      sessionStorage.removeItem("urr:toss:transfer");
+      return;
+    }
+
+    if (!paymentKey) return;
+
+    const raw = sessionStorage.getItem("urr:toss:transfer");
+    if (!raw) return;
+
+    sessionStorage.removeItem("urr:toss:transfer");
+    window.history.replaceState({}, "", window.location.pathname);
+
+    const { orderId, storedUserId } = JSON.parse(raw) as { orderId: string; storedUserId: string };
+
+    setStep("processing");
+    confirmTransferPost(orderId, paymentKey, storedUserId)
+      .then(() => {
+        updateTransferListingStatus(artistId, listing.id, "sold");
+        setStep("complete");
+      })
+      .catch(() => {
+        setStep("complete"); // 낙관적 처리
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const isMember = membership?.isActive === true;
   const pct = Math.round((listing.price / listing.faceValue) * 100);
 
@@ -55,17 +90,10 @@ export function TransferPurchaseSidebar({
     }
   }
 
-  async function handlePaymentComplete() {
+  function handlePaymentComplete() {
+    // Toss 플로우에서는 onComplete가 호출되지 않음 (리다이렉트로 처리됨)
+    // tossConfig 미제공 시 mock 플로우용 fallback
     setShowPaymentDialog(false);
-    setStep("processing");
-    try {
-      const orderId = orderIdRef.current ?? "";
-      const paymentKey = `mock_${Date.now()}`;
-      await confirmTransferPost(orderId, paymentKey, userId!);
-      updateTransferListingStatus(artistId, listing.id, "sold");
-    } catch {
-      // confirm 실패해도 UI는 complete로 진행 (낙관적 처리)
-    }
     setStep("complete");
   }
 
@@ -150,6 +178,14 @@ export function TransferPurchaseSidebar({
         totalAmount={listing.price}
         onComplete={handlePaymentComplete}
         onCancel={() => setShowPaymentDialog(false)}
+        tossConfig={orderIdRef.current ? {
+          orderId: orderIdRef.current,
+          orderName: `${listing.event.title} 양도 티켓`,
+          successUrl: `${typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""}`,
+          failUrl: `${typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""}?paymentFail=1`,
+          storageKey: "urr:toss:transfer",
+          storageData: { orderId: orderIdRef.current, storedUserId: String(userId ?? "") },
+        } : undefined}
       />
 
       {/* Processing */}

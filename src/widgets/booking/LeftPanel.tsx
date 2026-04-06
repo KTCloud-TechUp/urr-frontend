@@ -95,7 +95,6 @@ export function LeftPanel() {
     isLeftPanelExpanded,
     isLoading,
     selectedDateId,
-    selectedDate,
     tierWindows,
     userTier,
     bookingState,

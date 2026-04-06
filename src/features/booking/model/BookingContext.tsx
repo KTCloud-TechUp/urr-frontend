@@ -24,6 +24,9 @@ import { MAX_SEATS_PER_TIER } from "@/shared/lib/mocks/seats";
 import { getShows } from "@/features/show/api/getShows";
 import { getSeatsSummary } from "@/features/booking/api/getSeatsSummary";
 import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
+import { confirmPayment } from "@/features/payment/api/confirmPayment";
+import { toConfirmationData } from "@/features/booking/api/bookTicket";
+import type { BookTicketResponse } from "@/features/booking/api/bookTicket";
 import type { TierWindow } from "@/shared/types";
 
 // Static tier price map (pricing API not yet available)
@@ -210,6 +213,43 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       }
     }
   }, [showsLoading, eventDates, state.isLoading]);
+
+  // Toss 결제 콜백 처리: successUrl 복귀 시 paymentKey URL 파라미터 감지
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const paymentKey = params.get("paymentKey");
+    const orderId = params.get("orderId");
+    const amount = params.get("amount");
+    const paymentFail = params.get("paymentFail");
+
+    if (paymentFail) {
+      // 결제 실패: URL 파라미터만 제거하고 idle 상태 유지
+      window.history.replaceState({}, "", window.location.pathname);
+      sessionStorage.removeItem("urr:toss:booking");
+      return;
+    }
+
+    if (!paymentKey || !orderId || !amount) return;
+
+    const raw = sessionStorage.getItem("urr:toss:booking");
+    if (!raw) return;
+
+    sessionStorage.removeItem("urr:toss:booking");
+    window.history.replaceState({}, "", window.location.pathname);
+
+    const bookingData = JSON.parse(raw) as BookTicketResponse;
+
+    confirmPayment({ paymentKey, orderId, amount: Number(amount) })
+      .then(() => {
+        dispatch({ type: "SET_CONFIRMATION_DATA", payload: toConfirmationData(bookingData) });
+        dispatch({ type: "TRANSITION_STATE", payload: "confirmation" });
+      })
+      .catch(() => {
+        // confirm 실패 시 idle로 복귀 (좌석 재선택 필요)
+        dispatch({ type: "RESET_BOOKING" });
+      });
+  }, []);
 
   // showId derived from selectedDateId
   const showId = state.selectedDateId ? Number(state.selectedDateId) : null;
