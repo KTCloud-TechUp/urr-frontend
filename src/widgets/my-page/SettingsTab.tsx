@@ -296,7 +296,7 @@ export function SettingsTab({ user, onUpdateUser, initialConsents }: SettingsTab
                   return
                 }
                 tokenStore.clearToken()
-                router.replace('/onboarding')
+                router.replace('/landing')
               }}
             >
               로그아웃

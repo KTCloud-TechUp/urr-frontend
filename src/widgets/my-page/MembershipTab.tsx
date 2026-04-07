@@ -67,23 +67,40 @@ export function MembershipTab({ memberships, onCancelMembership, onNicknameChang
     )
   }
 
+  const activeMemberships = memberships.filter((m) => m.isActive)
+  const expiredMemberships = memberships.filter((m) => !m.isActive)
+
+  const renderCard = (m: Membership) => (
+    <MembershipCard
+      key={m.id}
+      membership={m}
+      isExpanded={expandedId === m.id}
+      onToggle={() => handleToggle(m.id)}
+      isMelonLinked={melonLinkedMap[m.id] ?? false}
+      isMelonLinking={linkingId === m.id}
+      onMelonLink={() => handleMelonLink(m.id)}
+      onCancel={() => handleCancelRequest(m.id)}
+      isCancelling={isCancelling && cancelTargetId === m.id}
+      onNicknameChange={onNicknameChange}
+    />
+  )
+
   return (
     <>
       <div className="space-y-3">
-        {memberships.map((m) => (
-          <MembershipCard
-            key={m.id}
-            membership={m}
-            isExpanded={expandedId === m.id}
-            onToggle={() => handleToggle(m.id)}
-            isMelonLinked={melonLinkedMap[m.id] ?? false}
-            isMelonLinking={linkingId === m.id}
-            onMelonLink={() => handleMelonLink(m.id)}
-            onCancel={() => handleCancelRequest(m.id)}
-            isCancelling={isCancelling && cancelTargetId === m.id}
-            onNicknameChange={onNicknameChange}
-          />
-        ))}
+        {activeMemberships.map((m) => renderCard(m))}
+        {expiredMemberships.length > 0 && (
+          <>
+            {activeMemberships.length > 0 && (
+              <div className="flex items-center gap-2 pt-2">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-xs text-muted-foreground">만료된 멤버십</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+            )}
+            {expiredMemberships.map((m) => renderCard(m))}
+          </>
+        )}
       </div>
 
       <MembershipCancelDialog

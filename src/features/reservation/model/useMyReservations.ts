@@ -71,7 +71,7 @@ export function useMyReservations(userId?: string | number) {
       price: 0,
       tierFee: 0,
       qrCode: r.reservationId,
-      isTransferable: isUpcoming,
+      isTransferable: r.transferEligible,
       isUpcoming,
       event,
     };

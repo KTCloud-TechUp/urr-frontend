@@ -161,7 +161,7 @@ export async function getTransferPosts(
 
   const res = await apiRequest<TransferPostsApiResponse>(
     `/transfers/posts?artistId=${artistId}&size=50`,
-    { headers },
+    { service: "community", headers },
   );
 
   return res.data.data.content.map(mapToEnrichedTransfer);
