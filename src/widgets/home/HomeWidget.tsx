@@ -42,17 +42,37 @@ export function HomeWidget() {
 
   const hasFollowedArtists = mockUser.followedArtistIds.length > 0;
 
-  const popularArtists: Artist[] = homeData.popularArtists.map((a) => ({
-    id: String(a.artistId),
-    name: a.artistName,
-    avatar: a.profileImageUrl ?? "",
-    banner: "",
-    bio: "",
-    followerCount: a.followerCount,
-    category: (a.category as Artist["category"]) ?? "solo",
-  }));
+  const uniqueArtistIds = new Set<number>();
+  const popularArtists: Artist[] = homeData.popularArtists
+    .filter((a) => {
+      if (uniqueArtistIds.has(a.artistId)) return false;
+      uniqueArtistIds.add(a.artistId);
+      return true;
+    })
+    .map((a) => ({
+      id: String(a.artistId),
+      name: a.artistName,
+      avatar: a.profileImageUrl ?? "",
+      banner: "",
+      bio: "",
+      followerCount: a.followerCount,
+      category: (a.category as Artist["category"]) ?? "solo",
+    }));
 
-  const banners: BannerEvent[] = homeData.trendingEvents.slice(0, 4).map((e) => {
+  const dedupById = <T extends { eventId: number }>(items: T[]): T[] => {
+    const seen = new Set<number>();
+    return items.filter((e) => {
+      if (seen.has(e.eventId)) return false;
+      seen.add(e.eventId);
+      return true;
+    });
+  };
+
+  const trendingEvents = dedupById(homeData.trendingEvents);
+  const popularEventRanking = dedupById(homeData.popularEventRanking);
+  const presaleOpeningSoon = dedupById(homeData.presaleOpeningSoon);
+
+  const banners: BannerEvent[] = trendingEvents.slice(0, 4).map((e) => {
     const artist = artists.find((a) => a.id === String(e.artistId));
     return {
       id: String(e.eventId),
@@ -107,7 +127,7 @@ export function HomeWidget() {
       <section className="space-y-4">
         <h2 className="text-xl font-bold">지금 뜨는 공연</h2>
         <div className="grid grid-cols-6 gap-3">
-          {homeData.trendingEvents.map((event, index) => (
+          {trendingEvents.map((event, index) => (
             <Link
               key={event.eventId}
               href={`/events/${event.eventId}`}
@@ -158,7 +178,7 @@ export function HomeWidget() {
           <span className="text-xs text-muted-foreground">이번 주</span>
         </div>
         <div className="grid grid-cols-2 grid-rows-4 grid-flow-col gap-x-8 gap-y-0">
-          {homeData.popularEventRanking.map((event) => (
+          {popularEventRanking.map((event) => (
             <Link
               key={event.eventId}
               href={`/events/${event.eventId}`}
@@ -197,7 +217,7 @@ export function HomeWidget() {
       </section>
 
       {/* ===== 5. 선예매 오픈 임박 ===== */}
-      {homeData.presaleOpeningSoon.length > 0 && (
+      {presaleOpeningSoon.length > 0 && (
         <section className="space-y-4">
           <SectionHeader
             title="선예매 오픈 임박"
@@ -205,7 +225,7 @@ export function HomeWidget() {
             linkLabel="공연 더보기"
           />
           <div className="grid grid-cols-3 gap-4">
-            {homeData.presaleOpeningSoon.map((event) => (
+            {presaleOpeningSoon.map((event) => (
               <Link
                 key={event.eventId}
                 href={`/events/${event.eventId}`}

@@ -14,7 +14,7 @@ function parseSeatId(seatId: string): { section: string; row: string; seatNumber
 export function useMyReservations(userId?: string | number) {
   const { data: reservations = [], isLoading: resLoading } = useQuery({
     queryKey: ["my-reservations", userId, "CONFIRMED"],
-    queryFn: () => getMyReservations(userId, "CONFIRMED"),
+    queryFn: () => getMyReservations(userId!, "CONFIRMED"),
     enabled: userId !== undefined,
   });
 
@@ -71,7 +71,7 @@ export function useMyReservations(userId?: string | number) {
       price: 0,
       tierFee: 0,
       qrCode: r.reservationId,
-      isTransferable: isUpcoming,
+      isTransferable: r.transferEligible,
       isUpcoming,
       event,
     };

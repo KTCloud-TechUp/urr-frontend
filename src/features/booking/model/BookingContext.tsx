@@ -4,7 +4,6 @@ import {
   createContext,
   useContext,
   useState,
-  useReducer,
   useCallback,
   useEffect,
   useMemo,
@@ -25,7 +24,9 @@ import { getShows } from "@/features/show/api/getShows";
 import { getSeatsSummary } from "@/features/booking/api/getSeatsSummary";
 import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
 import { confirmPayment } from "@/features/payment/api/confirmPayment";
+import { confirmReservation } from "@/features/booking/api/confirmReservation";
 import { getEvents } from "@/features/event/api/getEvents";
+import { useBookingStore } from "./useBookingStore";
 import type { TierWindow } from "@/shared/types";
 
 // Static tier price map (pricing API not yet available)
@@ -47,36 +48,12 @@ export interface BookingEvent {
   status: string;
 }
 
-interface BookingInternalState {
-  bookingState: BookingState;
-  selectedDateId: string | null;
-  isLeftPanelExpanded: boolean;
-  isLoading: boolean;
-  selectedSectionId: string | null;
-  selectedSeatIds: string[];
-  confirmationData: ConfirmationData | null;
-  seatTimerSecondsLeft: number | null;
-  queueToken: string | null;
-}
-
-type BookingAction =
-  | { type: "SET_EVENT_LOADED"; payload: { dateId: string } }
-  | { type: "SELECT_DATE"; payload: string }
-  | { type: "TOGGLE_LEFT_PANEL" }
-  | { type: "SET_LEFT_PANEL"; payload: boolean }
-  | { type: "TRANSITION_STATE"; payload: BookingState }
-  | { type: "SELECT_SECTION"; payload: string }
-  | { type: "TOGGLE_SEAT"; payload: { seatId: string; maxSeats: number } }
-  | { type: "RESET_BOOKING" }
-  | { type: "SET_CONFIRMATION_DATA"; payload: ConfirmationData }
-  | { type: "SET_SEAT_TIMER"; payload: number }
-  | { type: "SET_QUEUE_TOKEN"; payload: string | null };
-
 export interface BookingContextValue {
   eventId: string;
   artistId: string | null;
   bookingState: BookingState;
   event: BookingEvent | null;
+  eventDates: EventDate[];
   selectedDateId: string | null;
   isLeftPanelExpanded: boolean;
   isLoading: boolean;
@@ -106,67 +83,6 @@ export interface BookingContextValue {
   setQueueToken: (token: string | null) => void;
 }
 
-const initialState: BookingInternalState = {
-  bookingState: "idle",
-  selectedDateId: null,
-  isLeftPanelExpanded: true,
-  isLoading: true,
-  selectedSectionId: null,
-  selectedSeatIds: [],
-  confirmationData: null,
-  seatTimerSecondsLeft: null,
-  queueToken: null,
-};
-
-function bookingReducer(
-  state: BookingInternalState,
-  action: BookingAction,
-): BookingInternalState {
-  switch (action.type) {
-    case "SET_EVENT_LOADED":
-      return { ...state, selectedDateId: action.payload.dateId, isLoading: false };
-    case "SELECT_DATE":
-      return { ...state, selectedDateId: action.payload };
-    case "TOGGLE_LEFT_PANEL":
-      return { ...state, isLeftPanelExpanded: !state.isLeftPanelExpanded };
-    case "SET_LEFT_PANEL":
-      return { ...state, isLeftPanelExpanded: action.payload };
-    case "TRANSITION_STATE":
-      if (action.payload === "seats-section") {
-        return { ...state, bookingState: action.payload, selectedSeatIds: [], selectedSectionId: null };
-      }
-      return { ...state, bookingState: action.payload };
-    case "SELECT_SECTION":
-      return { ...state, selectedSectionId: action.payload, selectedSeatIds: [] };
-    case "TOGGLE_SEAT": {
-      const { seatId, maxSeats } = action.payload;
-      const current = state.selectedSeatIds;
-      if (current.includes(seatId)) {
-        return { ...state, selectedSeatIds: current.filter((id) => id !== seatId) };
-      }
-      if (current.length >= maxSeats) return state;
-      return { ...state, selectedSeatIds: [...current, seatId] };
-    }
-    case "RESET_BOOKING":
-      return {
-        ...state,
-        bookingState: "idle",
-        selectedSectionId: null,
-        selectedSeatIds: [],
-        confirmationData: null,
-        seatTimerSecondsLeft: null,
-      };
-    case "SET_CONFIRMATION_DATA":
-      return { ...state, confirmationData: action.payload };
-    case "SET_SEAT_TIMER":
-      return { ...state, seatTimerSecondsLeft: action.payload };
-    case "SET_QUEUE_TOKEN":
-      return { ...state, queueToken: action.payload };
-    default:
-      return state;
-  }
-}
-
 export const BookingContext = createContext<BookingContextValue | null>(null);
 
 interface BookingProviderProps {
@@ -175,7 +91,30 @@ interface BookingProviderProps {
 }
 
 export function BookingProvider({ eventId, children }: BookingProviderProps) {
-  const [state, dispatch] = useReducer(bookingReducer, initialState);
+  // Zustand store — 모든 클라이언트 상태머신 상태 관리
+  const {
+    bookingState,
+    selectedDateId,
+    isLeftPanelExpanded,
+    isLoading,
+    selectedSectionId,
+    selectedSeatIds,
+    confirmationData,
+    seatTimerSecondsLeft,
+    queueToken,
+    setEventLoaded,
+    selectDate,
+    toggleLeftPanel,
+    setLeftPanel,
+    transitionTo,
+    selectSection,
+    toggleSeat,
+    reset,
+    setConfirmationData,
+    setSeatTimerSecondsLeft,
+    setQueueToken,
+    setReservations,
+  } = useBookingStore();
 
   // Fetch events list to derive artistId for this event
   const { data: events } = useQuery({
@@ -214,18 +153,15 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
 
   // Initialize selectedDateId once shows are loaded
   useEffect(() => {
-    if (!showsLoading && eventDates.length > 0 && state.isLoading) {
-      dispatch({
-        type: "SET_EVENT_LOADED",
-        payload: { dateId: eventDates[0].id },
-      });
+    if (!showsLoading && eventDates.length > 0 && isLoading) {
+      setEventLoaded(eventDates[0].id);
       const startPhase = sessionStorage.getItem("urr:booking:startPhase") as BookingState | null;
       if (startPhase) {
         sessionStorage.removeItem("urr:booking:startPhase");
-        dispatch({ type: "TRANSITION_STATE", payload: startPhase });
+        transitionTo(startPhase);
       }
     }
-  }, [showsLoading, eventDates, state.isLoading]);
+  }, [showsLoading, eventDates, isLoading, setEventLoaded, transitionTo]);
 
   // Toss 결제 콜백 처리: successUrl 복귀 시 paymentKey URL 파라미터 감지
   useEffect(() => {
@@ -237,9 +173,9 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     const paymentFail = params.get("paymentFail");
 
     if (paymentFail) {
-      // 결제 실패: URL 파라미터만 제거하고 idle 상태 유지
       window.history.replaceState({}, "", window.location.pathname);
       sessionStorage.removeItem("urr:toss:booking");
+      sessionStorage.removeItem("urr:toss:reservations");
       return;
     }
 
@@ -248,30 +184,46 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     const raw = sessionStorage.getItem("urr:toss:booking");
     if (!raw) return;
 
+    // Toss 리다이렉트 후 메모리 초기화 → sessionStorage에서 reservationIds 복원
+    const rawReservations = sessionStorage.getItem("urr:toss:reservations");
+    const restoredIds: string[] = rawReservations ? (JSON.parse(rawReservations) as string[]) : [];
+
     sessionStorage.removeItem("urr:toss:booking");
+    sessionStorage.removeItem("urr:toss:reservations");
     window.history.replaceState({}, "", window.location.pathname);
 
     const confirmationData = JSON.parse(raw) as ConfirmationData;
 
+    // 1) Toss 결제 승인
     confirmPayment({ paymentKey, orderId, amount: Number(amount) })
       .then(() => {
-        dispatch({ type: "SET_CONFIRMATION_DATA", payload: confirmationData });
-        dispatch({ type: "TRANSITION_STATE", payload: "confirmation" });
+        // 2) store에 reservationIds 복원
+        if (restoredIds.length > 0) {
+          setReservations(restoredIds, orderId);
+        }
+        // 3) 각 예약 확정 (POST /api/v1/ticket/reservations/{id}/confirm)
+        return Promise.allSettled(restoredIds.map((id) => confirmReservation(id)));
+      })
+      .then(() => {
+        setConfirmationData(confirmationData);
+        transitionTo("confirmation");
       })
       .catch(() => {
-        // confirm 실패 시 idle로 복귀 (좌석 재선택 필요)
-        dispatch({ type: "RESET_BOOKING" });
+        // 결제/확정 실패 시 idle로 복귀
+        reset();
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // showId derived from selectedDateId
-  const showId = state.selectedDateId ? Number(state.selectedDateId) : null;
+  const showId = selectedDateId ? Number(selectedDateId) : null;
 
-  // Fetch seats summary for currently selected show
+  // Fetch seats summary for currently selected show — 예매 진행 중일 때만 호출
+  const isBookingActive = bookingState !== "idle";
   const { data: seatsSummary } = useQuery({
     queryKey: ["seats-summary", eventId, showId],
     queryFn: () => getSeatsSummary(eventId, showId!),
-    enabled: showId !== null,
+    enabled: isBookingActive && showId !== null,
   });
 
   // Fetch authoritative booking windows for the selected show
@@ -318,12 +270,13 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   }, []);
 
   const selectedDate = useMemo(() => {
-    if (!state.selectedDateId) return null;
-    return eventDates.find((d) => d.id === state.selectedDateId) ?? null;
-  }, [state.selectedDateId, eventDates]);
+    if (!selectedDateId) return null;
+    return eventDates.find((d) => d.id === selectedDateId) ?? null;
+  }, [selectedDateId, eventDates]);
 
   // Merge: prefer API booking-windows data; fall back to getShows() data
   const tierWindows: TierWindow[] = useMemo(() => {
+    // 1순위: tierPolicies 배열
     if (bookingWindowsData?.tierPolicies?.length) {
       return bookingWindowsData.tierPolicies.map((tp) => ({
         tier: tp.tier as TierLevel,
@@ -331,6 +284,14 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
         fee: tp.bookingFeeWon,
       }));
     }
+    // 2순위: bookingWindows Record<tier, opensAt> 형태 (API가 이 포맷으로 반환하는 경우)
+    if (bookingWindowsData?.bookingWindows) {
+      const fromRecord = (Object.entries(bookingWindowsData.bookingWindows) as [string, string][])
+        .filter(([, opensAt]) => !!opensAt)
+        .map(([tier, opensAt]) => ({ tier: tier as TierLevel, opensAt, fee: 0 }));
+      if (fromRecord.length > 0) return fromRecord;
+    }
+    // 3순위: getShows() 응답에 포함된 bookingWindows
     return selectedDate?.bookingWindows ?? [];
   }, [bookingWindowsData, selectedDate]);
 
@@ -349,62 +310,38 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     return sectionsForDate.every((s) => s.remainingSeats === 0);
   }, [sectionsForDate]);
 
-  const selectDate = useCallback((dateId: string) => {
-    dispatch({ type: "SELECT_DATE", payload: dateId });
-  }, []);
-
-  const toggleLeftPanel = useCallback(() => {
-    dispatch({ type: "TOGGLE_LEFT_PANEL" });
-  }, []);
-
-  const setLeftPanel = useCallback((expanded: boolean) => {
-    dispatch({ type: "SET_LEFT_PANEL", payload: expanded });
-  }, []);
-
-  const transitionTo = useCallback((nextState: BookingState) => {
-    dispatch({ type: "TRANSITION_STATE", payload: nextState });
-  }, []);
-
   const startBooking = useCallback(() => {
-    dispatch({ type: "TRANSITION_STATE", payload: "queue" });
-  }, []);
+    transitionTo("queue");
+  }, [transitionTo]);
 
-  const selectSection = useCallback((sectionId: string) => {
-    dispatch({ type: "SELECT_SECTION", payload: sectionId });
-  }, []);
-
-  const toggleSeat = useCallback(
+  const handleToggleSeat = useCallback(
     (seatId: string) => {
-      dispatch({ type: "TOGGLE_SEAT", payload: { seatId, maxSeats } });
+      toggleSeat(seatId, maxSeats);
     },
-    [maxSeats],
+    [toggleSeat, maxSeats],
   );
 
   const resetBooking = useCallback(() => {
-    dispatch({ type: "RESET_BOOKING" });
-  }, []);
+    reset();
+  }, [reset]);
 
-  const setConfirmationData = useCallback((data: ConfirmationData) => {
-    dispatch({ type: "SET_CONFIRMATION_DATA", payload: data });
-  }, []);
-
-  const setSeatTimerSecondsLeft = useCallback((seconds: number) => {
-    dispatch({ type: "SET_SEAT_TIMER", payload: seconds });
-  }, []);
-
-  const setQueueToken = useCallback((token: string | null) => {
-    dispatch({ type: "SET_QUEUE_TOKEN", payload: token });
-  }, []);
+  const handleSetSeatTimerSecondsLeft = useCallback(
+    (seconds: number) => {
+      setSeatTimerSecondsLeft(seconds);
+    },
+    [setSeatTimerSecondsLeft],
+  );
 
   const value: BookingContextValue = useMemo(
     () => ({
       eventId,
       artistId,
-      bookingState: state.bookingState,
+      bookingState,
       event,
-      selectedDateId: state.selectedDateId,
-      isLeftPanelExpanded: state.isLeftPanelExpanded,
-      isLoading: state.isLoading,
+      eventDates,
+      selectedDateId,
+      isLeftPanelExpanded,
+      isLoading,
       userTier,
       selectedDate,
       tierWindows,
@@ -412,36 +349,37 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       isWindowOpen,
       isSoldOut,
       userWindowOpensAt,
-      selectedSectionId: state.selectedSectionId,
-      selectedSeatIds: state.selectedSeatIds,
+      selectedSectionId,
+      selectedSeatIds,
       maxSeats,
-      confirmationData: state.confirmationData,
-      seatTimerSecondsLeft: state.seatTimerSecondsLeft,
-      queueToken: state.queueToken,
+      confirmationData,
+      seatTimerSecondsLeft,
+      queueToken,
       selectDate,
       toggleLeftPanel,
       setLeftPanel,
       transitionTo,
       startBooking,
       selectSection,
-      toggleSeat,
+      toggleSeat: handleToggleSeat,
       resetBooking,
       setConfirmationData,
-      setSeatTimerSecondsLeft,
+      setSeatTimerSecondsLeft: handleSetSeatTimerSecondsLeft,
       setQueueToken,
     }),
     [
       eventId,
       artistId,
-      state.bookingState,
-      state.selectedDateId,
-      state.isLeftPanelExpanded,
-      state.isLoading,
-      state.selectedSectionId,
-      state.selectedSeatIds,
-      state.confirmationData,
-      state.seatTimerSecondsLeft,
-      state.queueToken,
+      bookingState,
+      eventDates,
+      selectedDateId,
+      isLeftPanelExpanded,
+      isLoading,
+      selectedSectionId,
+      selectedSeatIds,
+      confirmationData,
+      seatTimerSecondsLeft,
+      queueToken,
       event,
       userTier,
       selectedDate,
@@ -457,10 +395,10 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       transitionTo,
       startBooking,
       selectSection,
-      toggleSeat,
+      handleToggleSeat,
       resetBooking,
       setConfirmationData,
-      setSeatTimerSecondsLeft,
+      handleSetSeatTimerSecondsLeft,
       setQueueToken,
     ],
   );

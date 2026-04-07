@@ -17,6 +17,7 @@ export interface ReservationSummary {
   expiresAt: string | null;
   refundedAt: string | null;
   updatedAt: string;
+  transferEligible: boolean;
 }
 
 interface ReservationsApiResponse {
@@ -27,16 +28,16 @@ interface ReservationsApiResponse {
 }
 
 export async function getMyReservations(
-  userId?: string | number,
+  userId: string | number,
   status?: ReservationStatus,
 ): Promise<ReservationSummary[]> {
   const params = status ? `?status=${status}` : "";
-  const headers: Record<string, string> = userId !== undefined
-    ? { "X-User-Id": String(userId) }
-    : {};
   const res = await apiRequest<ReservationsApiResponse>(
     `/ticket/users/reservations${params}`,
-    { service: "ticketing", headers },
+    {
+      service: "ticketing",
+      headers: { "X-User-Id": String(userId) },
+    },
   );
   return res.data.data;
 }

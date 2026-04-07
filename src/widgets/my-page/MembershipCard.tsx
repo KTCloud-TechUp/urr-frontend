@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, ChevronDown, Loader2, Music, Pencil, RefreshCw, XCircle } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Check, ChevronDown, Loader2, Pencil, RefreshCw, XCircle } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { TierBadge } from '@/entities/user'
@@ -75,19 +77,27 @@ export function MembershipCard({
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
+    <div className={cn(
+      "rounded-lg border bg-card overflow-hidden",
+      membership.isActive
+        ? "border-border"
+        : "border-dashed border-border bg-muted/40",
+    )}>
       {/* Main row */}
       <div className="flex items-center gap-4 p-4">
         {/* Artist gradient avatar */}
         <div
-          className="size-12 rounded-full shrink-0 flex items-center justify-center text-white text-sm font-bold"
+          className={cn(
+            "size-12 rounded-full shrink-0 flex items-center justify-center text-white text-sm font-bold",
+            !membership.isActive && "grayscale opacity-50",
+          )}
           style={{ background: gradient }}
         >
           {membership.artistName.charAt(0)}
         </div>
 
         {/* Info */}
-        <div className="flex-1 min-w-0">
+        <div className={cn("flex-1 min-w-0", !membership.isActive && "opacity-60")}>
           <div className="flex items-center gap-2">
             <span className="font-semibold truncate">{membership.artistName}</span>
             <TierBadge tier={membership.tier} size="sm" />
@@ -132,7 +142,7 @@ export function MembershipCard({
       {isExpanded && (
         <div className="border-t border-border bg-muted/30 px-5 py-5 space-y-6">
           {/* Nickname */}
-          <div>
+          <div className={cn(!membership.isActive && "opacity-60")}>
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">활동 닉네임</label>
             {isEditingNickname ? (
               <div className="flex items-center gap-2">
@@ -179,7 +189,7 @@ export function MembershipCard({
 
           {/* Tier progress */}
           {progress && (
-            <div>
+            <div className={cn(!membership.isActive && "opacity-60")}>
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">등급 진행</label>
             <div className="flex items-center gap-3 max-w-[320px]">
               <span className="text-xs tabular-nums font-medium shrink-0">{progressPercent}%</span>
@@ -200,7 +210,7 @@ export function MembershipCard({
           )}
 
           {/* Tier verification status */}
-          <div>
+          <div className={cn(!membership.isActive && "opacity-60")}>
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">등급 인증</label>
             <p className="text-sm font-medium">{TIER_LABELS[membership.tier]} 등급 인증 완료</p>
           </div>
@@ -209,39 +219,43 @@ export function MembershipCard({
           <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">멤버십 관리</label>
           <div className="flex items-center gap-2">
-            {/* Melon linking */}
-            {isMelonLinked ? (
-              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600">
-                <Music size={14} />
-                멜론 연동 완료 ✓
-              </span>
-            ) : (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={onMelonLink}
-                disabled={isMelonLinking}
-                className="gap-1.5"
-              >
-                {isMelonLinking ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    연동 중...
-                  </>
-                ) : (
-                  <>
-                    <Music size={14} />
-                    멜론 연동
-                  </>
-                )}
-              </Button>
+            {/* Melon linking (활성 멤버십만) */}
+            {membership.isActive && (
+              isMelonLinked ? (
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600">
+                  <Image src="/icons/logo_melon.png" alt="멜론" width={20} height={20} className="object-contain" />
+                  멜론 연동 완료 ✓
+                </span>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onMelonLink}
+                  disabled={isMelonLinking}
+                  className="gap-1.5 border-[#00CD3C] text-[#00CD3C] hover:bg-[#00CD3C]/10 hover:text-[#00CD3C]"
+                >
+                  {isMelonLinking ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      연동 중...
+                    </>
+                  ) : (
+                    <>
+                      <Image src="/icons/logo_melon.png" alt="멜론" width={20} height={20} className="object-contain" />
+                      멜론 연동
+                    </>
+                  )}
+                </Button>
+              )
             )}
 
             {/* Renewal button (expired only) */}
             {!membership.isActive && (
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <RefreshCw size={14} />
-                갱신
+              <Button variant="outline" size="sm" className="gap-1.5" asChild>
+                <Link href={`/membership?artistId=${membership.artistId}`}>
+                  <RefreshCw size={14} />
+                  갱신
+                </Link>
               </Button>
             )}
 

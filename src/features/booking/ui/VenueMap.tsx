@@ -328,6 +328,7 @@ export const VenueMap = forwardRef<SVGSVGElement, VenueMapProps>(
 
       const gElement = (
         <g
+          key={sectionId}
           data-section={sectionId}
           className={cn("transition-all duration-150", cursor)}
           style={{ opacity: sectionOpacity, filter: sectionFilter }}

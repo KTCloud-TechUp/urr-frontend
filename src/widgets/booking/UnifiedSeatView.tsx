@@ -62,19 +62,31 @@ export function UnifiedSeatView() {
 
   const showId = selectedDateId ? Number(selectedDateId) : null;
 
+  // API는 section 필드를 tier 단위로 반환 ("A", "S", "R", "VIP")
+  // selectedSectionId는 zone 단위 ("A1", "S3", "VIP1" 등) → tier 코드로 변환 후 필터링
+  const sectionTierCode = useMemo(() => {
+    if (!selectedSectionId) return null;
+    if (selectedSectionId.startsWith("VIP")) return "VIP";
+    if (selectedSectionId.startsWith("S")) return "S";
+    if (selectedSectionId.startsWith("R")) return "R";
+    if (selectedSectionId.startsWith("A")) return "A";
+    return selectedSectionId;
+  }, [selectedSectionId]);
+
   // Fetch real seat availability for the selected section
   const { data: seatsData } = useQuery({
-    queryKey: ["seats-availability", eventId, showId],
-    queryFn: () => getSeatsAvailability(eventId, showId!),
-    enabled: isInSeatMode && showId !== null,
+    queryKey: ["seats-availability", eventId, showId, sectionTierCode],
+    queryFn: () => getSeatsAvailability(eventId, showId!, sectionTierCode ?? undefined),
+    enabled: isInSeatMode && showId !== null && sectionTierCode !== null,
     staleTime: 30_000,
+    refetchOnWindowFocus: false,
   });
 
   // Filter to selected section and map to Seat[]
   const apiSeats: Seat[] = useMemo(() => {
     if (!seatsData) return [];
-    const sectionSeats = selectedSectionId
-      ? seatsData.filter((s) => s.section === selectedSectionId)
+    const sectionSeats = sectionTierCode
+      ? seatsData.filter((s) => s.section === sectionTierCode || s.section === selectedSectionId)
       : seatsData;
     return sectionSeats.map((s) => ({
       id: s.seatId,
@@ -83,7 +95,7 @@ export function UnifiedSeatView() {
       number: s.number,
       status: (s.status === "AVAILABLE" ? "available" : "taken") as SeatStatus,
     }));
-  }, [seatsData, selectedSectionId]);
+  }, [seatsData, sectionTierCode, selectedSectionId]);
 
   const layout = useMemo(() => {
     if (apiSeats.length === 0) return { rows: 0, seatsPerRow: 0 };
