@@ -8,24 +8,32 @@ import { ArtistCard } from "@/entities/artist";
 import { getArtistGradient } from "@/shared/lib/mocks/home";
 import { mockUser } from "@/shared/lib/mocks/user";
 import { getHome } from "@/features/home/api/getHome";
+import { getEvents } from "@/features/event/api/getEvents";
 import { useArtists } from "@/features/artist";
+import { parseApiDate, formatEventDate } from "@/shared/lib/utils";
 import type { Artist } from "@/shared/types";
 import type { BannerEvent } from "@/entities/event";
 import { HeroBannerCarousel } from "./HeroBannerCarousel";
 import { HomePageSkeleton } from "./HomePageSkeleton";
 
-function formatDateRange(openDate: string, endDate: string | null): string {
-  const open = new Date(openDate);
+function formatDateRange(openDate: unknown, endDate: unknown): string {
+  const open = parseApiDate(openDate);
+  if (isNaN(open.getTime())) return "";
   const openStr = `${open.getMonth() + 1}.${open.getDate()}`;
-  if (!endDate || endDate === openDate) return openStr;
-  const end = new Date(endDate);
+  if (!endDate) return openStr;
+  const end = parseApiDate(endDate);
+  if (isNaN(end.getTime())) return openStr;
   return `${openStr} ~ ${end.getMonth() + 1}.${end.getDate()}`;
 }
 
-function deriveStatus(openDate: string, endDate: string | null): BannerEvent["status"] {
+function deriveStatus(openDate: unknown, endDate: unknown): BannerEvent["status"] {
   const today = new Date().toISOString().split("T")[0];
-  if (openDate > today) return "upcoming";
-  if (!endDate || endDate >= today) return "open";
+  const open = parseApiDate(openDate);
+  const openStr = isNaN(open.getTime()) ? "" : open.toISOString().split("T")[0];
+  if (openStr > today) return "upcoming";
+  const end = endDate ? parseApiDate(endDate) : null;
+  const endStr = end && !isNaN(end.getTime()) ? end.toISOString().split("T")[0] : null;
+  if (!endStr || endStr >= today) return "open";
   return "closed";
 }
 
@@ -37,6 +45,12 @@ export function HomeWidget() {
   });
 
   const { data: artists = [] } = useArtists();
+  const { data: allEvents = [] } = useQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+    staleTime: 5 * 60 * 1000,
+  });
+  const eventMap = new Map(allEvents.map((e) => [e.eventId, e]));
 
   if (homeLoading || !homeData) return <HomePageSkeleton />;
 
@@ -68,9 +82,19 @@ export function HomeWidget() {
     });
   };
 
-  const trendingEvents = dedupById(homeData.trendingEvents);
-  const popularEventRanking = dedupById(homeData.popularEventRanking);
-  const presaleOpeningSoon = dedupById(homeData.presaleOpeningSoon);
+  const withPoster = <T extends { eventId: number; posterImageUrl: string | null; openDate: string }>(items: T[]): T[] =>
+    items.map((e) => {
+      const fallback = eventMap.get(e.eventId);
+      return {
+        ...e,
+        posterImageUrl: e.posterImageUrl ?? fallback?.posterImageUrl ?? null,
+        openDate: e.openDate ?? fallback?.openDate ?? "",
+      };
+    });
+
+  const trendingEvents = withPoster(dedupById(homeData.trendingEvents));
+  const popularEventRanking = withPoster(dedupById(homeData.popularEventRanking));
+  const presaleOpeningSoon = withPoster(dedupById(homeData.presaleOpeningSoon));
 
   const banners: BannerEvent[] = trendingEvents.slice(0, 4).map((e) => {
     const artist = artists.find((a) => a.id === String(e.artistId));
@@ -250,7 +274,7 @@ export function HomeWidget() {
                 )}
                 <div className="flex-1 min-w-0 flex flex-col py-0.5">
                   <p className="text-xs font-semibold text-foreground">
-                    {formatDateRange(event.openDate, event.endDate)}
+                    {formatEventDate(event.openDate, true)}
                   </p>
                   <p className="text-sm font-semibold line-clamp-2 leading-tight mt-0.5 group-hover:text-primary transition-colors">
                     {event.eventTitle}

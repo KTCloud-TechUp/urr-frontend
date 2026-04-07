@@ -13,6 +13,7 @@ import {
 import { useArtists } from '@/features/artist'
 import { confirmPayment } from '@/features/payment/api/confirmPayment'
 import { activateMembership } from '@/features/membership/api/activateMembership'
+import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
 import type { Artist, TierLevel } from '@/shared/types'
 
 type Step = 'select' | 'intro' | 'payment' | 'profile' | 'complete'
@@ -24,12 +25,14 @@ export function MembershipWidget() {
   const [profileData, setProfileData] = useState<{ nickname: string; tier: TierLevel } | null>(null)
   const { data: memberships = [] } = useMemberships()
   const { data: artists = [] } = useArtists()
+  const { data: currentUser } = useCurrentUser()
   const callbackHandled = useRef(false)
 
   // Toss 결제 성공 콜백: /membership?paymentKey=...&orderId=...&amount=... 감지
   useEffect(() => {
     if (callbackHandled.current) return
     if (typeof window === 'undefined') return
+    if (!currentUser?.userId) return
 
     const params = new URLSearchParams(window.location.search)
     const paymentKey = params.get('paymentKey')
@@ -54,14 +57,24 @@ export function MembershipWidget() {
 
     const { paymentId } = JSON.parse(raw) as { orderId: string; paymentId: string }
 
-    confirmPayment({ paymentKey, orderId, amount: Number(amount) })
+    confirmPayment({ paymentKey, orderId, amount: Number(amount), userId: currentUser.userId })
       .then(() => activateMembership(orderId, paymentId))
       .then(() => setStep('profile'))
       .catch(() => {
         // 실패 시 payment 단계로 복귀
         setStep('payment')
       })
-  }, [])
+  }, [currentUser?.userId])
+
+  // reset=1 파라미터가 있으면 select 단계로 초기화 (사이드바에서 재진입 시)
+  useEffect(() => {
+    if (!searchParams.get('reset')) return
+    queueMicrotask(() => {
+      setStep('select')
+      setSelectedArtist(null)
+      window.history.replaceState({}, '', '/membership')
+    })
+  }, [searchParams])
 
   // If artistId is provided via query param, skip to intro step
   useEffect(() => {

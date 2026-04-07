@@ -8,21 +8,25 @@
 
 ## 대기 중
 
-### 좌석 API 2가지 변경 요청
+### ① 좌석 조회 API — `section` 쿼리 파라미터 필터 추가
 
 - **우선순위**: 🔴 긴급
-
-#### ① `GET /ticket/events/{eventId}/shows/{showId}/seats` — section 필터 추가
+- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
 
 ```
-GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats?section=VIP
+GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats?section=VIP1
 ```
 
-- **요청**: `section` 쿼리 파라미터 추가. 해당 tier에 속하는 좌석만 반환.
+- **요청**: `section` 쿼리 파라미터 추가. 해당 구역에 속하는 좌석만 반환.
 - **이유**: 공연장 규모 15,000석 기준 전체 조회 시 응답이 ~1.5MB. 구역 클릭 시 해당 section만 요청하도록 프론트 변경 완료 — 백엔드 필터 지원 필요.
-- **필터 값**: tier 레벨 코드 (`VIP`, `S`, `R`, `A`) 중 하나. 파라미터 없으면 전체 반환 (기존 동작 유지).
+- **필터 값**: 구역 코드(`VIP1`, `VIP2`, `S1`, `R1`, `A1` 등). 파라미터 없으면 전체 반환 (기존 동작 유지).
 
-#### ② `GET /ticket/events/{eventId}/shows/{showId}/seats` — `section` 필드를 zone 레벨로 반환
+---
+
+### ② 좌석 조회 API — `section` 필드를 zone 레벨로 반환
+
+- **우선순위**: 🔴 긴급
+- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
 
 ```json
 // 현재 (tier 레벨) ❌
@@ -37,65 +41,61 @@ GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats?section=VIP
 
 ---
 
-### 예매 테스트용 좌석 배치도 데이터 세팅 요청
+### ③ 좌석 조회 API — 응답 정렬 순서 보장
 
-- **요청**: `eventId=1` 기준으로 예매 전체 플로우(구역 선택 → 좌석 선택 → 결제)를 테스트할 수 있도록 좌석 배치도 및 회차(showId) 데이터 세팅
-- **이유**: `GET /shows/{eventId}/shows/{showId}/seats/summary` 호출 시 대부분 공연에서 `"좌석 배치도 형식이 올바르지 않습니다."` (400) 반환. 프론트엔드 예매·결제 E2E 테스트를 `eventId=1` 단일 공연으로 고정해 진행하기로 결정.
 - **우선순위**: 🔴 긴급
+- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
 
-#### 프론트엔드가 기대하는 데이터 구조
+- **요청**: 응답 배열을 `row ASC → number ASC` 순으로 정렬해서 반환.
+- **이유**: 프론트는 배열 인덱스로 좌석의 SVG 좌표를 계산함. 정렬이 보장되지 않으면 좌석이 뒤죽박죽으로 렌더링됨.
 
-**① `GET /ticket/events/1/shows/{showId}/seats` 응답**
-
-포도알(좌석) 렌더링에 사용. `section` 필드가 아래 구역 코드와 **정확히 일치**해야 SVG 위에 올바르게 표시됨.
-
-```json
-[
-  {
-    "seatId": "seat-vip1-1-1",
-    "section": "VIP1",
-    "row": "1",
-    "number": "1",
-    "status": "AVAILABLE",
-    "price": 165000,
-    "lockedUntil": null,
-    "sellable": true,
-    "seatVersion": 1
-  }
-]
+```sql
+-- 쿼리 정렬 기준
+ORDER BY CAST(row AS INT) ASC, CAST(number AS INT) ASC
 ```
 
-- `section`: 아래 구역 코드 중 하나 (대소문자 정확히 일치)
-- `row`, `number`: **숫자형 문자열** (`"1"`, `"2"`, ...) — 그리드 계산에 사용
-- `status`: `"AVAILABLE"` | `"LOCKED"` | `"RESERVED"` | `"SOLD"`
-
-**② 구역 코드 목록 (총 38개)**
-
-| 티어 | 구역 코드                                      |
-| ---- | ---------------------------------------------- |
-| VIP  | `VIP1`, `VIP2`, `VIP3`                         |
-| S    | `S1`, `S2`, `S3`, `S4`, `S5`, `S6`, `S7`, `S8` |
-| R    | `R1`, `R2`, `R3`, `R4`, `R5`, `R6`, `R7`       |
-| A    | `A1`~`A20`                                     |
-
-**③ 최소 세팅 권장 (테스트 목적)**
-
-전체 38개 구역 불필요. 아래 3~4개 구역만 세팅해도 플로우 검증 가능:
-
-- `VIP1`: 3행 × 10석 (row 1~3, number 1~10)
-- `S1`: 5행 × 8석 (row 1~5, number 1~8)
-- `R1`: 4행 × 8석 (row 1~4, number 1~8)
-- `A1`: 6행 × 10석 (row 1~6, number 1~10)
+즉 row 1의 1번석 → row 1의 마지막 석 → row 2의 1번석 → ... 순서.
 
 ---
 
-## 보류 (프론트에서 해결)
+### ④ 홈 선예매 오픈 임박 — 추가 필드 요청
 
-### [해결됨] 홈 히어로 배너 API 추가
+- **우선순위**: 🟡 보통
+- **대상**: `GET /events/home` 응답의 `presaleOpeningSoon[]` 배열 및 `trendingEvents[]`, `popularEventRanking[]`
 
-`GET /events/home`에 배너 전용 필드가 없어 요청 예정이었으나,  
-`trendingEvents` 상위 4개 + `GET /artists`의 `bannerImageUrl` 매핑으로 프론트에서 해결.  
-별도 API 요청 불필요.
+현재 `presaleOpeningSoon` 항목은 `HomeTrendingEvent` 타입과 동일한 필드를 반환해 아래 정보를 프론트에서 표시할 수 없습니다.
+
+#### 요청 필드
+
+```json
+{
+  "eventId": 1,
+  "eventTitle": "IVE THE 1ST WORLD TOUR",
+  "artistId": 5,
+  "artistName": "IVE",
+  "posterImageUrl": "https://...", // 현재 null로 오고 있음 — 유효한 URL 반환 필요
+  "venueAddress": "KSPO DOME",
+  "openDate": "2026-03-03T20:00:00", // ★ LocalDate → LocalDateTime으로 변경 요청 (공연 시작 시간 포함)
+  "endDate": "2026-03-04",
+
+  // ↓ presaleOpeningSoon 전용 신규 요청 필드
+  "presaleOpenAt": "2026-02-20T20:00:00", // 선예매 오픈 일시 (없으면 null) — "02.20(목) 20:00" 표시용
+  "saleType": "PRESALE", // "PRESALE" | "GENERAL" — 선예매/일반예매 구분
+  "isHot": true, // HOT 뱃지
+  "isSeatAdvantage": false, // 좌석 우위 뱃지
+  "isExclusive": true // 단독판매 뱃지
+}
+```
+
+#### 각 필드 필요 이유
+
+| 필드                                        | 이유                                                                                                                                                           |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `posterImageUrl` (수정)                     | home API에서 null로 와서 이미지 미표시. `/events` API에서 폴백 중이나 홈에서 직접 주는 게 맞음                                                                 |
+| `openDate` → datetime                       | 현재 날짜만 오고 시간이 없어 "03.03(화)" 만 표시됨. "03.03(화) 20:00" 표시를 위해 시간 포함 필요. `trendingEvents`, `popularEventRanking`도 동일하게 변경 요청 |
+| `presaleOpenAt`                             | 선예매 오픈 일시를 카드에 별도 표시 ("선예매 D-3" 등 추후 확장 가능)                                                                                           |
+| `saleType`                                  | 선예매/일반예매 구분 텍스트 표시                                                                                                                               |
+| `isHot` / `isSeatAdvantage` / `isExclusive` | 디자인에 명시된 뱃지 표시                                                                                                                                      |
 
 ---
 
@@ -105,3 +105,8 @@ GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats?section=VIP
 
 - `ReservationSummary` 타입에 `transferEligible: boolean` 추가 (`src/features/reservation/api/getMyReservations.ts`)
 - `useMyReservations`에서 `isTransferable`을 `r.transferEligible`로 변경 (`src/features/reservation/model/useMyReservations.ts`)
+
+### `GET /api/v1/shows/{eventId}/shows/{showId}/seats/summary` 경로 확인
+
+- `ShowController` 클래스 레벨 `@RequestMapping("/api/v1/shows")` + 메서드 레벨 `@GetMapping("/{eventId}/shows/{showId}/seats/summary")` 구조로 `shows`가 두 번 나오는 것이 의도된 경로임을 확인.
+- 프론트 `getSeatsSummary.ts`의 경로(`/shows/{eventId}/shows/{showId}/seats/summary`)는 정확함. 변경 불필요.

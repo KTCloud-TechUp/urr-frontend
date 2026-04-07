@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Calendar } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn, parseApiDate } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui";
 import { BookingStatusBadge } from "@/entities/event";
 import { TierBadge } from "@/entities/user";
@@ -16,14 +16,16 @@ interface EventBookingSidebarProps {
   event: EventDetail;
 }
 
-function formatSidebarDate(isoDate: string): string {
-  const d = new Date(isoDate);
+function formatSidebarDate(value: unknown): string {
+  const d = parseApiDate(value);
+  if (isNaN(d.getTime())) return "날짜 미정";
   const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
   return `${d.getMonth() + 1}월 ${d.getDate()}일 (${weekdays[d.getDay()]}) ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-function formatTierTime(isoDate: string): string {
-  const d = new Date(isoDate);
+function formatTierTime(value: unknown): string {
+  const d = parseApiDate(value);
+  if (isNaN(d.getTime())) return "-";
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
