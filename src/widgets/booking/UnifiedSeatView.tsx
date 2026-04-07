@@ -62,14 +62,6 @@ export function UnifiedSeatView() {
 
   const showId = selectedDateId ? Number(selectedDateId) : null;
 
-  // Fetch real seat availability for the selected section
-  const { data: seatsData } = useQuery({
-    queryKey: ["seats-availability", eventId, showId],
-    queryFn: () => getSeatsAvailability(eventId, showId!),
-    enabled: isInSeatMode && showId !== null,
-    staleTime: 30_000,
-  });
-
   // API는 section 필드를 tier 단위로 반환 ("A", "S", "R", "VIP")
   // selectedSectionId는 zone 단위 ("A1", "S3", "VIP1" 등) → tier 코드로 변환 후 필터링
   const sectionTierCode = useMemo(() => {
@@ -80,6 +72,15 @@ export function UnifiedSeatView() {
     if (selectedSectionId.startsWith("A")) return "A";
     return selectedSectionId;
   }, [selectedSectionId]);
+
+  // Fetch real seat availability for the selected section
+  const { data: seatsData } = useQuery({
+    queryKey: ["seats-availability", eventId, showId, sectionTierCode],
+    queryFn: () => getSeatsAvailability(eventId, showId!, sectionTierCode ?? undefined),
+    enabled: isInSeatMode && showId !== null && sectionTierCode !== null,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
 
   // Filter to selected section and map to Seat[]
   const apiSeats: Seat[] = useMemo(() => {

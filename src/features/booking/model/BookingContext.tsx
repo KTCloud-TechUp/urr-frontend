@@ -53,6 +53,7 @@ export interface BookingContextValue {
   artistId: string | null;
   bookingState: BookingState;
   event: BookingEvent | null;
+  eventDates: EventDate[];
   selectedDateId: string | null;
   isLeftPanelExpanded: boolean;
   isLoading: boolean;
@@ -217,11 +218,12 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   // showId derived from selectedDateId
   const showId = selectedDateId ? Number(selectedDateId) : null;
 
-  // Fetch seats summary for currently selected show
+  // Fetch seats summary for currently selected show — 예매 진행 중일 때만 호출
+  const isBookingActive = bookingState !== "idle";
   const { data: seatsSummary } = useQuery({
     queryKey: ["seats-summary", eventId, showId],
     queryFn: () => getSeatsSummary(eventId, showId!),
-    enabled: showId !== null,
+    enabled: isBookingActive && showId !== null,
   });
 
   // Fetch authoritative booking windows for the selected show
@@ -336,6 +338,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       artistId,
       bookingState,
       event,
+      eventDates,
       selectedDateId,
       isLeftPanelExpanded,
       isLoading,
@@ -368,6 +371,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       eventId,
       artistId,
       bookingState,
+      eventDates,
       selectedDateId,
       isLeftPanelExpanded,
       isLoading,

@@ -29,7 +29,7 @@ function formatTierTime(isoDate: string): string {
 
 function EventBookingSidebarInner({ event }: EventBookingSidebarProps) {
   const router = useRouter();
-  const { bookingState, startBooking, resetBooking } = useBooking();
+  const { bookingState, startBooking, resetBooking, eventDates } = useBooking();
   const [selectedDateId, setSelectedDateId] = useState(event.dates[0]?.id ?? "");
 
   const selectedDate = event.dates.find((d) => d.id === selectedDateId);
@@ -80,30 +80,34 @@ function EventBookingSidebarInner({ event }: EventBookingSidebarProps) {
             공연 날짜 선택
           </h4>
           <div className="space-y-2">
-            {event.dates.map((d) => (
-              <button
-                key={d.id}
-                onClick={() => setSelectedDateId(d.id)}
-                className={cn(
-                  "w-full text-left px-4 py-3 rounded-lg border transition-colors cursor-pointer",
-                  selectedDateId === d.id
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:bg-muted/50",
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{formatSidebarDate(d.date)}</span>
-                  <span
-                    className={cn(
-                      "text-xs",
-                      d.remainingSeats < 1000 ? "text-destructive font-medium" : "text-muted-foreground",
-                    )}
-                  >
-                    잔여 {d.remainingSeats.toLocaleString()}석
-                  </span>
-                </div>
-              </button>
-            ))}
+            {event.dates.map((d) => {
+              const apiDate = eventDates.find((ed) => ed.id === d.id);
+              const remaining = apiDate?.remainingSeats ?? d.remainingSeats;
+              return (
+                <button
+                  key={d.id}
+                  onClick={() => setSelectedDateId(d.id)}
+                  className={cn(
+                    "w-full text-left px-4 py-3 rounded-lg border transition-colors cursor-pointer",
+                    selectedDateId === d.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:bg-muted/50",
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{formatSidebarDate(d.date)}</span>
+                    <span
+                      className={cn(
+                        "text-xs",
+                        remaining < 1000 ? "text-destructive font-medium" : "text-muted-foreground",
+                      )}
+                    >
+                      잔여 {remaining.toLocaleString()}석
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 

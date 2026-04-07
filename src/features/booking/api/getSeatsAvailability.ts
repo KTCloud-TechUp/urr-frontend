@@ -24,9 +24,11 @@ interface SeatsApiResponse {
 export async function getSeatsAvailability(
   eventId: string | number,
   showId: string | number,
+  section?: string,
 ): Promise<SeatAvailability[]> {
+  const query = section ? `?section=${section}` : "";
   const res = await apiRequest<SeatsApiResponse>(
-    `/ticket/events/${eventId}/shows/${showId}/seats`,
+    `/ticket/events/${eventId}/shows/${showId}/seats${query}`,
     { service: "ticketing" },
   );
   return res.data.data;
