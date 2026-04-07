@@ -2,25 +2,12 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-
-const ARTISTS = [
-  { name: "IVE", image: "/artists/artist_ive.png" },
-  { name: "aespa", image: "/artists/artist_aespa.png" },
-  { name: "BTS", image: "/artists/artist_bts.png" },
-  { name: "BLACKPINK", image: "/artists/artist_blackpink.png" },
-  { name: "NewJeans", image: "/artists/artist_newjeans.png" },
-  { name: "SEVENTEEN", image: "/artists/artist_seventeen.png" },
-  { name: "Stray Kids", image: "/artists/artist_stray-kids.png" },
-  { name: "TXT", image: "/artists/artist_txt.png" },
-  { name: "DAY6", image: "/artists/artist_day6.png" },
-  { name: "G-Dragon", image: "/artists/artist_g-dragon.png" },
-  { name: "(G)I-DLE", image: "/artists/artist_gi-dle.png" },
-];
-
-const DOUBLED = [...ARTISTS, ...ARTISTS];
+import { useArtists } from "@/features/artist/model/useArtists";
 
 export function ArtistScrollSection() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const { data: artists = [] } = useArtists();
+  const doubled = [...artists, ...artists];
 
   return (
     <section
@@ -108,7 +95,7 @@ export function ArtistScrollSection() {
             if (trackRef.current) trackRef.current.style.animationPlayState = "running";
           }}
         >
-          {DOUBLED.map((artist, i) => (
+          {doubled.map((artist, i) => (
             <div
               key={i}
               className="relative shrink-0 rounded-2xl overflow-hidden group transition-all duration-300"
@@ -130,7 +117,7 @@ export function ArtistScrollSection() {
               {/* Image container — square, contain */}
               <div className="relative mx-auto" style={{ width: "172px", height: "172px", margin: "16px auto 0" }}>
                 <Image
-                  src={artist.image}
+                  src={artist.avatar}
                   alt={artist.name}
                   fill
                   style={{ objectFit: "contain" }}

@@ -46,7 +46,7 @@ export function AuroraBackground() {
         PointsMaterial,
         Points,
         AdditiveBlending,
-        Clock,
+        Timer,
       }) => {
         const container = mountRef.current;
         if (!container) return;
@@ -93,10 +93,11 @@ export function AuroraBackground() {
         };
         window.addEventListener("mousemove", onMouse);
 
-        const clock = new Clock();
+        const timer = new Timer();
         const tick = () => {
           rafId = requestAnimationFrame(tick);
-          const elapsed = clock.getElapsedTime();
+          timer.update();
+          const elapsed = timer.getElapsed();
 
           mesh.rotation.y = elapsed * 0.02;
           mesh.rotation.x = elapsed * 0.01;

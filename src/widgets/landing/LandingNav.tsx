@@ -30,7 +30,7 @@ export function LandingNav() {
         {/* Logo */}
         <Link href="/landing" className="flex items-center gap-2.5">
           <Image
-            src="/logo_final.svg"
+            src="/icons/logo_final.svg"
             alt="URR"
             width={32}
             height={32}
@@ -85,14 +85,6 @@ export function LandingNav() {
           >
             이용방법
           </a>
-
-          <Link
-            href="/onboarding"
-            className="text-[0.82rem] transition-colors duration-200"
-            style={{ color: "#94a3b8" }}
-          >
-            로그인
-          </Link>
 
           {/* CTA */}
           <Link
