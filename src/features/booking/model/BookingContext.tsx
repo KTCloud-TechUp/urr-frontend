@@ -26,6 +26,7 @@ import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
 import { confirmPayment } from "@/features/payment/api/confirmPayment";
 import { confirmReservation } from "@/features/booking/api/confirmReservation";
 import { getEvents } from "@/features/event/api/getEvents";
+import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { useBookingStore } from "./useBookingStore";
 import type { TierWindow } from "@/shared/types";
 
@@ -91,6 +92,8 @@ interface BookingProviderProps {
 }
 
 export function BookingProvider({ eventId, children }: BookingProviderProps) {
+  const { data: currentUser } = useCurrentUser();
+
   // Zustand store — 모든 클라이언트 상태머신 상태 관리
   const {
     bookingState,
@@ -195,7 +198,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     const confirmationData = JSON.parse(raw) as ConfirmationData;
 
     // 1) Toss 결제 승인
-    confirmPayment({ paymentKey, orderId, amount: Number(amount) })
+    confirmPayment({ paymentKey, orderId, amount: Number(amount), userId: currentUser?.userId ?? "" })
       .then(() => {
         // 2) store에 reservationIds 복원
         if (restoredIds.length > 0) {

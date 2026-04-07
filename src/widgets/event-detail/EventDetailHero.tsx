@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Calendar, Clock, MapPin, Users, Heart, Share2 } from "lucide-react";
 import { BookingStatusBadge } from "@/entities/event";
 import { EventTagBadge } from "@/entities/event";
+import { parseApiDate } from "@/shared/lib/utils";
 import type { EventDetail } from "@/shared/lib/mocks/event-detail";
 
 interface EventDetailHeroProps {
@@ -10,11 +11,12 @@ interface EventDetailHeroProps {
 
 function formatDateRange(dates: { date: string }[]): string {
   if (dates.length === 0) return "";
-  const first = new Date(dates[0].date);
-  const last = new Date(dates[dates.length - 1].date);
+  const first = parseApiDate(dates[0].date);
+  const last = parseApiDate(dates[dates.length - 1].date);
+  if (isNaN(first.getTime())) return "";
   const fmt = (d: Date) =>
     `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
-  return dates.length === 1 ? fmt(first) : `${fmt(first)} ~ ${fmt(last)}`;
+  return dates.length === 1 || isNaN(last.getTime()) ? fmt(first) : `${fmt(first)} ~ ${fmt(last)}`;
 }
 
 export function EventDetailHero({ event }: EventDetailHeroProps) {
@@ -67,7 +69,8 @@ export function EventDetailHero({ event }: EventDetailHeroProps) {
             {/* Date overlay on poster bottom */}
             <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-3 py-2.5 space-y-0.5">
               {event.dates.map((d) => {
-                const date = new Date(d.date);
+                const date = parseApiDate(d.date);
+                if (isNaN(date.getTime())) return null;
                 const weekdays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
                 return (
                   <p key={d.id} className="text-white text-[11px] font-medium">

@@ -45,6 +45,8 @@ interface PaymentDialogProps {
   orderDescription?: string
   /** 제공 시 Toss PG 리다이렉트 플로우 사용. 미제공 시 mock 1.5s 처리 */
   tossConfig?: TossConfig
+  /** 결제 버튼 클릭 시점에 TossConfig를 생성하는 함수 (tossConfig보다 우선) */
+  getTossConfig?: () => Promise<TossConfig>
 }
 
 export function PaymentDialog({
@@ -56,6 +58,7 @@ export function PaymentDialog({
   onCancel,
   orderDescription,
   tossConfig,
+  getTossConfig,
 }: PaymentDialogProps) {
   const [phase, setPhase] = useState<Phase>('form')
   const {
@@ -66,23 +69,25 @@ export function PaymentDialog({
   const handleSubmit = useCallback(async () => {
     setPhase('processing')
 
-    if (tossConfig) {
+    const resolvedConfig = getTossConfig ? await getTossConfig().catch(() => null) : tossConfig ?? null
+
+    if (resolvedConfig) {
       // Toss PG 리다이렉트 플로우
       try {
-        sessionStorage.setItem(tossConfig.storageKey, JSON.stringify(tossConfig.storageData))
+        sessionStorage.setItem(resolvedConfig.storageKey, JSON.stringify(resolvedConfig.storageData))
         const tossPayments = await getTossPayments()
         await tossPayments.requestPayment(TOSS_METHOD_MAP[selectedMethod], {
           amount: totalAmount,
-          orderId: tossConfig.orderId,
-          orderName: tossConfig.orderName,
-          successUrl: tossConfig.successUrl,
-          failUrl: tossConfig.failUrl,
+          orderId: resolvedConfig.orderId,
+          orderName: resolvedConfig.orderName,
+          successUrl: resolvedConfig.successUrl,
+          failUrl: resolvedConfig.failUrl,
           customerName: buyerName,
           customerMobilePhone: buyerPhone.replace(/-/g, ''),
         })
         // 성공 시 리다이렉트 — 이후 코드 실행 안 됨
       } catch {
-        sessionStorage.removeItem(tossConfig.storageKey)
+        sessionStorage.removeItem(resolvedConfig.storageKey)
         setPhase('form')
       }
       return
@@ -92,7 +97,7 @@ export function PaymentDialog({
     setTimeout(async () => {
       await onComplete()
     }, 1500)
-  }, [tossConfig, selectedMethod, totalAmount, buyerName, buyerPhone, onComplete])
+  }, [tossConfig, getTossConfig, selectedMethod, totalAmount, buyerName, buyerPhone, onComplete])
 
   const handleCancel = useCallback(() => {
     resetForm()

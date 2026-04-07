@@ -4,6 +4,7 @@ interface ConfirmPaymentParams {
   paymentKey: string;
   orderId: string;
   amount: number;
+  userId: string | number;
 }
 
 export interface ConfirmPaymentResponse {
@@ -26,12 +27,14 @@ interface ConfirmPaymentApiResponse {
 export async function confirmPayment(
   params: ConfirmPaymentParams,
 ): Promise<ConfirmPaymentResponse> {
+  const { userId, ...body } = params;
   const res = await apiRequest<ConfirmPaymentApiResponse>(
     "/payments/confirm",
     {
       method: "POST",
       service: "payments",
-      body: params,
+      headers: { "X-User-Id": String(userId) },
+      body,
     },
   );
   return res.data.data;

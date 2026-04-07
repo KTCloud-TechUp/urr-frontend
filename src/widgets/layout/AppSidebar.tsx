@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
   Calendar,
@@ -41,7 +41,13 @@ export function AppSidebar() {
     expandArtist,
   } = useLayout();
   const pathname = usePathname();
+  const router = useRouter();
   const [showAllArtists, setShowAllArtists] = useState(false);
+
+  const handleMembershipClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    router.push(pathname === '/membership' ? '/membership?reset=1' : '/membership')
+  }
 
   const collapsed = !isSidebarExpanded;
   const { data: meData } = useCurrentUser();
@@ -104,6 +110,7 @@ export function AppSidebar() {
             <TooltipTrigger asChild>
               <Link
                 href="/membership"
+                onClick={handleMembershipClick}
                 className="h-8.5 w-10 flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 <Crown size={16} />
@@ -115,7 +122,7 @@ export function AppSidebar() {
           </Tooltip>
         ) : (
           <Button asChild size="sm" className="w-full gap-1.5 h-8.5">
-            <Link href="/membership">
+            <Link href="/membership" onClick={handleMembershipClick}>
               <Crown size={14} />
               멤버십 가입
             </Link>
@@ -163,6 +170,7 @@ export function AppSidebar() {
               </p>
               <Link
                 href="/membership"
+                onClick={handleMembershipClick}
                 className="text-[13px] text-primary font-medium hover:underline mt-1 inline-block"
               >
                 멤버십 가입하기
