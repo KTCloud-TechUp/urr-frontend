@@ -62,8 +62,7 @@ export function UnifiedSeatView() {
 
   const showId = selectedDateId ? Number(selectedDateId) : null;
 
-  // API는 section 필드를 tier 단위로 반환 ("A", "S", "R", "VIP")
-  // selectedSectionId는 zone 단위 ("A1", "S3", "VIP1" 등) → tier 코드로 변환 후 필터링
+  // selectedSectionId ("A1", "S3", "VIP1" 등) → tier + zoneNo 분리
   const sectionTierCode = useMemo(() => {
     if (!selectedSectionId) return null;
     if (selectedSectionId.startsWith("VIP")) return "VIP";
@@ -73,29 +72,32 @@ export function UnifiedSeatView() {
     return selectedSectionId;
   }, [selectedSectionId]);
 
+  const sectionZoneNo = useMemo(() => {
+    if (!selectedSectionId) return null;
+    const match = selectedSectionId.match(/(\d+)$/);
+    return match ? Number(match[1]) : null;
+  }, [selectedSectionId]);
+
   // Fetch real seat availability for the selected section
   const { data: seatsData } = useQuery({
-    queryKey: ["seats-availability", eventId, showId, sectionTierCode],
-    queryFn: () => getSeatsAvailability(eventId, showId!, sectionTierCode ?? undefined),
-    enabled: isInSeatMode && showId !== null && sectionTierCode !== null,
+    queryKey: ["seats-availability", eventId, showId, sectionTierCode, sectionZoneNo],
+    queryFn: () => getSeatsAvailability(eventId, showId!, sectionTierCode!, sectionZoneNo!),
+    enabled: isInSeatMode && showId !== null && sectionTierCode !== null && sectionZoneNo !== null,
     staleTime: 30_000,
     refetchOnWindowFocus: false,
   });
 
-  // Filter to selected section and map to Seat[]
+  // API가 tier+zoneNo로 필터링된 좌석 목록을 반환하므로 클라이언트 필터링 불필요
   const apiSeats: Seat[] = useMemo(() => {
     if (!seatsData) return [];
-    const sectionSeats = sectionTierCode
-      ? seatsData.filter((s) => s.section === sectionTierCode || s.section === selectedSectionId)
-      : seatsData;
-    return sectionSeats.map((s) => ({
+    return seatsData.seats.map((s) => ({
       id: s.seatId,
-      sectionId: s.section,
+      sectionId: seatsData.sectionCode,
       row: s.row,
-      number: s.number,
-      status: (s.status === "AVAILABLE" ? "available" : "taken") as SeatStatus,
+      number: String(s.number),
+      status: (s.bookable ? "available" : "taken") as SeatStatus,
     }));
-  }, [seatsData, sectionTierCode, selectedSectionId]);
+  }, [seatsData]);
 
   const layout = useMemo(() => {
     if (apiSeats.length === 0) return { rows: 0, seatsPerRow: 0 };
