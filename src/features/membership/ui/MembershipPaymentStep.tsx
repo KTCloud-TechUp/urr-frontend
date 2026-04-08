@@ -27,7 +27,7 @@ export function MembershipPaymentStep({ artist, onBack, onComplete }: Membership
       successUrl: `${window.location.origin}/membership`,
       failUrl: `${window.location.origin}/membership?paymentFail=1`,
       storageKey: 'urr:toss:membership',
-      storageData: { orderId: res.orderId, paymentId: res.paymentId },
+      storageData: { orderId: res.orderId, paymentId: res.paymentId, artistId: artist.id },
     }
   }, [artist.id, artist.name, currentUser])
 

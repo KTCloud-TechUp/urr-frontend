@@ -221,12 +221,13 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   // showId derived from selectedDateId
   const showId = selectedDateId ? Number(selectedDateId) : null;
 
-  // Fetch seats summary for currently selected show — 예매 진행 중일 때만 호출
-  const isBookingActive = bookingState !== "idle";
+  // seats/summary는 구역 선택 화면에서만 필요 — 이벤트 상세페이지 등 idle 상태에서 호출 방지
+  const needsSeatsSummary =
+    bookingState === "seats-section" || bookingState === "seats-individual";
   const { data: seatsSummary } = useQuery({
     queryKey: ["seats-summary", eventId, showId],
     queryFn: () => getSeatsSummary(eventId, showId!),
-    enabled: isBookingActive && showId !== null,
+    enabled: needsSeatsSummary && showId !== null,
   });
 
   // Fetch authoritative booking windows for the selected show

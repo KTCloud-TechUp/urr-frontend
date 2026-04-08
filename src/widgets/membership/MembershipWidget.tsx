@@ -12,7 +12,7 @@ import {
 } from '@/features/membership'
 import { useArtists } from '@/features/artist'
 import { confirmPayment } from '@/features/payment/api/confirmPayment'
-import { activateMembership } from '@/features/membership/api/activateMembership'
+import { getMemberships } from '@/features/membership/api/getMemberships'
 import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
 import type { Artist, TierLevel } from '@/shared/types'
 
@@ -22,6 +22,7 @@ export function MembershipWidget() {
   const searchParams = useSearchParams()
   const [step, setStep] = useState<Step>('select')
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null)
+  const [membershipId, setMembershipId] = useState<string | null>(null)
   const [profileData, setProfileData] = useState<{ nickname: string; tier: TierLevel } | null>(null)
   const { data: memberships = [] } = useMemberships()
   const { data: artists = [] } = useArtists()
@@ -51,20 +52,31 @@ export function MembershipWidget() {
     const raw = sessionStorage.getItem('urr:toss:membership')
     if (!raw) return
 
+    // artists 데이터가 아직 로드되지 않았으면 대기
+    if (artists.length === 0) return
+
     callbackHandled.current = true
     sessionStorage.removeItem('urr:toss:membership')
     window.history.replaceState({}, '', window.location.pathname)
 
-    const { paymentId } = JSON.parse(raw) as { orderId: string; paymentId: string }
+    const { artistId } = JSON.parse(raw) as { orderId: string; paymentId: string; artistId: string }
+
+    // 리다이렉트 후 state가 초기화되므로 artistId로 selectedArtist 복원
+    const artist = artists.find((a) => a.id === artistId)
+    if (artist) queueMicrotask(() => setSelectedArtist(artist))
 
     confirmPayment({ paymentKey, orderId, amount: Number(amount), userId: currentUser.userId })
-      .then(() => activateMembership(orderId, paymentId))
-      .then(() => setStep('profile'))
+      .then(() => getMemberships(currentUser.userId))
+      .then((fresh) => {
+        const found = fresh.find((m) => m.artistId === artistId)
+        if (found) setMembershipId(found.id)
+        setStep('profile')
+      })
       .catch(() => {
         // 실패 시 payment 단계로 복귀
         setStep('payment')
       })
-  }, [currentUser?.userId])
+  }, [currentUser?.userId, artists])
 
   // reset=1 파라미터가 있으면 select 단계로 초기화 (사이드바에서 재진입 시)
   useEffect(() => {
@@ -134,6 +146,7 @@ export function MembershipWidget() {
       {step === 'profile' && selectedArtist && (
         <MembershipProfileStep
           artist={selectedArtist}
+          membershipId={membershipId}
           onComplete={(data) => {
             setProfileData({ nickname: data.nickname, tier: data.tier })
             setStep('complete')
