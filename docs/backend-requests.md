@@ -8,6 +8,72 @@
 
 ## 대기 중
 
+### ⑥ `POST /auth/logout` — jti 추출 버그로 쿠키 미삭제 (자동로그인 버그) 🔴
+
+- **우선순위**: 🔴 긴급
+- **대상**: `SocialAuthService.java:271`
+
+#### 현상
+
+소셜 로그인 후 로그아웃하고 이메일 회원가입을 완료해도, 새 탭을 열거나 페이지를 새로고침하면 이전 소셜 계정으로 자동로그인됨.
+
+#### 원인 (코드 버그)
+
+`SocialAuthService.java:271`에서 jti 추출 방식이 잘못됨:
+
+```java
+// 현재 (버그) — 커스텀 클레임 조회, 항상 null 반환
+String jti = claims.get("jti", String.class);
+
+// 수정 필요 — JWT 표준 ID 클레임 조회
+String jti = claims.getId();
+```
+
+`JwtProvider.java:73`에서 `.id(jti)`로 JWT 표준 jti 클레임에 저장하므로 `claims.getId()`로만 읽을 수 있음.
+
+#### 결과 흐름
+
+1. `jti == null` → `AUTH_REFRESH_TOKEN_INVALID` 예외 발생
+2. `deleteRefreshTokenCookie()` 미실행 → 브라우저 쿠키 잔존
+3. DB 토큰 revoke 미실행 → 구 소셜 refreshToken이 ACTIVE 상태 유지
+4. 새 탭 → `AuthInitializer`가 `POST /token/reissue` 호출 → 구 소셜 쿠키 전송 → 자동로그인
+
+참고: `reissueTokens`는 `claims.getId()` ✅ 사용 중 — logout만 버그.
+
+#### 요청
+
+`SocialAuthService.java:271` 한 줄 수정:
+```java
+// Before
+String jti = claims.get("jti", String.class);
+// After
+String jti = claims.getId();
+```
+
+---
+
+### ⑤ `/auth/me` — `memberships` 필드 빈 배열로 반환되는 버그
+
+- **우선순위**: 🔴 긴급
+- **대상**: `GET /api/v1/auth/me`
+
+멤버십이 존재하는 유저임에도 `memberships: []`로 반환됨. auth 서비스의 `/me` 핸들러에서 멤버십 데이터를 조회·매핑하지 않는 것으로 보임.
+
+- **요청**: `/me` 응답의 `memberships` 배열에 해당 유저의 활성 멤버십 목록을 정상 반환해주세요.
+- **기대 응답 형식**: (기존 스펙 그대로)
+```json
+"memberships": [
+  {
+    "artistId": 2,
+    "artistName": "빅뱅",
+    "tier": "CLOUD",
+    "endDate": "2027-04-07"
+  }
+]
+```
+
+---
+
 ### ① 좌석 조회 API — `section` 쿼리 파라미터 필터 추가
 
 - **우선순위**: 🔴 긴급
