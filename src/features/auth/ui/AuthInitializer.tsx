@@ -39,6 +39,16 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
       return;
     }
 
+    // is_authenticated 쿠키 없으면 로그아웃 상태 — reissue 시도 불필요
+    // (httpOnly refreshToken 쿠키가 남아있어도 재로그인 방지)
+    const hasAuthCookie = document.cookie
+      .split(";")
+      .some((c) => c.trim().startsWith("is_authenticated="));
+    if (!hasAuthCookie) {
+      setTimeout(() => setReady(true), 0);
+      return;
+    }
+
     // 새로고침 시 httpOnly 쿠키로 세션 복원
     reissueToken().then((token) => {
       if (token) {
