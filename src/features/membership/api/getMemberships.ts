@@ -10,7 +10,6 @@ interface MembershipApiItem {
   tierLevel: number;
   tierProgressPercent: number;
   status: string;
-  orderId: string | null;
   startDate: string | null;
   endDate: string | null;
   active: boolean;
@@ -42,7 +41,6 @@ export async function getMemberships(userId: number): Promise<Membership[]> {
       joinedAt: item.startDate ?? "",
       expiresAt: item.endDate ?? "",
       isActive: item.active,
-      orderId: item.orderId ?? undefined,
       tierProgress: { current: item.tierProgressPercent, required: 100 },
     }),
   );

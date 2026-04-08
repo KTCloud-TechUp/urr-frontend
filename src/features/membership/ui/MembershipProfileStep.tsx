@@ -5,6 +5,8 @@ import { Music, Loader2, CheckCircle2, CircleCheck, CircleAlert } from 'lucide-r
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { TierBadge } from '@/entities/user'
+import { useUpdateNickname } from '@/features/membership/model/useUpdateNickname'
+import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
 import type { Artist, TierLevel } from '@/shared/types'
 
 type MelonState = 'idle' | 'linking' | 'done'
@@ -12,6 +14,7 @@ type NicknameStatus = 'idle' | 'checking' | 'available' | 'duplicate' | 'error'
 
 interface MembershipProfileStepProps {
   artist: Artist
+  membershipId: string | null
   onComplete: (data: { nickname: string; tier: TierLevel; melonLinked: boolean }) => void
 }
 
@@ -35,13 +38,16 @@ const MOCK_MELON_RESULT = {
   tier: 'THUNDER' as TierLevel,
 }
 
-export function MembershipProfileStep({ artist, onComplete }: MembershipProfileStepProps) {
+export function MembershipProfileStep({ artist, membershipId, onComplete }: MembershipProfileStepProps) {
   const [nickname, setNickname] = useState('')
   const [nicknameTouched, setNicknameTouched] = useState(false)
   const [nicknameStatus, setNicknameStatus] = useState<NicknameStatus>('idle')
 
   const [melonId, setMelonId] = useState('')
   const [melonState, setMelonState] = useState<MelonState>('idle')
+
+  const { data: currentUser } = useCurrentUser()
+  const updateNickname = useUpdateNickname()
 
   const nicknameError = validateNickname(nickname)
   const showNicknameError = nicknameError && nicknameTouched
@@ -72,12 +78,18 @@ export function MembershipProfileStep({ artist, onComplete }: MembershipProfileS
   }
 
   const handleSubmit = () => {
-    if (!isNicknameValid) return
-    onComplete({
-      nickname,
-      tier: resultTier,
-      melonLinked: melonState === 'done',
-    })
+    if (!isNicknameValid || !currentUser) return
+
+    const finish = () => onComplete({ nickname, tier: resultTier, melonLinked: melonState === 'done' })
+
+    if (membershipId) {
+      updateNickname.mutate(
+        { membershipId, userId: currentUser.userId, nickname },
+        { onSuccess: finish, onError: finish },
+      )
+    } else {
+      finish()
+    }
   }
 
   return (
@@ -221,9 +233,10 @@ export function MembershipProfileStep({ artist, onComplete }: MembershipProfileS
       <Button
         size="lg"
         className="w-full"
-        disabled={!isNicknameValid}
+        disabled={!isNicknameValid || updateNickname.isPending}
         onClick={handleSubmit}
       >
+        {updateNickname.isPending ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
         가입 완료하기
       </Button>
     </div>
