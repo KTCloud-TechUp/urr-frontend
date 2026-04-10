@@ -4,10 +4,10 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { Skeleton } from "@/shared/ui";
-import { getEvents } from "@/features/event";
+import { getEventDetail } from "@/features/event";
 import { getShows } from "@/features/show";
 import { getPresalePolicy } from "@/features/membership";
-import type { EventSummary } from "@/features/event";
+import type { EventDetailResponse } from "@/features/event";
 import type { ShowSummary } from "@/features/show";
 import type { PresalePolicy } from "@/features/membership";
 import type { TierLevel, TierWindow } from "@/shared/types";
@@ -26,7 +26,7 @@ function mapPresalePolicyToWindows(policy: PresalePolicy | undefined): TierWindo
 }
 
 function mapToEventDetail(
-  event: EventSummary,
+  event: EventDetailResponse,
   shows: ShowSummary[],
   presalePolicies: (PresalePolicy | undefined)[],
 ): EventDetail {
@@ -51,30 +51,36 @@ function mapToEventDetail(
   return {
     id: String(event.eventId),
     artistId: String(event.artistId),
-    artistName: event.artistName ?? "",
+    artistName: event.artistName,
     title: event.title,
-    subtitle: "",
+    subtitle: event.subtitle,
     venue: event.venueTemplateName,
-    venueAddress: "",
+    venueAddress: event.venueAddress,
     dates,
-    poster: event.posterImageUrl ?? "",
+    poster: event.posterImageUrl,
     status: event.active ? "open" : "closed",
-    category: event.category ?? "concert",
-    tags: event.tags ?? [],
-    runtime: "미정",
-    ageRating: "전체 이용가",
-    notices: [],
+    category: event.category,
+    tags: event.tags,
+    runtime: event.runtime,
+    ageRating: event.ageRating,
+    notices: event.notices,
     membershipPreSaleNotice: [],
-    identityVerification: [],
-    castInfo: "",
+    identityVerification: event.identityVerification,
+    castInfo: event.castInfo,
     performanceDescription: event.description,
-    organizer: { host: "", manager: "", contact: "", email: "" },
-    sections: [],
+    organizer: event.organizer,
+    sections: event.sections.map((s, i) => ({
+      id: String(i),
+      name: s.name,
+      price: s.price,
+      totalSeats: s.totalSeats,
+      remainingSeats: s.totalSeats,
+    })),
     bookingFee: "미정",
     shippingFee: "미정",
     validityPeriod: "미정",
-    cancellationPolicy: [],
-    ticketDelivery: [],
+    cancellationPolicy: event.cancellationPolicy,
+    ticketDelivery: event.ticketDelivery,
     mobileTicketInfo: [],
     precautions: [],
     sellerInfo: { name: "URR", bizNumber: "", ceo: "", address: "" },
@@ -104,17 +110,15 @@ interface EventDetailWidgetProps {
 }
 
 export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
-  const { data: allEvents, isLoading: eventsLoading } = useQuery({
-    queryKey: ["events"],
-    queryFn: getEvents,
+  const { data: eventData, isLoading: eventLoading, isError } = useQuery({
+    queryKey: ["event-detail", eventId],
+    queryFn: () => getEventDetail(0, eventId),
   });
-
-  const eventSummary = allEvents?.find((e) => String(e.eventId) === eventId);
 
   const { data: shows = [], isLoading: showsLoading } = useQuery({
     queryKey: ["shows", eventId],
     queryFn: () => getShows(eventId),
-    enabled: !!eventSummary,
+    enabled: !!eventData,
   });
 
   const presalePolicyResults = useQueries({
@@ -125,11 +129,11 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
     })),
   });
 
-  const isLoading = eventsLoading || showsLoading;
+  const isLoading = eventLoading || showsLoading;
 
   if (isLoading) return <EventDetailSkeleton />;
 
-  if (!eventSummary) {
+  if (isError || !eventData) {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <p className="text-lg font-medium">공연을 찾을 수 없습니다</p>
@@ -147,7 +151,7 @@ export function EventDetailWidget({ eventId }: EventDetailWidgetProps) {
   }
 
   const presalePolicies = presalePolicyResults.map((r) => r.data);
-  const event = mapToEventDetail(eventSummary, shows, presalePolicies);
+  const event = mapToEventDetail(eventData, shows, presalePolicies);
 
   return (
     <div className="space-y-6">
