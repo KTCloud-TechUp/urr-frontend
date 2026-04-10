@@ -63,7 +63,7 @@ function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
           router.replace("/onboarding?error=naver");
         });
     }
-  }, [searchParams, router, provider]);
+  }, [searchParams, router, provider, queryClient]);
 
   return <Spinner />;
 }
