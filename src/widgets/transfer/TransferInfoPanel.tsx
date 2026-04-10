@@ -26,7 +26,6 @@ import {
   formatDateFull,
   formatDateWithTime,
 } from "@/shared/lib/format";
-import { getSellerProfile } from "@/shared/lib/mocks/artist-page";
 import type { Event, TransferListing, TierLevel } from "@/shared/types";
 
 type EnrichedTransfer = TransferListing & { event: Event };
@@ -76,7 +75,6 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
   const highlightSection = sectionNameToId(listing.section);
   const sectionDesc = getSectionDescription(listing.section);
   const reliability = getSellerReliability(listing.sellerTier);
-  const seller = getSellerProfile(listing.sellerId);
 
   const firstDate = listing.event.dates[0]?.date ?? "";
   const dateStr = firstDate ? formatDateFull(firstDate) : "";
@@ -184,7 +182,7 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
               <User size={18} className="text-muted-foreground" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold">{seller.name}</p>
+              <p className="text-sm font-semibold">판매자 #{listing.sellerId}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <TierBadge tier={listing.sellerTier} size="sm" />
                 <span
@@ -222,12 +220,7 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
                 <User size={28} className="text-muted-foreground" />
               </div>
               <div>
-                <p className="text-lg font-bold">{seller.name}</p>
-                {seller.bio && (
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    {seller.bio}
-                  </p>
-                )}
+                <p className="text-lg font-bold">판매자 #{listing.sellerId}</p>
               </div>
             </div>
 

@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/shared/ui";
-import { getTransferListingById } from "@/shared/lib/mocks/artist-page";
 import { mockUser } from "@/shared/lib/mocks/user";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
+import { useTransferPostDetail } from "@/features/transfer";
 import { TransferInfoPanel } from "./TransferInfoPanel";
 import { TransferPurchaseSidebar } from "./TransferPurchaseSidebar";
 
@@ -36,11 +36,15 @@ interface TransferDetailWidgetProps {
 export function TransferDetailWidget({ artistId, listingId }: TransferDetailWidgetProps) {
   const router = useRouter();
   const { data: meData } = useCurrentUser();
+  const { data: listing, isLoading, isError } = useTransferPostDetail(listingId, meData?.userId);
 
-  const listing = getTransferListingById(artistId, listingId);
   const membership = mockUser.memberships.find((m) => m.artistId === artistId && m.isActive);
 
-  if (!listing) {
+  if (isLoading) {
+    return <TransferDetailSkeleton />;
+  }
+
+  if (isError || !listing) {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <p className="text-lg font-medium">양도 리스팅을 찾을 수 없습니다</p>
