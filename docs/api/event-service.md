@@ -26,8 +26,8 @@
 | 20  | 공연 상세 조회                      | GET    | `/api/v1/artists/{artistId}/events/{eventId}`                       | `features/event/api/getEventDetail.ts`             | ✅ 연동됨 |                                      |
 | 21  | 전체 공연 목록 조회                 | GET    | `/api/v1/events`                                                    | `features/event/api/getEvents.ts`                  | ✅ 연동됨 |                                      |
 | 22  | 공연장 템플릿 생성                  | POST   | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                 |
-| 23  | 공연장 템플릿 목록 조회             | GET    | `/api/v1/events/venues`                                             | `features/event/api/getVenues.ts` (getVenues)      | ✅ 연동됨 | 스펙 "no use" 명시                   |
-| 24  | 공연장 템플릿 상세 조회             | GET    | `/api/v1/events/venues/{venueTemplateId}`                           | `features/event/api/getVenues.ts` (getVenueDetail) | ✅ 연동됨 | 스펙 "no use" 명시                   |
+| 23  | 공연장 템플릿 목록 조회             | GET    | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거          |
+| 24  | 공연장 템플릿 상세 조회             | GET    | `/api/v1/events/venues/{venueTemplateId}`                           | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거          |
 | 25  | Home 큐레이션 조회                  | GET    | `/api/v1/events/home`                                               | `features/home/api/getHome.ts`                     | ✅ 연동됨 |                                      |
 | 26  | 공연 회차 생성                      | POST   | `/api/v1/shows/{eventId}/shows`                                     | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                 |
 | 27  | 공연 회차 목록 조회                 | GET    | `/api/v1/shows/{eventId}/shows`                                     | `features/show/api/getShows.ts`                    | ✅ 연동됨 |                                      |

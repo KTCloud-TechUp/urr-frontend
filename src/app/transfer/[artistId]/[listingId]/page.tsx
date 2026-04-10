@@ -5,6 +5,10 @@ interface Props {
   params: Promise<{ artistId: string; listingId: string }>;
 }
 
+export async function generateStaticParams() {
+  return [];
+}
+
 export default async function TransferDetailPage({ params }: Props) {
   const { artistId, listingId } = await params;
 
