@@ -94,7 +94,11 @@ export function HomeWidget() {
 
   const trendingEvents = withPoster(dedupById(homeData.trendingEvents));
   const popularEventRanking = withPoster(dedupById(homeData.popularEventRanking));
-  const presaleOpeningSoon = withPoster(dedupById(homeData.presaleOpeningSoon));
+  const presaleOpeningSoon = dedupById(homeData.presaleOpeningSoon).map((e) => ({
+    ...e,
+    posterImageUrl: eventMap.get(e.eventId)?.posterImageUrl ?? null,
+    openDate: e.saleOpenAt,
+  }));
 
   const banners: BannerEvent[] = trendingEvents.slice(0, 4).map((e) => {
     const artist = artists.find((a) => a.id === String(e.artistId));

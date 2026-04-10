@@ -95,7 +95,7 @@ export function useOnboardingAuth({
   };
 
   // Called after TermsStep — does the actual API registration
-  const handleTermsComplete = async () => {
+  const handleTermsComplete = async (marketingConsent: boolean) => {
     const identity = pendingIdentityRef.current;
 
     const raw = identity?.birthDate ?? "";
@@ -154,6 +154,7 @@ export function useOnboardingAuth({
         birthDate,
         phone: identity.phoneNumber,
         gender,
+        marketingConsent,
       });
       tokenStore.setToken(result.tokens.accessToken);
       if (onSuccess) {

@@ -1,3 +1,25 @@
+# Auth Service 연동 현황
+
+> 마지막 확인: 2026-04-10 / 마지막 수정: 2026-04-10
+
+| # | API | 메서드 | 엔드포인트 | 연동 파일 | 상태 | 비고 |
+|---|-----|--------|-----------|----------|------|------|
+| 1 | 카카오 OAuth 로그인 | POST | `/api/v1/auth/oauth/kakao` | `features/auth/api/kakaoLogin.ts` | ✅ 연동됨 | request body에 `rejoinConfirmed` 미포함 — 409 수신 후 /rejoin으로 처리 |
+| 2 | 카카오 OAuth 재가입 확정 | POST | `/api/v1/auth/oauth/kakao/rejoin` | `features/auth/api/kakaoRejoin.ts` | ✅ 연동됨 | |
+| 3 | 내 정보 조회 | GET | `/api/v1/auth/me` | `features/auth/api/me.ts` | ✅ 연동됨 | |
+| 4 | 내 이름 변경 | PATCH | `/api/v1/auth/me/name` | `features/auth/api/updateName.ts` | ✅ 연동됨 | |
+| 5 | 동의 설정 변경 | PATCH | `/api/v1/auth/me/consents` | `features/auth/api/updateConsents.ts` | ✅ 연동됨 | |
+| 6 | 로그아웃 | POST | `/api/v1/auth/logout` | `features/auth/api/logout.ts` | ✅ 연동됨 | |
+| 7 | 토큰 재발급 | POST | `/api/v1/auth/token/reissue` | `features/auth/api/reissue.ts` + `shared/api/interceptor.ts` | ✅ 연동됨 | |
+| 8 | 회원 탈퇴 | DELETE | `/api/v1/auth/me` | `features/auth/api/deleteAccount.ts` | ✅ 연동됨 | |
+| 9 | 일반 회원가입 | POST | `/api/v1/auth/register` | `features/auth/api/register.ts` | ✅ 연동됨 | 응답 HTTP 201이지만 fetchWithAuth가 2xx 전체 허용하므로 무해 |
+| 10 | 일반 로그인 | POST | `/api/v1/auth/login` | `features/auth/api/login.ts` | ✅ 연동됨 | |
+| 11 | 소셜 온보딩 완료 | POST | `/api/v1/auth/onboarding/social` | `features/auth/api/socialOnboarding.ts` | ✅ 연동됨 | |
+| 12 | 이메일 인증번호 발송 | POST | `/api/v1/auth/sms/send` | `features/auth/api/smsSend.ts` | ⚠️ 스펙 불일치 | 스펙: `email` 필드 → 코드: `phoneNumber` 필드 사용 중 |
+| 13 | 이메일 인증번호 검증 | POST | `/api/v1/auth/sms/verify` | `features/auth/api/smsVerify.ts` | ⚠️ 스펙 불일치 | 스펙: `{email, code}` → 코드: `{phoneNumber, code}` 사용 중 |
+
+---
+
 # 1. 카카오 OAuth 로그인
 
 ## API
@@ -11,10 +33,10 @@
 카카오로 시작하기 눌렀을때 호출
 
 1. 처음 회원가입이 안된 사람인경우
-   1. 카카오 인증 → DB에 저장 → 온보딩으로 리다이렉트
+    1. 카카오 인증 → DB에 저장 → 온보딩으로 리다이렉트
 2. 회원인 경우
-   1. 온보딩이 안된경우 → 온보딩 페이지로
-   2. 온보딩이 된 경우 → 로그인 성공
+    1. 온보딩이 안된경우 → 온보딩 페이지로
+    2. 온보딩이 된 경우 → 로그인 성공
 
 ## 인증
 
@@ -43,6 +65,7 @@
 ### 성공 응답 (200)
 
 > **주의:** `Set-Cookie: refresh_token=...; HttpOnly; ...` 헤더가 포함
+> 
 
 ```
 {
@@ -220,6 +243,12 @@ X-User-Id: 12
 
 ## Request
 
+### Header 예시
+
+```
+X-User-Id: 12
+```
+
 ### Body
 
 ```
@@ -262,6 +291,12 @@ X-User-Id: 12
 필요
 
 ## Request
+
+### Header 예시
+
+```
+X-User-Id: 12
+```
 
 ### Body
 
@@ -324,6 +359,9 @@ Cookie: refresh_token=<refresh-token>
 
 ### 성공 응답 (200)
 
+> **주의:** `Set-Cookie` 헤더로 `refresh_token` 쿠키가 삭제 처리됨
+> 
+
 ```
 {
   "isSuccess":true,
@@ -366,6 +404,7 @@ Cookie: refresh_token=<refresh-token>
 ### 성공 응답 (200)
 
 > **주의:** 신규 `refresh_token`이 `Set-Cookie`로 다시 설정
+> 
 
 ```
 {
@@ -412,6 +451,12 @@ Cookie: refresh_token=<refresh-token>
 
 ## Request
 
+### Header 예시
+
+```
+X-User-Id: 12
+```
+
 ### Body
 
 없음
@@ -419,6 +464,9 @@ Cookie: refresh_token=<refresh-token>
 ## Response
 
 ### 성공 응답 (200)
+
+> **주의:** `Set-Cookie` 헤더로 `refresh_token` 쿠키가 삭제 처리됨
+> 
 
 ```
 {
@@ -441,7 +489,7 @@ Cookie: refresh_token=<refresh-token>
 
 이메일/비밀번호 기반 일반 회원가입
 
-회원가입 버튼을 누르고, 번호인증 이후 최종 가입하기 버튼을 눌러서 호출
+회원가입 버튼을 누르고, 이메일 인증 이후 최종 가입하기 버튼을 눌러서 호출
 
 회원가입시 온보딩이 자동으로 true로 설정
 
@@ -460,7 +508,8 @@ Cookie: refresh_token=<refresh-token>
   "name":"신규유저",
   "birthDate":"1998-05-11",
   "phone":"01012345678",
-  "gender":"FEMALE"
+  "gender":"FEMALE",
+  "marketingConsent":false
 }
 ```
 
@@ -472,10 +521,14 @@ Cookie: refresh_token=<refresh-token>
 - `birthDate`: 생년월일
 - `phone`: 휴대폰 번호
 - `gender`: 성별 (`MALE`, `FEMALE`, `OTHER`)
+- `marketingConsent`: 마케팅 수신 동의 여부 (Boolean)
 
 ## Response
 
-### 성공 응답
+### 성공 응답 (201)
+
+> **주의:** HTTP 상태 코드는 201 Created. `Set-Cookie: refresh_token=...; HttpOnly; ...` 헤더가 포함
+> 
 
 ```
 {
@@ -498,7 +551,7 @@ Cookie: refresh_token=<refresh-token>
       "pushConsent":false,
       "smsConsent":false
     },
-    "onboardingRequired":false,
+    "onboardingRequired":true,
     "nextPath":"/home"
   }
 }
@@ -541,6 +594,9 @@ Cookie: refresh_token=<refresh-token>
 ## Response
 
 ### 성공 응답 (200)
+
+> **주의:** `Set-Cookie: refresh_token=...; HttpOnly; ...` 헤더가 포함
+> 
 
 ```
 {
@@ -587,6 +643,12 @@ Cookie: refresh_token=<refresh-token>
 
 ## Request
 
+### Header 예시
+
+```
+X-User-Id: 12
+```
+
 ### Body
 
 ```
@@ -603,7 +665,7 @@ Cookie: refresh_token=<refresh-token>
 - `nickname`: 닉네임
 - `birthDate`: 생년월일
 - `phone`: 휴대폰 번호
-- `gender`: 성별
+- `gender`: 성별 (`MALE`, `FEMALE`, `OTHER`)
 
 ## Response
 
@@ -620,7 +682,7 @@ Cookie: refresh_token=<refresh-token>
 
 ---
 
-# 12. SMS 인증번호 발송
+# 12. 이메일 인증번호 발송
 
 ## API
 
@@ -628,7 +690,10 @@ Cookie: refresh_token=<refresh-token>
 
 ## 설명
 
-~~입력한 휴대폰 번호로 인증번호 발송~~ → 입력된 이메일로 인증번호 전송
+입력된 이메일 주소로 인증번호 전송
+
+> **참고:** URL 경로는 `/sms/send`이지만 실제로는 이메일 기반 인증번호 발송임
+> 
 
 인증번호 전송을 누를 시 호출
 
@@ -641,12 +706,6 @@ Cookie: refresh_token=<refresh-token>
 ### Body
 
 ```
-~~{
-  "phoneNumber":"01012345678"
-}~~
-```
-
-```
 {
   "email":"user5@test.com"
 }
@@ -654,7 +713,7 @@ Cookie: refresh_token=<refresh-token>
 
 ### 필드 설명
 
-- `phoneNumber`: 인증번호를 받을 휴대폰 번호
+- `email`: 인증번호를 받을 이메일 주소
 
 ## Response
 
@@ -669,7 +728,7 @@ Cookie: refresh_token=<refresh-token>
 }
 ```
 
-### 실패 예시 (번호 형식 오류)
+### 실패 예시 (형식 오류)
 
 ```
 {
@@ -682,7 +741,7 @@ Cookie: refresh_token=<refresh-token>
 
 ---
 
-# 13. SMS 인증번호 검증
+# 13. 이메일 인증번호 검증
 
 ## API
 
@@ -690,9 +749,12 @@ Cookie: refresh_token=<refresh-token>
 
 ## 설명
 
-발송된 SMS 인증번호 검증
+발송된 이메일 인증번호 검증
 
-전송된 인증번호를 입력하고 확인버튼을 누르면 호
+> **참고:** URL 경로는 `/sms/verify`이지만 실제로는 이메일 기반 인증번호 검증임
+> 
+
+전송된 인증번호를 입력하고 확인버튼을 누르면 호출
 
 ## 인증
 
@@ -703,13 +765,6 @@ Cookie: refresh_token=<refresh-token>
 ### Body
 
 ```
-~~{
-  "phoneNumber":"01012345678",
-  "code":"492817"
-}~~
-```
-
-```
 {
   "email":"user5@test.com",
   "code":"492817"
@@ -718,6 +773,7 @@ Cookie: refresh_token=<refresh-token>
 
 ### 필드 설명
 
+- `email`: 인증번호를 받은 이메일 주소
 - `code`: 입력한 인증번호
 
 ## Response

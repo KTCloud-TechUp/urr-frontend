@@ -17,7 +17,7 @@ import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 import { bookTicket } from "@/features/booking/api/bookTicket";
 import { createPaymentRecord } from "@/features/payment/api/createPaymentRecord";
 import { getTossPayments, TOSS_METHOD_MAP } from "@/features/payment/lib/toss";
-import { useBookingStore } from "@/features/booking/model/useBookingStore";
+import { useBookingStore, type ReservationRef } from "@/features/booking/model/useBookingStore";
 import type { ConfirmationData } from "@/shared/types";
 import { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
 
@@ -110,8 +110,7 @@ export function PaymentView() {
         ),
       );
 
-      const reservationIdList = reservations.map((r) => r.reservationId);
-      const primaryReservationId = reservationIdList[0];
+      const primaryReservationId = reservations[0].reservationId;
 
       // 결제 레코드 생성 (Toss orderId 등록)
       const orderId = `ORD-${Date.now()}`;
@@ -121,10 +120,15 @@ export function PaymentView() {
         amount: total,
       });
 
-      // reservationIds를 store와 sessionStorage에 저장
+      // reservationRefs를 store와 sessionStorage에 저장
       // — Toss 리다이렉트 후 JS 메모리 초기화되므로 sessionStorage 백업 필수
-      setReservations(reservationIdList, orderId);
-      sessionStorage.setItem("urr:toss:reservations", JSON.stringify(reservationIdList));
+      const reservationRefList: ReservationRef[] = selectedSeatIds.map((seatId) => ({
+        eventId: Number(eventId),
+        showId: Number(selectedDate.id),
+        seatId,
+      }));
+      setReservations(reservationRefList, orderId);
+      sessionStorage.setItem("urr:toss:reservations", JSON.stringify(reservationRefList));
 
       // Toss 리다이렉트 복귀 후 ConfirmationData 복원에 사용
       const confirmationData: ConfirmationData = {

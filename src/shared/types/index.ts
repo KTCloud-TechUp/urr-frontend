@@ -75,6 +75,7 @@ export interface Seat {
 export interface Ticket {
   id: string;
   eventId: string;
+  showId?: string;
   section: string;
   row: string;
   seatNumber: string;

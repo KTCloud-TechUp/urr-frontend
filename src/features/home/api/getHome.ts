@@ -30,11 +30,21 @@ export interface HomeTrendingEvent {
   endDate: string | null;
 }
 
+export interface HomePresaleEvent {
+  showId: number;
+  eventId: number;
+  eventTitle: string;
+  artistId: number;
+  artistName: string;
+  saleOpenAt: string;
+  venueAddress: string | null;
+}
+
 export interface HomeData {
   popularEventRanking: HomeRankingEvent[];
   popularArtists: HomePopularArtist[];
   trendingEvents: HomeTrendingEvent[];
-  presaleOpeningSoon: HomeTrendingEvent[];
+  presaleOpeningSoon: HomePresaleEvent[];
   newArtists: HomePopularArtist[];
 }
 

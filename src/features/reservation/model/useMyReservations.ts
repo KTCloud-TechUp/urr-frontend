@@ -65,6 +65,7 @@ export function useMyReservations(userId?: string | number) {
     const ticket: Ticket & { event: Event } = {
       id: r.reservationId,
       eventId: String(r.eventId),
+      showId: String(r.showId),
       section,
       row,
       seatNumber,

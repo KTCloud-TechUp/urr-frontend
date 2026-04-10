@@ -43,7 +43,7 @@ export function TransferListingModal({ ticket, userTier, userId, open, onClose, 
 
   const createMutation = useMutation({
     mutationFn: () =>
-      createTransferPost(userId!, ticket!.event.artistId, ticket!.eventId, ticket!.id),
+      createTransferPost(userId!, ticket!.event.artistId, ticket!.eventId, ticket!.showId ?? ticket!.event.dates[0]?.id ?? "0", ticket!.id),
     onSuccess: () => {
       onListed(ticket!.id, price)
       setStep('success')

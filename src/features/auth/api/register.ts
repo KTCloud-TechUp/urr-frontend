@@ -8,6 +8,7 @@ export interface RegisterParams {
   birthDate: string; // "YYYY-MM-DD"
   phone: string;
   gender: "MALE" | "FEMALE";
+  marketingConsent: boolean;
 }
 
 export async function register(

@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import type { BookingState, ConfirmationData } from "@/shared/types";
 
+export interface ReservationRef {
+  eventId: number;
+  showId: number;
+  seatId: string;
+}
+
 interface BookingStore {
   // 상태
   bookingState: BookingState;
@@ -12,9 +18,9 @@ interface BookingStore {
   confirmationData: ConfirmationData | null;
   seatTimerSecondsLeft: number | null;
   queueToken: string | null;
-  /** bookTicket() 응답으로 받은 reservationId 배열 — confirmReservation() 호출에 사용 */
-  reservationIds: string[];
-  /** Toss 결제 orderId — 결제 레코드와 reservationIds 연결 */
+  /** bookTicket() 응답으로 받은 예약 참조 배열 — confirmReservation() 호출에 사용 */
+  reservationRefs: ReservationRef[];
+  /** Toss 결제 orderId — 결제 레코드와 reservationRefs 연결 */
   orderId: string | null;
 
   // 액션
@@ -31,8 +37,8 @@ interface BookingStore {
   setConfirmationData: (data: ConfirmationData) => void;
   setSeatTimerSecondsLeft: (seconds: number | null) => void;
   setQueueToken: (token: string | null) => void;
-  /** bookTicket() 완료 후 reservationId 배열과 orderId를 store에 저장 */
-  setReservations: (ids: string[], orderId: string) => void;
+  /** bookTicket() 완료 후 예약 참조 배열과 orderId를 store에 저장 */
+  setReservations: (refs: ReservationRef[], orderId: string) => void;
 }
 
 export const useBookingStore = create<BookingStore>((set) => ({
@@ -45,7 +51,7 @@ export const useBookingStore = create<BookingStore>((set) => ({
   confirmationData: null,
   seatTimerSecondsLeft: null,
   queueToken: null,
-  reservationIds: [],
+  reservationRefs: [],
   orderId: null,
 
   setEventLoaded: (dateId) => set({ selectedDateId: dateId, isLoading: false }),
@@ -85,7 +91,7 @@ export const useBookingStore = create<BookingStore>((set) => ({
       selectedSeatIds: [],
       confirmationData: null,
       seatTimerSecondsLeft: null,
-      reservationIds: [],
+      reservationRefs: [],
       orderId: null,
     }),
 
@@ -95,5 +101,5 @@ export const useBookingStore = create<BookingStore>((set) => ({
 
   setQueueToken: (token) => set({ queueToken: token }),
 
-  setReservations: (ids, orderId) => set({ reservationIds: ids, orderId }),
+  setReservations: (refs, orderId) => set({ reservationRefs: refs, orderId }),
 }));

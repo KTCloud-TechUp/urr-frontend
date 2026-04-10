@@ -27,7 +27,7 @@ import { confirmPayment } from "@/features/payment/api/confirmPayment";
 import { confirmReservation } from "@/features/booking/api/confirmReservation";
 import { getEvents } from "@/features/event/api/getEvents";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
-import { useBookingStore } from "./useBookingStore";
+import { useBookingStore, type ReservationRef } from "./useBookingStore";
 import type { TierWindow } from "@/shared/types";
 
 // Static tier price map (pricing API not yet available)
@@ -187,9 +187,9 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     const raw = sessionStorage.getItem("urr:toss:booking");
     if (!raw) return;
 
-    // Toss 리다이렉트 후 메모리 초기화 → sessionStorage에서 reservationIds 복원
+    // Toss 리다이렉트 후 메모리 초기화 → sessionStorage에서 reservationRefs 복원
     const rawReservations = sessionStorage.getItem("urr:toss:reservations");
-    const restoredIds: string[] = rawReservations ? (JSON.parse(rawReservations) as string[]) : [];
+    const restoredRefs: ReservationRef[] = rawReservations ? (JSON.parse(rawReservations) as ReservationRef[]) : [];
 
     sessionStorage.removeItem("urr:toss:booking");
     sessionStorage.removeItem("urr:toss:reservations");
@@ -200,12 +200,12 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     // 1) Toss 결제 승인
     confirmPayment({ paymentKey, orderId, amount: Number(amount), userId: currentUser?.userId ?? "" })
       .then(() => {
-        // 2) store에 reservationIds 복원
-        if (restoredIds.length > 0) {
-          setReservations(restoredIds, orderId);
+        // 2) store에 reservationRefs 복원
+        if (restoredRefs.length > 0) {
+          setReservations(restoredRefs, orderId);
         }
-        // 3) 각 예약 확정 (POST /api/v1/ticket/reservations/{id}/confirm)
-        return Promise.allSettled(restoredIds.map((id) => confirmReservation(id)));
+        // 3) 각 예약 확정 (POST /api/v1/ticket/reservations/confirm)
+        return Promise.allSettled(restoredRefs.map((ref) => confirmReservation(ref)));
       })
       .then(() => {
         setConfirmationData(confirmationData);

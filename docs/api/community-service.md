@@ -1,4 +1,87 @@
-# community api 명세
+# Community (양도) Service 연동 현황
+
+> 마지막 확인: 2026-04-10
+
+| # | API | 메서드 | 엔드포인트 | 연동 파일 | 상태 | 비고 |
+|---|-----|--------|-----------|----------|------|------|
+| 0-1 | Community Health Check | GET | `/api/v1/community` | — | ➖ 불필요 | |
+| 0-2 | Ops Health Check | GET | `/health` | — | ➖ 불필요 | |
+| 1-1 | 양도 게시글 등록 | POST | `/api/v1/transfers/posts` | `features/transfer/api/getTransferPosts.ts` (createTransferPost) | ✅ 연동됨 | |
+| 1-2 | 양도 게시글 상세 조회 | GET | `/api/v1/transfers/posts/{id}` | — | ❌ 미연동 | |
+| 1-3 | 양도 게시글 목록 조회 | GET | `/api/v1/transfers/posts` | `features/transfer/api/getTransferPosts.ts` (getTransferPosts) | ✅ 연동됨 | |
+| 1-4 | 양도 게시글 삭제 | DELETE | `/api/v1/transfers/posts/{id}` | `features/transfer/api/getTransferPosts.ts` (deleteTransferPost) | ✅ 연동됨 | |
+| 1-5 | 양도 게시글 예매(결제요청) | POST | `/api/v1/transfers/posts/{id}/reserve` | `features/transfer/api/getTransferPosts.ts` (reserveTransferPost) | ✅ 연동됨 | |
+| 1-6 | 양도 게시글 예매 확정(결제 확정) | POST | `/api/v1/transfers/posts/confirm` | `features/transfer/api/getTransferPosts.ts` (confirmTransferPost) | ✅ 연동됨 | |
+| 1-7 | 양도 게시글 수정 | PATCH | `/api/v1/transfers/posts/{id}` | `features/transfer/api/getTransferPosts.ts` (updateTransferPost) | ✅ 연동됨 | |
+| 1-8 | 나의 판매 내역 조회 | GET | `/api/v1/transfers/me/sales` | `features/transfer/api/getMyTransfers.ts` (getMySales) | ✅ 연동됨 | |
+| 1-9 | 나의 구매 내역 조회 | GET | `/api/v1/transfers/me/purchases` | `features/transfer/api/getMyTransfers.ts` (getMyPurchases) | ✅ 연동됨 | |
+
+---
+
+## **0-1. Community Service Health Check**
+
+### **API**
+
+```
+GET /api/v1/community
+```
+
+### **설명**
+
+커뮤니티 서비스의 상태를 확인하는 헬스체크 API입니다.
+
+### **요청 헤더**
+
+없음
+
+### **요청 예시**
+
+```
+GET /api/v1/community
+```
+
+### **응답 예시**
+
+```json
+{
+  "response": "success"
+}
+```
+
+---
+
+## **0-2. Ops Health Check**
+
+### **API**
+
+```
+GET /health
+```
+
+### **설명**
+
+운영용 서비스 상태 확인 API입니다.
+
+### **요청 헤더**
+
+없음
+
+### **요청 예시**
+
+```
+GET /health
+```
+
+### **응답 예시**
+
+```json
+{
+  "service": "community-service",
+  "status": "ok"
+}
+```
+
+---
 
 ## **1-1. 양도 게시글 등록**
 
@@ -164,10 +247,12 @@ GET /api/v1/transfers/posts?artistId=10&showId=20&page=0&size=10
         "createdAt": "2026-03-26T20:00:00"
       }
     ],
-    "pageNumber": 0,
-    "pageSize": 10,
+    "page": 1,
+    "size": 10,
     "totalElements": 1,
-    "totalPages": 1
+    "totalPages": 1,
+    "hasNext": false,
+    "hasPrevious": false
   }
 }
 ```
@@ -237,8 +322,6 @@ POST /api/v1/transfers/posts/1/reserve?artistId=10
 
 ### **응답 예시**
 
-_(수정됨: 결제 금액 필드명 `amount` -> `sellingPrice`로 변경됨)_
-
 ```json
 {
   "isSuccess": true,
@@ -273,7 +356,7 @@ POST /api/v1/transfers/posts/confirm
 
 ### **요청 예시 (Body)**
 
-_(수정됨: 주문번호가 반드시 `trf_` 로 시작해야 함, validation 준수)_
+*(주문번호는 반드시 `trf_` 로 시작해야 하며, 영문/숫자만 허용됩니다.)*
 
 ```json
 {

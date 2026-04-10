@@ -24,10 +24,12 @@ interface TransferPostsApiResponse {
   message: string;
   data: {
     content: TransferPostItem[];
-    pageNumber: number;
-    pageSize: number;
+    page: number;
+    size: number;
     totalElements: number;
     totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
   };
 }
 
@@ -80,7 +82,7 @@ export interface ReserveResult {
   postId: number;
   orderId: string;
   paymentId: number;
-  amount: number;
+  sellingPrice: number;
 }
 
 export async function reserveTransferPost(
@@ -115,14 +117,15 @@ export async function confirmTransferPost(
 export async function createTransferPost(
   userId: number | string,
   artistId: number | string,
+  eventId: number | string,
   showId: number | string,
-  seatId: number | string,
+  reservationId: string,
 ): Promise<void> {
   await apiRequest("/transfers/posts", {
     method: "POST",
     service: "community",
     headers: { "X-User-Id": String(userId) },
-    body: { artistId: Number(artistId), showId: Number(showId), seatId: Number(seatId) },
+    body: { artistId: Number(artistId), eventId: Number(eventId), showId: Number(showId), reservationId },
   });
 }
 

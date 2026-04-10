@@ -6,7 +6,7 @@ import { Button, Checkbox } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 
 interface TermsStepProps {
-  onComplete: () => void;
+  onComplete: (marketingConsent: boolean) => void;
   onBack: () => void;
   isMinor?: boolean;
 }
@@ -191,7 +191,7 @@ export function TermsStep({
         size="lg"
         className="w-full mt-10"
         disabled={!canSubmit}
-        onClick={onComplete}
+        onClick={() => onComplete(!!checked.marketing)}
       >
         동의하고 가입하기
       </Button>
