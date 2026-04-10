@@ -12,7 +12,7 @@
 | 연동 API | 45개 엔드포인트 |
 | 개발 페이지 | 10개 라우트 |
 | 머지 PR | 49회 |
-| 트러블슈팅 문서화 | 7건 |
+| 트러블슈팅 문서화 | 6건 |
 
 ---
 
@@ -634,6 +634,127 @@ const handleNext = useCallback(() => {
 > **교훈**: React Compiler를 사용하는 환경에서는 `useMemo` / `useCallback`을 수동으로 작성하지 않습니다. Compiler가 관리하는 메모이제이션과 수동 메모이제이션이 공존하면 예측하기 어려운 버그가 생깁니다.
 
 > 📝 **심화 글**: <!-- [Next.js 16 React Compiler와 수동 메모이제이션의 충돌](https://blog.example.com) -->
+
+---
+
+### 5. 로그인 전환 시 이전 사용자 정보 잔존
+
+**현상**
+
+소셜 로그인 후 로그아웃 → 일반 로그인 전환 시, 새로고침하기 전까지 이전 소셜 계정의 이름·정보가 그대로 표시됐습니다.
+
+**원인 분석**
+
+로그아웃 시 `tokenStore.clearToken()`으로 Access Token과 sessionStorage는 정상 삭제됐지만, **TanStack Query 캐시가 초기화되지 않았습니다.** 새 토큰으로 요청을 보내기 전에 캐시된 `/auth/me` 응답이 이전 사용자 데이터를 반환했고, 쿼리 staleTime(5분)이 남아 있어 재요청도 발생하지 않았습니다.
+
+```
+로그아웃
+  └─ clearToken() → accessToken = null, sessionStorage 삭제 ✅
+  └─ queryClient.clear() 누락 ❌
+
+새 계정으로 로그인
+  └─ setToken(newToken) ✅
+  └─ useCurrentUser() → 캐시 히트 → 이전 사용자 데이터 반환 ❌
+```
+
+**해결**
+
+토큰이 교체되는 세 지점 모두에 `queryClient.clear()`를 추가했습니다.
+
+| 위치 | 시점 |
+| ---- | ---- |
+| `SettingsTab.tsx` | 로그아웃 확인 후 |
+| `AccountDeleteDialog.tsx` | 탈퇴 완료 후 |
+| `SocialCallbackWidget.tsx` | 새 소셜 토큰 세팅 직전 (`clearToken()` + `queryClient.clear()`) |
+
+```ts
+// 소셜 콜백에서 이전 세션 완전 초기화 후 교체
+tokenStore.clearToken();
+queryClient.clear();
+tokenStore.setToken(result.tokens.accessToken);
+```
+
+> **교훈**: 토큰 교체 시 `clearToken()`만으로는 부족합니다. TanStack Query 캐시는 토큰과 독립적으로 살아있으므로, 사용자가 바뀌는 모든 지점에서 반드시 `queryClient.clear()`를 함께 호출해야 합니다.
+
+---
+
+### 6. 소셜 로그인 온보딩 미완료 이탈 → `/auth/me` CORS 오류 + 무한 리다이렉트 루프
+
+**현상**
+
+소셜 로그인 후 본인인증 단계에서 브라우저 뒤로가기로 이탈하면, 이후 어느 페이지로 이동해도 `/auth/me` CORS 오류가 발생하며 앱을 사용할 수 없었습니다.
+
+**원인 분석**
+
+브라우저 히스토리와 클라이언트 상태가 맞물려 루프가 형성됐습니다.
+
+```
+[히스토리 스택]
+/landing → /onboarding → /auth/callback/kakao → /onboarding?step=identity
+                                                 ↑ 현재 위치
+
+뒤로가기 1회 → /onboarding
+  OnboardingWidget: 토큰 감지 → router.replace("/")
+
+뒤로가기 2회 → /landing (replace 직전 엔트리)
+  홈 페이지: useCurrentUser() → fetchMe() → CORS 오류
+  → !user 판정 → router.replace("/landing")
+  → 다음 이동 시도 → 토큰 여전히 존재 → 홈 → CORS → 랜딩 → 무한 반복
+```
+
+두 가지 문제가 결합됐습니다.
+
+1. **온보딩 가드 부재**: `onboardingCompleted: false` 사용자가 보호 경로에 그대로 진입
+2. **오류 시 토큰 미초기화**: `fetchMe()` 실패 후에도 토큰이 남아 있어 이후 진입마다 동일 오류 반복
+
+**해결**
+
+두 문제를 각각 수정했습니다.
+
+**(1) `OnboardingGuard` 추가** — 모든 보호 경로에 온보딩 상태 가드 적용
+
+```ts
+// src/widgets/layout/LayoutShell.tsx
+function OnboardingGuard({ children }) {
+  const { data: user, isLoading, isError } = useCurrentUser();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (user && !user.onboardingCompleted) {
+      router.replace("/onboarding?step=identity");  // 온보딩 재진입
+    }
+    if (isError) {
+      tokenStore.clearToken();   // 잔존 토큰 제거
+      queryClient.clear();
+      router.replace("/landing"); // 루프 차단
+    }
+  }, [user, isLoading, isError]);
+}
+```
+
+**(2) `OnboardingWidget` 토큰 체크 개선** — 기존 토큰 존재 시 `fetchMe()`로 상태 검증 후 분기
+
+```ts
+if (tokenStore.getToken()) {
+  fetchMe()
+    .then((user) => {
+      router.replace(user.onboardingCompleted ? "/" : "/onboarding?step=identity");
+    })
+    .catch(() => {
+      tokenStore.clearToken(); // fetchMe 실패 시 토큰 초기화 → 재로그인 유도
+      setAuthChecked(true);
+    });
+  return;
+}
+```
+
+| 시나리오 | 수정 전 | 수정 후 |
+| -------- | ------- | ------- |
+| 온보딩 미완료 상태로 보호 경로 진입 | CORS 오류 + 무한 루프 | `/onboarding?step=identity`로 리다이렉트 |
+| `fetchMe()` 실패 (CORS 포함) | 토큰 잔존 → 루프 | 토큰 초기화 → `/landing`에서 재로그인 가능 |
+| 정상 로그인 사용자 | 영향 없음 | 영향 없음 |
+
+> **교훈**: 소셜 OAuth 콜백은 항상 **onboardingRequired** 플래그를 확인하고, 미완료 사용자가 보호 경로에 진입하지 못하도록 클라이언트 레벨 가드가 반드시 필요합니다. 또한 인증 관련 오류(CORS 포함)는 토큰 초기화로 마무리해야 오류 상태가 다음 세션으로 전파되지 않습니다.
 
 ---
 
