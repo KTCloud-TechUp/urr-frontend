@@ -124,7 +124,11 @@ export function useOnboardingAuth({
       return;
     }
 
-    if (isSocial) {
+    const pending = pendingRegisterRef.current;
+
+    // 이메일/비밀번호로 가입 시작한 경우 isSocial 플래그보다 우선
+    // (소셜 로그인 후 뒤로 가서 이메일 폼으로 전환한 케이스 대응)
+    if (!pending && isSocial) {
       try {
         await socialOnboarding({
           nickname: identity?.userName ?? "",
@@ -143,7 +147,6 @@ export function useOnboardingAuth({
       return;
     }
 
-    const pending = pendingRegisterRef.current;
     if (!pending || !identity) return;
 
     try {

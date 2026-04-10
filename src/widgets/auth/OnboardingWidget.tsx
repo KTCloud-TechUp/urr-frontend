@@ -15,6 +15,8 @@ import {
 } from "@/features/auth/onboarding";
 import { tokenStore } from "@/shared/api/tokenStore";
 import { reissueToken } from "@/features/auth/api/reissue";
+import { fetchMe } from "@/features/auth/api/me";
+import { logout } from "@/features/auth/api/logout";
 
 type FlowState =
   | "auth"
@@ -53,7 +55,19 @@ function OnboardingWidgetInner() {
     if (initialStep !== "auth") return;
 
     if (tokenStore.getToken()) {
-      router.replace("/");
+      fetchMe()
+        .then((user) => {
+          if (user.onboardingCompleted) {
+            router.replace("/");
+          } else {
+            router.replace("/onboarding?step=identity");
+          }
+        })
+        .catch(() => {
+          // fetchMe 실패 (CORS 포함) — 잔존 토큰 초기화 후 재로그인 유도
+          tokenStore.clearToken();
+          setAuthChecked(true);
+        });
       return;
     }
 
@@ -141,7 +155,14 @@ function OnboardingWidgetInner() {
                 setIsMinor(true);
                 setFlowState("guardian-identity");
               }}
-              onBack={() => setFlowState("auth")}
+              onBack={() => {
+                // 소셜 온보딩 도중 뒤로 가기 → 소셜 세션 클리어
+                if (isSocial) {
+                  tokenStore.clearToken();
+                  logout().catch(() => {}); // httpOnly refreshToken 클리어, fire-and-forget
+                }
+                setFlowState("auth");
+              }}
             />
           )}
           {flowState === "identity" && (
