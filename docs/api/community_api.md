@@ -1,21 +1,5 @@
 # community api 명세
 
-## 프론트 연동 현황
-
-| 메서드 | 엔드포인트 | 연동 상태 |
-| ------ | ---------- | --------- |
-| POST | `/api/v1/transfers/posts` | ✅ 완료 (`TransferListingModal`) |
-| GET | `/api/v1/transfers/posts/{id}` | ✅ 완료 (`TransferDetailPage`) |
-| GET | `/api/v1/transfers/posts` | ✅ 완료 (아티스트 양도 탭) |
-| DELETE | `/api/v1/transfers/posts/{id}` | ✅ 완료 (`TransferHistoryTab`) |
-| POST | `/api/v1/transfers/posts/{id}/reserve` | ✅ 완료 (`TransferPurchaseSidebar`) |
-| POST | `/api/v1/transfers/posts/confirm` | ✅ 완료 (`PaymentDialog.onComplete` 후) |
-| PATCH | `/api/v1/transfers/posts/{id}` | ✅ 완료 (`TransferHistoryTab`) |
-| GET | `/api/v1/transfers/me/sales` | ✅ 완료 (`MyPageWidget`) |
-| GET | `/api/v1/transfers/me/purchases` | ✅ 완료 (`MyPageWidget`) |
-
----
-
 ## **1-1. 양도 게시글 등록**
 
 ### **API**
@@ -26,19 +10,20 @@ POST /api/v1/transfers/posts
 
 ### **설명**
 
-사용자가 보유한 좌석에 대한 양도 게시글을 등록합니다.
+사용자가 보유한 예매 내역(reservationId) 기반으로 양도 게시글을 등록합니다.
 
 ### **요청 헤더**
 
 - `X-User-Id`: (Long) 현재 로그인한 사용자 ID
 
-### **요청 예시**
+### **요청 예시 (Body)**
 
 ```json
 {
   "artistId": 10,
+  "eventId": 15,
   "showId": 20,
-  "seatId": 30
+  "reservationId": "res-abc123"
 }
 ```
 
@@ -135,7 +120,7 @@ GET /api/v1/transfers/posts
 
 ### **설명**
 
-아티스트별 판매 중인 양도 게시글 목록을 조회합니다. `showId`를 포함하면 특정 공연의 게시글만 조회할 수 있으며 페이징 기능을 지원합니다.
+아티스트별 판매 중인 양도 게시글 목록을 조회합니다. `showId`를 포함하면 특정 공연의 게시글만 조회할 수 있으며 페이징 기능을 지원합니다.
 
 ### **요청 헤더**
 
@@ -143,11 +128,11 @@ GET /api/v1/transfers/posts
 
 ### **요청 파라미터(Query)**
 
-- `artistId` (필수): 아티스트 ID
-- `showId` (선택): 특정 공연 ID
-- `page` (선택, 기본: 0): 페이지 번호
-- `size` (선택, 기본: 10): 페이지 크기
-- `sort` (선택, 기본: createdAt,desc): 정렬 조건
+- `artistId` (필수): 아티스트 ID
+- `showId` (선택): 특정 공연 ID
+- `page` (선택, 기본: 0): 페이지 번호
+- `size` (선택, 기본: 10): 페이지 크기
+- `sort` (선택, 기본: createdAt,desc): 정렬 조건
 
 ### **요청 예시**
 
@@ -224,7 +209,7 @@ DELETE /api/v1/transfers/posts/1
 
 ---
 
-## **1-5. 양도 게시글 예매(결제요청) - 04.02 업데이트**
+## **1-5. 양도 게시글 예매(결제요청)**
 
 ### **API**
 
@@ -242,7 +227,7 @@ POST /api/v1/transfers/posts/{id}/reserve
 
 ### **요청 파라미터(Query)**
 
-- `artistId` (필수): 아티스트 ID
+- `artistId` (필수): 아티스트 ID
 
 ### **요청 예시**
 
@@ -252,6 +237,8 @@ POST /api/v1/transfers/posts/1/reserve?artistId=10
 
 ### **응답 예시**
 
+_(수정됨: 결제 금액 필드명 `amount` -> `sellingPrice`로 변경됨)_
+
 ```json
 {
   "isSuccess": true,
@@ -259,9 +246,9 @@ POST /api/v1/transfers/posts/1/reserve?artistId=10
   "message": "OK",
   "data": {
     "postId": 1,
-    "orderId": "ord_882910ab301",
+    "orderId": "trf_882910ab301",
     "paymentId": 9901,
-    "amount": 145000
+    "sellingPrice": 145000
   }
 }
 ```
@@ -284,33 +271,35 @@ POST /api/v1/transfers/posts/confirm
 
 - `X-User-Id`: (Long) 현재 로그인한 구매자 ID
 
-### **요청 예시**
+### **요청 예시 (Body)**
 
-```java
+_(수정됨: 주문번호가 반드시 `trf_` 로 시작해야 함, validation 준수)_
+
+```json
 {
-	"orderId":"ord_882910ab301",
-	"paymentKey":"toss_abcdef1234567890"
+  "orderId": "trf_882910ab301",
+  "paymentKey": "toss_abcdef1234567890"
 }
 ```
 
 ### **응답 예시**
 
-```java
+```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"postId":1,
-			"orderId":"ord_882910ab301",
-			"sellerUserId":100,
-			"buyerUserId":200,
-			"faceValue":150000,
-			"feeAmount":5000,
-			"sellerExpectedAmount":140000,
-			"status":"COMPLETED",
-			"completedAt":"2026-04-10T20:15:00"
-		}
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "postId": 1,
+    "orderId": "trf_882910ab301",
+    "sellerUserId": 100,
+    "buyerUserId": 200,
+    "faceValue": 150000,
+    "feeAmount": 5000,
+    "sellerExpectedAmount": 140000,
+    "status": "COMPLETED",
+    "completedAt": "2026-04-10T20:15:00"
+  }
 }
 ```
 
@@ -332,33 +321,29 @@ PATCH /api/v1/transfers/posts/{id}
 
 - `X-User-Id`: (Long) 현재 로그인한 사용자 ID
 
-### **요청 예시**
+### **요청 예시 (Body)**
 
-```
-PATCH /api/v1/transfers/posts/1
-```
-
-```java
+```json
 {
-	"sellingPrice":140000
+  "sellingPrice": 140000
 }
 ```
 
 ### **응답 예시**
 
-```java
+```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"id":1,
-			"sellingPrice":140000,
-			"feeRate":5,
-			"feeAmount":7000,
-			"sellerExpectedAmount":133000,
-			"status":"LISTED"
-		}
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "id": 1,
+    "sellingPrice": 140000,
+    "feeRate": 5,
+    "feeAmount": 7000,
+    "sellerExpectedAmount": 133000,
+    "status": "LISTED"
+  }
 }
 ```
 
@@ -388,26 +373,26 @@ GET /api/v1/transfers/me/sales
 
 ### **응답 예시**
 
-```java
+```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": [
-			{
-				"id":1,
-				"showName":"G-Dragon 2026 MAMA DOME TOUR",
-				"showDate":"2026-04-10T19:00:00",
-				"section":"VIP",
-				"rowInfo":"A",
-				"seatNumber":"15",
-				"sellingPrice":145000,
-				"feeAmount":5000,
-				"sellerExpectedAmount":140000,
-				"status":"COMPLETED",
-				"createdAt":"2026-03-26T20:00:00"
-			}
-		]
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": [
+    {
+      "id": 1,
+      "showName": "G-Dragon 2026 MAMA DOME TOUR",
+      "showDate": "2026-04-10T19:00:00",
+      "section": "VIP",
+      "rowInfo": "A",
+      "seatNumber": "15",
+      "sellingPrice": 145000,
+      "feeAmount": 5000,
+      "sellerExpectedAmount": 140000,
+      "status": "COMPLETED",
+      "createdAt": "2026-03-26T20:00:00"
+    }
+  ]
 }
 ```
 
@@ -437,24 +422,24 @@ GET /api/v1/transfers/me/purchases
 
 ### **응답 예시**
 
-```java
+```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": [
-			{
-			"id":1,
-			"showName":"G-Dragon 2026 MAMA DOME TOUR",
-			"showDate":"2026-04-10T19:00:00",
-			"section":"VIP",
-			"rowInfo":"A",
-			"seatNumber":"15",
-			"sellingPrice":145000,
-			"sellerUserId":100,
-			"status":"COMPLETED",
-			"updatedAt":"2026-04-10T20:15:00"
-			}
-		]
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": [
+    {
+      "id": 1,
+      "showName": "G-Dragon 2026 MAMA DOME TOUR",
+      "showDate": "2026-04-10T19:00:00",
+      "section": "VIP",
+      "rowInfo": "A",
+      "seatNumber": "15",
+      "sellingPrice": 145000,
+      "sellerUserId": 100,
+      "status": "COMPLETED",
+      "updatedAt": "2026-04-10T20:15:00"
+    }
+  ]
 }
 ```

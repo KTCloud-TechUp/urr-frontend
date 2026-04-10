@@ -7,10 +7,10 @@
 
 ### API 불일치 대응 원칙
 
-| 상황 | 대응 |
-| ---- | ---- |
-| API 응답 구조가 디자인과 소폭 차이 | 프론트엔드에서 데이터 가공·매핑해 현재 API에 맞게 구현 |
-| API 스펙 부재로 기능 일부 누락 가능 | mock 데이터로 UI 완성 후 연동 대기 |
+| 상황                                                    | 대응                                                      |
+| ------------------------------------------------------- | --------------------------------------------------------- |
+| API 응답 구조가 디자인과 소폭 차이                      | 프론트엔드에서 데이터 가공·매핑해 현재 API에 맞게 구현    |
+| API 스펙 부재로 기능 일부 누락 가능                     | mock 데이터로 UI 완성 후 연동 대기                        |
 | API 변경 없이는 **디자인 틀 자체가 바뀌어야** 하는 경우 | `docs/backend-requests.md`에 요청 추가 → 백엔드 수정 요청 |
 
 - "디자인 틀이 바뀐다" 기준: 화면 흐름(step/flow), 핵심 데이터 구조(필드 추가/삭제), 기능 단위(엔드포인트 신규 필요)가 달라지는 경우
@@ -45,12 +45,12 @@ npm run build  # 빌드 검증
 
 ### 상태 관리 기준
 
-| 상황                            | 사용                       |
-| ------------------------------- | -------------------------- |
-| API 데이터 조회 (GET)           | `useQuery`                 |
-| API 데이터 변경 (POST/PUT/DELETE) | `useMutation`            |
-| 모달/탭 등 UI 상태              | `useState`                 |
-| 여러 페이지 공유 클라이언트 상태 | `Zustand`                 |
+| 상황                              | 사용                       |
+| --------------------------------- | -------------------------- |
+| API 데이터 조회 (GET)             | `useQuery`                 |
+| API 데이터 변경 (POST/PUT/DELETE) | `useMutation`              |
+| 모달/탭 등 UI 상태                | `useState`                 |
+| 여러 페이지 공유 클라이언트 상태  | `Zustand`                  |
 | 앱 초기화 (세션 복원, OAuth 콜백) | `useEffect` 직접 사용 허용 |
 
 - **새 페이지 API 연동 시 반드시 TanStack Query 사용** (`useState + useEffect` 패턴 금지)
@@ -97,17 +97,17 @@ src/
 
 ## 주요 라우트 & 페이지
 
-| URL                              | 페이지             | 비고                              |
-| -------------------------------- | ------------------ | --------------------------------- |
-| `/`                              | HomePage           | 배너·인기아티스트·공연랭킹·선예매 |
+| URL                              | 페이지             | 비고                                 |
+| -------------------------------- | ------------------ | ------------------------------------ |
+| `/`                              | HomePage           | 배너·인기아티스트·공연랭킹·선예매    |
 | `/artists` / `/artists/:id`      | ArtistPage         | 홈/소통/공연/양도 탭 (멤버십 게이트) |
-| `/events` / `/events/:id`        | EventDetailPage    | 공연 목록 / 상세                  |
-| `/events/:id/booking`            | BookingPage        | 예매 2-Panel, 풀스크린 레이아웃   |
-| `/membership`                    | MembershipPage     | 4단계 가입 플로우                 |
-| `/my-page`                       | MyPage             | 멤버십/티켓 월렛/양도 내역        |
-| `/onboarding`                    | OnboardingPage     | 회원가입·로그인 (사이드바 없음)   |
-| `/search`                        | SearchPage         | 아티스트+공연 통합 검색           |
-| `/transfer/:artistId/:listingId` | TransferDetailPage | 양도 상세                         |
+| `/events` / `/events/:id`        | EventDetailPage    | 공연 목록 / 상세                     |
+| `/events/:id/booking`            | BookingPage        | 예매 2-Panel, 풀스크린 레이아웃      |
+| `/membership`                    | MembershipPage     | 4단계 가입 플로우                    |
+| `/my-page`                       | MyPage             | 멤버십/티켓 월렛/양도 내역           |
+| `/onboarding`                    | OnboardingPage     | 회원가입·로그인 (사이드바 없음)      |
+| `/search`                        | SearchPage         | 아티스트+공연 통합 검색              |
+| `/transfer/:artistId/:listingId` | TransferDetailPage | 양도 상세                            |
 
 **LayoutShell 예외**: `/onboarding`, `/auth/callback` → 사이드바/TopBar 없음 / `/events/:id/booking` → 풀스크린 (Footer/스크롤 없음)
 
@@ -152,27 +152,6 @@ idle → queue → seats-section → seats-individual → payment → confirmati
 **티어 클래스**: `text-tier-{lightning|thunder|cloud|mist}` / `bg-tier-{...}-bg`  
 **폰트**: Pretendard Variable (`font-sans`) / JetBrains Mono (`font-mono`, 타이머 전용)  
 **로고**: `public/logos/logo5.svg`
-
----
-
-## API 연동 현황
-
-> 상세 체크리스트 → `docs/CheckList.md`
-
-| Phase | 영역                                      | 상태            |
-| ----- | ----------------------------------------- | --------------- |
-| 1–5   | API 클라이언트, 인증 인프라               | ✅ 완료         |
-| 7–8   | 예매 UI (VenueMap 인터랙션)               | ✅ 완료         |
-| 10    | Events / Artists API 연동                 | ✅ 완료         |
-| 13a   | 선예매 정책 조회 / 멤버십 취소 API        | ✅ 완료         |
-| 11    | Ticketing + Queue API 연동                | 🔶 부분 완료    |
-| 12    | Payments (Toss SDK) 연동                  | 🔶 부분 완료    |
-| 13    | User 추가 기능                            | 🔶 부분 완료    |
-| 14    | Community (양도 완료 / 소통 미착수)       | 🔶 부분 완료    |
-| 6     | 온보딩 플로우 완성                        | 🔶 부분 완료    |
-| 9     | 예매 Zustand store                        | 🔲 미착수       |
-
-**현재 mock 데이터**: 홈 배너 섹션(`HeroBannerCarousel`), 커뮤니티 소통 탭
 
 ---
 

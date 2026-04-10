@@ -1,23 +1,3 @@
-# 프론트 연동 현황
-
-| 메서드 | 엔드포인트 | 연동 상태 |
-| ------ | ---------- | --------- |
-| POST | `/api/v1/auth/oauth/kakao` | ✅ 완료 |
-| POST | `/api/v1/auth/oauth/kakao/rejoin` | 🔲 미착수 |
-| GET | `/api/v1/auth/me` | ✅ 완료 |
-| PATCH | `/api/v1/auth/me/name` | ✅ 완료 |
-| PATCH | `/api/v1/auth/me/consents` | 🔲 미착수 |
-| POST | `/api/v1/auth/logout` | ✅ 완료 |
-| POST | `/api/v1/auth/token/reissue` | ✅ 완료 (interceptor) |
-| DELETE | `/api/v1/auth/me` | 🔲 미착수 |
-| POST | `/api/v1/auth/register` | 🔲 미착수 (이메일 회원가입) |
-| POST | `/api/v1/auth/login` | 🔲 미착수 (이메일 로그인) |
-| POST | `/api/v1/auth/onboarding/social` | 🔲 미착수 |
-| POST | `/api/v1/auth/sms/send` | ⚠️ 함수 존재·UI 미연결 |
-| POST | `/api/v1/auth/sms/verify` | ⚠️ 함수 존재·UI 미연결 |
-
----
-
 # 1. 카카오 OAuth 로그인
 
 ## API
@@ -27,6 +7,14 @@
 ## 설명
 
 카카오 인가 코드를 받아 로그인 처리
+
+카카오로 시작하기 눌렀을때 호출
+
+1. 처음 회원가입이 안된 사람인경우
+   1. 카카오 인증 → DB에 저장 → 온보딩으로 리다이렉트
+2. 회원인 경우
+   1. 온보딩이 안된경우 → 온보딩 페이지로
+   2. 온보딩이 된 경우 → 로그인 성공
 
 ## 인증
 
@@ -158,18 +146,20 @@
 
 현재 로그인한 사용자 정보 조회
 
+해당 유저의 멤버십목록, 유저세팅 조회
+
 ## 인증
 
 필요
 
-- Bearer 토큰 또는 게이트웨이 헤더 사용
+- 게이트웨이 헤더 사용
 
 ## Request
 
 ### Header 예시
 
 ```
-Authorization: Bearer <access-token>
+X-User-Id: 12
 ```
 
 ### Body
@@ -180,20 +170,34 @@ Authorization: Bearer <access-token>
 
 ### 성공 응답 (200)
 
-```
+```json
 {
-  "isSuccess":true,
-  "statusCode":200,
-  "message":"OK",
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
   "data": {
-    "userId":101,
-    "email":"user@urr.guru",
-    "nickname":"우르",
-    "role":"USER",
-    "onboardingCompleted":true,
-    "marketingConsent":true,
-    "pushConsent":false,
-    "smsConsent":true
+    "userId": 123,
+    "email": "user@example.com",
+    "nickname": "우르르",
+    "role": "USER",
+    "onboardingCompleted": true,
+    "marketingConsent": false,
+    "pushConsent": true,
+    "smsConsent": false,
+    "memberships": [
+      {
+        "artistId": 10,
+        "artistName": "ARTIST_A",
+        "tier": "GOLD",
+        "endDate": "2026-12-31"
+      },
+      {
+        "artistId": 11,
+        "artistName": "ARTIST_B",
+        "tier": "BASIC",
+        "endDate": "2026-06-30"
+      }
+    ]
   }
 }
 ```
@@ -208,7 +212,7 @@ Authorization: Bearer <access-token>
 
 ## 설명
 
-사용자 이름 변경
+마이페이지에서 이름 수정시 사용
 
 ## 인증
 
@@ -251,7 +255,7 @@ Authorization: Bearer <access-token>
 
 ## 설명
 
-마케팅/푸시/SMS 동의 여부 변경
+마이페이시 세팅에서 마케팅/푸시/SMS 동의 여부 변경
 
 ## 인증
 
@@ -339,7 +343,7 @@ Cookie: refresh_token=<refresh-token>
 
 ## 설명
 
-refresh_token 쿠키를 이용해 access token 재발급
+토큰 만료시 refresh_token 쿠키를 이용해 access token 재발급
 
 ## 인증
 
@@ -437,6 +441,10 @@ Cookie: refresh_token=<refresh-token>
 
 이메일/비밀번호 기반 일반 회원가입
 
+회원가입 버튼을 누르고, 번호인증 이후 최종 가입하기 버튼을 눌러서 호출
+
+회원가입시 온보딩이 자동으로 true로 설정
+
 ## 인증
 
 불필요
@@ -508,6 +516,8 @@ Cookie: refresh_token=<refresh-token>
 
 이메일/비밀번호 기반 로그인
 
+이메일 / 비밀번호 입력 후 로그인 버튼 눌러서 호출
+
 ## 인증
 
 불필요
@@ -569,7 +579,7 @@ Cookie: refresh_token=<refresh-token>
 
 ## 설명
 
-소셜 로그인 사용자 추가 정보 입력 완료 처리
+소셜 로그인시 온보딩상태가 true가 아니면 자동 호출
 
 ## 인증
 
@@ -618,7 +628,9 @@ Cookie: refresh_token=<refresh-token>
 
 ## 설명
 
-입력한 휴대폰 번호로 인증번호 발송
+~~입력한 휴대폰 번호로 인증번호 발송~~ → 입력된 이메일로 인증번호 전송
+
+인증번호 전송을 누를 시 호출
 
 ## 인증
 
@@ -629,8 +641,14 @@ Cookie: refresh_token=<refresh-token>
 ### Body
 
 ```
-{
+~~{
   "phoneNumber":"01012345678"
+}~~
+```
+
+```
+{
+  "email":"user5@test.com"
 }
 ```
 
@@ -657,7 +675,7 @@ Cookie: refresh_token=<refresh-token>
 {
   "isSuccess":false,
   "statusCode":400,
-  "message":"휴대폰 번호 형식이 올바르지 않습니다.",
+  "message":"형식이 올바르지 않습니다.",
   "data":null
 }
 ```
@@ -674,6 +692,8 @@ Cookie: refresh_token=<refresh-token>
 
 발송된 SMS 인증번호 검증
 
+전송된 인증번호를 입력하고 확인버튼을 누르면 호
+
 ## 인증
 
 불필요
@@ -683,15 +703,21 @@ Cookie: refresh_token=<refresh-token>
 ### Body
 
 ```
-{
+~~{
   "phoneNumber":"01012345678",
+  "code":"492817"
+}~~
+```
+
+```
+{
+  "email":"user5@test.com",
   "code":"492817"
 }
 ```
 
 ### 필드 설명
 
-- `phoneNumber`: 인증번호를 받은 휴대폰 번호
 - `code`: 입력한 인증번호
 
 ## Response

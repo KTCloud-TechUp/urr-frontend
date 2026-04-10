@@ -1,42 +1,6 @@
-# 프론트 연동 현황
+# 1. 없음
 
-| 메서드 | 엔드포인트 | 연동 상태 |
-| ------ | ---------- | --------- |
-| POST | `/api/v1/artists` (ADMIN) | — 프론트 해당 없음 |
-| GET | `/api/v1/artists` | ✅ 완료 (`getArtists`) |
-| GET | `/api/v1/artists/{artistId}` | ✅ 완료 (`getArtist`) |
-| POST | `/api/v1/artists/{artistId}/membership` | ✅ 완료 (`subscribeMembership`) |
-| POST | `/api/v1/artists/memberships/activate` | ✅ 완료 (`activateMembership`) |
-| POST | `/api/v1/artists/memberships/cancel` | ✅ 완료 (`cancelMembership`) |
-| POST | `/api/v1/artists/{artistId}/follow` | ✅ 완료 (`followArtist`) |
-| DELETE | `/api/v1/artists/{artistId}/follow` | ✅ 완료 (`unfollowArtist`) |
-| GET | `/api/v1/artists/followings` | 🔲 미착수 |
-| GET | `/api/v1/membership/artists/{artistId}/membership-policies` | 🔲 미착수 |
-| GET | `/api/v1/membership/events/{eventId}/shows/{showId}/presale-policy` | ✅ 완료 (`getPresalePolicy`) |
-| GET | `/api/v1/membership` | ✅ 완료 (`getMemberships`) |
-| GET | `/api/v1/membership/{membershipId}` | 🔲 미착수 |
-| PATCH | `/api/v1/membership/{membershipId}/nickname` | ✅ 완료 (`updateNickname`) |
-| POST | `/api/v1/artists/{artistId}/events` (ADMIN) | — 프론트 해당 없음 |
-| GET | `/api/v1/artists/{artistId}/events` | ✅ 완료 (`getArtistEvents`) |
-| GET | `/api/v1/artists/{artistId}/events/{eventId}` | ✅ 완료 (`getEventDetail`) |
-| GET | `/api/v1/events` | ✅ 완료 (`getEvents`) |
-| GET | `/api/v1/events/home` | ✅ 완료 (`getHome`) |
-| POST | `/api/v1/events/venues` (ADMIN) | — 프론트 해당 없음 |
-| GET | `/api/v1/events/venues` | ✅ 완료 (`getVenues`) |
-| GET | `/api/v1/events/venues/{venueTemplateId}` | ✅ 완료 (`getVenueDetail`) |
-| POST | `/api/v1/shows/{eventId}/shows` (ADMIN) | — 프론트 해당 없음 |
-| GET | `/api/v1/shows/{eventId}/shows` | ✅ 완료 (`getShows`) |
-| GET | `/api/v1/shows/{eventId}/shows/{showId}` | 🔲 미착수 |
-| GET | `/api/v1/shows/{eventId}/shows/{showId}/seatmap` | 🔲 미착수 |
-| GET | `/api/v1/shows/{showId}/sections` | 🔲 미착수 |
-
-> ⚠️ 추가 연동 완료된 엔드포인트 (이 파일에 명세 없음):  
-> `GET /api/v1/shows/{eventId}/shows/{showId}/seats/summary` → `getSeatsSummary` ✅  
-> `GET /api/v1/shows/{eventId}/shows/{showId}/seats/availability` → `getSeatsAvailability` ✅
-
----
-
-# 1. 아티스트 생성 (ADMIN)
+# 2. 아티스트 생성 (ADMIN)
 
 ## API
 
@@ -116,6 +80,8 @@ X-User-Role: ADMIN
 
 아티스트 목록을 조회합니다.
 
+아티스트 탭,멤버십가입 등의 페이에서 아티스트목록을 반환
+
 ## 인증
 
 불필요
@@ -180,6 +146,8 @@ GET /api/v1/artists?category=BOYGROUP
 
 특정 아티스트의 상세 정보를 조회합니다.
 
+특정아티스트를 확인할때 사용(아티스트 사진,아티스트 상세페이지)
+
 ## 인증
 
 불필요
@@ -227,6 +195,8 @@ GET /api/v1/artists?category=BOYGROUP
 ## 설명
 
 특정 아티스트의 멤버십을 구독합니다.
+
+멤버십 페이지에서 주문자정보기입후 ~원 결제하기 버튼 클릭시 호출
 
 ## 인증
 
@@ -280,6 +250,8 @@ X-User-Id: 101
 
 결제 완료 후 멤버십을 활성화합니다.
 
+토스 qr을 통해 결제를 진행하면 자동 호출
+
 ## 인증
 
 불필요
@@ -315,7 +287,7 @@ X-User-Id: 101
 
 ---
 
-# 7. 아티스트 멤버십 취소
+# 7. 아티스트 멤버십 취소(코드 다시확인하기)
 
 ## API
 
@@ -324,6 +296,8 @@ X-User-Id: 101
 ## 설명
 
 멤버십 결제 취소 또는 구독 취소 처리
+
+마이페이지 멤버십에서 해지버튼을 통해 호출
 
 ## 인증
 
@@ -369,6 +343,8 @@ X-User-Id: 101
 ## 설명
 
 특정 아티스트를 팔로우합니다.
+
+아티스트 상세페이지에서 아티스트 팔로우 클릭시 호출
 
 ## 인증
 
@@ -416,6 +392,8 @@ X-User-Id: 101
 ## 설명
 
 특정 아티스트 팔로우를 해제합니다.
+
+아티스트 상세페이지에서 아티스트 팔로우 클릭시 호출
 
 ## 인증
 
@@ -465,6 +443,10 @@ DELETE /api/v1/artists/{artistId}/follow?userId=101
 ## 설명
 
 사용자가 팔로우한 아티스트 목록을 조회합니다.
+
+사이드바용 로그인 직후 호출
+
+아티스트 팔로우/언팔로우 직후 재호출
 
 ## 인증
 
@@ -520,7 +502,7 @@ GET /api/v1/artists/followings?userId=101
 
 ---
 
-# 11. 아티스트 멤버십 정책 조회
+# 11. 아티스트 멤버십 정책 조회(수정필요)
 
 ## API
 
@@ -529,6 +511,8 @@ GET /api/v1/artists/followings?userId=101
 ## 설명
 
 아티스트별 멤버십 티어 정책을 조회합니다.
+
+공연상세페이지에서 예매, 가격정책을 위해 호출
 
 ## 인증
 
@@ -571,7 +555,7 @@ GET /api/v1/artists/followings?userId=101
 }
 ```
 
-# 12. 회차 선예매 정책 조회
+# 12. 회차 선예매 정책 조회(수정필요)
 
 ## API
 
@@ -580,6 +564,8 @@ GET /api/v1/artists/followings?userId=101
 ## 설명
 
 특정 공연 회차의 선예매 정책을 조회합니다.
+
+공연상세페이지에서 예매, 가격정책을 위해 호출
 
 ## 인증
 
@@ -638,6 +624,8 @@ GET /api/v1/artists/followings?userId=101
 ## 설명
 
 사용자의 멤버십 목록을 조회합니다.
+
+auth서비스 /me에서 유저 멤버십 조회를 위해 사용
 
 ## 인증
 
@@ -699,7 +687,7 @@ X-User-Id: 101
 
 ---
 
-# 14. 내 멤버십 상세 조회
+# 14. 내 멤버십 상세 조회(내 멤버십 목록 조회와 응답 겹침)
 
 ## API
 
@@ -708,6 +696,8 @@ X-User-Id: 101
 ## 설명
 
 특정 멤버십의 상세 정보를 조회합니다.
+
+mypage 멤버십용이었지만 “내 멤버십 목록 조회”에서 동일 내용을 반환하게 되면서 사용x
 
 ## 인증
 
@@ -771,6 +761,8 @@ X-User-Id: 101
 ## 설명
 
 멤버십 닉네임을 수정합니다.
+
+마이페이지 멤버십에서 특정 멤버십 이름 변경시 호출
 
 ## 인증
 
@@ -960,6 +952,8 @@ X-User-Role: ADMIN
 
 특정 아티스트의 공연 목록을 조회합니다.
 
+아티스트 상세페이지에서 공연탭 클릭시 호출
+
 ## 인증
 
 불필요
@@ -1076,11 +1070,11 @@ GET /api/v1/artists/{artistId}/events?active=true&fromOpenDate=2026-05-01&toOpen
 
 ---
 
-# 18. 공연 상세 조회
+# 18.공연 상세 조회
 
 ## API
 
-`GET /api/v1/artists/{artistId}/events/{eventId}`
+`GET /api/v1/shows/{eventId}/shows`
 
 ## 설명
 
@@ -1094,7 +1088,6 @@ GET /api/v1/artists/{artistId}/events?active=true&fromOpenDate=2026-05-01&toOpen
 
 ### Path Variable
 
-- `artistId`: 아티스트 ID
 - `eventId`: 공연 ID
 
 ### Body
@@ -1107,46 +1100,46 @@ GET /api/v1/artists/{artistId}/events?active=true&fromOpenDate=2026-05-01&toOpen
 
 ```
 {
-  "isSuccess":true,
-  "statusCode":200,
-  "message":"OK",
-  "data": {
-    "eventId":100,
-    "artistId":1,
-    "artistName":"BIGBANG",
-    "title":"G-Dragon 2026 MAMA DOME TOUR",
-    "subtitle":"WORLD TOUR IN SEOUL",
-    "description":"단독 공연 DOME TOUR",
-    "venueTemplateId":10,
-    "venueTemplateName":"잠실주경기장 기본 템플릿",
-    "venueAddress":"서울특별시 송파구 올림픽로 424",
-    "posterImageUrl":"https://cdn.example.com/posters/gd-2026.png",
-    "category":"concert",
-    "tags": ["HOT","NEW"],
-    "openDate":"2026-05-20",
-    "endDate":"2026-06-20",
-    "active":true,
-    "runtime":"약 120분",
-    "ageRating":"12세 이상",
-    "notices": ["티켓은 1인 2매","입장 30분 전 오픈"],
-    "identityVerification": ["실물 신분증 필수","본인 명의 예매만 가능"],
-    "castInfo":"G-Dragon",
-    "cancellationPolicy": [
-      { "period":"공연 10일 전", "fee":"수수료 없음" },
-      { "period":"공연 3일 전", "fee":"티켓금액의 10%" }
-    ],
-    "ticketDelivery": ["모바일 티켓","현장 수령"],
-    "sections": [
-      { "name":"VIP", "price":220000, "totalSeats":1000 },
-      { "name":"R", "price":165000, "totalSeats":3000 }
-    ],
-    "organizer": {
-      "host":"URR Entertainment",
-      "manager":"URR Live",
-      "contact":"1588-0000",
-      "email":"help@urr.com"
-    }
-  }
+    "isSuccess": true,
+    "statusCode": 200,
+    "message": "OK",
+    "data": [
+        {
+            "showId": 2,
+            "sessionNo": 1,
+            "startAt": "2026-05-20T19:00:00",
+            "endAt": "2026-05-20T21:00:00",
+            "capacity": 8153,
+            "remainingSeats": 8153,
+            "saleOpenAt": "2026-04-02T17:12:16",
+            "saleCloseAt": "2026-05-20T18:50:00",
+            "bookingWindows": [
+                {
+                    "tier": "LIGHTNING",
+                    "opensAt": "2026-04-02T14:12:16",
+                    "fee": 3000
+                },
+                {
+                    "tier": "THUNDER",
+                    "opensAt": "2026-04-02T15:12:16",
+                    "fee": 2500
+                },
+                {
+                    "tier": "CLOUD",
+                    "opensAt": "2026-04-02T16:12:16",
+                    "fee": 2000
+                },
+                {
+                    "tier": "MIST",
+                    "opensAt": "2026-04-02T17:12:16",
+                    "fee": 1500
+                }
+            ],
+            "status": "DRAFT",
+            "active": true,
+            "seatmapVersion": 1
+        }
+    ]
 }
 ```
 
@@ -1161,6 +1154,8 @@ GET /api/v1/artists/{artistId}/events?active=true&fromOpenDate=2026-05-01&toOpen
 ## 설명
 
 전체 공연 목록을 조회합니다.
+
+사이드바에서 공연을 누를시 호출
 
 ## 인증
 
@@ -1301,7 +1296,7 @@ X-User-Role: ADMIN
 
 ---
 
-# 21. 공연장 템플릿 목록 조회
+# 21. 공연장 템플릿 목록 조회(no use)
 
 ## API
 
@@ -1310,6 +1305,8 @@ X-User-Role: ADMIN
 ## 설명
 
 공연장 템플릿 목록을 조회합니다.
+
+백엔드 내부에서 테스트할떄 호출
 
 ## 인증
 
@@ -1351,7 +1348,7 @@ X-User-Role: ADMIN
 
 ---
 
-# 22. 공연장 템플릿 상세 조회
+# 22. 공연장 템플릿 상세 조회(no use)
 
 ## API
 
@@ -1360,6 +1357,8 @@ X-User-Role: ADMIN
 ## 설명
 
 특정 공연장 템플릿의 상세 정보를 조회합니다.
+
+백엔드 내부에서 테스트할때 호출
 
 ## 인증
 
@@ -1479,7 +1478,7 @@ X-User-Role: ADMIN
 
 ---
 
-# 24. 공연 회차 목록 조회
+# 24. 공연 회차 목록 조회(수정필요)
 
 ## API
 
@@ -2183,6 +2182,12 @@ request
 # 30. 특정회차 잔여석 전체 요약 조회
 
 GET /api/v1/shows/{eventId}/shows/{showId}/seats/summary
+
+## 설명
+
+공연 상세페이지에서 예매하기 버튼 클릭시(대기열서비스→예매페이지=이때 호출?) 해당 eventId와 showId기반으로 포도알이랑 좌석선택 페이지(구역별 잔여석,가격) 불러옴
+
+-멤버십검증 필요
 
 ### Path Parameter
 
@@ -4025,6 +4030,318 @@ GET /api/v1/shows/{eventId}/shows/{showId}/seats/availability
         "sellable": true,
         "ticketStatus": "AVAILABLE",
         "bookable": true
+      }
+    ]
+  }
+}
+```
+
+---
+
+# 32. 공연상세페이지 통합용 api
+
+## API
+
+`GET /api/v1/events/{eventId}/detail-with-booking-windows`
+
+## 설명
+
+특정 이벤트상세 페이지에 들어갔을때 필요한 정보를 모은 api
+
+전체 events 목록 정보api
+
+공연 상세 조회api(18번)
+
+presale-policyapi(12번)
+
+booking-windows api
+
+## 인증
+
+없음
+
+## Request
+
+### Path Variable
+
+- `eventId`: 이벤트ID
+
+## response
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "event": {
+      "eventId": 1,
+      "artistId": 1,
+      "artistName": "G-Dragon",
+      "title": "G-Dragon WORLD TOUR 'POWER'",
+      "subtitle": "POWER WORLD TOUR 2026 IN SEOUL",
+      "description": "2026년 G-Dragon 첫 단독 월드투어. 퍼포먼스와 예술의 경계를 허무는 무대.",
+      "venueTemplateId": 1,
+      "venueTemplateName": "KSPO DOME",
+      "venueAddress": "서울특별시 송파구 올림픽로 424 KSPO DOME",
+      "posterImageUrl": "/artists/1/events/event_gdragon-power-world-tour.png",
+      "category": "concert",
+      "tags": ["HOT", "PRE_SALE"],
+      "openDate": "2026-02-22",
+      "endDate": "2026-06-03",
+      "active": true,
+      "runtime": "2시간 30분",
+      "ageRating": "만 7세 이상 관람가",
+      "notices": [
+        "공연 당일 티켓 수령 후 재입장 불가",
+        "공연장 내 음식물 반입 금지",
+        "사진 및 동영상 촬영 금지",
+        "공연 중 휴대전화 사용 제한"
+      ],
+      "identityVerification": [
+        "본인 명의 신분증 지참 필수",
+        "예매자 본인만 입장 가능",
+        "미성년자는 법정대리인 동의서 지참"
+      ],
+      "castInfo": "G-Dragon",
+      "cancellationPolicy": [
+        {
+          "period": "관람일 7일 전까지",
+          "fee": "취소 수수료 없음"
+        },
+        {
+          "period": "관람일 6~3일 전",
+          "fee": "티켓 금액의 10%"
+        },
+        {
+          "period": "관람일 2~1일 전",
+          "fee": "티켓 금액의 20%"
+        },
+        {
+          "period": "관람 당일",
+          "fee": "환불 불가"
+        }
+      ],
+      "ticketDelivery": [
+        "모바일 티켓 (QR 코드)",
+        "공연 당일 입장 시 QR 스캔 후 입장",
+        "분실 시 재발급 불가"
+      ],
+      "sections": [],
+      "organizer": {
+        "host": "YG Entertainment",
+        "manager": "YG Entertainment 공연사업부",
+        "contact": "02-2218-4600",
+        "email": "concert@yg-ent.com"
+      }
+    },
+    "shows": [
+      {
+        "showId": 1,
+        "sessionNo": 1,
+        "startAt": "2026-06-01T09:00:00",
+        "bookingWindows": {
+          "bookingWindows": {
+            "LIGHTNING": "2026-02-18T02:00:00",
+            "THUNDER": "2026-02-18T03:00:00",
+            "CLOUD": "2026-02-20T02:00:00",
+            "MIST": "2026-02-20T03:00:00"
+          },
+          "tierPolicies": [
+            {
+              "tier": "LIGHTNING",
+              "presaleOffsetMinutes": 2940,
+              "bookingFeeWon": 0,
+              "openAt": "2026-02-18T02:00:00"
+            },
+            {
+              "tier": "THUNDER",
+              "presaleOffsetMinutes": 2880,
+              "bookingFeeWon": 3000,
+              "openAt": "2026-02-18T03:00:00"
+            },
+            {
+              "tier": "CLOUD",
+              "presaleOffsetMinutes": 60,
+              "bookingFeeWon": 5000,
+              "openAt": "2026-02-20T02:00:00"
+            },
+            {
+              "tier": "MIST",
+              "presaleOffsetMinutes": 0,
+              "bookingFeeWon": 8000,
+              "openAt": "2026-02-20T03:00:00"
+            }
+          ]
+        },
+        "sectionPrices": [
+          {
+            "code": "VIP",
+            "grade": "VIP",
+            "zoneNo": null,
+            "price": 165000,
+            "color": "#FF5E32"
+          },
+          {
+            "code": "R",
+            "grade": "R",
+            "zoneNo": null,
+            "price": 143000,
+            "color": "#1F2792"
+          },
+          {
+            "code": "S",
+            "grade": "S",
+            "zoneNo": null,
+            "price": 121000,
+            "color": "#4A90D9"
+          },
+          {
+            "code": "A",
+            "grade": "A",
+            "zoneNo": null,
+            "price": 99000,
+            "color": "#6DBE6B"
+          }
+        ]
+      },
+      {
+        "showId": 2,
+        "sessionNo": 2,
+        "startAt": "2026-06-02T09:00:00",
+        "bookingWindows": {
+          "bookingWindows": {
+            "LIGHTNING": "2026-02-18T02:00:00",
+            "THUNDER": "2026-02-18T03:00:00",
+            "CLOUD": "2026-02-20T02:00:00",
+            "MIST": "2026-02-20T03:00:00"
+          },
+          "tierPolicies": [
+            {
+              "tier": "LIGHTNING",
+              "presaleOffsetMinutes": 2940,
+              "bookingFeeWon": 0,
+              "openAt": "2026-02-18T02:00:00"
+            },
+            {
+              "tier": "THUNDER",
+              "presaleOffsetMinutes": 2880,
+              "bookingFeeWon": 3000,
+              "openAt": "2026-02-18T03:00:00"
+            },
+            {
+              "tier": "CLOUD",
+              "presaleOffsetMinutes": 60,
+              "bookingFeeWon": 5000,
+              "openAt": "2026-02-20T02:00:00"
+            },
+            {
+              "tier": "MIST",
+              "presaleOffsetMinutes": 0,
+              "bookingFeeWon": 8000,
+              "openAt": "2026-02-20T03:00:00"
+            }
+          ]
+        },
+        "sectionPrices": [
+          {
+            "code": "VIP",
+            "grade": "VIP",
+            "zoneNo": null,
+            "price": 165000,
+            "color": "#FF5E32"
+          },
+          {
+            "code": "R",
+            "grade": "R",
+            "zoneNo": null,
+            "price": 143000,
+            "color": "#1F2792"
+          },
+          {
+            "code": "S",
+            "grade": "S",
+            "zoneNo": null,
+            "price": 121000,
+            "color": "#4A90D9"
+          },
+          {
+            "code": "A",
+            "grade": "A",
+            "zoneNo": null,
+            "price": 99000,
+            "color": "#6DBE6B"
+          }
+        ]
+      },
+      {
+        "showId": 3,
+        "sessionNo": 3,
+        "startAt": "2026-06-03T08:00:00",
+        "bookingWindows": {
+          "bookingWindows": {
+            "LIGHTNING": "2026-02-18T02:00:00",
+            "THUNDER": "2026-02-18T03:00:00",
+            "CLOUD": "2026-02-20T02:00:00",
+            "MIST": "2026-02-20T03:00:00"
+          },
+          "tierPolicies": [
+            {
+              "tier": "LIGHTNING",
+              "presaleOffsetMinutes": 2940,
+              "bookingFeeWon": 0,
+              "openAt": "2026-02-18T02:00:00"
+            },
+            {
+              "tier": "THUNDER",
+              "presaleOffsetMinutes": 2880,
+              "bookingFeeWon": 3000,
+              "openAt": "2026-02-18T03:00:00"
+            },
+            {
+              "tier": "CLOUD",
+              "presaleOffsetMinutes": 60,
+              "bookingFeeWon": 5000,
+              "openAt": "2026-02-20T02:00:00"
+            },
+            {
+              "tier": "MIST",
+              "presaleOffsetMinutes": 0,
+              "bookingFeeWon": 8000,
+              "openAt": "2026-02-20T03:00:00"
+            }
+          ]
+        },
+        "sectionPrices": [
+          {
+            "code": "VIP",
+            "grade": "VIP",
+            "zoneNo": null,
+            "price": 165000,
+            "color": "#FF5E32"
+          },
+          {
+            "code": "R",
+            "grade": "R",
+            "zoneNo": null,
+            "price": 143000,
+            "color": "#1F2792"
+          },
+          {
+            "code": "S",
+            "grade": "S",
+            "zoneNo": null,
+            "price": 121000,
+            "color": "#4A90D9"
+          },
+          {
+            "code": "A",
+            "grade": "A",
+            "zoneNo": null,
+            "price": 99000,
+            "color": "#6DBE6B"
+          }
+        ]
       }
     ]
   }

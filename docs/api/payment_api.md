@@ -1,19 +1,3 @@
-# payment api 명세
-
-## 프론트 연동 현황
-
-| 메서드 | 엔드포인트 | 연동 상태 |
-| ------ | ---------- | --------- |
-| POST | `/api/v1/payments/create` | — 서버 내부 자동 처리 (프론트 직접 호출 X) |
-| POST | `/api/v1/payments/confirm` | ✅ 완료 |
-| GET | `/api/v1/payments/order/{orderId}` | ✅ 완료 (`getPayment.ts`) |
-| POST | `/api/v1/payments/{paymentKey}/cancel` | 🔲 미착수 |
-| POST | `/api/v1/internal/payments/membership/create` | — 서버 내부 (이벤트 서비스) |
-| POST | `/api/v1/internal/payments/ticket/create` | — 서버 내부 (티켓 서비스) |
-| POST | `/api/v1/internal/payments/transfer/create` | — 서버 내부 (커뮤니티 서비스) |
-
----
-
 ## **1. 외부 클라이언트 API (Public)**
 
 ### **1.1 결제 데이터 생성 (검증용)**

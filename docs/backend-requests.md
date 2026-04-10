@@ -8,48 +8,6 @@
 
 ## 대기 중
 
-### ⑥ `POST /auth/logout` — jti 추출 버그로 쿠키 미삭제 (자동로그인 버그) 🔴
-
-- **우선순위**: 🔴 긴급
-- **대상**: `SocialAuthService.java:271`
-
-#### 현상
-
-소셜 로그인 후 로그아웃하고 이메일 회원가입을 완료해도, 새 탭을 열거나 페이지를 새로고침하면 이전 소셜 계정으로 자동로그인됨.
-
-#### 원인 (코드 버그)
-
-`SocialAuthService.java:271`에서 jti 추출 방식이 잘못됨:
-
-```java
-// 현재 (버그) — 커스텀 클레임 조회, 항상 null 반환
-String jti = claims.get("jti", String.class);
-
-// 수정 필요 — JWT 표준 ID 클레임 조회
-String jti = claims.getId();
-```
-
-`JwtProvider.java:73`에서 `.id(jti)`로 JWT 표준 jti 클레임에 저장하므로 `claims.getId()`로만 읽을 수 있음.
-
-#### 결과 흐름
-
-1. `jti == null` → `AUTH_REFRESH_TOKEN_INVALID` 예외 발생
-2. `deleteRefreshTokenCookie()` 미실행 → 브라우저 쿠키 잔존
-3. DB 토큰 revoke 미실행 → 구 소셜 refreshToken이 ACTIVE 상태 유지
-4. 새 탭 → `AuthInitializer`가 `POST /token/reissue` 호출 → 구 소셜 쿠키 전송 → 자동로그인
-
-참고: `reissueTokens`는 `claims.getId()` ✅ 사용 중 — logout만 버그.
-
-#### 요청
-
-`SocialAuthService.java:271` 한 줄 수정:
-```java
-// Before
-String jti = claims.get("jti", String.class);
-// After
-String jti = claims.getId();
-```
-
 ---
 
 ### ⑤ `/auth/me` — `memberships` 필드 빈 배열로 반환되는 버그
@@ -57,10 +15,11 @@ String jti = claims.getId();
 - **우선순위**: 🔴 긴급
 - **대상**: `GET /api/v1/auth/me`
 
-멤버십이 존재하는 유저임에도 `memberships: []`로 반환됨. auth 서비스의 `/me` 핸들러에서 멤버십 데이터를 조회·매핑하지 않는 것으로 보임.
+멤버십이 존재하는 유저임에도 `memberships: []`로 반환됨. `fetchMemberships()`는 구현되어 있으나 event 서비스의 `/api/v1/membership` 엔드포인트가 실제 데이터를 반환하는지 런타임 확인 필요.
 
-- **요청**: `/me` 응답의 `memberships` 배열에 해당 유저의 활성 멤버십 목록을 정상 반환해주세요.
+- **요청**: Docker 환경에서 `/api/v1/membership` 응답 확인 및 정상 반환 여부 검증.
 - **기대 응답 형식**: (기존 스펙 그대로)
+
 ```json
 "memberships": [
   {
@@ -74,98 +33,47 @@ String jti = claims.getId();
 
 ---
 
-### ① 좌석 조회 API — `section` 쿼리 파라미터 필터 추가
-
-- **우선순위**: 🔴 긴급
-- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
-
-```
-GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats?section=VIP1
-```
-
-- **요청**: `section` 쿼리 파라미터 추가. 해당 구역에 속하는 좌석만 반환.
-- **이유**: 공연장 규모 15,000석 기준 전체 조회 시 응답이 ~1.5MB. 구역 클릭 시 해당 section만 요청하도록 프론트 변경 완료 — 백엔드 필터 지원 필요.
-- **필터 값**: 구역 코드(`VIP1`, `VIP2`, `S1`, `R1`, `A1` 등). 파라미터 없으면 전체 반환 (기존 동작 유지).
-
----
-
-### ② 좌석 조회 API — `section` 필드를 zone 레벨로 반환
-
-- **우선순위**: 🔴 긴급
-- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
-
-```json
-// 현재 (tier 레벨) ❌
-{ "section": "A" }
-
-// 필요 (zone 레벨) ✅
-{ "section": "A1" }
-```
-
-- **요청**: 응답의 `section` 필드를 tier 레벨(`A`)이 아닌 zone 레벨(`A1`)로 반환.
-- **이유**: SVG 공연장 지도에서 VIP1/VIP2/VIP3을 각각 별도 구역으로 렌더링함. tier 레벨로 오면 VIP1 클릭 시 VIP2·VIP3 좌석까지 섞여서 표시됨.
-
----
-
-### ③ 좌석 조회 API — 응답 정렬 순서 보장
-
-- **우선순위**: 🔴 긴급
-- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
-
-- **요청**: 응답 배열을 `row ASC → number ASC` 순으로 정렬해서 반환.
-- **이유**: 프론트는 배열 인덱스로 좌석의 SVG 좌표를 계산함. 정렬이 보장되지 않으면 좌석이 뒤죽박죽으로 렌더링됨.
-
-```sql
--- 쿼리 정렬 기준
-ORDER BY CAST(row AS INT) ASC, CAST(number AS INT) ASC
-```
-
-즉 row 1의 1번석 → row 1의 마지막 석 → row 2의 1번석 → ... 순서.
-
----
-
-### ④ 홈 선예매 오픈 임박 — 추가 필드 요청
-
-- **우선순위**: 🟡 보통
-- **대상**: `GET /events/home` 응답의 `presaleOpeningSoon[]` 배열 및 `trendingEvents[]`, `popularEventRanking[]`
-
-현재 `presaleOpeningSoon` 항목은 `HomeTrendingEvent` 타입과 동일한 필드를 반환해 아래 정보를 프론트에서 표시할 수 없습니다.
-
-#### 요청 필드
-
-```json
-{
-  "eventId": 1,
-  "eventTitle": "IVE THE 1ST WORLD TOUR",
-  "artistId": 5,
-  "artistName": "IVE",
-  "posterImageUrl": "https://...", // 현재 null로 오고 있음 — 유효한 URL 반환 필요
-  "venueAddress": "KSPO DOME",
-  "openDate": "2026-03-03T20:00:00", // ★ LocalDate → LocalDateTime으로 변경 요청 (공연 시작 시간 포함)
-  "endDate": "2026-03-04",
-
-  // ↓ presaleOpeningSoon 전용 신규 요청 필드
-  "presaleOpenAt": "2026-02-20T20:00:00", // 선예매 오픈 일시 (없으면 null) — "02.20(목) 20:00" 표시용
-  "saleType": "PRESALE", // "PRESALE" | "GENERAL" — 선예매/일반예매 구분
-  "isHot": true, // HOT 뱃지
-  "isSeatAdvantage": false, // 좌석 우위 뱃지
-  "isExclusive": true // 단독판매 뱃지
-}
-```
-
-#### 각 필드 필요 이유
-
-| 필드                                        | 이유                                                                                                                                                           |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `posterImageUrl` (수정)                     | home API에서 null로 와서 이미지 미표시. `/events` API에서 폴백 중이나 홈에서 직접 주는 게 맞음                                                                 |
-| `openDate` → datetime                       | 현재 날짜만 오고 시간이 없어 "03.03(화)" 만 표시됨. "03.03(화) 20:00" 표시를 위해 시간 포함 필요. `trendingEvents`, `popularEventRanking`도 동일하게 변경 요청 |
-| `presaleOpenAt`                             | 선예매 오픈 일시를 카드에 별도 표시 ("선예매 D-3" 등 추후 확장 가능)                                                                                           |
-| `saleType`                                  | 선예매/일반예매 구분 텍스트 표시                                                                                                                               |
-| `isHot` / `isSeatAdvantage` / `isExclusive` | 디자인에 명시된 뱃지 표시                                                                                                                                      |
-
----
-
 ## 완료
+
+### ⑦ `POST /auth/sms/send`, `POST /auth/sms/verify` — 온보딩 미완료 유저 403 차단 해제 ✅
+
+- **대상**: `UserContextFilter.blockWhenOnboardingNotCompleted()`
+
+`/auth/sms/send`, `/auth/sms/verify`를 `blockWhenOnboardingNotCompleted` 예외 항목에 추가 완료.
+
+---
+
+### ⑥ `POST /auth/logout` — jti 추출 버그로 쿠키 미삭제 (자동로그인 버그) ✅
+
+- **대상**: `SocialAuthService.java:271`
+
+`claims.get("jti", String.class)` → `claims.getId()` 수정 완료. 코드 확인됨.
+
+---
+
+### ① 좌석 조회 API — `section` 쿼리 파라미터 필터 추가 ✅
+
+- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
+
+`TicketController.java:31`에 `@RequestParam(required = false) String section` 추가 및 서비스 레이어 필터링 구현 완료. 코드 확인됨.
+
+---
+
+### ② 좌석 조회 API — `section` 필드를 zone 레벨로 반환 ✅
+
+- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
+
+Event 서비스가 `sectionCode`(zone 레벨, `VIP1`)와 `tier`(tier 레벨, `VIP`)를 분리 반환. Ticket 서비스에서 zone 레벨 `sectionCode`를 우선 사용하도록 구현 완료. 코드 확인됨.
+
+---
+
+### ③ 좌석 조회 API — 응답 정렬 순서 보장 ✅
+
+- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
+
+`TicketReservationService.getSeats()` 두 경로 모두 `row ASC → number ASC` 숫자 정렬 적용 완료. 코드 확인됨.
+
+---
 
 ### `GET /ticket/users/reservations` 응답에 `transferEligible` 필드 추가
 

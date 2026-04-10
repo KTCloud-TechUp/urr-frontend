@@ -5,7 +5,7 @@
 -- 전제: 테이블은 Hibernate DDL로 이미 생성된 상태
 -- ==============================================================
 
-CREATE DATABASE urr_event CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; 
+CREATE DATABASE IF NOT EXISTS urr_event CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE urr_event;
 -- ──────────────────────────────────────────────────────────────
@@ -181,7 +181,7 @@ VALUES
   (1, 1,
    'G-Dragon WORLD TOUR ''POWER''',
    '2026년 G-Dragon 첫 단독 월드투어. 퍼포먼스와 예술의 경계를 허무는 무대.',
-   1, '2026-02-22', '2026-06-03', 1,
+   1, '2026-04-09', '2026-06-03', 1,
    '/artists/1/events/upcoming_gdragon-2026-mama.png',
    'CONCERT',
    '["HOT","PRE_SALE"]',
@@ -471,18 +471,18 @@ INSERT INTO shows
    created_at, updated_at)
 VALUES
   -- ── event 1: G-Dragon POWER (3회차) ─────────────────────────
-  (1,  1, 1, '2026-06-01 18:00:00', '2026-06-01 20:30:00', 14693, 1,
-   '2026-02-20 12:00:00', '2026-05-31 23:59:59', 'OPEN',
-   '{"sections":[{"code":"VIP","total":2001,"remaining":42},{"code":"R","total":5292,"remaining":291},{"code":"S","total":4400,"remaining":960},{"code":"A","total":3000,"remaining":800}]}',
-   3, '2026-01-10 00:00:00', '2026-02-22 13:00:00'),
-  (2,  1, 2, '2026-06-02 18:00:00', '2026-06-02 20:30:00', 14693, 1,
-   '2026-02-20 12:00:00', '2026-06-01 23:59:59', 'OPEN',
-   '{"sections":[{"code":"VIP","total":2001,"remaining":891},{"code":"R","total":5292,"remaining":1560},{"code":"S","total":4400,"remaining":2330},{"code":"A","total":3000,"remaining":1440}]}',
-   2, '2026-01-10 00:00:00', '2026-02-22 13:00:00'),
-  (3,  1, 3, '2026-06-03 17:00:00', '2026-06-03 19:30:00', 14693, 1,
-   '2026-02-20 12:00:00', '2026-06-02 23:59:59', 'OPEN',
-   '{"sections":[{"code":"VIP","total":2001,"remaining":1800},{"code":"R","total":5292,"remaining":4500},{"code":"S","total":4400,"remaining":4000},{"code":"A","total":3000,"remaining":2800}]}',
-   1, '2026-01-10 00:00:00', '2026-02-22 13:00:00'),
+  (1,  1, 1, '2026-06-01 18:00:00', '2026-06-01 20:30:00', 66, 1,
+   '2026-04-07 12:00:00', '2026-05-31 23:59:59', 'OPEN',
+   '{"version":1,"sections":[{"name":"VIP1","tier":"VIP","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"VIP2","tier":"VIP","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R1","tier":"R","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R2","tier":"R","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R3","tier":"R","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S1","tier":"S","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S2","tier":"S","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S3","tier":"S","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A1","tier":"A","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A2","tier":"A","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A3","tier":"A","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]}]}',
+   1, '2026-01-10 00:00:00', '2026-04-09 13:00:00'),
+  (2,  1, 2, '2026-06-02 18:00:00', '2026-06-02 20:30:00', 66, 1,
+   '2026-04-07 12:00:00', '2026-06-01 23:59:59', 'OPEN',
+   '{"version":1,"sections":[{"name":"VIP1","tier":"VIP","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"VIP2","tier":"VIP","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R1","tier":"R","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R2","tier":"R","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R3","tier":"R","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S1","tier":"S","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S2","tier":"S","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S3","tier":"S","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A1","tier":"A","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A2","tier":"A","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A3","tier":"A","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]}]}',
+   1, '2026-01-10 00:00:00', '2026-04-09 13:00:00'),
+  (3,  1, 3, '2026-06-03 17:00:00', '2026-06-03 19:30:00', 66, 1,
+   '2026-04-07 12:00:00', '2026-06-02 23:59:59', 'OPEN',
+   '{"version":1,"sections":[{"name":"VIP1","tier":"VIP","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"VIP2","tier":"VIP","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R1","tier":"R","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R2","tier":"R","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"R3","tier":"R","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S1","tier":"S","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S2","tier":"S","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"S3","tier":"S","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A1","tier":"A","zoneNo":1,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A2","tier":"A","zoneNo":2,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]},{"name":"A3","tier":"A","zoneNo":3,"seats":[{"row":"A","number":1,"sellable":true},{"row":"A","number":2,"sellable":true},{"row":"A","number":3,"sellable":true},{"row":"B","number":1,"sellable":true},{"row":"B","number":2,"sellable":true},{"row":"B","number":3,"sellable":true}]}]}',
+   1, '2026-01-10 00:00:00', '2026-04-09 13:00:00'),
 
   -- ── event 2: BTS YET TO COME IN CINEMAS (3회차) ─────────────
   (4,  2, 1, '2026-08-01 19:00:00', '2026-08-01 22:00:00', 46900, 1,
@@ -606,11 +606,11 @@ VALUES
 
   -- ── event 13: (G)I-DLE iDOL (2회차) ─────────────────────────
   (29, 13, 1, '2026-04-20 18:00:00', '2026-04-20 20:20:00', 14693, 1,
-   '2026-02-20 12:00:00', '2026-04-19 23:59:59', 'OPEN',
+   '2026-04-07 12:00:00', '2026-04-19 23:59:59', 'OPEN',
    '{"sections":[{"code":"VIP","total":2001,"remaining":80},{"code":"R","total":5292,"remaining":450},{"code":"S","total":4400,"remaining":1100},{"code":"A","total":3000,"remaining":850}]}',
    2, '2026-01-01 00:00:00', '2026-02-22 13:00:00'),
   (30, 13, 2, '2026-04-21 18:00:00', '2026-04-21 20:20:00', 14693, 1,
-   '2026-02-20 12:00:00', '2026-04-20 23:59:59', 'OPEN',
+   '2026-04-07 12:00:00', '2026-04-20 23:59:59', 'OPEN',
    '{"sections":[{"code":"VIP","total":2001,"remaining":600},{"code":"R","total":5292,"remaining":2200},{"code":"S","total":4400,"remaining":3400},{"code":"A","total":3000,"remaining":2600}]}',
    1, '2026-01-01 00:00:00', '2026-02-22 13:00:00'),
 
@@ -681,35 +681,26 @@ VALUES
 -- BaseTimeEntity 미적용 → created_at / updated_at 컬럼 없음
 -- pending_expires_at: 결제 완료된 멤버십은 의미 없지만 NOT NULL 이므로 가입 시각 +30분으로 설정
 -- ──────────────────────────────────────────────────────────────
--- INSERT INTO artist_memberships
---   (id, artist_id, user_id, nickname, tier, status, order_id, payment_id,
---    pending_expires_at, start_date, end_date)
--- VALUES
---   -- mem-001: G-Dragon, LIGHTNING, ACTIVE
---   (1, 1, 1, '지디사랑해', 'LIGHTNING', 'ACTIVE',
---    'ORD-GD-2025-0001', 'PAY-GD-2025-0001',
---    '2025-01-15 00:30:00', '2025-01-15', '2026-12-31'),
--- 
---   -- mem-002: BTS, THUNDER, EXPIRED (isActive=false, expiresAt=2026-06-30)
---   (2, 2, 1, '보라해아미', 'THUNDER', 'EXPIRED',
---    'ORD-BTS-2025-0042', 'PAY-BTS-2025-0042',
---    '2025-03-20 00:30:00', '2025-03-20', '2026-06-30'),
--- 
---   -- mem-003: aespa, CLOUD, ACTIVE
---   (3, 3, 1, '마이윈터', 'CLOUD', 'ACTIVE',
---    'ORD-AE-2025-0128', 'PAY-AE-2025-0128',
---    '2025-06-01 00:30:00', '2025-06-01', '2026-09-15'),
--- 
---   -- mem-004: IVE, MIST, EXPIRED (isActive=false)
---   (4, 4, 1, '아이브최고', 'MIST', 'EXPIRED',
---    'ORD-IVE-2025-0085', 'PAY-IVE-2025-0085',
---    '2025-08-10 00:30:00', '2025-08-10', '2026-08-10');
-
-
--- ──────────────────────────────────────────────────────────────
--- PATCH: poster_image_url 경로 수정
--- event id=1 (G-Dragon): 실제 존재하는 파일로 교체
--- ──────────────────────────────────────────────────────────────
-UPDATE events
-SET poster_image_url = '/artists/1/events/upcoming_gdragon-power-concert-2025.png'
-WHERE id = 1;
+ INSERT INTO artist_memberships
+   (id, artist_id, user_id, nickname, tier, status, order_id, payment_id,
+    pending_expires_at, start_date, end_date)
+ VALUES
+   -- mem-001: G-Dragon, LIGHTNING, ACTIVE
+   (1, 1, 1, '지디사랑해', 'LIGHTNING', 'ACTIVE',
+    'ORD-GD-2025-0001', 'PAY-GD-2025-0001',
+    '2025-01-15 00:30:00', '2025-01-15', '2026-12-31'),
+ 
+   -- mem-002: BTS, THUNDER, EXPIRED (isActive=false, expiresAt=2026-06-30)
+   (2, 2, 1, '보라해아미', 'THUNDER', 'EXPIRED',
+    'ORD-BTS-2025-0042', 'PAY-BTS-2025-0042',
+    '2025-03-20 00:30:00', '2025-03-20', '2026-06-30'),
+ 
+   -- mem-003: aespa, CLOUD, ACTIVE
+   (3, 3, 1, '마이윈터', 'CLOUD', 'ACTIVE',
+    'ORD-AE-2025-0128', 'PAY-AE-2025-0128',
+    '2025-06-01 00:30:00', '2025-06-01', '2026-09-15'),
+ 
+   -- mem-004: IVE, MIST, EXPIRED (isActive=false)
+   (4, 4, 1, '아이브최고', 'MIST', 'EXPIRED',
+    'ORD-IVE-2025-0085', 'PAY-IVE-2025-0085',
+    '2025-08-10 00:30:00', '2025-08-10', '2026-08-10');
