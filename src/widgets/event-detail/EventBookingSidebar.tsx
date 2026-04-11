@@ -31,7 +31,7 @@ function formatTierTime(value: unknown): string {
 
 function EventBookingSidebarInner({ event }: EventBookingSidebarProps) {
   const router = useRouter();
-  const { bookingState, startBooking, resetBooking, eventDates } = useBooking();
+  const { bookingState, startBooking, resetBooking } = useBooking();
   const [selectedDateId, setSelectedDateId] = useState(event.dates[0]?.id ?? "");
 
   const selectedDate = event.dates.find((d) => d.id === selectedDateId);
@@ -83,8 +83,6 @@ function EventBookingSidebarInner({ event }: EventBookingSidebarProps) {
           </h4>
           <div className="space-y-2">
             {event.dates.map((d) => {
-              const apiDate = eventDates.find((ed) => ed.id === d.id);
-              const remaining = apiDate?.remainingSeats ?? d.remainingSeats;
               return (
                 <button
                   key={d.id}
@@ -96,17 +94,7 @@ function EventBookingSidebarInner({ event }: EventBookingSidebarProps) {
                       : "border-border hover:bg-muted/50",
                   )}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{formatSidebarDate(d.date)}</span>
-                    <span
-                      className={cn(
-                        "text-xs",
-                        remaining < 1000 ? "text-destructive font-medium" : "text-muted-foreground",
-                      )}
-                    >
-                      잔여 {remaining.toLocaleString()}석
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium">{formatSidebarDate(d.date)}</span>
                 </button>
               );
             })}
