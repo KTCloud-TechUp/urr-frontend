@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   ArtistSelectStep,
   MembershipIntroStep,
@@ -13,7 +14,7 @@ import {
 import { useArtists } from '@/features/artist'
 import { confirmPayment } from '@/features/payment/api/confirmPayment'
 import { getMemberships } from '@/features/membership/api/getMemberships'
-import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
+import { useCurrentUser, AUTH_ME_QUERY_KEY } from '@/features/auth/model/useCurrentUser'
 import type { Artist, TierLevel } from '@/shared/types'
 
 type Step = 'select' | 'intro' | 'payment' | 'profile' | 'complete'
@@ -27,6 +28,7 @@ export function MembershipWidget() {
   const { data: memberships = [] } = useMemberships()
   const { data: artists = [] } = useArtists()
   const { data: currentUser } = useCurrentUser()
+  const queryClient = useQueryClient()
   const callbackHandled = useRef(false)
 
   // Toss 결제 성공 콜백: /membership?paymentKey=...&orderId=...&amount=... 감지
@@ -70,6 +72,7 @@ export function MembershipWidget() {
       .then((fresh) => {
         const found = fresh.find((m) => m.artistId === artistId)
         if (found) setMembershipId(found.id)
+        queryClient.invalidateQueries({ queryKey: AUTH_ME_QUERY_KEY })
         setStep('profile')
       })
       .catch(() => {

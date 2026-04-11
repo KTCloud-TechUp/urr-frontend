@@ -9,12 +9,11 @@ import { getArtist, followArtist, unfollowArtist } from "@/features/artist";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { getArtistEvents } from "@/features/event";
 import type { EventSummary } from "@/features/event";
-import { mockUser } from "@/shared/lib/mocks/user";
 import {
   getArtistExtendedInfo,
 } from "@/shared/lib/mocks/artist-page";
 import { getTransferPosts } from "@/features/transfer";
-import type { Artist, Event } from "@/shared/types";
+import type { Artist, Event, TierLevel } from "@/shared/types";
 import { getCommunityPostsByArtistId } from "@/shared/lib/mocks/community";
 import { ArtistHeader } from "./ArtistHeader";
 import { ArtistHomeTab } from "./ArtistHomeTab";
@@ -125,7 +124,20 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
 
   const hasRepresentativeImage = Boolean(artist.avatar);
 
-  const membership = mockUser.memberships.find((m) => m.artistId === artistId && m.isActive);
+  const membershipInfo = currentUser?.memberships?.find((m) => String(m.artistId) === artistId);
+  const membership = membershipInfo
+    ? {
+        id: String(membershipInfo.artistId),
+        artistId: String(membershipInfo.artistId),
+        artistName: membershipInfo.artistName,
+        tier: membershipInfo.tier as TierLevel,
+        nickname: '',
+        membershipNumber: '',
+        joinedAt: '',
+        expiresAt: membershipInfo.endDate,
+        isActive: new Date(membershipInfo.endDate) > new Date(),
+      }
+    : undefined;
   const extendedInfo = getArtistExtendedInfo(artist.id);
   const allEvents: Event[] = artistEventsData
     .filter((e: EventSummary) => String(e.artistId) === artistId)
