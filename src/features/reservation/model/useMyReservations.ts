@@ -6,8 +6,16 @@ import { getEvents } from "@/features/event";
 import { getShows } from "@/features/show";
 import type { Ticket, Event } from "@/shared/types";
 
+// seatId 형식: "{sectionCode}-{row}-{number}" (API #31 스펙 확인)
+// 예: "VIP1-A-1" → section: "VIP1", row: "A", seatNumber: "1"
 function parseSeatId(seatId: string): { section: string; row: string; seatNumber: string } {
-  // seatId 형식이 불명확하므로 그대로 표시
+  const parts = seatId.split("-");
+  if (parts.length >= 3) {
+    const seatNumber = parts[parts.length - 1];
+    const row = parts[parts.length - 2];
+    const section = parts.slice(0, parts.length - 2).join("-");
+    return { section, row, seatNumber };
+  }
   return { section: seatId, row: "-", seatNumber: "-" };
 }
 

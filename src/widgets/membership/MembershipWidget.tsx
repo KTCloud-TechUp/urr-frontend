@@ -79,7 +79,7 @@ export function MembershipWidget() {
         // 실패 시 payment 단계로 복귀
         setStep('payment')
       })
-  }, [currentUser?.userId, artists])
+  }, [currentUser?.userId, artists, queryClient])
 
   // reset=1 파라미터가 있으면 select 단계로 초기화 (사이드바에서 재진입 시)
   useEffect(() => {

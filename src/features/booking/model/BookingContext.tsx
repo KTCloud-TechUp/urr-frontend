@@ -21,6 +21,7 @@ import { mockEvent } from "@/shared/lib/mocks/event-detail";
 import { mockUser } from "@/shared/lib/mocks/user";
 import { MAX_SEATS_PER_TIER } from "@/shared/lib/mocks/seats";
 import { getShows } from "@/features/show/api/getShows";
+import { getSections } from "@/features/show/api/getSections";
 import { getSeatsSummary } from "@/features/booking/api/getSeatsSummary";
 import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
 import { confirmPayment } from "@/features/payment/api/confirmPayment";
@@ -30,8 +31,8 @@ import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { useBookingStore, type ReservationRef } from "./useBookingStore";
 import type { TierWindow } from "@/shared/types";
 
-// Static tier price map (pricing API not yet available)
-const TIER_PRICES: Record<string, number> = {
+// Fallback tier price map (used when sections API is unavailable)
+const TIER_PRICES_FALLBACK: Record<string, number> = {
   VIP: 198000,
   S: 132000,
   R: 110000,
@@ -237,6 +238,20 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     enabled: showId !== null,
   });
 
+  // Fetch section pricing (API #30)
+  const { data: sectionsData } = useQuery({
+    queryKey: ["show-sections", showId],
+    queryFn: () => getSections(showId!),
+    enabled: needsSeatsSummary && showId !== null,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Build sectionCode → price lookup from sections API
+  const sectionPriceMap = useMemo(() => {
+    if (!sectionsData) return new Map<string, number>();
+    return new Map(sectionsData.sections.map((s) => [s.code, s.price]));
+  }, [sectionsData]);
+
   // Map summary zones to Section[]
   const sectionsForDate: Section[] = useMemo(() => {
     if (!seatsSummary) return [];
@@ -244,12 +259,15 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       tier.zones.map((zone) => ({
         id: zone.sectionCode,
         name: zone.sectionCode,
-        price: TIER_PRICES[tier.tier] ?? 99000,
+        price:
+          sectionPriceMap.get(zone.sectionCode) ??
+          TIER_PRICES_FALLBACK[tier.tier] ??
+          99000,
         totalSeats: zone.totalSeats,
         remainingSeats: zone.bookableSeats,
       })),
     );
-  }, [seatsSummary]);
+  }, [seatsSummary, sectionPriceMap]);
 
   // Build event object with real dates (keep mock metadata until event detail API is integrated)
   const event: BookingEvent | null = useMemo(() => {
