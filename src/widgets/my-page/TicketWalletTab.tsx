@@ -10,7 +10,7 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import { QRCodeModal } from './QRCodeModal'
 import { TransferListingModal } from './TransferListingModal'
 import { CancelBookingDialog } from './CancelBookingDialog'
-import { cancelPayment } from '@/features/payment'
+import { cancelReservation } from '@/features/booking/api/cancelReservation'
 import type { Ticket, Event, TierLevel, User } from '@/shared/types'
 
 interface TicketWalletTabProps {
@@ -38,8 +38,8 @@ export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps)
   const past = tickets.filter((t) => !t.isUpcoming)
 
   const cancelMutation = useMutation({
-    mutationFn: ({ paymentKey, reason }: { paymentKey: string; reason: string }) =>
-      cancelPayment(paymentKey, reason),
+    mutationFn: ({ eventId, showId, seatId }: { eventId: number; showId: number; seatId: string }) =>
+      cancelReservation({ eventId, showId, seatId }, userId ?? ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-reservations', userId, 'CONFIRMED'] })
       setCancelTicket(null)
@@ -60,14 +60,18 @@ export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps)
     }
   }, [])
 
-  const handleCancelBookingConfirm = useCallback((reason: string) => {
+  const handleCancelBookingConfirm = useCallback((_reason: string) => {
     if (!cancelTicket) return
-    if (!cancelTicket.paymentKey) {
-      alert('결제 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.')
+    if (!cancelTicket.seatId) {
+      alert('좌석 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.')
       setCancelTicket(null)
       return
     }
-    cancelMutation.mutate({ paymentKey: cancelTicket.paymentKey, reason })
+    cancelMutation.mutate({
+      eventId: Number(cancelTicket.eventId),
+      showId: Number(cancelTicket.showId),
+      seatId: cancelTicket.seatId,
+    })
   }, [cancelTicket, cancelMutation])
 
   if (tickets.length === 0) {

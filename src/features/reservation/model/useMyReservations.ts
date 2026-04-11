@@ -74,6 +74,7 @@ export function useMyReservations(userId?: string | number) {
       id: r.reservationId,
       eventId: String(r.eventId),
       showId: String(r.showId),
+      seatId: r.seatId,
       section,
       row,
       seatNumber,

@@ -76,6 +76,8 @@ export interface Ticket {
   id: string;
   eventId: string;
   showId?: string;
+  /** 원본 seatId — 예약 취소 API (POST /ticket/reservations/cancel) 호출용 */
+  seatId?: string;
   section: string;
   row: string;
   seatNumber: string;
@@ -84,8 +86,6 @@ export interface Ticket {
   qrCode: string;
   isTransferable: boolean;
   isUpcoming: boolean;
-  /** Toss paymentKey — 예약 API가 반환 시 결제 취소에 사용. 현재는 별도 조회 필요 */
-  paymentKey?: string;
 }
 
 export interface TransferListing {
