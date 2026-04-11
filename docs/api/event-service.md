@@ -2,42 +2,42 @@
 
 > 마지막 확인: 2026-04-10
 
-| # | API | 메서드 | 엔드포인트 | 연동 파일 | 상태 | 비고 |
-|---|-----|--------|-----------|----------|------|------|
-| 1 | — | — | — | — | — | 항목 없음 |
-| 2 | 아티스트 생성 | POST | `/api/v1/artists` | — | ➖ 불필요 | ADMIN 전용 |
-| 3 | 아티스트 목록 조회 | GET | `/api/v1/artists` | `features/artist/api/getArtists.ts` | ✅ 연동됨 | |
-| 4 | 아티스트 상세 조회 | GET | `/api/v1/artists/{artistId}` | `features/artist/api/getArtist.ts` | ✅ 연동됨 | |
-| 5 | 아티스트 멤버십 구독 | POST | `/api/v1/artists/{artistId}/membership` | `features/membership/api/subscribeMembership.ts` | ✅ 연동됨 | |
-| 6 | 아티스트 멤버십 활성화 | POST | `/api/v1/artists/memberships/activate` | — | ❌ 미연동 | 프론트에서 의도적 제거 (결제 흐름 개선) |
-| 7 | 아티스트 멤버십 취소 | POST | `/api/v1/artists/memberships/cancel` | `features/membership/api/cancelMembership.ts` | ✅ 연동됨 | |
-| 8 | 아티스트 팔로우 | POST | `/api/v1/artists/{artistId}/follow` | `features/artist/api/followArtist.ts` | ✅ 연동됨 | |
-| 9 | 아티스트 언팔로우 | DELETE | `/api/v1/artists/{artistId}/follow` | `features/artist/api/unfollowArtist.ts` | ✅ 연동됨 | |
-| 10 | 팔로우한 아티스트 목록 조회 | GET | `/api/v1/artists/followings` | — | ❌ 미연동 | 사이드바 로그인 후 호출 필요 |
-| 11 | 아티스트 멤버십 정책 조회 | GET | `/api/v1/membership/artists/{artistId}/membership-policies` | `features/membership/api/getMembershipPolicies.ts` | ✅ 연동됨 | |
-| 12 | 회차 선예매 정책 조회 | GET | `/api/v1/membership/events/{eventId}/shows/{showId}/presale-policy` | `features/membership/api/getPresalePolicy.ts` | ✅ 연동됨 | |
-| 13 | 내 멤버십 목록 조회 | GET | `/api/v1/membership` | `features/membership/api/getMemberships.ts` | ✅ 연동됨 | 응답 `data.details` 구조 코드와 일치 |
-| 14 | 내 멤버십 상세 조회 | GET | `/api/v1/membership/{membershipId}` | — | ➖ 불필요 | 스펙에 "사용x" 명시 |
-| 15 | 내 멤버십 닉네임 수정 | PATCH | `/api/v1/membership/{membershipId}/nickname` | `features/membership/api/updateNickname.ts` | ✅ 연동됨 | |
-| 16 | 유저 멤버십 레벨 조회 (내부) | GET | `/api/v1/membership/level` | — | ➖ 불필요 | 서비스 내부 API |
-| 17 | 유저 멤버십 조회 (내부) | GET | `/api/v1/membership/internal/membership-info` | — | ➖ 불필요 | 서비스 내부 API |
-| 18 | 공연 생성 | POST | `/api/v1/artists/{artistId}/events` | — | ➖ 불필요 | ADMIN 전용 |
-| 19 | 아티스트 공연 목록 조회 | GET | `/api/v1/artists/{artistId}/events` | `features/event/api/getArtistEvents.ts` | ✅ 연동됨 | |
-| 20 | 공연 상세 조회 | GET | `/api/v1/artists/{artistId}/events/{eventId}` | `features/event/api/getEventDetail.ts` | ✅ 연동됨 | |
-| 21 | 전체 공연 목록 조회 | GET | `/api/v1/events` | `features/event/api/getEvents.ts` | ✅ 연동됨 | |
-| 22 | 공연장 템플릿 생성 | POST | `/api/v1/events/venues` | — | ➖ 불필요 | ADMIN 전용 |
-| 23 | 공연장 템플릿 목록 조회 | GET | `/api/v1/events/venues` | `features/event/api/getVenues.ts` (getVenues) | ✅ 연동됨 | 스펙 "no use" 명시 |
-| 24 | 공연장 템플릿 상세 조회 | GET | `/api/v1/events/venues/{venueTemplateId}` | `features/event/api/getVenues.ts` (getVenueDetail) | ✅ 연동됨 | 스펙 "no use" 명시 |
-| 25 | Home 큐레이션 조회 | GET | `/api/v1/events/home` | `features/home/api/getHome.ts` | ✅ 연동됨 | |
-| 26 | 공연 회차 생성 | POST | `/api/v1/shows/{eventId}/shows` | — | ➖ 불필요 | ADMIN 전용 |
-| 27 | 공연 회차 목록 조회 | GET | `/api/v1/shows/{eventId}/shows` | `features/show/api/getShows.ts` | ✅ 연동됨 | |
-| 28 | 공연 회차 상세 조회 | GET | `/api/v1/shows/{eventId}/shows/{showId}` | `features/show/api/getShowDetail.ts` | ✅ 연동됨 | |
-| 29 | 공연 회차 좌석 메타데이터 조회 | GET | `/api/v1/shows/{eventId}/shows/{showId}/seatmap` | — | ❌ 미연동 | |
-| 30 | 회차별 가격/구역 정책 조회 | GET | `/api/v1/shows/{showId}/sections` | — | ❌ 미연동 | |
-| 31 | 공연 회차 좌석 카탈로그 조회 | GET | `/api/v1/shows/{eventId}/shows/{showId}/seats` | — | ❌ 미연동 | |
-| 32 | 잔여석 전체 요약 조회 | GET | `/api/v1/shows/{eventId}/shows/{showId}/seats/summary` | `features/booking/api/getSeatsSummary.ts` | ✅ 연동됨 | |
-| 33 | 특정 티어/구역 예매 가능 좌석 조회 | GET | `/api/v1/shows/{eventId}/shows/{showId}/seats/availability` | `features/booking/api/getSeatsAvailability.ts` | ✅ 연동됨 | |
-| 34 | 회차별 멤버십 예매 오픈 시간표 조회 | GET | `/api/v1/shows/{eventId}/shows/{showId}/booking-windows` | `features/booking/api/getBookingWindows.ts` | ✅ 연동됨 | |
+| #   | API                                 | 메서드 | 엔드포인트                                                          | 연동 파일                                          | 상태      | 비고                                 |
+| --- | ----------------------------------- | ------ | ------------------------------------------------------------------- | -------------------------------------------------- | --------- | ------------------------------------ |
+| 1   | —                                   | —      | —                                                                   | —                                                  | —         | 항목 없음                            |
+| 2   | 아티스트 생성                       | POST   | `/api/v1/artists`                                                   | —                                                  | ➖ 불필요 | ADMIN 전용                           |
+| 3   | 아티스트 목록 조회                  | GET    | `/api/v1/artists`                                                   | `features/artist/api/getArtists.ts`                | ✅ 연동됨 |                                      |
+| 4   | 아티스트 상세 조회                  | GET    | `/api/v1/artists/{artistId}`                                        | `features/artist/api/getArtist.ts`                 | ✅ 연동됨 |                                      |
+| 5   | 아티스트 멤버십 구독                | POST   | `/api/v1/artists/{artistId}/membership`                             | `features/membership/api/subscribeMembership.ts`   | ✅ 연동됨 |                                      |
+| 6   | 아티스트 멤버십 활성화              | POST   | `/api/v1/artists/memberships/activate`                              | —                                                  | ➖ 불필요 | 서비스 내부 API                      |
+| 7   | 아티스트 멤버십 취소                | POST   | `/api/v1/artists/memberships/cancel`                                | `features/membership/api/cancelMembership.ts`      | ✅ 연동됨 |                                      |
+| 8   | 아티스트 팔로우                     | POST   | `/api/v1/artists/{artistId}/follow`                                 | `features/artist/api/followArtist.ts`              | ✅ 연동됨 |                                      |
+| 9   | 아티스트 언팔로우                   | DELETE | `/api/v1/artists/{artistId}/follow`                                 | `features/artist/api/unfollowArtist.ts`            | ✅ 연동됨 |                                      |
+| 10  | 팔로우한 아티스트 목록 조회         | GET    | `/api/v1/artists/followings`                                        | —                                                  | ➖ 불필요 | UI 없음                              |
+| 11  | 아티스트 멤버십 정책 조회           | GET    | `/api/v1/membership/artists/{artistId}/membership-policies`         | `features/membership/api/getMembershipPolicies.ts` | ✅ 연동됨 |                                      |
+| 12  | 회차 선예매 정책 조회               | GET    | `/api/v1/membership/events/{eventId}/shows/{showId}/presale-policy` | `features/membership/api/getPresalePolicy.ts`      | ✅ 연동됨 |                                      |
+| 13  | 내 멤버십 목록 조회                 | GET    | `/api/v1/membership`                                                | `features/membership/api/getMemberships.ts`        | ✅ 연동됨 | 응답 `data.details` 구조 코드와 일치 |
+| 14  | 내 멤버십 상세 조회                 | GET    | `/api/v1/membership/{membershipId}`                                 | —                                                  | ➖ 불필요 | 상세하게 조회할 UI 없음              |
+| 15  | 내 멤버십 닉네임 수정               | PATCH  | `/api/v1/membership/{membershipId}/nickname`                        | `features/membership/api/updateNickname.ts`        | ✅ 연동됨 |                                      |
+| 16  | 유저 멤버십 레벨 조회 (내부)        | GET    | `/api/v1/membership/level`                                          | —                                                  | ➖ 불필요 | 서비스 내부 API                      |
+| 17  | 유저 멤버십 조회 (내부)             | GET    | `/api/v1/membership/internal/membership-info`                       | —                                                  | ➖ 불필요 | 서비스 내부 API                      |
+| 18  | 공연 생성                           | POST   | `/api/v1/artists/{artistId}/events`                                 | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                 |
+| 19  | 아티스트 공연 목록 조회             | GET    | `/api/v1/artists/{artistId}/events`                                 | `features/event/api/getArtistEvents.ts`            | ✅ 연동됨 |                                      |
+| 20  | 공연 상세 조회                      | GET    | `/api/v1/artists/{artistId}/events/{eventId}`                       | `features/event/api/getEventDetail.ts`             | ✅ 연동됨 |                                      |
+| 21  | 전체 공연 목록 조회                 | GET    | `/api/v1/events`                                                    | `features/event/api/getEvents.ts`                  | ✅ 연동됨 |                                      |
+| 22  | 공연장 템플릿 생성                  | POST   | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                 |
+| 23  | 공연장 템플릿 목록 조회             | GET    | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거          |
+| 24  | 공연장 템플릿 상세 조회             | GET    | `/api/v1/events/venues/{venueTemplateId}`                           | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거          |
+| 25  | Home 큐레이션 조회                  | GET    | `/api/v1/events/home`                                               | `features/home/api/getHome.ts`                     | ✅ 연동됨 |                                      |
+| 26  | 공연 회차 생성                      | POST   | `/api/v1/shows/{eventId}/shows`                                     | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                 |
+| 27  | 공연 회차 목록 조회                 | GET    | `/api/v1/shows/{eventId}/shows`                                     | `features/show/api/getShows.ts`                    | ✅ 연동됨 |                                      |
+| 28  | 공연 회차 상세 조회                 | GET    | `/api/v1/shows/{eventId}/shows/{showId}`                            | `features/show/api/getShowDetail.ts`               | ✅ 연동됨 |                                      |
+| 29  | 공연 회차 좌석 메타데이터 조회      | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seatmap`                    | —                                                  | ❌ 미연동 |                                      |
+| 30  | 회차별 가격/구역 정책 조회          | GET    | `/api/v1/shows/{showId}/sections`                                   | —                                                  | ❌ 미연동 |                                      |
+| 31  | 공연 회차 좌석 카탈로그 조회        | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats`                      | —                                                  | ❌ 미연동 |                                      |
+| 32  | 잔여석 전체 요약 조회               | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/summary`              | `features/booking/api/getSeatsSummary.ts`          | ✅ 연동됨 |                                      |
+| 33  | 특정 티어/구역 예매 가능 좌석 조회  | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/availability`         | `features/booking/api/getSeatsAvailability.ts`     | ✅ 연동됨 |                                      |
+| 34  | 회차별 멤버십 예매 오픈 시간표 조회 | GET    | `/api/v1/shows/{eventId}/shows/{showId}/booking-windows`            | `features/booking/api/getBookingWindows.ts`        | ✅ 연동됨 |                                      |
 
 ---
 
@@ -674,7 +674,7 @@ GET /api/v1/artists/followings?userId=101
 
 사용자의 멤버십 목록을 조회합니다.
 
-auth서비스  /me에서 유저 멤버십 조회를 위해 사용
+auth서비스 /me에서 유저 멤버십 조회를 위해 사용
 
 ## 인증
 
@@ -1595,64 +1595,64 @@ GET /api/v1/events/home?limit=5
 
 ```json
 {
-    "isSuccess": true,
-    "statusCode": 200,
-    "message": "OK",
-    "data": {
-        "popularEventRanking": [
-            {
-                "rank": 1,
-                "eventId": 14,
-                "eventTitle": "POSTMAN TEST CONCERT 2026",
-                "artistId": 2,
-                "artistName": "빅뱅",
-                "posterImageUrl": null,
-                "openDate": "2026-04-10",
-                "endDate": null
-            }
-        ],
-        "popularArtists": [
-            {
-                "artistId": 2,
-                "artistName": "빅뱅",
-                "profileImageUrl": "https://cdn.example.com/artists/bigbang.png",
-                "followerCount": 3,
-                "category": "boygroup"
-            }
-        ],
-        "trendingEvents": [
-            {
-                "eventId": 14,
-                "eventTitle": "POSTMAN TEST CONCERT 2026",
-                "artistId": 2,
-                "artistName": "빅뱅",
-                "posterImageUrl": null,
-                "venueAddress": null,
-                "openDate": "2026-04-10",
-                "endDate": null
-            }
-        ],
-        "presaleOpeningSoon": [
-            {
-                "showId": 1,
-                "eventId": 14,
-                "eventTitle": "POSTMAN TEST CONCERT 2026",
-                "artistId": 2,
-                "artistName": "빅뱅",
-                "saleOpenAt": "2026-04-15T10:00:00",
-                "venueAddress": "KSPO DOME"
-            }
-        ],
-        "newArtists": [
-            {
-                "artistId": 4,
-                "artistName": "악동뮤지션",
-                "profileImageUrl": "https://cdn.example.com/artists/bts.png",
-                "followerCount": 0,
-                "category": "coedgroup"
-            }
-        ]
-    }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "popularEventRanking": [
+      {
+        "rank": 1,
+        "eventId": 14,
+        "eventTitle": "POSTMAN TEST CONCERT 2026",
+        "artistId": 2,
+        "artistName": "빅뱅",
+        "posterImageUrl": null,
+        "openDate": "2026-04-10",
+        "endDate": null
+      }
+    ],
+    "popularArtists": [
+      {
+        "artistId": 2,
+        "artistName": "빅뱅",
+        "profileImageUrl": "https://cdn.example.com/artists/bigbang.png",
+        "followerCount": 3,
+        "category": "boygroup"
+      }
+    ],
+    "trendingEvents": [
+      {
+        "eventId": 14,
+        "eventTitle": "POSTMAN TEST CONCERT 2026",
+        "artistId": 2,
+        "artistName": "빅뱅",
+        "posterImageUrl": null,
+        "venueAddress": null,
+        "openDate": "2026-04-10",
+        "endDate": null
+      }
+    ],
+    "presaleOpeningSoon": [
+      {
+        "showId": 1,
+        "eventId": 14,
+        "eventTitle": "POSTMAN TEST CONCERT 2026",
+        "artistId": 2,
+        "artistName": "빅뱅",
+        "saleOpenAt": "2026-04-15T10:00:00",
+        "venueAddress": "KSPO DOME"
+      }
+    ],
+    "newArtists": [
+      {
+        "artistId": 4,
+        "artistName": "악동뮤지션",
+        "profileImageUrl": "https://cdn.example.com/artists/bts.png",
+        "followerCount": 0,
+        "category": "coedgroup"
+      }
+    ]
+  }
 }
 ```
 
@@ -2061,10 +2061,10 @@ GET /api/v1/shows/{eventId}/shows/{showId}/seats/summary
 
 ### Path Parameter
 
-| 파라미터명 | 타입 | 필수 여부 | 설명 |
-| --- | --- | --- | --- |
-| eventId | number | 필수 | 공연 ID |
-| showId | number | 필수 | 공연 회차 ID |
+| 파라미터명 | 타입   | 필수 여부 | 설명         |
+| ---------- | ------ | --------- | ------------ |
+| eventId    | number | 필수      | 공연 ID      |
+| showId     | number | 필수      | 공연 회차 ID |
 
 Response Body
 
@@ -2076,59 +2076,59 @@ sellableSeats/bookableSeats: 정책으로 막히지 않은/예약가능 구역
 
 ```json
 {
-    "isSuccess": true,
-    "statusCode": 200,
-    "message": "OK",
-    "data": {
-        "eventId": 14,
-        "showId": 2,
-        "tiers": [
-            {
-                "tier": "VIP",
-                "totalSeats": 410,
-                "sellableSeats": 409,
-                "bookableSeats": 409,
-                "zones": [
-                    {
-                        "sectionCode": "VIP1",
-                        "zoneNo": 1,
-                        "totalSeats": 184,
-                        "sellableSeats": 183,
-                        "bookableSeats": 183
-                    },
-                    {
-                        "sectionCode": "VIP2",
-                        "zoneNo": 2,
-                        "totalSeats": 96,
-                        "sellableSeats": 96,
-                        "bookableSeats": 96
-                    },
-                    {
-                        "sectionCode": "VIP3",
-                        "zoneNo": 3,
-                        "totalSeats": 130,
-                        "sellableSeats": 130,
-                        "bookableSeats": 130
-                    }
-                ]
-            },
-            {
-                "tier": "S",
-                "totalSeats": 1440,
-                "sellableSeats": 1440,
-                "bookableSeats": 1440,
-                "zones": [
-                    {
-                        "sectionCode": "S1",
-                        "zoneNo": 1,
-                        "totalSeats": 216,
-                        "sellableSeats": 216,
-                        "bookableSeats": 216
-                    }
-                ]
-            }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "eventId": 14,
+    "showId": 2,
+    "tiers": [
+      {
+        "tier": "VIP",
+        "totalSeats": 410,
+        "sellableSeats": 409,
+        "bookableSeats": 409,
+        "zones": [
+          {
+            "sectionCode": "VIP1",
+            "zoneNo": 1,
+            "totalSeats": 184,
+            "sellableSeats": 183,
+            "bookableSeats": 183
+          },
+          {
+            "sectionCode": "VIP2",
+            "zoneNo": 2,
+            "totalSeats": 96,
+            "sellableSeats": 96,
+            "bookableSeats": 96
+          },
+          {
+            "sectionCode": "VIP3",
+            "zoneNo": 3,
+            "totalSeats": 130,
+            "sellableSeats": 130,
+            "bookableSeats": 130
+          }
         ]
-    }
+      },
+      {
+        "tier": "S",
+        "totalSeats": 1440,
+        "sellableSeats": 1440,
+        "bookableSeats": 1440,
+        "zones": [
+          {
+            "sectionCode": "S1",
+            "zoneNo": 1,
+            "totalSeats": 216,
+            "sellableSeats": 216,
+            "bookableSeats": 216
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
@@ -2144,61 +2144,61 @@ GET /api/v1/shows/{eventId}/shows/{showId}/seats/availability
 
 ### Path Parameter
 
-| 파라미터명 | 타입 | 필수 여부 | 설명 |
-| --- | --- | --- | --- |
-| eventId | number | 필수 | 공연 ID |
-| showId | number | 필수 | 공연 회차 ID |
+| 파라미터명 | 타입   | 필수 여부 | 설명         |
+| ---------- | ------ | --------- | ------------ |
+| eventId    | number | 필수      | 공연 ID      |
+| showId     | number | 필수      | 공연 회차 ID |
 
 ### Query Parameter
 
-| 파라미터명 | 타입 | 필수 여부 | 설명 |
-| --- | --- | --- | --- |
-| tier | string | 필수 | 조회할 티어 |
-| zoneNo | number | 필수 | 조회할 구역 번호 |
+| 파라미터명 | 타입   | 필수 여부 | 설명             |
+| ---------- | ------ | --------- | ---------------- |
+| tier       | string | 필수      | 조회할 티어      |
+| zoneNo     | number | 필수      | 조회할 구역 번호 |
 
 ### Response Body
 
 ```json
 {
-    "isSuccess": true,
-    "statusCode": 200,
-    "message": "OK",
-    "data": {
-        "eventId": 14,
-        "showId": 2,
-        "tier": "VIP",
-        "zoneNo": 1,
-        "sectionCode": "VIP1",
-        "totalSeats": 184,
-        "sellableSeats": 183,
-        "bookableSeats": 183,
-        "seats": [
-            {
-                "seatId": "VIP1-A-1",
-                "row": "A",
-                "number": 1,
-                "sellable": true,
-                "ticketStatus": "AVAILABLE",
-                "bookable": true
-            },
-            {
-                "seatId": "VIP1-A-2",
-                "row": "A",
-                "number": 2,
-                "sellable": true,
-                "ticketStatus": "AVAILABLE",
-                "bookable": true
-            },
-            {
-                "seatId": "VIP1-B-2",
-                "row": "B",
-                "number": 2,
-                "sellable": false,
-                "ticketStatus": "AVAILABLE",
-                "bookable": false
-            }
-        ]
-    }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "eventId": 14,
+    "showId": 2,
+    "tier": "VIP",
+    "zoneNo": 1,
+    "sectionCode": "VIP1",
+    "totalSeats": 184,
+    "sellableSeats": 183,
+    "bookableSeats": 183,
+    "seats": [
+      {
+        "seatId": "VIP1-A-1",
+        "row": "A",
+        "number": 1,
+        "sellable": true,
+        "ticketStatus": "AVAILABLE",
+        "bookable": true
+      },
+      {
+        "seatId": "VIP1-A-2",
+        "row": "A",
+        "number": 2,
+        "sellable": true,
+        "ticketStatus": "AVAILABLE",
+        "bookable": true
+      },
+      {
+        "seatId": "VIP1-B-2",
+        "row": "B",
+        "number": 2,
+        "sellable": false,
+        "ticketStatus": "AVAILABLE",
+        "bookable": false
+      }
+    ]
+  }
 }
 ```
 

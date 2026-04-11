@@ -2,6 +2,7 @@
 
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { kakaoLogin, naverLogin } from "@/features/auth/api";
 import { tokenStore } from "@/shared/api/tokenStore";
 
@@ -18,6 +19,7 @@ function Spinner() {
 function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -41,6 +43,8 @@ function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
             router.replace(`/onboarding?${params.toString()}`);
             return;
           }
+          tokenStore.clearToken();
+          queryClient.clear();
           tokenStore.setToken(result.tokens.accessToken);
           router.replace(result.onboardingRequired ? "/onboarding?step=identity" : "/");
         })
@@ -50,6 +54,8 @@ function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
     } else {
       naverLogin(code, redirectUri)
         .then((result) => {
+          tokenStore.clearToken();
+          queryClient.clear();
           tokenStore.setToken(result.tokens.accessToken);
           router.replace(result.onboardingRequired ? "/onboarding?step=identity" : "/");
         })
@@ -57,7 +63,7 @@ function SocialCallbackInner({ provider }: { provider: SocialProvider }) {
           router.replace("/onboarding?error=naver");
         });
     }
-  }, [searchParams, router, provider]);
+  }, [searchParams, router, provider, queryClient]);
 
   return <Spinner />;
 }

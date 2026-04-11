@@ -8,9 +8,7 @@
 
 ## 대기 중
 
----
-
-### ⑤ `/auth/me` — `memberships` 필드 빈 배열로 반환되는 버그
+### 1. `/auth/me` — `memberships` 필드 빈 배열로 반환되는 버그
 
 - **우선순위**: 🔴 긴급
 - **대상**: `GET /api/v1/auth/me`
@@ -33,54 +31,37 @@
 
 ---
 
+### 2. payment-service 시작 실패 — `ObjectMapper` 빈 주입 오류
+
+- **우선순위**: 🔴 긴급
+- **대상**: `urr-paymentService`
+
+**에러 로그**:
+```
+Error creating bean with name 'paymentSqsPublisher': 
+Unsatisfied dependency expressed through constructor parameter 1: 
+No qualifying bean of type 'com.fasterxml.jackson.databind.ObjectMapper' available
+```
+
+**원인**: `PaymentSqsPublisher`가 `ObjectMapper`를 생성자 주입으로 받는데, Spring Boot 4.0.2 환경에서 `JacksonAutoConfiguration`이 `ObjectMapper` 빈을 자동 등록하지 못하는 문제. `springdoc-openapi-starter-webmvc-ui:3.0.2`와의 호환성 충돌 또는 Spring Boot 4.0 breaking change로 추정.
+
+**요청 (택1)**:
+
+1. **즉시 해결**: `SqsConfig.java`에 `ObjectMapper` 빈 명시적 등록
+```java
+@Bean
+public ObjectMapper objectMapper() {
+    return new ObjectMapper();
+}
+```
+
+2. **근본 해결**: 로컬 환경에서 `SQS_PAYMENT_EVENTS_URL`이 없으면 `PaymentSqsPublisher`를 아예 비활성화
+```java
+@Component
+@ConditionalOnProperty(name = "sqs.payment-events-url", matchIfMissing = false)
+public class PaymentSqsPublisher { ... }
+```
+
+---
+
 ## 완료
-
-### ⑦ `POST /auth/sms/send`, `POST /auth/sms/verify` — 온보딩 미완료 유저 403 차단 해제 ✅
-
-- **대상**: `UserContextFilter.blockWhenOnboardingNotCompleted()`
-
-`/auth/sms/send`, `/auth/sms/verify`를 `blockWhenOnboardingNotCompleted` 예외 항목에 추가 완료.
-
----
-
-### ⑥ `POST /auth/logout` — jti 추출 버그로 쿠키 미삭제 (자동로그인 버그) ✅
-
-- **대상**: `SocialAuthService.java:271`
-
-`claims.get("jti", String.class)` → `claims.getId()` 수정 완료. 코드 확인됨.
-
----
-
-### ① 좌석 조회 API — `section` 쿼리 파라미터 필터 추가 ✅
-
-- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
-
-`TicketController.java:31`에 `@RequestParam(required = false) String section` 추가 및 서비스 레이어 필터링 구현 완료. 코드 확인됨.
-
----
-
-### ② 좌석 조회 API — `section` 필드를 zone 레벨로 반환 ✅
-
-- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
-
-Event 서비스가 `sectionCode`(zone 레벨, `VIP1`)와 `tier`(tier 레벨, `VIP`)를 분리 반환. Ticket 서비스에서 zone 레벨 `sectionCode`를 우선 사용하도록 구현 완료. 코드 확인됨.
-
----
-
-### ③ 좌석 조회 API — 응답 정렬 순서 보장 ✅
-
-- **대상**: `GET /api/v1/ticket/events/{eventId}/shows/{showId}/seats`
-
-`TicketReservationService.getSeats()` 두 경로 모두 `row ASC → number ASC` 숫자 정렬 적용 완료. 코드 확인됨.
-
----
-
-### `GET /ticket/users/reservations` 응답에 `transferEligible` 필드 추가
-
-- `ReservationSummary` 타입에 `transferEligible: boolean` 추가 (`src/features/reservation/api/getMyReservations.ts`)
-- `useMyReservations`에서 `isTransferable`을 `r.transferEligible`로 변경 (`src/features/reservation/model/useMyReservations.ts`)
-
-### `GET /api/v1/shows/{eventId}/shows/{showId}/seats/summary` 경로 확인
-
-- `ShowController` 클래스 레벨 `@RequestMapping("/api/v1/shows")` + 메서드 레벨 `@GetMapping("/{eventId}/shows/{showId}/seats/summary")` 구조로 `shows`가 두 번 나오는 것이 의도된 경로임을 확인.
-- 프론트 `getSeatsSummary.ts`의 경로(`/shows/{eventId}/shows/{showId}/seats/summary`)는 정확함. 변경 불필요.

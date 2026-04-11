@@ -7,7 +7,7 @@
 | 0-1 | Community Health Check | GET | `/api/v1/community` | — | ➖ 불필요 | |
 | 0-2 | Ops Health Check | GET | `/health` | — | ➖ 불필요 | |
 | 1-1 | 양도 게시글 등록 | POST | `/api/v1/transfers/posts` | `features/transfer/api/getTransferPosts.ts` (createTransferPost) | ✅ 연동됨 | |
-| 1-2 | 양도 게시글 상세 조회 | GET | `/api/v1/transfers/posts/{id}` | — | ❌ 미연동 | |
+| 1-2 | 양도 게시글 상세 조회 | GET | `/api/v1/transfers/posts/{id}` | `features/transfer/api/getTransferPosts.ts` (getTransferPostById) | ✅ 연동됨 | |
 | 1-3 | 양도 게시글 목록 조회 | GET | `/api/v1/transfers/posts` | `features/transfer/api/getTransferPosts.ts` (getTransferPosts) | ✅ 연동됨 | |
 | 1-4 | 양도 게시글 삭제 | DELETE | `/api/v1/transfers/posts/{id}` | `features/transfer/api/getTransferPosts.ts` (deleteTransferPost) | ✅ 연동됨 | |
 | 1-5 | 양도 게시글 예매(결제요청) | POST | `/api/v1/transfers/posts/{id}/reserve` | `features/transfer/api/getTransferPosts.ts` (reserveTransferPost) | ✅ 연동됨 | |

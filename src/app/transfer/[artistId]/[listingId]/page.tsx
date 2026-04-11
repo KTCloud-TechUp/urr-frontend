@@ -1,19 +1,30 @@
 import { Suspense } from "react";
 import { TransferDetailWidget, TransferDetailSkeleton } from "@/widgets/transfer";
-import { getTransfersByArtistId } from "@/shared/lib/mocks/artist-page";
-import { mockArtists } from "@/shared/lib/mocks/artists";
-
-export function generateStaticParams() {
-  return mockArtists.flatMap((artist) =>
-    getTransfersByArtistId(artist.id).map((t) => ({
-      artistId: artist.id,
-      listingId: t.id,
-    }))
-  );
-}
+import { getTransferPosts } from "@/features/transfer";
 
 interface Props {
   params: Promise<{ artistId: string; listingId: string }>;
+}
+
+const FALLBACK_ARTIST_IDS = Array.from({ length: 10 }, (_, i) => String(i + 1));
+const FALLBACK_LISTING_IDS = Array.from({ length: 20 }, (_, i) => String(i + 1));
+
+export async function generateStaticParams() {
+  try {
+    const params: { artistId: string; listingId: string }[] = [];
+    for (const artistId of FALLBACK_ARTIST_IDS) {
+      const posts = await getTransferPosts(artistId);
+      for (const post of posts) {
+        params.push({ artistId, listingId: post.id });
+      }
+    }
+    if (params.length > 0) return params;
+  } catch {
+    // API not available at build time — use fallback
+  }
+  return FALLBACK_ARTIST_IDS.flatMap((artistId) =>
+    FALLBACK_LISTING_IDS.map((listingId) => ({ artistId, listingId })),
+  );
 }
 
 export default async function TransferDetailPage({ params }: Props) {

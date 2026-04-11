@@ -296,6 +296,7 @@ export function SettingsTab({ user, onUpdateUser, initialConsents }: SettingsTab
                   return
                 }
                 tokenStore.clearToken()
+                queryClient.clear()
                 router.replace('/landing')
               }}
             >

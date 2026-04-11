@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -24,6 +25,7 @@ interface AccountDeleteDialogProps {
 
 export function AccountDeleteDialog({ open, onOpenChange }: AccountDeleteDialogProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [confirmed, setConfirmed] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -80,6 +82,7 @@ export function AccountDeleteDialog({ open, onOpenChange }: AccountDeleteDialogP
               try {
                 await deleteAccount()
                 tokenStore.clearToken()
+                queryClient.clear()
                 router.replace('/onboarding')
               } catch (err) {
                 const message = err instanceof Error ? err.message : String(err)

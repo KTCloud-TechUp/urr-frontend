@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense } from "react";
-import { usePathname } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { LayoutProvider, useLayout } from "./model/useLayout";
 import { AppSidebar } from "./AppSidebar";
@@ -9,9 +9,34 @@ import { TopBar } from "./TopBar";
 import { Footer } from "./Footer";
 import { cn } from "@/shared/lib/utils";
 import { AuthInitializer } from "@/features/auth/ui/AuthInitializer";
+import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
+import { useQueryClient } from "@tanstack/react-query";
+import { tokenStore } from "@/shared/api/tokenStore";
 
 // Pages without sidebar/topbar
 const NO_SHELL_ROUTES = ["/onboarding", "/auth/callback", "/queue", "/landing"];
+
+function OnboardingGuard({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { data: user, isLoading, isError } = useCurrentUser();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (user && !user.onboardingCompleted) {
+      router.replace("/onboarding?step=identity");
+      return;
+    }
+    if (isError) {
+      // fetchMe 실패 (CORS 등) — 잔존 토큰 초기화 후 랜딩으로 이동
+      tokenStore.clearToken();
+      queryClient.clear();
+      router.replace("/landing");
+    }
+  }, [user, isLoading, isError, router, queryClient]);
+
+  return <>{children}</>;
+}
 
 function ShellInner({ children }: { children: ReactNode }) {
   const { isSidebarExpanded } = useLayout();
@@ -65,7 +90,9 @@ export function LayoutShell({ children }: { children: ReactNode }) {
   return (
     <LayoutProvider>
       <AuthInitializer>
-        <ShellInner>{children}</ShellInner>
+        <OnboardingGuard>
+          <ShellInner>{children}</ShellInner>
+        </OnboardingGuard>
       </AuthInitializer>
     </LayoutProvider>
   );

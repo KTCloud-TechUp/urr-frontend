@@ -78,6 +78,81 @@ function mapToEnrichedTransfer(item: TransferPostItem): EnrichedTransfer {
   };
 }
 
+interface TransferPostDetail {
+  id: number;
+  artistId: number;
+  sellerUserId: number;
+  showName: string;
+  showDate: string;
+  showVenue: string;
+  section: string;
+  rowInfo: string;
+  seatNumber: string;
+  faceValue: number;
+  sellingPrice: number;
+  sellerTier: string;
+  sellerTradeCount: number;
+  status: string;
+  sellerExpectedAmount: number;
+  feeAmount: number;
+  createdAt: string;
+}
+
+function mapDetailToEnrichedTransfer(item: TransferPostDetail): EnrichedTransfer {
+  const seatParts = [item.rowInfo && `${item.rowInfo}열`, item.seatNumber && `${item.seatNumber}번`]
+    .filter(Boolean)
+    .join(" ");
+
+  return {
+    id: String(item.id),
+    ticketId: "",
+    eventId: String(item.id),
+    sellerId: String(item.sellerUserId),
+    sellerTier: toTierLevel(item.sellerTier),
+    sellerTransactionCount: item.sellerTradeCount,
+    price: item.sellingPrice,
+    faceValue: item.faceValue,
+    section: item.section,
+    seatInfo: seatParts,
+    status: toTransferStatus(item.status),
+    createdAt: item.createdAt,
+    event: {
+      id: String(item.id),
+      artistId: String(item.artistId),
+      title: item.showName,
+      venue: item.showVenue,
+      dates: [
+        {
+          id: String(item.id),
+          date: item.showDate,
+          bookingWindows: [],
+          totalSeats: 0,
+          remainingSeats: 0,
+        },
+      ],
+      poster: "",
+      status: "open",
+    },
+  };
+}
+
+export async function getTransferPostById(
+  id: number | string,
+  userId?: number | string,
+): Promise<EnrichedTransfer> {
+  const headers: Record<string, string> = {};
+  if (userId !== undefined) {
+    headers["X-User-Id"] = String(userId);
+  }
+
+  const res = await apiRequest<{ isSuccess: boolean; data: TransferPostDetail }>(
+    `/transfers/posts/${id}`,
+    { service: "community", headers },
+  );
+
+  return mapDetailToEnrichedTransfer(res.data.data);
+}
+
 export interface ReserveResult {
   postId: number;
   orderId: string;
