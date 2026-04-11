@@ -1,7 +1,7 @@
 import { apiRequest } from "@/shared/api/client";
 
 export type ReservationStatus = "PENDING" | "CONFIRMED" | "EXPIRED" | "FAILED" | "CANCELLED";
-export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED";
 export type RefundStatus = "NONE" | "REQUESTED" | "COMPLETED";
 
 export interface ReservationSummary {

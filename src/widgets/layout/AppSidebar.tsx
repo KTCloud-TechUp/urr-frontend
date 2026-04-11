@@ -19,9 +19,9 @@ import { SidebarNavItem } from "./SidebarNavItem";
 import { ArtistTreeItem } from "./ArtistTreeItem";
 import { useLayout } from "./model/useLayout";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
+import { useArtists } from "@/features/artist/model/useArtists";
 import { TierBadge } from "@/entities/user";
 import { mockUser } from "@/shared/lib/mocks/user";
-import { mockArtists } from "@/shared/lib/mocks/artists";
 import { cn } from "@/shared/lib/utils";
 
 const navItems = [
@@ -51,13 +51,16 @@ export function AppSidebar() {
 
   const collapsed = !isSidebarExpanded;
   const { data: meData } = useCurrentUser();
+  const { data: allArtists = [] } = useArtists();
   const displayName = meData?.nickname ?? mockUser.name;
 
-  // Resolve membership artists (only active memberships)
-  const membershipArtists = mockUser.memberships
-    .filter((m) => m.isActive)
-    .map((m) => mockArtists.find((a) => a.id === m.artistId))
-    .filter(Boolean) as typeof mockArtists;
+  // Filter cached artists by membership artistIds
+  const membershipArtistIds = new Set(
+    (meData?.memberships ?? []).map((m) => String(m.artistId)),
+  );
+  const membershipArtists = allArtists.filter((a) =>
+    membershipArtistIds.has(a.id),
+  );
 
   // Auto-expand artist tree when navigating to an artist page
   useEffect(() => {

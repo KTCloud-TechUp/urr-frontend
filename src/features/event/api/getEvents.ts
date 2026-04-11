@@ -19,9 +19,11 @@ export interface EventSummary {
   eventId: number;
   artistId: number;
   title: string;
+  subtitle?: string;
   description: string;
   venueTemplateId: number;
   venueTemplateName: string;
+  venueAddress?: string;
   openDate: string;
   active: boolean;
   posterImageUrl?: string;

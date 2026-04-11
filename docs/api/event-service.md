@@ -1,6 +1,6 @@
 # Event / Artist / Membership / Show Service 연동 현황
 
-> 마지막 확인: 2026-04-10
+> 마지막 확인: 2026-04-11
 
 | #   | API                                 | 메서드 | 엔드포인트                                                          | 연동 파일                                          | 상태      | 비고                                 |
 | --- | ----------------------------------- | ------ | ------------------------------------------------------------------- | -------------------------------------------------- | --------- | ------------------------------------ |
@@ -24,7 +24,7 @@
 | 18  | 공연 생성                           | POST   | `/api/v1/artists/{artistId}/events`                                 | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                 |
 | 19  | 아티스트 공연 목록 조회             | GET    | `/api/v1/artists/{artistId}/events`                                 | `features/event/api/getArtistEvents.ts`            | ✅ 연동됨 |                                      |
 | 20  | 공연 상세 조회                      | GET    | `/api/v1/artists/{artistId}/events/{eventId}`                       | `features/event/api/getEventDetail.ts`             | ✅ 연동됨 |                                      |
-| 21  | 전체 공연 목록 조회                 | GET    | `/api/v1/events`                                                    | `features/event/api/getEvents.ts`                  | ✅ 연동됨 |                                      |
+| 21  | 전체 공연 목록 조회                 | GET    | `/api/v1/events`                                                    | `features/event/api/getEvents.ts`                  | ✅ 연동됨 | `EventSummary`에 `subtitle`, `venueAddress` 추가 |
 | 22  | 공연장 템플릿 생성                  | POST   | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                 |
 | 23  | 공연장 템플릿 목록 조회             | GET    | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거          |
 | 24  | 공연장 템플릿 상세 조회             | GET    | `/api/v1/events/venues/{venueTemplateId}`                           | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거          |
