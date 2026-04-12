@@ -53,7 +53,9 @@ function EventBookingSidebarInner({ event }: EventBookingSidebarProps) {
 
   const handleQueuePassed = (_token: string | null) => {
     sessionStorage.setItem("urr:booking:startPhase", "seats-section");
-    resetBooking();
+    // resetBooking()을 여기서 호출하면 이벤트 상세 페이지의 BookingContext.useEffect가
+    // startPhase 키를 먼저 소비해 BookingGuard가 키를 찾지 못하고 되돌아오는 문제가 생긴다.
+    // 대신 BookingGuard에서 reset()을 처리한다.
     router.push(`/events/${event.id}/booking`);
   };
 

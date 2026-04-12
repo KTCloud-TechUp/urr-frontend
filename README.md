@@ -758,6 +758,100 @@ if (tokenStore.getToken()) {
 
 ---
 
+### 7. 예매하기 클릭 시 모달이 깜빡이고 예매 페이지로 이동되지 않는 문제
+
+**현상**
+
+`/events/:id` 상세 페이지에서 예매하기 버튼을 클릭하면 대기열 모달이 잠깐 깜빡이다 사라지고, 예매 페이지(`/events/:id/booking`)로 이동되지 않았습니다.
+
+**원인 분석**
+
+`useBookingStore`는 전역 Zustand 스토어로, 이벤트 상세 페이지(`EventBookingSidebar`)와 예매 페이지(`BookingWidget`) 양쪽의 `BookingProvider`가 동일한 인스턴스를 공유합니다.
+
+대기열 통과 시 `handleQueuePassed`의 실행 순서가 문제였습니다.
+
+```
+[handleQueuePassed 실행 순서]
+
+1. sessionStorage.setItem("urr:booking:startPhase", "seats-section")
+2. resetBooking()  ← isLoading = true 로 변경
+3. router.push("/events/1/booking")
+
+[부작용]
+
+resetBooking() → isLoading 변경
+  → 이벤트 상세 페이지의 BookingContext.useEffect 발동
+    조건: !showsLoading && eventDates.length > 0 && isLoading === true
+    → sessionStorage 키 읽기 & 삭제  ← 예매 페이지 몫의 키를 소비
+    → transitionTo("seats-section")  (이벤트 상세 페이지에서 불필요하게 실행)
+
+[예매 페이지 진입]
+
+BookingGuard: sessionStorage.getItem("urr:booking:startPhase") → null
+  → router.replace("/events/1")  ← 다시 이벤트 상세 페이지로 되돌아감
+```
+
+즉, `resetBooking()`이 `isLoading`을 `true`로 바꾸는 순간, **이벤트 상세 페이지의** `BookingContext.useEffect`가 먼저 sessionStorage 키를 소비해버려 예매 페이지의 `BookingGuard`가 키를 찾지 못하고 리다이렉트하는 순환이 발생했습니다.
+
+**해결**
+
+역할을 분리했습니다. `handleQueuePassed`에서 `resetBooking()` 호출을 제거하고, 대신 `BookingGuard`가 진입 허가 시점에 직접 `reset()`을 호출하도록 변경했습니다.
+
+**`EventBookingSidebar.handleQueuePassed`** — `resetBooking()` 제거
+
+```ts
+// before
+const handleQueuePassed = (_token: string | null) => {
+  sessionStorage.setItem("urr:booking:startPhase", "seats-section");
+  resetBooking();  // ← 이벤트 상세 페이지 useEffect가 키 소비
+  router.push(`/events/${event.id}/booking`);
+};
+
+// after
+const handleQueuePassed = (_token: string | null) => {
+  sessionStorage.setItem("urr:booking:startPhase", "seats-section");
+  router.push(`/events/${event.id}/booking`);
+  // reset은 BookingGuard에서 처리
+};
+```
+
+**`BookingGuard`** — 진입 시 `reset()` 호출
+
+```ts
+// before
+useEffect(() => {
+  const hasKey = sessionStorage.getItem("urr:booking:startPhase") !== null;
+  if (!hasKey) {
+    router.replace(`/events/${eventId}`);
+  } else {
+    setAuthorized(true);
+  }
+}, [eventId, router]);
+
+// after
+useEffect(() => {
+  const hasKey = sessionStorage.getItem("urr:booking:startPhase") !== null;
+  if (!hasKey) {
+    router.replace(`/events/${eventId}`);
+  } else {
+    reset();           // isLoading = true → 예매 페이지 BookingContext가 키를 소비
+    setAuthorized(true);
+  }
+}, [eventId, router, reset]);
+```
+
+이렇게 하면 이벤트 상세 페이지가 언마운트된 이후에 `reset()`이 호출되므로 해당 페이지의 `BookingContext.useEffect`가 키를 가로채지 않습니다.
+
+| 시나리오 | 수정 전 | 수정 후 |
+| -------- | ------- | ------- |
+| 예매하기 → 대기열 통과 | 모달 깜빡임 후 이벤트 상세 페이지로 복귀 | 예매 페이지(`seats-section`)로 정상 이동 |
+| 예매 페이지 직접 URL 접근 | 영향 없음 | 영향 없음 (키 없으면 상세 페이지로 리다이렉트) |
+| 모달 닫기(취소) | 정상 | 정상 |
+
+> **교훈**: 전역 상태(Zustand)를 여러 페이지의 Provider가 공유할 때, 상태 변경의 부작용(side-effect)이 예상치 못한 페이지의 `useEffect`를 트리거할 수 있습니다. 페이지 이동을 위한 초기화는 **이동 대상 페이지(Guard)**에서 처리하고, 출발 페이지에서는 최소한의 작업만 수행해야 합니다.
+
+---
+
 ## 회고
 
 ### 잘 된 것

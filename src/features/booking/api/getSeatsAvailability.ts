@@ -2,30 +2,21 @@ import { apiRequest } from "@/shared/api/client";
 
 export interface SeatAvailability {
   seatId: string;
+  section: string;
   row: string;
-  number: number;
+  number: string;
+  status: string;
+  price: number;
+  lockedUntil: string | null;
   sellable: boolean;
-  ticketStatus: string;
-  bookable: boolean;
-}
-
-export interface SeatsAvailabilityData {
-  eventId: number;
-  showId: number;
-  tier: string;
-  zoneNo: number;
-  sectionCode: string;
-  totalSeats: number;
-  sellableSeats: number;
-  bookableSeats: number;
-  seats: SeatAvailability[];
+  seatVersion: number;
 }
 
 interface SeatsAvailabilityApiResponse {
   isSuccess: boolean;
   statusCode: number;
   message: string;
-  data: SeatsAvailabilityData;
+  data: SeatAvailability[];
 }
 
 export async function getSeatsAvailability(
@@ -33,10 +24,10 @@ export async function getSeatsAvailability(
   showId: string | number,
   tier: string,
   zoneNo: number,
-): Promise<SeatsAvailabilityData> {
+): Promise<SeatAvailability[]> {
   const res = await apiRequest<SeatsAvailabilityApiResponse>(
     `/shows/${eventId}/shows/${showId}/seats/availability?tier=${tier}&zoneNo=${zoneNo}`,
     { service: "events" },
   );
-  return res.data.data;
+  return res.data.data ?? [];
 }

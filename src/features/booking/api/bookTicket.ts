@@ -4,14 +4,17 @@ export interface BookTicketParams {
   eventId: number | string;
   showId: number | string;
   artistId: number | string;
-  seatId: string;
+  seatIds: string[];
   holdSeconds?: number;
 }
 
 export interface BookTicketResponse {
-  reservationId: string;
+  reservationIds: string[];
+  seatIds: string[];
   status: string;
   paymentStatus: string;
+  paymentId: number;
+  totalAmount: number;
   expiresAt: string;
 }
 
@@ -32,8 +35,8 @@ export async function bookTicket(
       eventId: params.eventId,
       showId: params.showId,
       artistId: params.artistId,
-      seatId: params.seatId,
-      holdSeconds: params.holdSeconds ?? 180,
+      seatIds: params.seatIds,
+      holdSeconds: params.holdSeconds ?? 300,
     },
   });
   return res.data.data;

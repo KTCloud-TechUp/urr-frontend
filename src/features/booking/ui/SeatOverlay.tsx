@@ -21,6 +21,8 @@ interface SeatOverlayProps {
   seats: Seat[];
   rows: number;
   seatsPerRow: number;
+  /** 실제 행 이름 배열 (예: ["1","2","3"] 또는 ["A","B","C"]) */
+  rowLabels?: string[];
   bbox: { x: number; y: number; w: number; h: number };
   selectedSeatIds: string[];
   onSeatClick: (seatId: string) => void;
@@ -38,6 +40,7 @@ function SeatOverlayInner({
   seats,
   rows,
   seatsPerRow,
+  rowLabels,
   bbox,
   selectedSeatIds,
   onSeatClick,
@@ -85,7 +88,7 @@ function SeatOverlayInner({
           fontFamily="monospace"
           style={{ pointerEvents: "none" }}
         >
-          {rowLabel(r)}
+          {rowLabels ? (rowLabels[r] ?? rowLabel(r)) : rowLabel(r)}
         </text>
       ))}
 

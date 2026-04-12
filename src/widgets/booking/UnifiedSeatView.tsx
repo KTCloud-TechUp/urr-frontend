@@ -88,22 +88,37 @@ export function UnifiedSeatView() {
   });
 
   // API가 tier+zoneNo로 필터링된 좌석 목록을 반환하므로 클라이언트 필터링 불필요
+  // row 오름차순 → number 오름차순으로 정렬해 SeatOverlay의 index 기반 배치와 일치시킴
   const apiSeats: Seat[] = useMemo(() => {
-    if (!seatsData) return [];
-    return seatsData.seats.map((s) => ({
-      id: s.seatId,
-      sectionId: seatsData.sectionCode,
-      row: s.row,
-      number: String(s.number),
-      status: (s.bookable ? "available" : "taken") as SeatStatus,
-    }));
+    if (!seatsData?.length) return [];
+    // 행이 숫자("1","2"…) 또는 알파벳("A","B"…) 모두 처리
+    const rowToIndex = (r: string): number => {
+      const n = Number(r);
+      if (!isNaN(n) && r.trim() !== "") return n - 1;
+      const s = r.toUpperCase();
+      if (s.length === 1) return s.charCodeAt(0) - 65;
+      return (s.charCodeAt(0) - 64) * 26 + (s.charCodeAt(1) - 65);
+    };
+    return [...seatsData]
+      .sort((a, b) => {
+        const rd = rowToIndex(a.row) - rowToIndex(b.row);
+        return rd !== 0 ? rd : Number(a.number) - Number(b.number);
+      })
+      .map((s) => ({
+        id: s.seatId,
+        sectionId: s.section,
+        row: s.row,
+        number: s.number,
+        status: (s.status === "AVAILABLE" && s.sellable ? "available" : "taken") as SeatStatus,
+      }));
   }, [seatsData]);
 
   const layout = useMemo(() => {
-    if (apiSeats.length === 0) return { rows: 0, seatsPerRow: 0 };
+    if (apiSeats.length === 0) return { rows: 0, seatsPerRow: 0, rowLabels: [] as string[] };
+    // row 고유값(순서 유지) → 실제 행 레이블, max(number) → 열 수
+    const rowLabels = [...new Set(apiSeats.map((s) => s.row))];
     const seatsPerRow = Math.max(...apiSeats.map((s) => Number(s.number)));
-    const rows = Math.round(apiSeats.length / seatsPerRow);
-    return { rows, seatsPerRow };
+    return { rows: rowLabels.length, seatsPerRow, rowLabels };
   }, [apiSeats]);
 
   const [seats, setSeats] = useState<Seat[]>([]);
@@ -233,6 +248,7 @@ export function UnifiedSeatView() {
                     seats={seats}
                     rows={layout.rows}
                     seatsPerRow={layout.seatsPerRow}
+                    rowLabels={layout.rowLabels}
                     bbox={bbox}
                     selectedSeatIds={selectedSeatIds}
                     onSeatClick={handleSeatClick}

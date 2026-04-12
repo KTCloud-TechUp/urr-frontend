@@ -4,7 +4,7 @@ import type { BookingState, ConfirmationData } from "@/shared/types";
 export interface ReservationRef {
   eventId: number;
   showId: number;
-  seatId: string;
+  seatIds: string[];
 }
 
 interface BookingStore {
@@ -87,6 +87,7 @@ export const useBookingStore = create<BookingStore>((set) => ({
   reset: () =>
     set({
       bookingState: "idle",
+      isLoading: true,
       selectedSectionId: null,
       selectedSeatIds: [],
       confirmationData: null,
