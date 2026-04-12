@@ -16,6 +16,7 @@ import { formatPrice, parseSeatDisplay, formatDateDot } from "@/shared/lib/forma
 import { PAYMENT_METHODS } from "@/shared/lib/constants";
 import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 import { bookTicket } from "@/features/booking/api/bookTicket";
+import { cancelReservation } from "@/features/booking/api/cancelReservation";
 import { createPaymentRecord } from "@/features/payment/api/createPaymentRecord";
 import { getTossPayments, TOSS_METHOD_MAP } from "@/features/payment/lib/toss";
 import { useBookingStore, type ReservationRef } from "@/features/booking/model/useBookingStore";
@@ -40,10 +41,9 @@ export function PaymentView() {
     sectionsForDate,
     userTier,
     transitionTo,
-    resetBooking,
   } = useBooking();
 
-  const { setReservations } = useBookingStore();
+  const { reservationRefs, setReservations } = useBookingStore();
   const { data: currentUser } = useCurrentUser();
 
   const [phase, setPhase] = useState<PaymentPhase>("confirm-seats");
@@ -109,6 +109,14 @@ export function PaymentView() {
         userId: currentUser?.userId ?? "",
       });
 
+      // 선점 직후 refs 저장 — createPaymentRecord/requestPayment 실패 시에도 취소 가능
+      const reservationRefList: ReservationRef[] = [{
+        eventId: Number(eventId),
+        showId: Number(selectedDate.id),
+        seatIds: reservation.seatIds,
+      }];
+      setReservations(reservationRefList, "");
+
       // 결제 레코드 생성 (Toss orderId 등록)
       const orderId = `res_${Date.now()}`;
       await createPaymentRecord({
@@ -117,13 +125,8 @@ export function PaymentView() {
         amount: reservation.totalAmount,
       });
 
-      // reservationRef(단일 bulk ref)를 store와 sessionStorage에 저장
+      // orderId 확정 후 store·sessionStorage 갱신
       // — Toss 리다이렉트 후 JS 메모리 초기화되므로 sessionStorage 백업 필수
-      const reservationRefList: ReservationRef[] = [{
-        eventId: Number(eventId),
-        showId: Number(selectedDate.id),
-        seatIds: reservation.seatIds,
-      }];
       setReservations(reservationRefList, orderId);
       sessionStorage.setItem("urr:toss:reservations", JSON.stringify(reservationRefList));
 
@@ -189,9 +192,23 @@ export function PaymentView() {
     setPhase("payment-form");
   }, []);
 
-  const handleExitBooking = useCallback(() => {
-    resetBooking();
-  }, [resetBooking]);
+  const handleExitBooking = useCallback(async () => {
+    // 좌석 선점이 있으면 취소 API 호출해 선점 해제
+    if (reservationRefs.length > 0 && currentUser) {
+      await Promise.allSettled(
+        reservationRefs.flatMap((ref) =>
+          ref.seatIds.map((seatId) =>
+            cancelReservation(
+              { eventId: ref.eventId, showId: ref.showId, seatId },
+              currentUser.userId,
+            ),
+          ),
+        ),
+      );
+    }
+    // 구역 선택 화면으로 복귀 (취소 후 다른 좌석 선택 가능)
+    transitionTo("seats-section");
+  }, [reservationRefs, currentUser, transitionTo]);
 
   // --- Phase 1: Seat Confirmation ---
   if (phase === "confirm-seats") {
