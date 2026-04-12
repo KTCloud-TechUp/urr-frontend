@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Clock, X } from "lucide-react";
+import { AlertTriangle, Clock, RefreshCw, WifiOff, X } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
 import { useBooking } from "@/features/booking/model/BookingContext";
@@ -35,7 +35,9 @@ const GROUP_NAMES: Record<string, string> = {
 };
 
 function QueueContent({ onQueuePassed }: { onQueuePassed?: (token: string | null) => void }) {
-  const { eventId, sectionsForDate, transitionTo, resetBooking, setQueueToken } = useBooking();
+  const { eventId, selectedDateId, sectionsForDate, transitionTo, resetBooking, setQueueToken } = useBooking();
+
+  const showId = selectedDateId ?? eventId;
 
   const {
     position,
@@ -45,7 +47,9 @@ function QueueContent({ onQueuePassed }: { onQueuePassed?: (token: string | null
     phase,
     previousPosition,
     stayInQueue,
-  } = useQueue(eventId, sectionsForDate, (token, _remainMs) => {
+    error: queueError,
+    retryEntry,
+  } = useQueue(showId, sectionsForDate, (token, _remainMs) => {
     setQueueToken(token);
     if (onQueuePassed) {
       onQueuePassed(token);
@@ -176,19 +180,39 @@ function QueueContent({ onQueuePassed }: { onQueuePassed?: (token: string | null
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           대기열
         </p>
-        <div className="flex items-baseline gap-2 mt-2">
-          <span
-            className={cn(
-              "text-4xl font-bold text-primary tabular-nums",
-              isRolling && "animate-pulse",
-            )}
-          >
-            #{position}
-          </span>
-          <span className="text-sm text-muted-foreground">
-            / {totalInQueue.toLocaleString()}명
-          </span>
-        </div>
+
+        {queueError === "entry-failed" ? (
+          <div className="mt-3 flex flex-col items-center gap-3 py-2">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertTriangle size={18} />
+              <span className="text-sm font-medium">대기열 진입에 실패했습니다</span>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              네트워크 연결을 확인하고 다시 시도해 주세요.
+            </p>
+            <button
+              onClick={retryEntry}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              <RefreshCw size={14} />
+              다시 시도
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-baseline gap-2 mt-2">
+            <span
+              className={cn(
+                "text-4xl font-bold text-primary tabular-nums",
+                isRolling && "animate-pulse",
+              )}
+            >
+              #{position}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              / {totalInQueue.toLocaleString()}명
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="px-6 py-3 space-y-3">
@@ -210,6 +234,22 @@ function QueueContent({ onQueuePassed }: { onQueuePassed?: (token: string | null
             style={{ width: `${progressPercent}%` }}
           />
         </div>
+
+        {queueError === "poll-failed" && (
+          <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200">
+            <span className="flex items-center gap-1.5 text-amber-700 text-xs font-medium">
+              <WifiOff size={13} />
+              연결이 불안정합니다. 순서 업데이트가 중단됐어요.
+            </span>
+            <button
+              onClick={retryEntry}
+              className="shrink-0 flex items-center gap-1 text-xs text-amber-700 font-semibold hover:text-amber-900 transition-colors"
+            >
+              <RefreshCw size={12} />
+              재연결
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="px-6 flex-1 min-h-0 overflow-hidden flex flex-col">
