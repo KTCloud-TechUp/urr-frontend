@@ -92,6 +92,7 @@ function LeftPanelSkeleton() {
 export function LeftPanel() {
   const {
     event,
+    bookingState,
     isLeftPanelExpanded,
     isLoading,
     selectedDateId,
@@ -101,6 +102,7 @@ export function LeftPanel() {
     userWindowOpensAt,
     selectDate,
     toggleLeftPanel,
+    startBooking,
   } = useBooking();
 
   const countdownToOpen = useCountdown(isWindowOpen ? null : userWindowOpensAt);
@@ -227,6 +229,14 @@ export function LeftPanel() {
                 <span className="tabular-nums">
                   예매 오픈까지 {formatCountdown(countdownToOpen)}
                 </span>
+              </Button>
+            </div>
+          )}
+
+          {!isLoading && event && isWindowOpen && bookingState === "idle" && (
+            <div className="shrink-0 border-t border-border px-5 py-3">
+              <Button className="w-full" size="lg" onClick={startBooking}>
+                예매 시작하기
               </Button>
             </div>
           )}

@@ -38,7 +38,7 @@ export async function bookTicket(
       showId: Number(params.showId),
       artistId: Number(params.artistId),
       seatIds: params.seatIds,
-      holdSeconds: params.holdSeconds ?? 300,
+      holdSeconds: params.holdSeconds ?? 180,
     },
   });
   return res.data.data;
