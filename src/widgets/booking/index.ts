@@ -1,4 +1,5 @@
 export { BookingWidget } from "./BookingWidget";
+export { BookingGuard } from "./BookingGuard";
 export { RightMain } from "./RightMain";
 export { LeftPanel } from "./LeftPanel";
 export { LeftPanelCollapsed } from "./LeftPanelCollapsed";

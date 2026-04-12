@@ -1,4 +1,5 @@
 import { BookingWidget } from "@/widgets/booking";
+import { BookingGuard } from "@/widgets/booking/BookingGuard";
 import { getEvents } from "@/features/event";
 
 const FALLBACK_EVENT_IDS = Array.from({ length: 20 }, (_, i) => String(i + 1));
@@ -21,5 +22,9 @@ interface Props {
 
 export default async function BookingPage({ params }: Props) {
   const { eventId } = await params;
-  return <BookingWidget eventId={eventId} />;
+  return (
+    <BookingGuard eventId={eventId}>
+      <BookingWidget eventId={eventId} />
+    </BookingGuard>
+  );
 }

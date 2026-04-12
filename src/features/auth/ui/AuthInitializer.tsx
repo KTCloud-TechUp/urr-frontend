@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { registerAuthHandlers, tokenStore } from "@/shared/api";
+import { registerAuthHandlers, redirectToQueue, tokenStore } from "@/shared/api";
 import { reissueToken } from "../api/reissue";
 
 function Spinner() {
@@ -31,6 +31,7 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
         tokenStore.clearToken();
         routerRef.current.replace("/onboarding");
       },
+      onRateLimited: () => redirectToQueue(),
     });
 
     // 이미 토큰이 있으면 (소셜 로그인 직후 등) reissue 스킵
