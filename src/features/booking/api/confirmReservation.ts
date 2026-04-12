@@ -3,10 +3,10 @@ import { apiRequest } from "@/shared/api/client";
 export interface ConfirmReservationParams {
   eventId: number;
   showId: number;
-  seatId: string;
+  seatIds: string[];
 }
 
-export interface ConfirmReservationResponse {
+export interface ConfirmReservationItem {
   reservationId: string;
   eventId: number;
   showId: number;
@@ -15,10 +15,15 @@ export interface ConfirmReservationResponse {
   status: string;
   paymentStatus: string;
   paidAt: string;
-  refundStatus: string;
+  refundStatus: string | null;
   expiresAt: string;
   refundedAt: string | null;
   updatedAt: string;
+}
+
+export interface ConfirmReservationResponse {
+  paymentId: number;
+  reservations: ConfirmReservationItem[];
 }
 
 interface ConfirmReservationApiResponse {
