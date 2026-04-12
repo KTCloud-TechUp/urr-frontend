@@ -54,6 +54,12 @@ function SeatOverlayInner({
   const cellH = bbox.h / rows;
   const iconScale = (Math.min(cellW, cellH) * 0.82) / 16;
 
+  // row 레이블 → 행 인덱스 맵 (O(1) 조회)
+  const rowIndexMap = useMemo(() => {
+    const labels = rowLabels ?? Array.from({ length: rows }, (_, r) => rowLabel(r));
+    return new Map(labels.map((label, i) => [label, i]));
+  }, [rowLabels, rows]);
+
   function getColor(seat: Seat): string {
     if (selectedSet.has(seat.id)) return COLORS.selected;
     if (seat.status === "available") return COLORS.enabled;
@@ -92,11 +98,13 @@ function SeatOverlayInner({
         </text>
       ))}
 
-      {seats.map((seat, i) => {
-        const row = Math.floor(i / seatsPerRow);
-        const col = i % seatsPerRow;
+      {seats.map((seat) => {
+        // seat.row / seat.number 기반으로 실제 위치 계산
+        // (인덱스 기반은 행별 좌석 수가 고르지 않을 때 위치 어긋남)
+        const rowIdx = rowIndexMap.get(seat.row) ?? 0;
+        const col = Math.max(0, Number(seat.number) - 1);
         const cx = seatAreaX + col * cellW + cellW / 2;
-        const cy = bbox.y + row * cellH + cellH / 2;
+        const cy = bbox.y + rowIdx * cellH + cellH / 2;
         const x = cx - iconScale * 8;
         const y = cy - iconScale * 8;
         const color = getColor(seat);
