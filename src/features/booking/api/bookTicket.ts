@@ -6,6 +6,7 @@ export interface BookTicketParams {
   artistId: number | string;
   seatIds: string[];
   holdSeconds?: number;
+  userId: number | string;
 }
 
 export interface BookTicketResponse {
@@ -31,10 +32,11 @@ export async function bookTicket(
   const res = await apiRequest<BookTicketApiResponse>("/ticket/reservations", {
     method: "POST",
     service: "ticketing",
+    headers: { "X-User-Id": String(params.userId) },
     body: {
-      eventId: params.eventId,
-      showId: params.showId,
-      artistId: params.artistId,
+      eventId: Number(params.eventId),
+      showId: Number(params.showId),
+      artistId: Number(params.artistId),
       seatIds: params.seatIds,
       holdSeconds: params.holdSeconds ?? 300,
     },

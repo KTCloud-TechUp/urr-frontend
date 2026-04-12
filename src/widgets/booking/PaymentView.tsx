@@ -9,6 +9,7 @@ import { cn } from "@/shared/lib/utils";
 import { useBooking } from "@/features/booking/model/BookingContext";
 import { useSeatTimer } from "@/features/booking/model/useSeatTimer";
 import { usePaymentForm } from "@/features/booking/model/usePaymentForm";
+import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { TimerDisplay } from "@/features/booking/ui/TimerDisplay";
 import { PriceDisplay } from "@/shared/ui/PriceDisplay";
 import { formatPrice, parseSeatDisplay, formatDateDot } from "@/shared/lib/format";
@@ -43,6 +44,7 @@ export function PaymentView() {
   } = useBooking();
 
   const { setReservations } = useBookingStore();
+  const { data: currentUser } = useCurrentUser();
 
   const [phase, setPhase] = useState<PaymentPhase>("confirm-seats");
   const retryTimer = useSeatTimer(60);
@@ -104,6 +106,7 @@ export function PaymentView() {
         showId: selectedDate.id,
         artistId,
         seatIds: selectedSeatIds,
+        userId: currentUser?.userId ?? "",
       });
 
       // 결제 레코드 생성 (Toss orderId 등록)
@@ -165,6 +168,7 @@ export function PaymentView() {
     artistId,
     eventId,
     selectedSeatIds,
+    currentUser,
     buyerName,
     buyerPhone,
     selectedMethod,
