@@ -72,6 +72,7 @@ export interface BookingContextValue {
   confirmationData: ConfirmationData | null;
   seatTimerSecondsLeft: number | null;
   queueToken: string | null;
+  paymentFailed: boolean;
   selectDate: (dateId: string) => void;
   toggleLeftPanel: () => void;
   setLeftPanel: (expanded: boolean) => void;
@@ -83,6 +84,7 @@ export interface BookingContextValue {
   setConfirmationData: (data: ConfirmationData) => void;
   setSeatTimerSecondsLeft: (seconds: number) => void;
   setQueueToken: (token: string | null) => void;
+  clearPaymentFailed: () => void;
 }
 
 export const BookingContext = createContext<BookingContextValue | null>(null);
@@ -94,6 +96,8 @@ interface BookingProviderProps {
 
 export function BookingProvider({ eventId, children }: BookingProviderProps) {
   const { data: currentUser } = useCurrentUser();
+
+  const [paymentFailed, setPaymentFailed] = useState(false);
 
   // Zustand store — 모든 클라이언트 상태머신 상태 관리
   const {
@@ -180,6 +184,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       window.history.replaceState({}, "", window.location.pathname);
       sessionStorage.removeItem("urr:toss:booking");
       sessionStorage.removeItem("urr:toss:reservations");
+      setPaymentFailed(true);
       return;
     }
 
@@ -347,6 +352,10 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     reset();
   }, [reset]);
 
+  const clearPaymentFailed = useCallback(() => {
+    setPaymentFailed(false);
+  }, []);
+
   const handleSetSeatTimerSecondsLeft = useCallback(
     (seconds: number) => {
       setSeatTimerSecondsLeft(seconds);
@@ -377,6 +386,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       confirmationData,
       seatTimerSecondsLeft,
       queueToken,
+      paymentFailed,
       selectDate,
       toggleLeftPanel,
       setLeftPanel,
@@ -388,6 +398,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       setConfirmationData,
       setSeatTimerSecondsLeft: handleSetSeatTimerSecondsLeft,
       setQueueToken,
+      clearPaymentFailed,
     }),
     [
       eventId,
@@ -402,6 +413,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       confirmationData,
       seatTimerSecondsLeft,
       queueToken,
+      paymentFailed,
       event,
       userTier,
       selectedDate,
@@ -422,6 +434,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       setConfirmationData,
       handleSetSeatTimerSecondsLeft,
       setQueueToken,
+      clearPaymentFailed,
     ],
   );
 

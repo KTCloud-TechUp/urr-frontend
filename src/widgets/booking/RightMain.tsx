@@ -2,6 +2,7 @@
 
 import { useBooking } from "@/features/booking/model/BookingContext";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { IdleView } from "./IdleView";
 import { UnifiedSeatView } from "./UnifiedSeatView";
 import { PaymentView } from "./PaymentView";
 import { ConfirmationView } from "./ConfirmationView";
@@ -24,8 +25,12 @@ export function RightMain() {
 
   return (
     <div className="flex-1 min-w-0 h-full overflow-y-auto bg-background">
-      {isLoading || bookingState === "idle" ? (
+      {isLoading ? (
         <RightMainSkeleton />
+      ) : bookingState === "idle" ? (
+        <div key="idle" className="h-full animate-in fade-in duration-200">
+          <IdleView />
+        </div>
       ) : bookingState === "seats-section" || bookingState === "seats-individual" || bookingState === "payment" ? (
         <div key="seats-unified" className="h-full animate-in fade-in duration-200">
           <UnifiedSeatView />
