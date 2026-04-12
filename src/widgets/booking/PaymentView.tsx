@@ -98,41 +98,35 @@ export function PaymentView() {
     setPhase("processing");
 
     try {
-      // 각 좌석별 예약 생성 (단일 엔드포인트 — bulk API 미완성)
-      const reservations = await Promise.all(
-        selectedSeatIds.map((seatId) =>
-          bookTicket({
-            eventId,
-            showId: selectedDate.id,
-            artistId,
-            seatId,
-          }),
-        ),
-      );
-
-      const primaryReservationId = reservations[0].reservationId;
-
-      // 결제 레코드 생성 (Toss orderId 등록)
-      const orderId = `ORD-${Date.now()}`;
-      await createPaymentRecord({
-        referenceId: primaryReservationId,
-        orderId,
-        amount: total,
+      // 좌석 bulk 선점 (최대 4석)
+      const reservation = await bookTicket({
+        eventId,
+        showId: selectedDate.id,
+        artistId,
+        seatIds: selectedSeatIds,
       });
 
-      // reservationRefs를 store와 sessionStorage에 저장
+      // 결제 레코드 생성 (Toss orderId 등록)
+      const orderId = `res_${Date.now()}`;
+      await createPaymentRecord({
+        referenceId: String(reservation.paymentId),
+        orderId,
+        amount: reservation.totalAmount,
+      });
+
+      // reservationRef(단일 bulk ref)를 store와 sessionStorage에 저장
       // — Toss 리다이렉트 후 JS 메모리 초기화되므로 sessionStorage 백업 필수
-      const reservationRefList: ReservationRef[] = selectedSeatIds.map((seatId) => ({
+      const reservationRefList: ReservationRef[] = [{
         eventId: Number(eventId),
         showId: Number(selectedDate.id),
-        seatId,
-      }));
+        seatIds: reservation.seatIds,
+      }];
       setReservations(reservationRefList, orderId);
       sessionStorage.setItem("urr:toss:reservations", JSON.stringify(reservationRefList));
 
       // Toss 리다이렉트 복귀 후 ConfirmationData 복원에 사용
       const confirmationData: ConfirmationData = {
-        bookingId: primaryReservationId,
+        bookingId: reservation.reservationIds[0] ?? "",
         tickets: selectedSeatIds.map((id) => {
           const parts = id.split("-");
           return {
