@@ -1,43 +1,45 @@
 # Event / Artist / Membership / Show Service 연동 현황
 
+> 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-eventService
+>
 > 마지막 확인: 2026-04-11
 
-| #   | API                                 | 메서드 | 엔드포인트                                                          | 연동 파일                                          | 상태      | 비고                                                                                  |
-| --- | ----------------------------------- | ------ | ------------------------------------------------------------------- | -------------------------------------------------- | --------- | ------------------------------------------------------------------------------------- |
-| 1   | —                                   | —      | —                                                                   | —                                                  | —         | 항목 없음                                                                             |
-| 2   | 아티스트 생성                       | POST   | `/api/v1/artists`                                                   | —                                                  | ➖ 불필요 | ADMIN 전용                                                                            |
-| 3   | 아티스트 목록 조회                  | GET    | `/api/v1/artists`                                                   | `features/artist/api/getArtists.ts`                | ✅ 연동됨 |                                                                                       |
-| 4   | 아티스트 상세 조회                  | GET    | `/api/v1/artists/{artistId}`                                        | `features/artist/api/getArtist.ts`                 | ✅ 연동됨 |                                                                                       |
-| 5   | 아티스트 멤버십 구독                | POST   | `/api/v1/artists/{artistId}/membership`                             | `features/membership/api/subscribeMembership.ts`   | ✅ 연동됨 |                                                                                       |
-| 6   | 아티스트 멤버십 활성화              | POST   | `/api/v1/artists/memberships/activate`                              | —                                                  | ➖ 불필요 | 서비스 내부 API                                                                       |
-| 7   | 아티스트 멤버십 취소                | POST   | `/api/v1/artists/memberships/cancel`                                | `features/membership/api/cancelMembership.ts`      | ✅ 연동됨 |                                                                                       |
-| 8   | 아티스트 팔로우                     | POST   | `/api/v1/artists/{artistId}/follow`                                 | `features/artist/api/followArtist.ts`              | ✅ 연동됨 |                                                                                       |
-| 9   | 아티스트 언팔로우                   | DELETE | `/api/v1/artists/{artistId}/follow`                                 | `features/artist/api/unfollowArtist.ts`            | ✅ 연동됨 |                                                                                       |
-| 10  | 팔로우한 아티스트 목록 조회         | GET    | `/api/v1/artists/followings`                                        | —                                                  | ➖ 불필요 | UI 없음                                                                               |
-| 11  | 아티스트 멤버십 정책 조회           | GET    | `/api/v1/membership/artists/{artistId}/membership-policies`         | `features/membership/api/getMembershipPolicies.ts` | ✅ 연동됨 |                                                                                       |
-| 12  | 회차 선예매 정책 조회               | GET    | `/api/v1/membership/events/{eventId}/shows/{showId}/presale-policy` | `features/membership/api/getPresalePolicy.ts`      | ✅ 연동됨 |                                                                                       |
-| 13  | 내 멤버십 목록 조회                 | GET    | `/api/v1/membership`                                                | `features/membership/api/getMemberships.ts`        | ✅ 연동됨 | 응답 `data.details` 구조 코드와 일치                                                  |
-| 14  | 내 멤버십 상세 조회                 | GET    | `/api/v1/membership/{membershipId}`                                 | —                                                  | ➖ 불필요 | 상세하게 조회할 UI 없음                                                               |
-| 15  | 내 멤버십 닉네임 수정               | PATCH  | `/api/v1/membership/{membershipId}/nickname`                        | `features/membership/api/updateNickname.ts`        | ✅ 연동됨 |                                                                                       |
-| 16  | 유저 멤버십 레벨 조회 (내부)        | GET    | `/api/v1/membership/level`                                          | —                                                  | ➖ 불필요 | 서비스 내부 API                                                                       |
-| 17  | 유저 멤버십 조회 (내부)             | GET    | `/api/v1/membership/internal/membership-info`                       | —                                                  | ➖ 불필요 | 서비스 내부 API                                                                       |
-| 18  | 공연 생성                           | POST   | `/api/v1/artists/{artistId}/events`                                 | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                                                                  |
-| 19  | 아티스트 공연 목록 조회             | GET    | `/api/v1/artists/{artistId}/events`                                 | `features/event/api/getArtistEvents.ts`            | ✅ 연동됨 |                                                                                       |
-| 20  | 공연 상세 조회                      | GET    | `/api/v1/artists/{artistId}/events/{eventId}`                       | `features/event/api/getEventDetail.ts`             | ✅ 연동됨 |                                                                                       |
-| 21  | 전체 공연 목록 조회                 | GET    | `/api/v1/events`                                                    | `features/event/api/getEvents.ts`                  | ✅ 연동됨 | `EventSummary`에 `subtitle`, `venueAddress` 추가                                      |
-| 22  | 공연장 템플릿 생성                  | POST   | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                                                                  |
-| 23  | 공연장 템플릿 목록 조회             | GET    | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거                                                           |
-| 24  | 공연장 템플릿 상세 조회             | GET    | `/api/v1/events/venues/{venueTemplateId}`                           | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거                                                           |
-| 25  | Home 큐레이션 조회                  | GET    | `/api/v1/events/home`                                               | `features/home/api/getHome.ts`                     | ✅ 연동됨 |                                                                                       |
-| 26  | 공연 회차 생성                      | POST   | `/api/v1/shows/{eventId}/shows`                                     | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                                                                  |
-| 27  | 공연 회차 목록 조회                 | GET    | `/api/v1/shows/{eventId}/shows`                                     | `features/show/api/getShows.ts`                    | ✅ 연동됨 |                                                                                       |
-| 28  | 공연 회차 상세 조회                 | GET    | `/api/v1/shows/{eventId}/shows/{showId}`                            | `features/show/api/getShowDetail.ts`               | ✅ 연동됨 |                                                                                       |
-| 29  | 공연 회차 좌석 메타데이터 조회      | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seatmap`                    | —                                                  | ➖ 불필요 | VenueMap이 하드코딩 SVG — UI 연결점 없음                                              |
-| 30  | 회차별 가격/구역 정책 조회          | GET    | `/api/v1/shows/{showId}/sections`                                   | `features/show/api/getSections.ts`                 | ✅ 연동됨 | BookingContext에서 구역별 실제 가격 사용 (기존 TIER_PRICES 하드코딩 대체)             |
-| 31  | 공연 회차 좌석 카탈로그 조회        | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats`                      | `features/show/api/getShowSeats.ts`                | ✅ 연동됨 | API 스펙으로 seatId 형식(`{sectionCode}-{row}-{number}`) 확인 → parseSeatId 파싱 수정 |
-| 32  | 잔여석 전체 요약 조회               | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/summary`              | `features/booking/api/getSeatsSummary.ts`          | ✅ 연동됨 |                                                                                       |
-| 33  | 특정 티어/구역 예매 가능 좌석 조회  | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/availability`         | `features/booking/api/getSeatsAvailability.ts`     | ✅ 연동됨 |                                                                                       |
-| 34  | 회차별 멤버십 예매 오픈 시간표 조회 | GET    | `/api/v1/shows/{eventId}/shows/{showId}/booking-windows`            | `features/booking/api/getBookingWindows.ts`        | ✅ 연동됨 |                                                                                       |
+| #   | API                                 | 메서드 | 엔드포인트                                                          | 연동 파일                                          | 상태      | 비고                                                                      |
+| --- | ----------------------------------- | ------ | ------------------------------------------------------------------- | -------------------------------------------------- | --------- | ------------------------------------------------------------------------- |
+| 1   | —                                   | —      | —                                                                   | —                                                  | —         | 항목 없음                                                                 |
+| 2   | 아티스트 생성                       | POST   | `/api/v1/artists`                                                   | —                                                  | ➖ 불필요 | ADMIN 전용                                                                |
+| 3   | 아티스트 목록 조회                  | GET    | `/api/v1/artists`                                                   | `features/artist/api/getArtists.ts`                | ✅ 연동됨 |                                                                           |
+| 4   | 아티스트 상세 조회                  | GET    | `/api/v1/artists/{artistId}`                                        | `features/artist/api/getArtist.ts`                 | ✅ 연동됨 |                                                                           |
+| 5   | 아티스트 멤버십 구독                | POST   | `/api/v1/artists/{artistId}/membership`                             | `features/membership/api/subscribeMembership.ts`   | ✅ 연동됨 |                                                                           |
+| 6   | 아티스트 멤버십 활성화              | POST   | `/api/v1/artists/memberships/activate`                              | —                                                  | ➖ 불필요 | 서비스 내부 API                                                           |
+| 7   | 아티스트 멤버십 취소                | POST   | `/api/v1/artists/memberships/cancel`                                | `features/membership/api/cancelMembership.ts`      | ✅ 연동됨 |                                                                           |
+| 8   | 아티스트 팔로우                     | POST   | `/api/v1/artists/{artistId}/follow`                                 | `features/artist/api/followArtist.ts`              | ✅ 연동됨 |                                                                           |
+| 9   | 아티스트 언팔로우                   | DELETE | `/api/v1/artists/{artistId}/follow`                                 | `features/artist/api/unfollowArtist.ts`            | ✅ 연동됨 |                                                                           |
+| 10  | 팔로우한 아티스트 목록 조회         | GET    | `/api/v1/artists/followings`                                        | —                                                  | ➖ 불필요 | UI 없음                                                                   |
+| 11  | 아티스트 멤버십 정책 조회           | GET    | `/api/v1/membership/artists/{artistId}/membership-policies`         | `features/membership/api/getMembershipPolicies.ts` | ✅ 연동됨 |                                                                           |
+| 12  | 회차 선예매 정책 조회               | GET    | `/api/v1/membership/events/{eventId}/shows/{showId}/presale-policy` | `features/membership/api/getPresalePolicy.ts`      | ✅ 연동됨 |                                                                           |
+| 13  | 내 멤버십 목록 조회                 | GET    | `/api/v1/membership`                                                | `features/membership/api/getMemberships.ts`        | ✅ 연동됨 | 응답 `data.details` 구조 코드와 일치                                      |
+| 14  | 내 멤버십 상세 조회                 | GET    | `/api/v1/membership/{membershipId}`                                 | —                                                  | ➖ 불필요 | 상세하게 조회할 UI 없음                                                   |
+| 15  | 내 멤버십 닉네임 수정               | PATCH  | `/api/v1/membership/{membershipId}/nickname`                        | `features/membership/api/updateNickname.ts`        | ✅ 연동됨 |                                                                           |
+| 16  | 유저 멤버십 레벨 조회 (내부)        | GET    | `/api/v1/membership/level`                                          | —                                                  | ➖ 불필요 | 서비스 내부 API                                                           |
+| 17  | 유저 멤버십 조회 (내부)             | GET    | `/api/v1/membership/internal/membership-info`                       | —                                                  | ➖ 불필요 | 서비스 내부 API                                                           |
+| 18  | 공연 생성                           | POST   | `/api/v1/artists/{artistId}/events`                                 | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                                                      |
+| 19  | 아티스트 공연 목록 조회             | GET    | `/api/v1/artists/{artistId}/events`                                 | `features/event/api/getArtistEvents.ts`            | ✅ 연동됨 |                                                                           |
+| 20  | 공연 상세 조회                      | GET    | `/api/v1/artists/{artistId}/events/{eventId}`                       | `features/event/api/getEventDetail.ts`             | ✅ 연동됨 |                                                                           |
+| 21  | 전체 공연 목록 조회                 | GET    | `/api/v1/events`                                                    | `features/event/api/getEvents.ts`                  | ✅ 연동됨 | `EventSummary`에 `subtitle`, `venueAddress` 추가                          |
+| 22  | 공연장 템플릿 생성                  | POST   | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                                                      |
+| 23  | 공연장 템플릿 목록 조회             | GET    | `/api/v1/events/venues`                                             | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거                                               |
+| 24  | 공연장 템플릿 상세 조회             | GET    | `/api/v1/events/venues/{venueTemplateId}`                           | —                                                  | ➖ 불필요 | 서비스 내부 API / 연동 제거                                               |
+| 25  | Home 큐레이션 조회                  | GET    | `/api/v1/events/home`                                               | `features/home/api/getHome.ts`                     | ✅ 연동됨 |                                                                           |
+| 26  | 공연 회차 생성                      | POST   | `/api/v1/shows/{eventId}/shows`                                     | —                                                  | ➖ 불필요 | ADMIN 전용 / UI 없음                                                      |
+| 27  | 공연 회차 목록 조회                 | GET    | `/api/v1/shows/{eventId}/shows`                                     | `features/show/api/getShows.ts`                    | ✅ 연동됨 |                                                                           |
+| 28  | 공연 회차 상세 조회                 | GET    | `/api/v1/shows/{eventId}/shows/{showId}`                            | `features/show/api/getShowDetail.ts`               | ✅ 연동됨 |                                                                           |
+| 29  | 공연 회차 좌석 메타데이터 조회      | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seatmap`                    | —                                                  | ➖ 불필요 | VenueMap이 하드코딩 SVG — UI 연결점 없음                                  |
+| 30  | 회차별 가격/구역 정책 조회          | GET    | `/api/v1/shows/{showId}/sections`                                   | `features/show/api/getSections.ts`                 | ✅ 연동됨 | BookingContext에서 구역별 실제 가격 사용 (기존 TIER_PRICES 하드코딩 대체) |
+| 31  | 공연 회차 좌석 카탈로그 조회        | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats`                      | `features/show/api/getShowSeats.ts`                | ✅ 연동됨 | seatId 형식: `{tier}-{zoneNo}-{row}-{number}` (예: `VIP-1-3-1`)           |
+| 32  | 잔여석 전체 요약 조회               | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/summary`              | `features/booking/api/getSeatsSummary.ts`          | ✅ 연동됨 |                                                                           |
+| 33  | 특정 티어/구역 예매 가능 좌석 조회  | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/availability`         | `features/booking/api/getSeatsAvailability.ts`     | ✅ 연동됨 |                                                                           |
+| 34  | 회차별 멤버십 예매 오픈 시간표 조회 | GET    | `/api/v1/shows/{eventId}/shows/{showId}/booking-windows`            | `features/booking/api/getBookingWindows.ts`        | ✅ 연동됨 |                                                                           |
 
 ---
 
@@ -2025,20 +2027,20 @@ X-User-Role: ADMIN
     "showId": 1001,
     "seats": [
       {
-        "seatId": "VIP1-A-1",
+        "seatId": "VIP-1-3-1",
         "sectionCode": "VIP1",
         "tier": "VIP",
         "zoneNo": 1,
-        "row": "A",
+        "row": "3",
         "number": 1,
         "sellable": true
       },
       {
-        "seatId": "VIP1-A-2",
+        "seatId": "VIP-1-3-2",
         "sectionCode": "VIP1",
         "tier": "VIP",
         "zoneNo": 1,
-        "row": "A",
+        "row": "3",
         "number": 2,
         "sellable": false
       }
@@ -2158,47 +2160,48 @@ GET /api/v1/shows/{eventId}/shows/{showId}/seats/availability
 
 ### Response Body
 
+`data`는 배열로 반환됩니다 (객체로 감싸지 않음).
+
 ```json
 {
   "isSuccess": true,
   "statusCode": 200,
   "message": "OK",
-  "data": {
-    "eventId": 14,
-    "showId": 2,
-    "tier": "VIP",
-    "zoneNo": 1,
-    "sectionCode": "VIP1",
-    "totalSeats": 184,
-    "sellableSeats": 183,
-    "bookableSeats": 183,
-    "seats": [
-      {
-        "seatId": "VIP1-A-1",
-        "row": "A",
-        "number": 1,
-        "sellable": true,
-        "ticketStatus": "AVAILABLE",
-        "bookable": true
-      },
-      {
-        "seatId": "VIP1-A-2",
-        "row": "A",
-        "number": 2,
-        "sellable": true,
-        "ticketStatus": "AVAILABLE",
-        "bookable": true
-      },
-      {
-        "seatId": "VIP1-B-2",
-        "row": "B",
-        "number": 2,
-        "sellable": false,
-        "ticketStatus": "AVAILABLE",
-        "bookable": false
-      }
-    ]
-  }
+  "data": [
+    {
+      "seatId": "VIP-1-3-1",
+      "section": "VIP1",
+      "row": "3",
+      "number": "1",
+      "status": "AVAILABLE",
+      "price": 220000,
+      "lockedUntil": null,
+      "sellable": true,
+      "seatVersion": 1
+    },
+    {
+      "seatId": "VIP-1-3-2",
+      "section": "VIP1",
+      "row": "3",
+      "number": "2",
+      "status": "AVAILABLE",
+      "price": 220000,
+      "lockedUntil": null,
+      "sellable": true,
+      "seatVersion": 1
+    },
+    {
+      "seatId": "VIP-1-4-2",
+      "section": "VIP1",
+      "row": "4",
+      "number": "2",
+      "status": "AVAILABLE",
+      "price": 220000,
+      "lockedUntil": "2026-05-20T20:05:00",
+      "sellable": false,
+      "seatVersion": 2
+    }
+  ]
 }
 ```
 

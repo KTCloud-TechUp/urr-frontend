@@ -2,6 +2,8 @@
 
 # Queue Service 연동 현황
 
+> 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-queueService
+>
 > 마지막 확인: 2026-04-10
 
 | # | API | 메서드 | 엔드포인트 | 연동 파일 | 상태 | 비고 |
@@ -26,16 +28,16 @@ POST /api/v1/queue/check/{showId}
 
 ### **Path Variable**
 
-| 이름 | 타입 | 설명 |
-| --- | --- | --- |
+| 이름     | 타입 | 설명    |
+| -------- | ---- | ------- |
 | `showId` | Long | 공연 ID |
 
 ### **요청 헤더**
 
-| 이름 | 타입 | 필수 | 설명 |
-| --- | --- | --- | --- |
-| `X-User-Id` | Long | Y | 현재 로그인한 사용자 ID |
-| `X-Vwr-Position` | Long | N | 뷰어 위치 힌트 (우선순위 배정에 활용) |
+| 이름             | 타입 | 필수 | 설명                                  |
+| ---------------- | ---- | ---- | ------------------------------------- |
+| `X-User-Id`      | Long | Y    | 현재 로그인한 사용자 ID               |
+| `X-Vwr-Position` | Long | N    | 뷰어 위치 힌트 (우선순위 배정에 활용) |
 
 ### **응답 예시 - 대기열 진입 (WAIT)**
 
@@ -75,14 +77,14 @@ POST /api/v1/queue/check/{showId}
 
 ### **응답 필드 설명**
 
-| 필드 | 타입 | 설명 |
-| --- | --- | --- |
-| `userId` | Long | 사용자 ID |
-| `showId` | Long | 공연 ID |
-| `status` | String | 상태 (`ACTIVE` / `WAIT`) |
-| `rank` | Long | 대기 순위 (WAIT일 때만 반환) |
-| `total` | Long | 전체 대기 인원 수 (WAIT일 때만 반환) |
-| `waitTime` | Long | 예상 대기 시간 (초 단위, WAIT일 때만 반환) |
+| 필드       | 타입   | 설명                                       |
+| ---------- | ------ | ------------------------------------------ |
+| `userId`   | Long   | 사용자 ID                                  |
+| `showId`   | Long   | 공연 ID                                    |
+| `status`   | String | 상태 (`ACTIVE` / `WAIT`)                   |
+| `rank`     | Long   | 대기 순위 (WAIT일 때만 반환)               |
+| `total`    | Long   | 전체 대기 인원 수 (WAIT일 때만 반환)       |
+| `waitTime` | Long   | 예상 대기 시간 (초 단위, WAIT일 때만 반환) |
 
 ---
 
@@ -100,15 +102,15 @@ GET /api/v1/queue/{showId}
 
 ### **Path Variable**
 
-| 이름 | 타입 | 설명 |
-| --- | --- | --- |
+| 이름     | 타입 | 설명    |
+| -------- | ---- | ------- |
 | `showId` | Long | 공연 ID |
 
 ### **요청 헤더**
 
-| 이름 | 타입 | 필수 | 설명 |
-| --- | --- | --- | --- |
-| `X-User-Id` | Long | Y | 현재 로그인한 사용자 ID |
+| 이름        | 타입 | 필수 | 설명                    |
+| ----------- | ---- | ---- | ----------------------- |
+| `X-User-Id` | Long | Y    | 현재 로그인한 사용자 ID |
 
 ### **응답 예시 - 대기 중 (WAIT)**
 
@@ -172,16 +174,16 @@ GET /api/v1/queue/{showId}
 
 ### **응답 필드 설명**
 
-| 필드 | 타입 | 설명 |
-| --- | --- | --- |
-| `userId` | Long | 사용자 ID |
-| `showId` | Long | 공연 ID |
-| `status` | String | 상태 (`ACTIVE` / `WAIT` / `NOT_WAIT`) |
-| `rank` | Long | 대기 순위 (WAIT일 때만 반환) |
-| `total` | Long | 전체 대기 인원 수 (WAIT일 때만 반환) |
-| `waitTime` | Long | 예상 대기 시간 (초 단위, WAIT일 때만 반환) |
-| `token` | String | JWT 입장 토큰 (ACTIVE일 때만 반환) |
-| `remainMs` | Long | 토큰 잔여 유효 시간 (ms 단위, ACTIVE일 때만 반환) |
+| 필드       | 타입   | 설명                                              |
+| ---------- | ------ | ------------------------------------------------- |
+| `userId`   | Long   | 사용자 ID                                         |
+| `showId`   | Long   | 공연 ID                                           |
+| `status`   | String | 상태 (`ACTIVE` / `WAIT` / `NOT_WAIT`)             |
+| `rank`     | Long   | 대기 순위 (WAIT일 때만 반환)                      |
+| `total`    | Long   | 전체 대기 인원 수 (WAIT일 때만 반환)              |
+| `waitTime` | Long   | 예상 대기 시간 (초 단위, WAIT일 때만 반환)        |
+| `token`    | String | JWT 입장 토큰 (ACTIVE일 때만 반환)                |
+| `remainMs` | Long   | 토큰 잔여 유효 시간 (ms 단위, ACTIVE일 때만 반환) |
 
 ---
 
@@ -212,10 +214,10 @@ GET /health
 
 ### **응답 필드 설명**
 
-| 필드 | 타입 | 설명 |
-| --- | --- | --- |
-| `service` | String | 서비스 이름 |
-| `status` | String | 서비스 상태 (`ok`) |
+| 필드      | 타입   | 설명               |
+| --------- | ------ | ------------------ |
+| `service` | String | 서비스 이름        |
+| `status`  | String | 서비스 상태 (`ok`) |
 
 > **참고**: 이 엔드포인트는 공통 응답 형식(`ApiResponse`)을 사용하지 않고, 위 JSON 형식을 직접 반환합니다.
 
@@ -249,8 +251,8 @@ GET /health
 
 ## **상태값(QueueStatus) 정의**
 
-| 값 | 설명 |
-| --- | --- |
-| `ACTIVE` | 활성 대기열 진입 완료. JWT 토큰 발급됨 |
-| `WAIT` | 대기열에서 순서를 기다리는 중 |
+| 값         | 설명                                              |
+| ---------- | ------------------------------------------------- |
+| `ACTIVE`   | 활성 대기열 진입 완료. JWT 토큰 발급됨            |
+| `WAIT`     | 대기열에서 순서를 기다리는 중                     |
 | `NOT_WAIT` | 대기열에 등록되지 않은 상태. `/check` 재호출 필요 |
