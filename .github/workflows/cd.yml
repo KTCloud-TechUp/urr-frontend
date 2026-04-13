@@ -30,6 +30,7 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: https://urr.guru/api/v1
           NEXT_PUBLIC_KAKAO_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_KAKAO_CLIENT_ID }}
           NEXT_PUBLIC_NAVER_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_NAVER_CLIENT_ID }}
+          NEXT_PUBLIC_TOSS_CLIENT_KEY: test_ck_ZLKGPx4M3Mn9vGzDDpZeVBaWypv1
         run: npm run build
 
       - name: Configure AWS credentials
