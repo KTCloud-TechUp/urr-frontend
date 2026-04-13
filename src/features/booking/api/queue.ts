@@ -1,4 +1,5 @@
 import { fetchWithAuth } from "@/shared/api";
+import { tokenStore } from "@/shared/api/tokenStore";
 import { getUserIdFromToken } from "@/shared/lib/jwt";
 import type { ApiBaseResponse } from "@/features/auth/model/types";
 
@@ -49,8 +50,7 @@ export async function vwrCheck(eventId: string | number, requestId: string): Pro
 }
 
 function getAuthHeader(): Record<string, string> {
-  // tokenStore에서 토큰 가져오기 — import 순환 방지를 위해 직접 sessionStorage 접근
-  const token = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("at") : null;
+  const token = tokenStore.getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
