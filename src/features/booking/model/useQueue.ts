@@ -62,7 +62,15 @@ export function useQueue(
   }
 
   // --- Step 1~3: VWR 대기열 ---
+  const skipVwr = process.env.NEXT_PUBLIC_SKIP_VWR === "true";
+
   const startVwr = useCallback(async () => {
+    // 로컬 개발: VWR Lambda 없으면 Tier2 직접 진입
+    if (skipVwr) {
+      await enterTier2();
+      return;
+    }
+
     try {
       // Step 1: VWR assign
       const assignResult = await vwrAssign(eventId);
