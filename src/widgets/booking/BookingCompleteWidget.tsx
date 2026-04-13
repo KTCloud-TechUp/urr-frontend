@@ -76,14 +76,17 @@ export function BookingCompleteWidget() {
 
     confirmPayment({ paymentKey, orderId, amount: Number(amount), userId: savedUserId })
       .then(async () => {
-        // confirmPayment 성공 = 결제 완료. confirmReservation은 백엔드가 내부적으로
-        // 이미 처리했을 수 있으므로 실패해도 성공 화면을 보여준다.
-        const allReservationIds = restoredRefs.flatMap((ref) => ref.reservationIds ?? []);
-        if (allReservationIds.length > 0) {
-          await confirmReservation({ reservationIds: allReservationIds, userId: savedUserId })
-            .catch(() => {
-              // 이미 확정된 예약이거나 백엔드가 내부 처리한 경우 — 무시
-            });
+        // AWS 환경: SQS → Lambda가 예약 확정 처리 (프론트 직접 호출 불필요)
+        // 로컬 환경: SQS 없으므로 프론트가 직접 confirm 호출
+        const isLocal = process.env.NEXT_PUBLIC_API_BASE_URL?.includes("localhost");
+        if (isLocal) {
+          const allReservationIds = restoredRefs.flatMap((ref) => ref.reservationIds ?? []);
+          if (allReservationIds.length > 0) {
+            await confirmReservation({ reservationIds: allReservationIds, userId: savedUserId })
+              .catch(() => {
+                // 이미 확정된 예약이거나 백엔드가 내부 처리한 경우 — 무시
+              });
+          }
         }
         setData(completeData);
         setPhase("success");
