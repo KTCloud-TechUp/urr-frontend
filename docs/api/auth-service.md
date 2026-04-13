@@ -2,7 +2,7 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-authService
 >
-> 마지막 확인: 2026-04-10 / 마지막 수정: 2026-04-10
+> 마지막 확인: 2026-04-13 / 마지막 수정: 2026-04-13
 
 | #   | API                      | 메서드 | 엔드포인트                        | 연동 파일                                                    | 상태           | 비고                                                                   |
 | --- | ------------------------ | ------ | --------------------------------- | ------------------------------------------------------------ | -------------- | ---------------------------------------------------------------------- |
@@ -17,8 +17,8 @@
 | 9   | 일반 회원가입            | POST   | `/api/v1/auth/register`           | `features/auth/api/register.ts`                              | ✅ 연동됨      | 응답 HTTP 201이지만 fetchWithAuth가 2xx 전체 허용하므로 무해           |
 | 10  | 일반 로그인              | POST   | `/api/v1/auth/login`              | `features/auth/api/login.ts`                                 | ✅ 연동됨      |                                                                        |
 | 11  | 소셜 온보딩 완료         | POST   | `/api/v1/auth/onboarding/social`  | `features/auth/api/socialOnboarding.ts`                      | ✅ 연동됨      |                                                                        |
-| 12  | 이메일 인증번호 발송     | POST   | `/api/v1/auth/sms/send`           | `features/auth/api/smsSend.ts`                               | ⚠️ 스펙 불일치 | 스펙: `email` 필드 → 코드: `phoneNumber` 필드 사용 중                  |
-| 13  | 이메일 인증번호 검증     | POST   | `/api/v1/auth/sms/verify`         | `features/auth/api/smsVerify.ts`                             | ⚠️ 스펙 불일치 | 스펙: `{email, code}` → 코드: `{phoneNumber, code}` 사용 중            |
+| 12  | 이메일 인증번호 발송     | POST   | `/api/v1/auth/sms/send`           | `features/auth/api/smsSend.ts`                               | ✅ 연동됨      | 백엔드 `EmailSendRequest(email)` 사용 — 이전 phoneNumber 불일치 해소      |
+| 13  | 이메일 인증번호 검증     | POST   | `/api/v1/auth/sms/verify`         | `features/auth/api/smsVerify.ts`                             | ✅ 연동됨      | 백엔드 `EmailVerifyRequest(email, code)` 사용 — 이전 phoneNumber 불일치 해소 |
 
 ---
 
