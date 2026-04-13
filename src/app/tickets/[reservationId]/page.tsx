@@ -1,10 +1,10 @@
 import { TicketDetailWidget } from "@/widgets/ticket/TicketDetailWidget";
 
 // Reservation IDs are runtime UUIDs — cannot be enumerated at build time.
-// Returning [] satisfies the static export requirement; CloudFront SPA
-// fallback handles runtime navigation to these paths.
+// A placeholder entry satisfies Next.js static export requirement;
+// real ticket URLs are handled by CloudFront SPA fallback (→ index.html).
 export async function generateStaticParams() {
-  return [];
+  return [{ reservationId: "placeholder" }];
 }
 
 interface Props {
