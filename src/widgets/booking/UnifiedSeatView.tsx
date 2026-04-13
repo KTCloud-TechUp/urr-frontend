@@ -81,7 +81,7 @@ export function UnifiedSeatView() {
   // Fetch real seat availability for the selected section
   const { data: seatsData } = useQuery({
     queryKey: ["seats-availability", eventId, showId, sectionTierCode, sectionZoneNo],
-    queryFn: () => getSeatsAvailability(showId!, sectionTierCode!, sectionZoneNo!),
+    queryFn: () => getSeatsAvailability(eventId, showId!, sectionTierCode!, sectionZoneNo!),
     enabled: isInSeatMode && showId !== null && sectionTierCode !== null && sectionZoneNo !== null,
     staleTime: 30_000,
     refetchOnWindowFocus: false,
