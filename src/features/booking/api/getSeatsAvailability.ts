@@ -20,13 +20,12 @@ interface SeatsAvailabilityApiResponse {
 }
 
 export async function getSeatsAvailability(
-  eventId: string | number,
   showId: string | number,
   tier: string,
   zoneNo: number,
 ): Promise<SeatAvailability[]> {
   const res = await apiRequest<SeatsAvailabilityApiResponse>(
-    `/shows/${eventId}/shows/${showId}/seats/availability?tier=${tier}&zoneNo=${zoneNo}`,
+    `/shows/${showId}/seats/availability?tier=${tier}&zoneNo=${zoneNo}`,
     { service: "events" },
   );
   return res.data.data ?? [];
