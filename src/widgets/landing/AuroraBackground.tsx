@@ -13,6 +13,25 @@ export function AuroraBackground() {
 
   useEffect(() => {
     // ── Layer 1: UnicornStudio ──────────────────────────────────────
+    // The UnicornStudio scene is authored at a fixed design size and anchored
+    // top-left inside its canvas. On wide viewports this causes the aurora to
+    // cluster on the left. Fix: keep the host sized to the design canvas
+    // (so init renders a well-proportioned scene) and cover-scale it with CSS
+    // transform, centered via translate(-50%, -50%). On resize we only adjust
+    // the transform — no re-init, no flicker.
+    const DESIGN_W = 1920;
+    const DESIGN_H = 1080;
+
+    const applyCoverTransform = () => {
+      const host = document.getElementById("bg-unicorn");
+      if (!host) return;
+      const scale = Math.max(
+        window.innerWidth / DESIGN_W,
+        window.innerHeight / DESIGN_H
+      );
+      host.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    };
+
     if (!window.UnicornStudio) {
       window.UnicornStudio = { isInitialized: false, init: () => {} };
       const s = document.createElement("script");
@@ -23,12 +42,19 @@ export function AuroraBackground() {
           window.UnicornStudio.init();
           window.UnicornStudio.isInitialized = true;
         }
+        applyCoverTransform();
       };
       document.head.appendChild(s);
     } else if (!window.UnicornStudio.isInitialized) {
       window.UnicornStudio.init();
       window.UnicornStudio.isInitialized = true;
+      applyCoverTransform();
+    } else {
+      applyCoverTransform();
     }
+
+    const onUnicornResize = () => applyCoverTransform();
+    window.addEventListener("resize", onUnicornResize);
 
 
 
@@ -132,18 +158,27 @@ export function AuroraBackground() {
     );
 
     return () => {
+      window.removeEventListener("resize", onUnicornResize);
       cleanup?.();
     };
   }, []);
 
   return (
     <div className="absolute inset-0" style={{ background: "#0A0A1A", overflow: "hidden" }}>
-      {/* UnicornStudio aurora/curtain layer */}
+      {/* UnicornStudio aurora/curtain layer — fixed to viewport so the scene
+          always re-centers on large resolutions (reference parity) */}
       <div
         id="bg-unicorn"
         data-us-project="qO2hJSXvjk0iEIVJ5nim"
-        className="absolute inset-0"
         style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: "1920px",
+          height: "1080px",
+          transformOrigin: "center center",
+          transform: "translate(-50%, -50%)",
+          willChange: "transform",
           maskImage:
             "linear-gradient(to bottom, transparent, black 0%, black 80%, transparent)",
           WebkitMaskImage:
@@ -156,8 +191,8 @@ export function AuroraBackground() {
       <div
         className="absolute bottom-0 left-0 w-full pointer-events-none"
         style={{
-          height: "180px",
-          background: "linear-gradient(to bottom, transparent 0%, #0A0A1A 50%)",
+          height: "260px",
+          background: "linear-gradient(to bottom, transparent 0%, #0A0A1A 35%)",
           zIndex: 100000000,
         }}
       />
