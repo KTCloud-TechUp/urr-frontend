@@ -1,12 +1,13 @@
 import { apiRequest } from "@/shared/api/client";
 
 interface CreatePaymentRecordParams {
+  userId: string | number;
   referenceId: string;
   orderId: string;
   amount: number;
 }
 
-export interface CreatePaymentRecordResponse {
+interface CreatePaymentRecordResponse {
   paymentId: number;
   orderId: string;
   referenceId: string;
@@ -24,12 +25,14 @@ interface CreatePaymentRecordApiResponse {
 export async function createPaymentRecord(
   params: CreatePaymentRecordParams,
 ): Promise<CreatePaymentRecordResponse> {
+  const { userId, ...body } = params;
   const res = await apiRequest<CreatePaymentRecordApiResponse>(
     "/payments/create",
     {
       method: "POST",
       service: "payments",
-      body: params,
+      headers: { "X-User-Id": String(userId) },
+      body,
     },
   );
   return res.data.data;
