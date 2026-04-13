@@ -49,7 +49,7 @@ function QueueContent({ onQueuePassed }: { onQueuePassed?: (token: string | null
     stayInQueue,
     error: queueError,
     retryEntry,
-  } = useQueue(showId, sectionsForDate, (token, _remainMs) => {
+  } = useQueue(eventId, showId, sectionsForDate, (token, _remainMs) => {
     setQueueToken(token);
     if (onQueuePassed) {
       onQueuePassed(token);

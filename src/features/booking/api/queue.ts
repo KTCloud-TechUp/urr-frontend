@@ -2,6 +2,65 @@ import { fetchWithAuth } from "@/shared/api";
 import { getUserIdFromToken } from "@/shared/lib/jwt";
 import type { ApiBaseResponse } from "@/features/auth/model/types";
 
+// --- VWR (Tier 1) ---
+
+const VWR_BASE_URL = typeof window !== "undefined"
+  ? `${window.location.origin}/vwr`
+  : "https://urr.guru/vwr";
+
+export interface VwrAssignData {
+  requestId: string;
+  position: number;
+  estimatedWait: number;
+}
+
+export interface VwrCheckData {
+  admitted: boolean;
+  token?: string;
+  position: number;
+  servingCounter: number;
+  totalInQueue: number;
+  ahead: number;
+  estimatedWait?: number;
+  nextPoll?: number;
+}
+
+export async function vwrAssign(eventId: string | number): Promise<VwrAssignData> {
+  const response = await fetch(`${VWR_BASE_URL}/assign/${eventId}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
+  });
+  if (!response.ok) throw new Error(`VWR assign failed: ${response.status}`);
+  return response.json();
+}
+
+export async function vwrCheck(eventId: string | number, requestId: string): Promise<VwrCheckData> {
+  const response = await fetch(`${VWR_BASE_URL}/check/${eventId}/${requestId}`, {
+    method: "GET",
+    credentials: "include",
+    headers: getAuthHeader(),
+  });
+  if (!response.ok) throw new Error(`VWR check failed: ${response.status}`);
+  return response.json();
+}
+
+function getAuthHeader(): Record<string, string> {
+  // tokenStore에서 토큰 가져오기 — import 순환 방지를 위해 직접 sessionStorage 접근
+  const token = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("at") : null;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function setEntryTokenCookie(token: string) {
+  if (typeof document === "undefined") return;
+  document.cookie = `urr-entry-token=${token}; path=/; max-age=900; SameSite=Lax`;
+}
+
+// --- Queue (Tier 2) ---
+
 export interface QueueEntryData {
   userId: number | null;
   showId: number | null;
@@ -50,3 +109,5 @@ export async function pollQueue(showId: string | number): Promise<QueuePollData>
   );
   return res.data.data;
 }
+
+export { setEntryTokenCookie };
