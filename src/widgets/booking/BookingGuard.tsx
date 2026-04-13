@@ -22,7 +22,10 @@ export function BookingGuard({ eventId, children }: BookingGuardProps) {
   // SSR 안전: sessionStorage는 클라이언트에서만 접근 가능
   const [authorized] = useState(() => {
     if (typeof window === "undefined") return false;
-    return sessionStorage.getItem("urr:booking:startPhase") !== null;
+    // 일반 진입: startPhase 키 존재 여부
+    if (sessionStorage.getItem("urr:booking:startPhase") !== null) return true;
+    // Toss 결제 실패 복귀: failUrl(?paymentFail=1)로 돌아왔을 때 허용
+    return new URLSearchParams(window.location.search).has("paymentFail");
   });
 
   useEffect(() => {

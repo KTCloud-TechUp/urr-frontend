@@ -5,6 +5,7 @@ export interface ReservationRef {
   eventId: number;
   showId: number;
   seatIds: string[];
+  reservationIds: string[];
 }
 
 interface BookingStore {

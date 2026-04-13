@@ -1,5 +1,7 @@
 import type { Section, Seat, SeatStatus, TierLevel } from "@/shared/types";
 
+// URR KSPO DOME STYLE V2 venue template 기준
+// seatmap_json의 sections[] 에서 tier+zoneNo별 rowEnd-rowStart+1, colEnd-colStart+1 값
 const SECTION_LAYOUT: Record<string, { rows: number; seatsPerRow: number }> = {
   VIP1: { rows: 23, seatsPerRow: 29 }, VIP2: { rows: 23, seatsPerRow: 29 }, VIP3: { rows: 23, seatsPerRow: 29 },
   S1: { rows: 25, seatsPerRow: 22 }, S2: { rows: 25, seatsPerRow: 22 }, S3: { rows: 25, seatsPerRow: 22 }, S4: { rows: 25, seatsPerRow: 22 },
@@ -43,9 +45,12 @@ function hashString(str: string): number {
   return hash;
 }
 
-function rowLabel(index: number): string {
-  if (index < 26) return String.fromCharCode(65 + index);
-  return String.fromCharCode(65 + Math.floor(index / 26) - 1) + String.fromCharCode(65 + (index % 26));
+// sectionId (e.g. "VIP1", "R3", "A10") → { tier, zoneNo }
+// 백엔드 seatId 형식: {tier}-{zoneNo}-{row}-{number} (예: VIP-1-3-1)
+function parseSectionId(sectionId: string): { tier: string; zoneNo: number } {
+  const match = sectionId.match(/^([A-Z]+)(\d+)$/);
+  if (match) return { tier: match[1], zoneNo: Number(match[2]) };
+  return { tier: sectionId, zoneNo: 1 };
 }
 
 export function getSectionLayout(sectionId: string) {
@@ -57,6 +62,7 @@ export function generateSeatsForSection(section: Section, userTier: TierLevel): 
   const { rows, seatsPerRow } = layout;
   const totalSeats = rows * seatsPerRow;
   const rand = seededRandom(hashString(section.id));
+  const { tier, zoneNo } = parseSectionId(section.id);
 
   const baseTaken = section.totalSeats - section.remainingSeats;
   const extraTaken = Math.round(section.totalSeats * TIER_EXTRA_TAKEN_RATIO[userTier]);
@@ -74,11 +80,14 @@ export function generateSeatsForSection(section: Section, userTier: TierLevel): 
     for (let c = 0; c < seatsPerRow; c++) {
       const flatIndex = r * seatsPerRow + c;
       const status: SeatStatus = takenSet.has(flatIndex) ? "taken" : "available";
+      const row = String(r + 1);
+      const number = String(c + 1);
       seats.push({
-        id: `${section.id}-${rowLabel(r)}-${c + 1}`,
+        // 백엔드 ShowService seatId 형식: {tier}-{zoneNo}-{row}-{number}
+        id: `${tier}-${zoneNo}-${row}-${number}`,
         sectionId: section.id,
-        row: rowLabel(r),
-        number: String(c + 1),
+        row,
+        number,
         status,
       });
     }

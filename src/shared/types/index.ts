@@ -174,6 +174,11 @@ export interface ConfirmationData {
   }[];
   totalAmount: number;
   bookedAt: string;
+  /** /booking/complete 페이지에서 사용 — Toss 리다이렉트 전 sessionStorage에 저장 */
+  eventTitle?: string;
+  eventVenue?: string;
+  showDate?: string;
+  userTier?: TierLevel;
 }
 // === Label Constants ===
 

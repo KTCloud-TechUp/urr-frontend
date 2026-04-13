@@ -3,7 +3,7 @@
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { getMyReservations } from "../api/getMyReservations";
 import { getEvents } from "@/features/event";
-import { getShows } from "@/features/show";
+import { getShows, getSections } from "@/features/show";
 import type { Ticket, Event } from "@/shared/types";
 
 // seatId 형식: "{sectionCode}-{row}-{number}" (API #31 스펙 확인)
@@ -43,7 +43,18 @@ export function useMyReservations(userId?: string | number) {
     })),
   });
 
-  const isLoading = resLoading || eventsLoading || showResults.some((r) => r.isLoading);
+  const uniqueShowIds = [...new Set(reservations.map((r) => r.showId))];
+
+  const sectionResults = useQueries({
+    queries: uniqueShowIds.map((showId) => ({
+      queryKey: ["sections", String(showId)],
+      queryFn: () => getSections(showId),
+      enabled: uniqueShowIds.length > 0,
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+
+  const isLoading = resLoading || eventsLoading || showResults.some((r) => r.isLoading) || sectionResults.some((r) => r.isLoading);
 
   const tickets: (Ticket & { event: Event })[] = reservations.flatMap((r) => {
     const eventSummary = allEvents.find((e) => e.eventId === r.eventId);
@@ -70,6 +81,16 @@ export function useMyReservations(userId?: string | number) {
 
     const { section, row, seatNumber } = parseSeatId(r.seatId);
 
+    const showIndex = uniqueShowIds.indexOf(r.showId);
+    const sections = sectionResults[showIndex]?.data?.sections ?? [];
+    // getSections 코드는 "VIP","S","R","A" 형식 (zoneNo 없음)
+    // seatId → section이 "VIP-1", "VIP1" 등으로 오면 접미 숫자·대시 제거해 매칭
+    const tierCode = section.replace(/-?\d+$/, "");
+    const matchedSection =
+      sections.find((s) => s.code === section) ??
+      sections.find((s) => s.code === tierCode);
+    const price = matchedSection?.price ?? 0;
+
     const ticket: Ticket & { event: Event } = {
       id: r.reservationId,
       eventId: String(r.eventId),
@@ -78,7 +99,7 @@ export function useMyReservations(userId?: string | number) {
       section,
       row,
       seatNumber,
-      price: 0,
+      price,
       tierFee: 0,
       qrCode: r.reservationId,
       isTransferable: r.transferEligible,
