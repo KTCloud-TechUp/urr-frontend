@@ -16,7 +16,7 @@
 | 8   | 예약티켓 목록 조회                       | GET    | `/api/v1/ticket/users/reservations`                             | `features/reservation/api/getMyReservations.ts` | ✅ 연동됨    | URL 일치 (헤더로 userId 전달)                               |
 | 9   | (내부) 양도 가능 여부 조회               | GET    | `/api/v1/ticket/internal/transfers/{reservationId}/eligibility` | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
 | 10  | (내부) 소유권 양도 완료                  | POST   | `/api/v1/ticket/internal/transfers/{reservationId}/complete`    | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
-| 11  | (내부) 티켓 좌석 정보 조회 (양도용)      | POST   | `/api/v1/ticket/internal/transfer-seat-info`                    | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
+| 11  | (내부) 티켓 좌석 정보 조회 (양도용)      | GET    | `/api/v1/ticket/internal/transfer-seat-info`                    | —                                               | ⚠️ 스펙 불일치 | POST→GET 변경, body `{showId,tier,zoneNo}` → query `{eventId,showId}` + 헤더 `X-User-Id` |
 | 12  | (내부) 특정 티어/구역 사용불가 좌석 조회 | POST   | `/api/v1/ticket/internal/seats/statuses`                        | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
 | 13  | 티켓 좌석 정보 조회                      | POST   | `/api/v1/ticket/seats/statuses`                                 | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
 | 14  | Health Check                             | GET    | `/health`                                                       | —                                               | ➖ 불필요    |                                                             |
@@ -749,16 +749,18 @@ POST /api/v1/ticket/internal/transfers/{reservationId}/complete
 ## API
 
 ```
-POST /api/v1/ticket/internal/transfer-seat-info
+GET /api/v1/ticket/internal/transfer-seat-info
 ```
+
+> ⚠️ **스펙 불일치**: 문서 원본은 `POST` + body `{showId, tier, zoneNo}` 였으나, 실제 백엔드는 `GET` + query params로 변경됨
 
 ## 설명
 
-- Event 서비스가 tier/zone 기준으로 사용불가(LOCKED/RESERVED) 좌석을 조회
+- Community(양도) 서비스가 특정 사용자/이벤트/회차 기준으로 양도 대상 좌석 정보를 조회
 
 ## Headers
 
-- 없음
+- `X-User-Id` (Long, 필수): 사용자 ID
 
 ## Path Parameters
 
@@ -766,23 +768,12 @@ POST /api/v1/ticket/internal/transfer-seat-info
 
 ## Query Parameters
 
-- 없음
+- `eventId` (Long, 필수): 공연 ID
+- `showId` (Long, 필수): 회차 ID
 
 ## Request Body
 
-```json
-{
-  "showId": 100,
-  "tier": "VIP",
-  "zoneNo": 1
-}
-```
-
-| 필드   | 타입    | 필수 | 설명              |
-| ------ | ------- | ---- | ----------------- |
-| showId | Long    | Y    | 회차 ID (양수)    |
-| tier   | String  | Y    | 티어 (blank 불가) |
-| zoneNo | Integer | Y    | 구역 번호 (양수)  |
+없음 (GET 메서드)
 
 ## Response 200
 

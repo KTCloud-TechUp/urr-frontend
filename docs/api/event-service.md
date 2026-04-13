@@ -2,7 +2,7 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-eventService
 >
-> 마지막 확인: 2026-04-11
+> 마지막 확인: 2026-04-13
 
 | #   | API                                 | 메서드 | 엔드포인트                                                          | 연동 파일                                          | 상태      | 비고                                                                      |
 | --- | ----------------------------------- | ------ | ------------------------------------------------------------------- | -------------------------------------------------- | --------- | ------------------------------------------------------------------------- |
@@ -40,6 +40,8 @@
 | 32  | 잔여석 전체 요약 조회               | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/summary`              | `features/booking/api/getSeatsSummary.ts`          | ✅ 연동됨 |                                                                           |
 | 33  | 특정 티어/구역 예매 가능 좌석 조회  | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/availability`         | `features/booking/api/getSeatsAvailability.ts`     | ✅ 연동됨 |                                                                           |
 | 34  | 회차별 멤버십 예매 오픈 시간표 조회 | GET    | `/api/v1/shows/{eventId}/shows/{showId}/booking-windows`            | `features/booking/api/getBookingWindows.ts`        | ✅ 연동됨 |                                                                           |
+| 35  | 공연 상세 + booking windows 통합 조회 | GET    | `/api/v1/events/{eventId}/detail-with-booking-windows`              | —                                                  | ➖ 불필요 | 신규 엔드포인트 — UI 연결 없음                                            |
+| 36  | 회차별 좌석 목록(가격/수수료 포함) 조회 | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/detail`               | —                                                  | ➖ 불필요 | 신규 엔드포인트 — 티켓 서비스 내부 연동용, query `seatIds`(선택) 지원    |
 
 ---
 
