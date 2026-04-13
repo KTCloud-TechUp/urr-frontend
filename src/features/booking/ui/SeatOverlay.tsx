@@ -28,12 +28,9 @@ interface SeatOverlayProps {
   onSeatClick: (seatId: string) => void;
 }
 
+// 백엔드 row는 1-based 숫자 문자열 ("1", "2", ...)
 function rowLabel(index: number): string {
-  if (index < 26) return String.fromCharCode(65 + index);
-  return (
-    String.fromCharCode(65 + Math.floor(index / 26) - 1) +
-    String.fromCharCode(65 + (index % 26))
-  );
+  return String(index + 1);
 }
 
 function SeatOverlayInner({

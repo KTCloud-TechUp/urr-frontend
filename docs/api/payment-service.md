@@ -1,23 +1,25 @@
 # Payment Service 연동 현황
 
-> 마지막 확인: 2026-04-10
+> 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-paymentService
+>
+> 마지막 확인: 2026-04-13
 
-| # | API | 메서드 | 엔드포인트 | 연동 파일 | 상태 | 비고 |
-|---|-----|--------|-----------|----------|------|------|
-| 1.1 | 결제 데이터 생성 | POST | `/api/v1/payments/create` | `features/payment/api/createPaymentRecord.ts` | ✅ 연동됨 | `status: string`으로 반환하며 코드에서 값 비교 없음 (무해) |
-| 1.2 | 결제 승인 | POST | `/api/v1/payments/confirm` | `features/payment/api/confirmPayment.ts` | ✅ 연동됨 | `status: string`으로 반환하며 코드에서 값 비교 없음 (무해) |
-| 1.3 | 결제 단건 조회 | GET | `/api/v1/payments/order/{orderId}` | `features/payment/api/getPayment.ts` | ✅ 연동됨 | |
-| 1.4 | 결제 취소 | POST | `/api/v1/payments/{paymentKey}/cancel` | `features/payment/api/cancelPayment.ts` | ✅ 연동됨 | 스펙에 응답 body 추가됐으나 코드는 void 반환 (무해) |
-| 2.1 | 멤버십 결제 생성 (내부) | POST | `/api/v1/internal/payments/membership/create` | — | ➖ 불필요 | 서비스 내부 API |
-| 2.2 | 티켓 예매 결제 생성 (내부) | POST | `/api/v1/internal/payments/ticket/create` | — | ➖ 불필요 | 서비스 내부 API |
-| 2.3 | 양도 커뮤니티 구매 결제 생성 (내부) | POST | `/api/v1/internal/payments/transfer/create` | — | ➖ 불필요 | 서비스 내부 API |
-| 2.4 | 예매 결제 금액 조회 (내부) | GET | `/api/v1/internal/payments/reservation/{reservationId}/amount` | — | ➖ 불필요 | 서비스 내부 API (신규 추가) |
+| #   | API                                 | 메서드 | 엔드포인트                                                     | 연동 파일                                     | 상태      | 비고                                                       |
+| --- | ----------------------------------- | ------ | -------------------------------------------------------------- | --------------------------------------------- | --------- | ---------------------------------------------------------- |
+| 1.1 | 결제 데이터 생성                    | POST   | `/api/v1/payments/create`                                      | —                                             | ➖ 불필요 | 프론트 미사용 — 티켓 서비스 내부에서 처리                  |
+| 1.2 | 결제 승인                           | POST   | `/api/v1/payments/confirm`                                     | `features/payment/api/confirmPayment.ts`      | ✅ 연동됨 | `status: string`으로 반환하며 코드에서 값 비교 없음 (무해) |
+| 1.3 | 결제 단건 조회                      | GET    | `/api/v1/payments/order/{orderId}`                             | —                                             | ➖ 불필요 | 프론트 미사용                                              |
+| 1.4 | 결제 취소                           | POST   | `/api/v1/payments/{paymentKey}/cancel`                         | —                                             | ➖ 불필요 | 프론트 미사용                                              |
+| 2.1 | 멤버십 결제 생성 (내부)             | POST   | `/api/v1/internal/payments/membership/create`                  | —                                             | ➖ 불필요 | 서비스 내부 API                                            |
+| 2.2 | 티켓 예매 결제 생성 (내부)          | POST   | `/api/v1/internal/payments/ticket/create`                      | —                                             | ➖ 불필요 | 서비스 내부 API                                            |
+| 2.3 | 양도 커뮤니티 구매 결제 생성 (내부) | POST   | `/api/v1/internal/payments/transfer/create`                    | —                                             | ➖ 불필요 | 서비스 내부 API                                            |
+| 2.4 | 예매 결제 금액 조회 (내부)          | GET    | `/api/v1/internal/payments/reservation/{reservationId}/amount` | —                                             | ➖ 불필요 | 서비스 내부 API (신규 추가)                                |
 
 > **참고**: `PaymentStatus` enum 변경 — `READY`→`PENDING`, `DONE`→`PAID`, `PARTIAL_CANCELED` 제거. status 값을 직접 비교하는 UI 로직이 있다면 확인 필요.
 
 ---
 
-[[공유]결제 연동 가이드(프론트엔드)](https://www.notion.so/338088024298805093a3e117c7b1f148?pvs=21) 
+[[공유]결제 연동 가이드(프론트엔드)](https://www.notion.so/338088024298805093a3e117c7b1f148?pvs=21)
 
 ---
 
@@ -31,17 +33,17 @@
 
 **요청 헤더**
 
-| **이름** | **타입** | **필수** | **설명** |
-| --- | --- | --- | --- |
-| `X-User-Id` | Long | Y | 현재 사용자 ID |
+| **이름**    | **타입** | **필수** | **설명**       |
+| ----------- | -------- | -------- | -------------- |
+| `X-User-Id` | Long     | Y        | 현재 사용자 ID |
 
 **요청 바디**
 
 ```json
 {
-		"referenceId":"res_20240403_01",
-		"orderId":"ORD-123456789",
-		"amount":50000
+  "referenceId": "res_20240403_01",
+  "orderId": "ORD-123456789",
+  "amount": 50000
 }
 ```
 
@@ -49,16 +51,16 @@
 
 ```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"paymentId":1,
-			"orderId":"ORD-123456789",
-			"referenceId":"res_20240403_01",
-			"amount":50000,
-			"status":"PENDING"
-	  }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "paymentId": 1,
+    "orderId": "ORD-123456789",
+    "referenceId": "res_20240403_01",
+    "amount": 50000,
+    "status": "PENDING"
+  }
 }
 ```
 
@@ -72,17 +74,17 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 **요청 헤더**
 
-| **이름** | **타입** | **필수** | **설명** |
-| --- | --- | --- | --- |
-| `X-User-Id` | Long | Y | 현재 사용자 ID |
+| **이름**    | **타입** | **필수** | **설명**       |
+| ----------- | -------- | -------- | -------------- |
+| `X-User-Id` | Long     | Y        | 현재 사용자 ID |
 
 **요청 바디**
 
 ```json
 {
-	"paymentKey":"tgen_20240403164307M1234",
-	"orderId":"ORD-123456789",
-	"amount":50000
+  "paymentKey": "tgen_20240403164307M1234",
+  "orderId": "ORD-123456789",
+  "amount": 50000
 }
 ```
 
@@ -90,18 +92,18 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"paymentKey":"tgen_20240403164307M1234",
-			"orderId":"ORD-123456789",
-			"amount":50000,
-			"method":"CARD",
-			"referenceId":"res_20240403_01",
-			"status":"PAID",
-			"approvedAt":"2024-04-03T16:45:00"
-	  }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "paymentKey": "tgen_20240403164307M1234",
+    "orderId": "ORD-123456789",
+    "amount": 50000,
+    "method": "CARD",
+    "referenceId": "res_20240403_01",
+    "status": "PAID",
+    "approvedAt": "2024-04-03T16:45:00"
+  }
 }
 ```
 
@@ -115,26 +117,57 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 **요청 헤더**
 
-| **이름** | **타입** | **필수** | **설명** |
-| --- | --- | --- | --- |
-| `X-User-Id` | Long | Y | 현재 사용자 ID |
+| **이름**    | **타입** | **필수** | **설명**       |
+| ----------- | -------- | -------- | -------------- |
+| `X-User-Id` | Long     | Y        | 현재 사용자 ID |
 
-**응답 예시**
+**응답 필드**
+
+| **필드**      | **타입**      | **Nullable** | **설명**                                                    |
+| ------------- | ------------- | ------------ | ----------------------------------------------------------- |
+| `paymentKey`  | String        | Y            | `PENDING` 상태에서는 `null`                                 |
+| `orderId`     | String        | N            |                                                             |
+| `amount`      | Long          | N            |                                                             |
+| `method`      | String        | Y            | `PENDING` 상태에서는 `null`                                 |
+| `referenceId` | String        | N            | 다중 예약의 경우 쉼표 구분 문자열 (예: `"res_001,res_002"`) |
+| `status`      | String        | N            | `PENDING` / `PAID` / `FAILED` / `CANCELED`                  |
+| `approvedAt`  | LocalDateTime | Y            | `PENDING` 상태에서는 `null`                                 |
+
+**응답 예시 (PAID 상태)**
 
 ```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"paymentKey":"tgen_20240403164307M1234",
-			"orderId":"ORD-123456789",
-			"amount":50000,
-			"method":"CARD",
-			"referenceId":"res_20240403_01",
-			"status":"PAID",
-			"approvedAt":"2024-04-03T16:45:00"
-	  }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "paymentKey": "tgen_20240403164307M1234",
+    "orderId": "ORD-123456789",
+    "amount": 50000,
+    "method": "CARD",
+    "referenceId": "res_20240403_01",
+    "status": "PAID",
+    "approvedAt": "2024-04-03T16:45:00"
+  }
+}
+```
+
+**응답 예시 (PENDING 상태 — 결제 생성 직후)**
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "paymentKey": null,
+    "orderId": "ORD-123456789",
+    "amount": 50000,
+    "method": null,
+    "referenceId": "res_20240403_01",
+    "status": "PENDING",
+    "approvedAt": null
+  }
 }
 ```
 
@@ -148,15 +181,15 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 **요청 헤더**
 
-| **이름** | **타입** | **필수** | **설명** |
-| --- | --- | --- | --- |
-| `X-User-Id` | Long | Y | 현재 사용자 ID |
+| **이름**    | **타입** | **필수** | **설명**       |
+| ----------- | -------- | -------- | -------------- |
+| `X-User-Id` | Long     | Y        | 현재 사용자 ID |
 
 **요청 바디**
 
 ```json
 {
-	"cancelReason":"고객 단순 변심"
+  "cancelReason": "고객 단순 변심"
 }
 ```
 
@@ -164,17 +197,17 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"orderId":"ORD-123456789",
-			"paymentKey":"tgen_20240403164307M1234",
-			"amount":50000,
-			"status":"CANCELED",
-			"cancelReason":"고객 단순 변심",
-			"canceledAt":"2024-04-03T17:00:00"
-	  }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "orderId": "ORD-123456789",
+    "paymentKey": "tgen_20240403164307M1234",
+    "amount": 50000,
+    "status": "CANCELED",
+    "cancelReason": "고객 단순 변심",
+    "canceledAt": "2024-04-03T17:00:00"
+  }
 }
 ```
 
@@ -192,10 +225,10 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"userId":1,
-	"referenceId":"membership_001",
-	"orderId":"mem_123",
-	"amount":9900
+  "userId": 1,
+  "referenceId": "membership_001",
+  "orderId": "mem_123",
+  "amount": 9900
 }
 ```
 
@@ -203,13 +236,13 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"paymentId":10
-	  }
-	}
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "paymentId": 10
+  }
+}
 ```
 
 ### **2.2 티켓 예매 결제 생성**
@@ -220,10 +253,10 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"userId":1,
-	"referenceId":"reservation_001",
-	"orderId":"res_123",
-	"amount":50000
+  "userId": 1,
+  "referenceId": "reservation_001",
+  "orderId": "res_123",
+  "amount": 50000
 }
 ```
 
@@ -231,12 +264,12 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"paymentId":25
-	  }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "paymentId": 25
+  }
 }
 ```
 
@@ -248,10 +281,10 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"userId":1,
-	"referenceId":"post_001",
-	"orderId":"trf_123",
-	"amount":35000
+  "userId": 1,
+  "referenceId": "post_001",
+  "orderId": "trf_123",
+  "amount": 35000
 }
 ```
 
@@ -259,14 +292,14 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"orderId":"trf_123",
-			"paymentId":50,
-			"amount":35000
-	  }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "orderId": "trf_123",
+    "paymentId": 50,
+    "amount": 35000
+  }
 }
 ```
 
@@ -280,13 +313,13 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"isSuccess":true,
-	"statusCode":200,
-	"message":"OK",
-	"data": {
-			"reservationId":"reservation_001",
-			"amount":50000
-	  }
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "reservationId": "reservation_001",
+    "amount": 50000
+  }
 }
 ```
 
@@ -309,10 +342,10 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ```json
 {
-	"isSuccess":false,
-	"statusCode":400,
-	"message":"에러 메시지 내용",
-	"data":null
+  "isSuccess": false,
+  "statusCode": 400,
+  "message": "에러 메시지 내용",
+  "data": null
 }
 ```
 
@@ -320,12 +353,12 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ## **상태값 (PaymentStatus)**
 
-| **상태** | **설명** |
-| --- | --- |
-| `PENDING` | 결제 생성 직후, 승인 전 대기 상태 |
-| `PAID` | 결제 승인 완료 |
-| `CANCELED` | 결제 취소 완료 |
-| `FAILED` | 결제 실패 |
+| **상태**   | **설명**                          |
+| ---------- | --------------------------------- |
+| `PENDING`  | 결제 생성 직후, 승인 전 대기 상태 |
+| `PAID`     | 결제 승인 완료                    |
+| `CANCELED` | 결제 취소 완료                    |
+| `FAILED`   | 결제 실패                         |
 
 ---
 
@@ -335,9 +368,10 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 - **목적**: 결제가 어떤 도메인 리소스(예: 티켓 예약, 멤버십 가입, 양도 게시글)에 의해 발생했는지 추적하기 위해 사용됩니다.
 - **역할**:
-    - 외부 PG(토스페이먼츠 등)와의 통신에는 시스템 고유의 `orderId`를 사용하지만, 내부 관리를 위해 실제 도메인 모델의 ID를 `referenceId`에 저장합니다.
-    - 결제 성공 시 `referenceId`를 통해 해당 도메인 서비스(Ticket, Membership 등)에 결제 완료 상태를 전파할 수 있습니다.
+  - 외부 PG(토스페이먼츠 등)와의 통신에는 시스템 고유의 `orderId`를 사용하지만, 내부 관리를 위해 실제 도메인 모델의 ID를 `referenceId`에 저장합니다.
+  - 결제 성공 시 `referenceId`를 통해 해당 도메인 서비스(Ticket, Membership 등)에 결제 완료 상태를 전파할 수 있습니다.
 - **분야별 데이터 예시**:
-    - **티켓 서비스**: `reservationId` (예약 번호)
-    - **멤버십 서비스**: `membershipId` (멤버십 가입 번호)
-    - **양도 서비스**: `postId` (게시글 ID)
+  - **티켓 서비스**: `reservationId` (예약 번호)
+  - **멤버십 서비스**: `membershipId` (멤버십 가입 번호)
+  - **양도 서비스**: `postId` (게시글 ID)
+- **참고**: 외부 공개 API(1.1)에서는 `referenceId` 키 그대로 전송. 내부 서비스 API(2.x)에서는 `reservationId`, `membershipId`, `postId` 키도 `@JsonAlias`로 허용되므로 각 서비스가 자체 키 이름으로 전송 가능.

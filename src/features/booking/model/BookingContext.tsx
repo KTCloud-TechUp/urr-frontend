@@ -24,11 +24,9 @@ import { getShows } from "@/features/show/api/getShows";
 import { getSections } from "@/features/show/api/getSections";
 import { getSeatsSummary } from "@/features/booking/api/getSeatsSummary";
 import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
-import { confirmPayment } from "@/features/payment/api/confirmPayment";
-import { confirmReservation } from "@/features/booking/api/confirmReservation";
 import { getEvents } from "@/features/event/api/getEvents";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
-import { useBookingStore, type ReservationRef } from "./useBookingStore";
+import { useBookingStore } from "./useBookingStore";
 import type { TierWindow } from "@/shared/types";
 
 // Fallback tier price map (used when sections API is unavailable)
@@ -95,7 +93,7 @@ interface BookingProviderProps {
 }
 
 export function BookingProvider({ eventId, children }: BookingProviderProps) {
-  const { data: currentUser } = useCurrentUser();
+  useCurrentUser();
 
   const [paymentFailed, setPaymentFailed] = useState(false);
 
@@ -121,7 +119,6 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     setConfirmationData,
     setSeatTimerSecondsLeft,
     setQueueToken,
-    setReservations,
   } = useBookingStore();
 
   // Fetch events list to derive artistId for this event
@@ -171,57 +168,19 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     }
   }, [showsLoading, eventDates, isLoading, setEventLoaded, transitionTo]);
 
-  // Toss 결제 콜백 처리: successUrl 복귀 시 paymentKey URL 파라미터 감지
+  // Toss 결제 실패 복귀 처리: failUrl(?paymentFail=1)로 돌아왔을 때
+  // 성공 시에는 /booking/complete 페이지로 이동하므로 여기서 처리하지 않음
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    const paymentKey = params.get("paymentKey");
-    const orderId = params.get("orderId");
-    const amount = params.get("amount");
-    const paymentFail = params.get("paymentFail");
+    if (!params.get("paymentFail")) return;
 
-    if (paymentFail) {
-      window.history.replaceState({}, "", window.location.pathname);
-      sessionStorage.removeItem("urr:toss:booking");
-      sessionStorage.removeItem("urr:toss:reservations");
-      setPaymentFailed(true);
-      return;
-    }
-
-    if (!paymentKey || !orderId || !amount) return;
-
-    const raw = sessionStorage.getItem("urr:toss:booking");
-    if (!raw) return;
-
-    // Toss 리다이렉트 후 메모리 초기화 → sessionStorage에서 reservationRefs 복원
-    const rawReservations = sessionStorage.getItem("urr:toss:reservations");
-    const restoredRefs: ReservationRef[] = rawReservations ? (JSON.parse(rawReservations) as ReservationRef[]) : [];
-
+    window.history.replaceState({}, "", window.location.pathname);
     sessionStorage.removeItem("urr:toss:booking");
     sessionStorage.removeItem("urr:toss:reservations");
-    window.history.replaceState({}, "", window.location.pathname);
-
-    const confirmationData = JSON.parse(raw) as ConfirmationData;
-
-    // 1) Toss 결제 승인
-    confirmPayment({ paymentKey, orderId, amount: Number(amount), userId: currentUser?.userId ?? "" })
-      .then(() => {
-        // 2) store에 reservationRefs 복원
-        if (restoredRefs.length > 0) {
-          setReservations(restoredRefs, orderId);
-        }
-        // 3) 각 예약 확정 (POST /api/v1/ticket/reservations/confirm)
-        return Promise.allSettled(restoredRefs.map((ref) => confirmReservation(ref)));
-      })
-      .then(() => {
-        setConfirmationData(confirmationData);
-        transitionTo("confirmation");
-      })
-      .catch(() => {
-        // 결제/확정 실패 시 idle로 복귀
-        reset();
-      });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    sessionStorage.removeItem("urr:toss:userId");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPaymentFailed(true);
   }, []);
 
   // showId derived from selectedDateId

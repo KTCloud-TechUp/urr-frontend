@@ -1,9 +1,8 @@
 import { apiRequest } from "@/shared/api/client";
 
 export interface ConfirmReservationParams {
-  eventId: number;
-  showId: number;
-  seatIds: string[];
+  reservationIds: string[];
+  userId: string | number;
 }
 
 export interface ConfirmReservationItem {
@@ -36,12 +35,14 @@ interface ConfirmReservationApiResponse {
 export async function confirmReservation(
   params: ConfirmReservationParams,
 ): Promise<ConfirmReservationResponse> {
+  const { userId, reservationIds } = params;
   const res = await apiRequest<ConfirmReservationApiResponse>(
     "/ticket/reservations/confirm",
     {
       method: "POST",
       service: "ticketing",
-      body: params,
+      headers: { "X-User-Id": String(userId) },
+      body: { reservationIds },
     },
   );
   return res.data.data;

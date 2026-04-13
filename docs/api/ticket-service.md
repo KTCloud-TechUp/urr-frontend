@@ -1,23 +1,25 @@
 # Ticket Service 연동 현황
 
-> 마지막 확인: 2026-04-10
+> 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-ticketService
+>
+> 마지막 확인: 2026-04-13
 
-| # | API | 메서드 | 엔드포인트 | 연동 파일 | 상태 | 비고 |
-|---|-----|--------|-----------|----------|------|------|
-| 1 | 좌석 조회 | GET | `/api/v1/ticket/events/{eventId}/shows/{showId}/seats` | — | ❌ 미연동 | 코드는 event-service의 `/shows/.../seats/availability` 사용 |
-| 2 | 단일 좌석 선점 + 예약 생성 | POST | `/api/v1/ticket/reservations` | `features/booking/api/bookTicket.ts` | ✅ 연동됨 | |
-| 3 | 예약 확정 | POST | `/api/v1/ticket/reservations/confirm` | `features/booking/api/confirmReservation.ts` | ✅ 연동됨 | |
-| 4 | 결제 전 선점 상태 조회 | GET | `/api/v1/ticket/reservations/{reservationId}/hold-status` | — | ❌ 미연동 | |
-| 5 | 예약 만료 처리 | POST | `/api/v1/ticket/reservations/{reservationId}/expire` | — | ➖ 불필요 | 스케줄러 처리 |
-| 6 | 예약 취소 | POST | `/api/v1/ticket/reservations/cancel` | `features/booking/api/cancelReservation.ts` | ✅ 연동됨 | body: `{eventId, showId, seatId}`, `X-User-Id` 헤더 |
-| 7 | 환불 처리 | POST | `/api/v1/ticket/reservations/{reservationId}/refund` | — | ➖ 불필요 | 서버 내부 처리 |
-| 8 | 예약티켓 목록 조회 | GET | `/api/v1/ticket/users/reservations` | `features/reservation/api/getMyReservations.ts` | ✅ 연동됨 | URL 일치 (헤더로 userId 전달) |
-| 9 | (내부) 양도 가능 여부 조회 | GET | `/api/v1/ticket/internal/transfers/{reservationId}/eligibility` | — | ➖ 불필요 | 서비스 내부 API |
-| 10 | (내부) 소유권 양도 완료 | POST | `/api/v1/ticket/internal/transfers/{reservationId}/complete` | — | ➖ 불필요 | 서비스 내부 API |
-| 11 | (내부) 티켓 좌석 정보 조회 (양도용) | POST | `/api/v1/ticket/internal/transfer-seat-info` | — | ➖ 불필요 | 서비스 내부 API |
-| 12 | (내부) 특정 티어/구역 사용불가 좌석 조회 | POST | `/api/v1/ticket/internal/seats/statuses` | — | ➖ 불필요 | 서비스 내부 API |
-| 13 | 티켓 좌석 정보 조회 | POST | `/api/v1/ticket/seats/statuses` | — | ➖ 불필요 | 서비스 내부 API |
-| 14 | Health Check | GET | `/health` | — | ➖ 불필요 | |
+| #   | API                                      | 메서드 | 엔드포인트                                                      | 연동 파일                                       | 상태         | 비고                                                        |
+| --- | ---------------------------------------- | ------ | --------------------------------------------------------------- | ----------------------------------------------- | ------------ | ----------------------------------------------------------- |
+| 1   | 좌석 조회                                | GET    | `/api/v1/ticket/events/{eventId}/shows/{showId}/seats`          | —                                               | ❌ 미연동    | 코드는 event-service의 `/shows/.../seats/availability` 사용 |
+| 2   | 다중 좌석 선점 + 예약 생성               | POST   | `/api/v1/ticket/reservations`                                   | `features/booking/api/bookTicket.ts`            | ⚠️ 수정 필요 | request: `seatId`→`seatIds[]`, response 구조 변경           |
+| 3   | 예약 확정                                | POST   | `/api/v1/ticket/reservations/confirm`                           | `features/booking/api/confirmReservation.ts`    | ⚠️ 수정 필요 | request/response 구조 완전 변경                             |
+| 4   | 결제 전 선점 상태 조회                   | GET    | `/api/v1/ticket/reservations/{reservationId}/hold-status`       | —                                               | ❌ 미연동    |                                                             |
+| 5   | 예약 만료 처리                           | POST   | `/api/v1/ticket/reservations/{reservationId}/expire`            | —                                               | ➖ 불필요    | 스케줄러 처리                                               |
+| 6   | 예약 취소                                | POST   | `/api/v1/ticket/reservations/cancel`                            | `features/booking/api/cancelReservation.ts`     | ✅ 연동됨    | body: `{eventId, showId, seatId}`, `X-User-Id` 헤더         |
+| 7   | 환불 처리                                | POST   | `/api/v1/ticket/reservations/{reservationId}/refund`            | —                                               | ➖ 불필요    | 서버 내부 처리                                              |
+| 8   | 예약티켓 목록 조회                       | GET    | `/api/v1/ticket/users/reservations`                             | `features/reservation/api/getMyReservations.ts` | ✅ 연동됨    | URL 일치 (헤더로 userId 전달)                               |
+| 9   | (내부) 양도 가능 여부 조회               | GET    | `/api/v1/ticket/internal/transfers/{reservationId}/eligibility` | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
+| 10  | (내부) 소유권 양도 완료                  | POST   | `/api/v1/ticket/internal/transfers/{reservationId}/complete`    | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
+| 11  | (내부) 티켓 좌석 정보 조회 (양도용)      | POST   | `/api/v1/ticket/internal/transfer-seat-info`                    | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
+| 12  | (내부) 특정 티어/구역 사용불가 좌석 조회 | POST   | `/api/v1/ticket/internal/seats/statuses`                        | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
+| 13  | 티켓 좌석 정보 조회                      | POST   | `/api/v1/ticket/seats/statuses`                                 | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
+| 14  | Health Check                             | GET    | `/health`                                                       | —                                               | ➖ 불필요    |                                                             |
 
 ---
 
@@ -90,21 +92,21 @@ GET /api/v1/ticket/events/10/shows/100/seats?section=VIP
 
 ### SeatResponse 필드
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| seatId | String | 좌석 ID |
-| status | SeatStatus | `AVAILABLE`, `LOCKED`, `RESERVED` |
-| lockedUntil | LocalDateTime | 선점 만료 시각 (nullable) |
-| section | String | 구역 (nullable) |
-| row | String | 열 (nullable) |
-| number | String | 번호 (nullable) |
-| price | Long | 가격 (nullable) |
-| sellable | Boolean | 판매 가능 여부 (status가 AVAILABLE일 때 true) |
-| seatVersion | Long | 좌석 버전 |
+| 필드        | 타입          | 설명                                          |
+| ----------- | ------------- | --------------------------------------------- |
+| seatId      | String        | 좌석 ID                                       |
+| status      | SeatStatus    | `AVAILABLE`, `LOCKED`, `RESERVED`             |
+| lockedUntil | LocalDateTime | 선점 만료 시각 (nullable)                     |
+| section     | String        | 구역 (nullable)                               |
+| row         | String        | 열 (nullable)                                 |
+| number      | String        | 번호 (nullable)                               |
+| price       | Long          | 가격 (nullable)                               |
+| sellable    | Boolean       | 판매 가능 여부 (status가 AVAILABLE일 때 true) |
+| seatVersion | Long          | 좌석 버전                                     |
 
 ---
 
-# 2) 단일 좌석 선점 + 예약 생성
+# 2) 다중 좌석 선점 + 예약 생성
 
 ## API
 
@@ -114,13 +116,11 @@ POST /api/v1/ticket/reservations
 
 ## 설명
 
-- 단일 좌석을 선점하고 예약을 생성
+- 최대 4개 좌석을 선점하고 예약(PENDING) + 결제를 생성
 
 ## Headers
 
 - `X-User-Id` (Long, 필수): 사용자 ID
-- `Authorization` (String, optional): `Bearer <queue-entry-jwt>`
-- `X-Queue-Entry-Token` (String, optional): 대기열 진입 토큰
 
 ## Path Parameters
 
@@ -137,18 +137,18 @@ POST /api/v1/ticket/reservations
   "eventId": 10,
   "showId": 100,
   "artistId": 777,
-  "seatId": "A01",
+  "seatIds": ["A01", "A02"],
   "holdSeconds": 180
 }
 ```
 
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| eventId | Long | Y | 공연 ID |
-| showId | Long | Y | 회차 ID |
-| artistId | Long | Y | 아티스트 ID |
-| seatId | String | Y | 좌석 ID (blank 불가) |
-| holdSeconds | long | Y | 선점 유지 시간 (최소 30초) |
+| 필드        | 타입           | 필수 | 설명                                |
+| ----------- | -------------- | ---- | ----------------------------------- |
+| eventId     | Long           | Y    | 공연 ID                             |
+| showId      | Long           | Y    | 회차 ID                             |
+| artistId    | Long           | Y    | 아티스트 ID                         |
+| seatIds     | List\<String\> | Y    | 좌석 ID 목록 (1개 이상, blank 불가) |
+| holdSeconds | long           | Y    | 선점 유지 시간 (최소 30초)          |
 
 ## Response 200
 
@@ -158,9 +158,15 @@ POST /api/v1/ticket/reservations
   "statusCode": 200,
   "message": "OK",
   "data": {
-    "reservationId": "8f7184cb-95a5-4de1-9fa6-3f5ab8d2c16d",
+    "reservationIds": [
+      "8f7184cb-95a5-4de1-9fa6-3f5ab8d2c16d",
+      "1a2b3c4d-5e6f-7890-abcd-ef1234567890"
+    ],
+    "seatIds": ["A01", "A02"],
     "status": "PENDING",
     "paymentStatus": "PENDING",
+    "paymentId": 5001,
+    "totalAmount": 176000,
     "expiresAt": "2026-03-31T09:00:00"
   }
 }
@@ -168,12 +174,15 @@ POST /api/v1/ticket/reservations
 
 ### CreateReservationResponse 필드
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| reservationId | String | 예약 ID (UUID) |
-| status | ReservationStatus | `PENDING` |
-| paymentStatus | PaymentStatus | `PENDING` |
-| expiresAt | LocalDateTime | 선점 만료 시각 |
+| 필드           | 타입              | 설명                |
+| -------------- | ----------------- | ------------------- |
+| reservationIds | List\<String\>    | 예약 ID 목록 (UUID) |
+| seatIds        | List\<String\>    | 선점된 좌석 ID 목록 |
+| status         | ReservationStatus | `PENDING`           |
+| paymentStatus  | PaymentStatus     | `PENDING`           |
+| paymentId      | Long              | 생성된 결제 ID      |
+| totalAmount    | Long              | 총 결제 금액        |
+| expiresAt      | LocalDateTime     | 선점 만료 시각      |
 
 ---
 
@@ -188,7 +197,7 @@ POST /api/v1/ticket/reservations/confirm
 ## 설명
 
 - 결제 완료 후 예약을 최종 확정
-- reservationId가 아닌 eventId + showId + seatId 조합으로 예약을 조회
+- reservationIds 리스트로 다중 예약을 일괄 확정
 
 ## Headers
 
@@ -206,17 +215,16 @@ POST /api/v1/ticket/reservations/confirm
 
 ```json
 {
-  "eventId": 10,
-  "showId": 100,
-  "seatId": "A01"
+  "reservationIds": [
+    "8f7184cb-95a5-4de1-9fa6-3f5ab8d2c16d",
+    "1a2b3c4d-5e6f-7890-abcd-ef1234567890"
+  ]
 }
 ```
 
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| eventId | Long | Y | 공연 ID |
-| showId | Long | Y | 회차 ID |
-| seatId | String | Y | 좌석 ID (blank 불가) |
+| 필드           | 타입           | 필수 | 설명                           |
+| -------------- | -------------- | ---- | ------------------------------ |
+| reservationIds | List\<String\> | Y    | 확정할 예약 ID 목록 (1개 이상) |
 
 ## Response 200
 
@@ -226,21 +234,64 @@ POST /api/v1/ticket/reservations/confirm
   "statusCode": 200,
   "message": "OK",
   "data": {
-    "reservationId": "8f7184cb-95a5-4de1-9fa6-3f5ab8d2c16d",
-    "eventId": 10,
-    "showId": 100,
-    "seatId": "A01",
-    "userId": 101,
-    "status": "CONFIRMED",
-    "paymentStatus": "SUCCESS",
-    "paidAt": "2026-03-30T10:10:00",
-    "refundStatus": "NONE",
-    "expiresAt": "2026-03-31T09:00:00",
-    "refundedAt": null,
-    "updatedAt": "2026-03-30T10:10:00"
+    "paymentId": 5001,
+    "reservations": [
+      {
+        "reservationId": "8f7184cb-95a5-4de1-9fa6-3f5ab8d2c16d",
+        "eventId": 10,
+        "showId": 100,
+        "seatId": "A01",
+        "userId": 101,
+        "status": "CONFIRMED",
+        "paymentStatus": "SUCCESS",
+        "paidAt": "2026-03-30T10:10:00",
+        "refundStatus": "NONE",
+        "expiresAt": "2026-03-31T09:00:00",
+        "refundedAt": null,
+        "updatedAt": "2026-03-30T10:10:00"
+      },
+      {
+        "reservationId": "1a2b3c4d-5e6f-7890-abcd-ef1234567890",
+        "eventId": 10,
+        "showId": 100,
+        "seatId": "A02",
+        "userId": 101,
+        "status": "CONFIRMED",
+        "paymentStatus": "SUCCESS",
+        "paidAt": "2026-03-30T10:10:00",
+        "refundStatus": "NONE",
+        "expiresAt": "2026-03-31T09:00:00",
+        "refundedAt": null,
+        "updatedAt": "2026-03-30T10:10:00"
+      }
+    ]
   }
 }
 ```
+
+### ConfirmReservationsResponse 필드
+
+| 필드         | 타입                        | 설명             |
+| ------------ | --------------------------- | ---------------- |
+| paymentId    | Long                        | 결제 ID          |
+| reservations | List\<ReservationResponse\> | 확정된 예약 목록 |
+
+#### ReservationResponse 필드
+
+| 필드          | 타입              | 설명                 |
+| ------------- | ----------------- | -------------------- |
+| reservationId | String            | 예약 ID (UUID)       |
+| eventId       | Long              | 공연 ID              |
+| showId        | Long              | 회차 ID              |
+| seatId        | String            | 좌석 ID              |
+| userId        | Long              | 사용자 ID            |
+| status        | ReservationStatus | 예약 상태            |
+| paymentStatus | PaymentStatus     | 결제 상태            |
+| paidAt        | LocalDateTime     | 결제 시각 (nullable) |
+| refundStatus  | RefundStatus      | 환불 상태            |
+| expiresAt     | LocalDateTime     | 만료 시각            |
+| refundedAt    | LocalDateTime     | 환불 시각 (nullable) |
+| updatedAt     | LocalDateTime     | 수정 시각            |
 
 ---
 
@@ -289,11 +340,11 @@ GET /api/v1/ticket/reservations/{reservationId}/hold-status
 
 ### ReservationHoldStatusResponse 필드
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| reservationId | String | 예약 ID |
-| holdValid | boolean | 선점 유효 여부 |
-| holdTtlSeconds | long | 남은 TTL (초) |
+| 필드           | 타입    | 설명           |
+| -------------- | ------- | -------------- |
+| reservationId  | String  | 예약 ID        |
+| holdValid      | boolean | 선점 유효 여부 |
+| holdTtlSeconds | long    | 남은 TTL (초)  |
 
 ---
 
@@ -387,11 +438,11 @@ POST /api/v1/ticket/reservations/cancel
 }
 ```
 
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| eventId | Long | Y | 공연 ID |
-| showId | Long | Y | 회차 ID |
-| seatId | String | Y | 좌석 ID (blank 불가) |
+| 필드    | 타입   | 필수 | 설명                 |
+| ------- | ------ | ---- | -------------------- |
+| eventId | Long   | Y    | 공연 ID              |
+| showId  | Long   | Y    | 회차 ID              |
+| seatId  | String | Y    | 좌석 ID (blank 불가) |
 
 ## Response 200
 
@@ -451,9 +502,9 @@ POST /api/v1/ticket/reservations/{reservationId}/refund
 }
 ```
 
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| success | Boolean | Y | 환불 성공 여부 |
+| 필드    | 타입    | 필수 | 설명           |
+| ------- | ------- | ---- | -------------- |
+| success | Boolean | Y    | 환불 성공 여부 |
 
 ## Response 200
 
@@ -557,21 +608,21 @@ GET /api/v1/ticket/users/reservations?status=CONFIRMED
 
 ### MyReservationResponse 필드
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| reservationId | String | 예약 ID |
-| eventId | Long | 공연 ID |
-| showId | Long | 회차 ID |
-| seatId | String | 좌석 ID |
-| userId | Long | 사용자 ID |
-| status | ReservationStatus | 예약 상태 |
-| paymentStatus | PaymentStatus | 결제 상태 |
-| paidAt | LocalDateTime | 결제 시각 (nullable) |
-| refundStatus | RefundStatus | 환불 상태 |
-| transferEligible | boolean | 양도 가능 여부 (CONFIRMED + SUCCESS + NONE 일 때 true) |
-| expiresAt | LocalDateTime | 만료 시각 |
-| refundedAt | LocalDateTime | 환불 시각 (nullable) |
-| updatedAt | LocalDateTime | 수정 시각 |
+| 필드             | 타입              | 설명                                                   |
+| ---------------- | ----------------- | ------------------------------------------------------ |
+| reservationId    | String            | 예약 ID                                                |
+| eventId          | Long              | 공연 ID                                                |
+| showId           | Long              | 회차 ID                                                |
+| seatId           | String            | 좌석 ID                                                |
+| userId           | Long              | 사용자 ID                                              |
+| status           | ReservationStatus | 예약 상태                                              |
+| paymentStatus    | PaymentStatus     | 결제 상태                                              |
+| paidAt           | LocalDateTime     | 결제 시각 (nullable)                                   |
+| refundStatus     | RefundStatus      | 환불 상태                                              |
+| transferEligible | boolean           | 양도 가능 여부 (CONFIRMED + SUCCESS + NONE 일 때 true) |
+| expiresAt        | LocalDateTime     | 만료 시각                                              |
+| refundedAt       | LocalDateTime     | 환불 시각 (nullable)                                   |
+| updatedAt        | LocalDateTime     | 수정 시각                                              |
 
 ---
 
@@ -622,12 +673,12 @@ GET /api/v1/ticket/internal/transfers/{reservationId}/eligibility
 
 ### TransferEligibilityResponse 필드
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| reservationId | String | 예약 ID |
-| ownerUserId | Long | 현재 소유자 ID |
-| eligible | boolean | 양도 가능 여부 |
-| reason | String | 사유 |
+| 필드          | 타입    | 설명           |
+| ------------- | ------- | -------------- |
+| reservationId | String  | 예약 ID        |
+| ownerUserId   | Long    | 현재 소유자 ID |
+| eligible      | boolean | 양도 가능 여부 |
+| reason        | String  | 사유           |
 
 ---
 
@@ -663,9 +714,9 @@ POST /api/v1/ticket/internal/transfers/{reservationId}/complete
 }
 ```
 
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| userId | Long | Y | 양수인 사용자 ID |
+| 필드   | 타입 | 필수 | 설명             |
+| ------ | ---- | ---- | ---------------- |
+| userId | Long | Y    | 양수인 사용자 ID |
 
 ## Response 200
 
@@ -727,11 +778,11 @@ POST /api/v1/ticket/internal/transfer-seat-info
 }
 ```
 
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| showId | Long | Y | 회차 ID (양수) |
-| tier | String | Y | 티어 (blank 불가) |
-| zoneNo | Integer | Y | 구역 번호 (양수) |
+| 필드   | 타입    | 필수 | 설명              |
+| ------ | ------- | ---- | ----------------- |
+| showId | Long    | Y    | 회차 ID (양수)    |
+| tier   | String  | Y    | 티어 (blank 불가) |
+| zoneNo | Integer | Y    | 구역 번호 (양수)  |
 
 ## Response 200
 
@@ -757,15 +808,15 @@ POST /api/v1/ticket/internal/transfer-seat-info
 
 ### InternalUnavailableSeatsResponse 필드
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
+| 필드  | 타입                   | 설명               |
+| ----- | ---------------------- | ------------------ |
 | seats | List\<SeatStatusItem\> | 사용불가 좌석 목록 |
 
 #### SeatStatusItem
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| seatId | String | 좌석 ID |
+| 필드   | 타입       | 설명                              |
+| ------ | ---------- | --------------------------------- |
+| seatId | String     | 좌석 ID                           |
 | status | SeatStatus | `AVAILABLE`, `LOCKED`, `RESERVED` |
 
 ---
@@ -804,11 +855,11 @@ POST /api/v1/ticket/internal/seats/statuses
 }
 ```
 
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| showId | Long | Y | 회차 ID (양수) |
-| tier | String | Y | 티어 (blank 불가) |
-| zoneNo | Integer | Y | 구역 번호 (양수) |
+| 필드   | 타입    | 필수 | 설명              |
+| ------ | ------- | ---- | ----------------- |
+| showId | Long    | Y    | 회차 ID (양수)    |
+| tier   | String  | Y    | 티어 (blank 불가) |
+| zoneNo | Integer | Y    | 구역 번호 (양수)  |
 
 ## Response 200
 
@@ -868,11 +919,11 @@ POST /api/v1/ticket/seats/statuses
 }
 ```
 
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| eventId | Long | Y | 공연 ID |
-| showId | Long | Y | 회차 ID (양수) |
-| userId | Long | Y | 사용자 ID |
+| 필드    | 타입 | 필수 | 설명           |
+| ------- | ---- | ---- | -------------- |
+| eventId | Long | Y    | 공연 ID        |
+| showId  | Long | Y    | 회차 ID (양수) |
+| userId  | Long | Y    | 사용자 ID      |
 
 ## Response 200
 
@@ -898,16 +949,16 @@ POST /api/v1/ticket/seats/statuses
 
 ### InternalTicketInfoResponse 필드
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
+| 필드  | 타입               | 설명           |
+| ----- | ------------------ | -------------- |
 | seats | List\<ticketSeat\> | 티켓 좌석 목록 |
 
 #### ticketSeat
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
+| 필드    | 타입   | 설명    |
+| ------- | ------ | ------- |
 | seatIds | String | 좌석 ID |
-| price | Long | 가격 |
+| price   | Long   | 가격    |
 
 ---
 
@@ -954,38 +1005,38 @@ GET /health
 
 ## ReservationStatus
 
-| 값 | 설명 |
-|------|------|
-| PENDING | 예약 대기 |
+| 값        | 설명      |
+| --------- | --------- |
+| PENDING   | 예약 대기 |
 | CONFIRMED | 예약 확정 |
-| EXPIRED | 만료 |
-| FAILED | 실패 |
-| CANCELLED | 취소 |
+| EXPIRED   | 만료      |
+| FAILED    | 실패      |
+| CANCELLED | 취소      |
 
 ## PaymentStatus
 
-| 값 | 설명 |
-|------|------|
+| 값      | 설명      |
+| ------- | --------- |
 | PENDING | 결제 대기 |
 | SUCCESS | 결제 성공 |
-| FAILED | 결제 실패 |
+| FAILED  | 결제 실패 |
 
 ## RefundStatus
 
-| 값 | 설명 |
-|------|------|
-| NONE | 환불 없음 |
+| 값        | 설명      |
+| --------- | --------- |
+| NONE      | 환불 없음 |
 | REQUESTED | 환불 요청 |
 | COMPLETED | 환불 완료 |
-| FAILED | 환불 실패 |
+| FAILED    | 환불 실패 |
 
 ## SeatStatus
 
-| 값 | 설명 |
-|------|------|
+| 값        | 설명      |
+| --------- | --------- |
 | AVAILABLE | 사용 가능 |
-| LOCKED | 선점 중 |
-| RESERVED | 예약 완료 |
+| LOCKED    | 선점 중   |
+| RESERVED  | 예약 완료 |
 
 ---
 
@@ -1000,9 +1051,9 @@ GET /health
 }
 ```
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| isSuccess | boolean | 성공 여부 |
-| statusCode | int | HTTP 상태 코드 |
-| message | String | 메시지 |
-| data | T | 응답 데이터 (nullable) |
+| 필드       | 타입    | 설명                   |
+| ---------- | ------- | ---------------------- |
+| isSuccess  | boolean | 성공 여부              |
+| statusCode | int     | HTTP 상태 코드         |
+| message    | String  | 메시지                 |
+| data       | T       | 응답 데이터 (nullable) |

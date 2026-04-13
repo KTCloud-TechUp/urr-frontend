@@ -14,7 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { tokenStore } from "@/shared/api/tokenStore";
 
 // Pages without sidebar/topbar
-const NO_SHELL_ROUTES = ["/onboarding", "/auth/callback", "/queue", "/landing"];
+const NO_SHELL_ROUTES = ["/onboarding", "/auth/callback", "/queue", "/landing", "/booking/complete"];
 
 function OnboardingGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
