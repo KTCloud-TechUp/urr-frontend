@@ -17,20 +17,6 @@ interface MembershipIntroStepProps {
 
 const TIER_ORDER: TierLevel[] = ["LIGHTNING", "THUNDER", "CLOUD", "MIST"];
 
-const TIER_BOOKING_LABEL: Record<TierLevel, string> = {
-  LIGHTNING: "우선 예매",
-  THUNDER: "우선 예매",
-  CLOUD: "일반 예매",
-  MIST: "일반 예매",
-};
-
-const TIER_TRANSFER_FEE: Record<TierLevel, string> = {
-  LIGHTNING: "5%",
-  THUNDER: "5%",
-  CLOUD: "10%",
-  MIST: "불가",
-};
-
 function formatOffset(minutes: number): string {
   if (minutes === 0) return "최우선 오픈";
   if (minutes < 60) return `일반예매 ${minutes}분 전 오픈`;
@@ -123,7 +109,11 @@ export function MembershipIntroStep({
                       <TierBadge tier={tier} size="sm" />
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {TIER_BOOKING_LABEL[tier]}
+                      {policy
+                        ? policy.bookingType === "PRESALE"
+                          ? "선예매"
+                          : "일반 예매"
+                        : "—"}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {policy ? formatOffset(policy.presaleOffsetMinutes) : "—"}
@@ -134,7 +124,11 @@ export function MembershipIntroStep({
                         : "—"}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {TIER_TRANSFER_FEE[tier]}
+                      {policy
+                        ? policy.transferFeeRate != null
+                          ? `${policy.transferFeeRate}%`
+                          : "불가"
+                        : "—"}
                     </td>
                   </tr>
                 );

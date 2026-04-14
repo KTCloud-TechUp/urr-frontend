@@ -2,18 +2,19 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-paymentService
 >
-> 마지막 확인: 2026-04-14
+> 마지막 확인: 2026-04-14 / 마지막 수정: 2026-04-14
 
 | #   | API                                 | 메서드 | 엔드포인트                                                     | 연동 파일                                     | 상태      | 비고                                                       |
 | --- | ----------------------------------- | ------ | -------------------------------------------------------------- | --------------------------------------------- | --------- | ---------------------------------------------------------- |
 | 1.1 | 결제 데이터 생성                    | POST   | `/api/v1/payments/create`                                      | —                                             | ➖ 불필요 | 프론트 미사용 — 티켓 서비스 내부에서 처리                  |
 | 1.2 | 결제 승인                           | POST   | `/api/v1/payments/confirm`                                     | `features/payment/api/confirmPayment.ts`      | ✅ 연동됨 | `status: string`으로 반환하며 코드에서 값 비교 없음 (무해) |
 | 1.3 | 결제 단건 조회                      | GET    | `/api/v1/payments/order/{orderId}`                             | —                                             | ➖ 불필요 | 프론트 미사용                                              |
-| 1.4 | 결제 취소                           | POST   | `/api/v1/payments/{paymentKey}/cancel`                         | —                                             | ➖ 불필요 | 프론트 미사용                                              |
+| 1.4 | 결제 취소                           | POST   | `/api/v1/payments/cancel`                                      | —                                             | ➖ 불필요 | 프론트 미사용; 경로 수정: `/{paymentKey}/cancel` → `/cancel`, Request에 `orderId` 필수 추가 |
 | 2.1 | 멤버십 결제 생성 (내부)             | POST   | `/api/v1/internal/payments/membership/create`                  | —                                             | ➖ 불필요 | 서비스 내부 API                                            |
 | 2.2 | 티켓 예매 결제 생성 (내부)          | POST   | `/api/v1/internal/payments/ticket/create`                      | —                                             | ➖ 불필요 | 서비스 내부 API                                            |
 | 2.3 | 양도 커뮤니티 구매 결제 생성 (내부) | POST   | `/api/v1/internal/payments/transfer/create`                    | —                                             | ➖ 불필요 | 서비스 내부 API                                            |
 | 2.4 | 예매 결제 금액 조회 (내부)          | GET    | `/api/v1/internal/payments/reservation/{reservationId}/amount` | —                                             | ➖ 불필요 | 서비스 내부 API (신규 추가)                                |
+| 2.5 | 티켓 예매 결제 취소 (내부)          | POST   | `/api/v1/internal/payments/ticket/cancel`                      | —                                             | ➖ 불필요 | 티켓 서비스 → 결제 서비스 내부 취소 콜백                  |
 
 > **참고**: `PaymentStatus` enum 변경 — `READY`→`PENDING`, `DONE`→`PAID`, `PARTIAL_CANCELED` 제거. status 값을 직접 비교하는 UI 로직이 있다면 확인 필요.
 
@@ -175,7 +176,7 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 ### **1.4 결제 취소**
 
-`POST /api/v1/payments/{paymentKey}/cancel`
+`POST /api/v1/payments/cancel`
 
 승인된 결제를 취소 요청합니다.
 
@@ -187,8 +188,16 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
 
 **요청 바디**
 
+| **필드**      | **타입** | **필수** | **설명**                                                             |
+| ------------- | -------- | -------- | -------------------------------------------------------------------- |
+| `orderId`     | String   | Y        | 주문 번호 (`res_`, `mem_`, `trf_` 접두어)                            |
+| `referenceId` | String   | N        | 도메인 식별자 (`reservationId`, `membershipId`, `postId` alias 허용) |
+| `cancelReason`| String   | N        | 취소 사유                                                            |
+
 ```json
 {
+  "orderId": "ORD-123456789",
+  "referenceId": "res_20240403_01",
   "cancelReason": "고객 단순 변심"
 }
 ```
@@ -201,7 +210,9 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
   "statusCode": 200,
   "message": "OK",
   "data": {
+    "userId": 1,
     "orderId": "ORD-123456789",
+    "referenceId": "res_20240403_01",
     "paymentKey": "tgen_20240403164307M1234",
     "amount": 50000,
     "status": "CANCELED",
@@ -319,6 +330,38 @@ PG(토스페이먼츠) 결제창에서 결제 완료 후, 리다이렉트된 `su
   "data": {
     "reservationId": "reservation_001",
     "amount": 50000
+  }
+}
+```
+
+### **2.5 티켓 예매 결제 취소 (내부)**
+
+`POST /api/v1/internal/payments/ticket/cancel`
+
+티켓 서비스에서 `reservationId` 기반으로 결제 취소를 요청하는 내부 API입니다.
+
+**요청 바디**
+
+```json
+{
+  "userId": 1,
+  "reservationIds": ["res_001", "res_002"],
+  "cancelReason": "좌석 선점 만료"
+}
+```
+
+**응답 예시**
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": {
+    "referenceId": "res_001,res_002",
+    "userId": 1,
+    "status": "CANCELED",
+    "refundAt": "2024-04-03T17:00:00"
   }
 }
 ```

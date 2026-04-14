@@ -62,7 +62,10 @@ export function PaymentView() {
     handlePhoneChange,
     setSelectedMethod,
     toggleTerms,
-  } = usePaymentForm();
+  } = usePaymentForm({
+    initialName: currentUser?.name,
+    initialPhone: currentUser?.phoneNumber,
+  });
 
   const section = useMemo(
     () => sectionsForDate.find((s) => s.id === selectedSectionId) ?? null,

@@ -2,13 +2,13 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-authService
 >
-> 마지막 확인: 2026-04-13 / 마지막 수정: 2026-04-13
+> 마지막 확인: 2026-04-14 / 마지막 수정: 2026-04-14
 
 | #   | API                      | 메서드 | 엔드포인트                        | 연동 파일                                                    | 상태           | 비고                                                                   |
 | --- | ------------------------ | ------ | --------------------------------- | ------------------------------------------------------------ | -------------- | ---------------------------------------------------------------------- |
 | 1   | 카카오 OAuth 로그인      | POST   | `/api/v1/auth/oauth/kakao`        | `features/auth/api/kakaoLogin.ts`                            | ✅ 연동됨      | request body에 `rejoinConfirmed` 미포함 — 409 수신 후 /rejoin으로 처리 |
 | 2   | 카카오 OAuth 재가입 확정 | POST   | `/api/v1/auth/oauth/kakao/rejoin` | `features/auth/api/kakaoRejoin.ts`                           | ✅ 연동됨      |                                                                        |
-| 3   | 내 정보 조회             | GET    | `/api/v1/auth/me`                 | `features/auth/api/me.ts`                                    | ✅ 연동됨      |                                                                        |
+| 3   | 내 정보 조회             | GET    | `/api/v1/auth/me`                 | `features/auth/api/me.ts`                                    | ✅ 연동됨      | `name`, `phoneNumber` 필드 프론트 적용 완료                            |
 | 4   | 내 이름 변경             | PATCH  | `/api/v1/auth/me/name`            | `features/auth/api/updateName.ts`                            | ✅ 연동됨      |                                                                        |
 | 5   | 동의 설정 변경           | PATCH  | `/api/v1/auth/me/consents`        | `features/auth/api/updateConsents.ts`                        | ✅ 연동됨      |                                                                        |
 | 6   | 로그아웃                 | POST   | `/api/v1/auth/logout`             | `features/auth/api/logout.ts`                                | ✅ 연동됨      |                                                                        |
@@ -203,6 +203,8 @@ X-User-Id: 12
     "userId": 123,
     "email": "user@example.com",
     "nickname": "우르르",
+    "name": "홍길동",
+    "phoneNumber": "01012345678",
     "role": "USER",
     "onboardingCompleted": true,
     "marketingConsent": false,

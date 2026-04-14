@@ -74,6 +74,7 @@
 | 예매 확정 | `POST /ticket/reservations/confirm` | ✅ | |
 | 예매 취소 | `DELETE /ticket/reservations` | ✅ | |
 | 좌석 요약 조회 | `GET /shows/{showId}/seats/summary` | ✅ | |
+| 선점 해제 | `POST /ticket/reservations/release` | ✅ | `resetBooking()` 호출 시 자동 (fire-and-forget) |
 
 ---
 

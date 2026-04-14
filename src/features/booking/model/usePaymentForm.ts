@@ -4,11 +4,21 @@ import { useState, useCallback } from "react";
 import { formatPhone } from "@/shared/lib/format";
 import type { PaymentMethod } from "@/shared/lib/constants";
 
-export function usePaymentForm() {
-  const [buyerName, setBuyerName] = useState("");
-  const [buyerPhone, setBuyerPhone] = useState("");
+interface UsePaymentFormOptions {
+  initialName?: string;
+  initialPhone?: string;
+}
+
+export function usePaymentForm({ initialName = "", initialPhone = "" }: UsePaymentFormOptions = {}) {
+  // null = 사용자가 아직 수정 안 함 → initialValue 사용
+  // string = 사용자가 직접 입력한 값 → override 우선
+  const [nameOverride, setNameOverride] = useState<string | null>(null);
+  const [phoneOverride, setPhoneOverride] = useState<string | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("card");
   const [termsAgreed, setTermsAgreed] = useState(false);
+
+  const buyerName = nameOverride ?? initialName;
+  const buyerPhone = phoneOverride ?? (initialPhone ? formatPhone(initialPhone) : "");
 
   const isFormValid =
     buyerName.length >= 2 &&
@@ -16,11 +26,11 @@ export function usePaymentForm() {
     termsAgreed;
 
   const handleNameChange = useCallback((value: string) => {
-    setBuyerName(value);
+    setNameOverride(value);
   }, []);
 
   const handlePhoneChange = useCallback((value: string) => {
-    setBuyerPhone(formatPhone(value));
+    setPhoneOverride(formatPhone(value));
   }, []);
 
   const toggleTerms = useCallback(() => {
@@ -28,8 +38,8 @@ export function usePaymentForm() {
   }, []);
 
   const resetForm = useCallback(() => {
-    setBuyerName("");
-    setBuyerPhone("");
+    setNameOverride(null);
+    setPhoneOverride(null);
     setSelectedMethod("card");
     setTermsAgreed(false);
   }, []);
