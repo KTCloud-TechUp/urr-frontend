@@ -32,11 +32,11 @@ const TIER_TRANSFER_FEE: Record<TierLevel, string> = {
 };
 
 function formatOffset(minutes: number): string {
-  if (minutes === 0) return "기준";
-  if (minutes < 60) return `+${minutes}분`;
-  if (minutes % (60 * 24) === 0) return `+${minutes / (60 * 24)}일`;
-  if (minutes % 60 === 0) return `+${minutes / 60}시간`;
-  return `+${minutes}분`;
+  if (minutes === 0) return "최우선 오픈";
+  if (minutes < 60) return `일반예매 ${minutes}분 전 오픈`;
+  if (minutes % (60 * 24) === 0) return `일반예매 ${minutes / (60 * 24)}일 전 오픈`;
+  if (minutes % 60 === 0) return `일반예매 ${minutes / 60}시간 전 오픈`;
+  return `일반예매 ${minutes}분 전 오픈`;
 }
 
 export function MembershipIntroStep({
@@ -102,7 +102,7 @@ export function MembershipIntroStep({
               <tr className="bg-muted/50">
                 <th className="text-left px-4 py-3 font-semibold">티어</th>
                 <th className="text-left px-4 py-3 font-semibold">예매</th>
-                <th className="text-left px-4 py-3 font-semibold">오픈 시점</th>
+                <th className="text-left px-4 py-3 font-semibold">선예매 시점</th>
                 <th className="text-left px-4 py-3 font-semibold">
                   예매 수수료
                 </th>
