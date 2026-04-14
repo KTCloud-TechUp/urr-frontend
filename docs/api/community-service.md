@@ -2,21 +2,21 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-communityService
 >
-> 마지막 확인: 2026-04-13
+> 마지막 확인: 2026-04-14
 
 | #   | API                              | 메서드 | 엔드포인트                             | 연동 파일                                                         | 상태      | 비고 |
 | --- | -------------------------------- | ------ | -------------------------------------- | ----------------------------------------------------------------- | --------- | ---- |
 | 0-1 | Community Health Check           | GET    | `/api/v1/community`                    | —                                                                 | ➖ 불필요 |      |
 | 0-2 | Ops Health Check                 | GET    | `/health`                              | —                                                                 | ➖ 불필요 |      |
-| 1-1 | 양도 게시글 등록                 | POST   | `/api/v1/transfers/posts`              | `features/transfer/api/getTransferPosts.ts` (createTransferPost)  | ✅ 연동됨 |      |
-| 1-2 | 양도 게시글 상세 조회            | GET    | `/api/v1/transfers/posts/{id}`         | `features/transfer/api/getTransferPosts.ts` (getTransferPostById) | ✅ 연동됨 |      |
-| 1-3 | 양도 게시글 목록 조회            | GET    | `/api/v1/transfers/posts`              | `features/transfer/api/getTransferPosts.ts` (getTransferPosts)    | ✅ 연동됨 |      |
+| 1-1 | 양도 게시글 등록                 | POST   | `/api/v1/transfers/posts`              | `features/transfer/api/getTransferPosts.ts` (createTransferPost)  | ⚠️ 스펙 불일치 | Response에 `zone` 필드 추가 (`section`과 `rowInfo` 사이) |
+| 1-2 | 양도 게시글 상세 조회            | GET    | `/api/v1/transfers/posts/{id}`         | `features/transfer/api/getTransferPosts.ts` (getTransferPostById) | ⚠️ 스펙 불일치 | Response에 `zone` 필드 추가 (`section`과 `rowInfo` 사이) |
+| 1-3 | 양도 게시글 목록 조회            | GET    | `/api/v1/transfers/posts`              | `features/transfer/api/getTransferPosts.ts` (getTransferPosts)    | ⚠️ 스펙 불일치 | Response에 `zone` 필드 추가 (`section`과 `rowInfo` 사이) |
 | 1-4 | 양도 게시글 삭제                 | DELETE | `/api/v1/transfers/posts/{id}`         | `features/transfer/api/getTransferPosts.ts` (deleteTransferPost)  | ✅ 연동됨 |      |
 | 1-5 | 양도 게시글 예매(결제요청)       | POST   | `/api/v1/transfers/posts/{id}/reserve` | `features/transfer/api/getTransferPosts.ts` (reserveTransferPost) | ✅ 연동됨 |      |
 | 1-6 | 양도 게시글 예매 확정(결제 확정) | POST   | `/api/v1/transfers/posts/confirm`      | `features/transfer/api/getTransferPosts.ts` (confirmTransferPost) | ✅ 연동됨 |      |
 | 1-7 | 양도 게시글 수정                 | PATCH  | `/api/v1/transfers/posts/{id}`         | `features/transfer/api/getTransferPosts.ts` (updateTransferPost)  | ✅ 연동됨 |      |
-| 1-8 | 나의 판매 내역 조회              | GET    | `/api/v1/transfers/me/sales`           | `features/transfer/api/getMyTransfers.ts` (getMySales)            | ✅ 연동됨 |      |
-| 1-9 | 나의 구매 내역 조회              | GET    | `/api/v1/transfers/me/purchases`       | `features/transfer/api/getMyTransfers.ts` (getMyPurchases)        | ✅ 연동됨 |      |
+| 1-8 | 나의 판매 내역 조회              | GET    | `/api/v1/transfers/me/sales`           | `features/transfer/api/getMyTransfers.ts` (getMySales)            | ⚠️ 스펙 불일치 | Response에 `zone` 필드 추가 (`section`과 `rowInfo` 사이) |
+| 1-9 | 나의 구매 내역 조회              | GET    | `/api/v1/transfers/me/purchases`       | `features/transfer/api/getMyTransfers.ts` (getMyPurchases)        | ⚠️ 스펙 불일치 | Response에 `zone` 필드 추가 (`section`과 `rowInfo` 사이) |
 
 ---
 
@@ -126,8 +126,9 @@ POST /api/v1/transfers/posts
     "showName": "G-Dragon 2026 MAMA DOME TOUR",
     "showDate": "2026-04-10T19:00:00",
     "showVenue": "고척 스카이돔",
-    "section": "VIP",
-    "rowInfo": "A",
+    "section": "vip",
+    "zone": "1",
+    "rowInfo": "3",
     "seatNumber": "15",
     "faceValue": 150000,
     "sellingPrice": 145000,
@@ -178,8 +179,9 @@ GET /api/v1/transfers/posts/1
     "showName": "G-Dragon 2026 MAMA DOME TOUR",
     "showDate": "2026-04-10T19:00:00",
     "showVenue": "고척 스카이돔",
-    "section": "VIP",
-    "rowInfo": "A",
+    "section": "vip",
+    "zone": "1",
+    "rowInfo": "3",
     "seatNumber": "15",
     "faceValue": 150000,
     "sellingPrice": 145000,
@@ -240,8 +242,9 @@ GET /api/v1/transfers/posts?artistId=10&showId=20&page=0&size=10
         "showId": 20,
         "showName": "G-Dragon 2026 MAMA DOME TOUR",
         "showDate": "2026-04-10T19:00:00",
-        "section": "VIP",
-        "rowInfo": "A",
+        "section": "vip",
+        "zone": "1",
+        "rowInfo": "3",
         "faceValue": 150000,
         "sellingPrice": 145000,
         "sellerTier": "PLATINUM",
@@ -468,8 +471,9 @@ GET /api/v1/transfers/me/sales
       "id": 1,
       "showName": "G-Dragon 2026 MAMA DOME TOUR",
       "showDate": "2026-04-10T19:00:00",
-      "section": "VIP",
-      "rowInfo": "A",
+      "section": "vip",
+      "zone": "1",
+      "rowInfo": "3",
       "seatNumber": "15",
       "sellingPrice": 145000,
       "feeAmount": 5000,
@@ -517,8 +521,9 @@ GET /api/v1/transfers/me/purchases
       "id": 1,
       "showName": "G-Dragon 2026 MAMA DOME TOUR",
       "showDate": "2026-04-10T19:00:00",
-      "section": "VIP",
-      "rowInfo": "A",
+      "section": "vip",
+      "zone": "1",
+      "rowInfo": "3",
       "seatNumber": "15",
       "sellingPrice": 145000,
       "sellerUserId": 100,

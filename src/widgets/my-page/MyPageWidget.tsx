@@ -14,7 +14,23 @@ import { useCurrentUser } from '@/features/auth/model/useCurrentUser'
 import { useMemberships, useUpdateNickname, useCancelMembership } from '@/features/membership'
 import { getMySales, getMyPurchases } from '@/features/transfer'
 import { useMyReservations } from '@/features/reservation'
-import type { User } from '@/shared/types'
+import type { User, TierLevel } from '@/shared/types'
+
+const TIER_RANK: Record<TierLevel, number> = {
+  LIGHTNING: 4,
+  THUNDER: 3,
+  CLOUD: 2,
+  MIST: 1,
+}
+
+function deriveTopTier(memberships: User['memberships']): TierLevel {
+  const active = memberships.filter((m) => m.isActive)
+  if (active.length === 0) return 'MIST'
+  return active.reduce((best, m) =>
+    TIER_RANK[m.tier] > TIER_RANK[best] ? m.tier : best,
+    'MIST' as TierLevel,
+  )
+}
 
 export function MyPageWidget() {
   const searchParams = useSearchParams()
@@ -46,6 +62,7 @@ export function MyPageWidget() {
     name: meData?.nickname ?? mockUser.name,
     email: meData?.email ?? mockUser.email,
     memberships,
+    tier: deriveTopTier(memberships),
   }
 
   if (isUserLoading || isMembershipsLoading || isTicketsLoading) return <MyPageSkeleton />

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Calendar,
   CheckCircle2,
@@ -11,7 +12,6 @@ import {
 } from "lucide-react";
 import { Button, Separator, PaymentDialog, PriceDisplay, FaceValueBadge } from "@/shared/ui";
 import { formatPrice, formatDateShort } from "@/shared/lib/format";
-import { updateTransferListingStatus } from "@/shared/lib/mocks/artist-page";
 import { reserveTransferPost, confirmTransferPost } from "@/features/transfer";
 import type { Event, TransferListing, Membership } from "@/shared/types";
 
@@ -32,6 +32,7 @@ export function TransferPurchaseSidebar({
   userId,
 }: TransferPurchaseSidebarProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [step, setStep] = useState<PurchaseStep>("summary");
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [isReserving, setIsReserving] = useState(false);
@@ -63,7 +64,8 @@ export function TransferPurchaseSidebar({
     setStep("processing");
     confirmTransferPost(orderId, paymentKey, storedUserId)
       .then(() => {
-        updateTransferListingStatus(artistId, listing.id, "sold");
+        queryClient.invalidateQueries({ queryKey: ["transfer-posts", artistId] });
+        queryClient.invalidateQueries({ queryKey: ["transfer-post", listing.id] });
         setStep("complete");
       })
       .catch(() => {

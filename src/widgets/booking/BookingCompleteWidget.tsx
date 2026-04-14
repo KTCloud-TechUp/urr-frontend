@@ -108,7 +108,7 @@ export function BookingCompleteWidget() {
     });
   }, [phase]);
 
-  const handleGoToWallet = useCallback(() => router.push("/my-page"), [router]);
+  const handleGoToWallet = useCallback(() => router.push("/my-page?tab=wallet"), [router]);
   const handleGoHome = useCallback(() => router.push("/"), [router]);
 
   const ticketSubtotal = useMemo(

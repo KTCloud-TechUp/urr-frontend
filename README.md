@@ -12,7 +12,7 @@
 | 연동 API | 45개 엔드포인트 |
 | 개발 페이지 | 10개 라우트 |
 | 머지 PR | 49회 |
-| 트러블슈팅 문서화 | 6건 |
+| 트러블슈팅 문서화 | 4건 |
 
 ---
 
@@ -533,84 +533,7 @@ let accessToken: string | null =
 
 ---
 
-### 2. 백엔드 API 경로에 `/api/v1` 접두사 추가 — 모든 API 요청이 백엔드에 미도달
-
-**현상**
-
-특정 시점 이후 프로덕션에서 로그인·공연 조회·예매 등 모든 API가 실패했습니다. 로컬에서는 정상 동작.
-
-**원인 분석**
-
-백엔드 팀이 배포 중반에 모든 엔드포인트 경로에 `/api/v1` 버전 접두사를 추가했습니다. 기존 프론트엔드는 `https://urr.guru` 기준으로 `/auth/login` 등 접두사 없는 경로를 사용하고 있었고, CloudFront는 `/api/v1/*` 경로만 백엔드 ALB로 라우팅하도록 설정되어 있어, 변경 전 경로 요청은 전부 S3(정적 파일)로 라우팅돼 404가 발생했습니다.
-
-```
-# 백엔드 변경 전 (기존 동작)
-GET https://urr.guru/auth/login  → ALB → Spring Boot ✅
-
-# 백엔드가 /api/v1 접두사 추가 후
-GET https://urr.guru/auth/login  → S3 → 404 ❌
-
-# 프론트엔드 대응 후
-GET https://urr.guru/api/v1/auth/login  → ALB → Spring Boot ✅
-```
-
-**해결**
-
-`NEXT_PUBLIC_API_BASE_URL`에 `/api/v1`을 포함하도록 CD 파이프라인 환경 변수를 수정하고, 각 API 파일의 경로에서 중복된 `/api/v1` 접두사를 모두 제거했습니다.
-
-> **교훈**: 백엔드 API 버전 정책(경로 접두사 유무)이 바뀔 경우 CloudFront 라우팅 규칙과 프론트엔드 Base URL을 함께 변경해야 합니다. 변경 전 프론트엔드 팀에 사전 공유가 필요합니다.
-
-> 📝 **심화 글**: <!-- [CloudFront + S3 정적 배포에서 API 라우팅 설계하기](https://blog.example.com) -->
-
----
-
-### 3. 로그인 상태에서 `/onboarding` 직접 접근 가능
-
-**현상**
-
-소셜 로그인으로 인증을 완료한 상태에서 `/onboarding`을 직접 입력하면 로그인 화면이 그대로 노출됐습니다.
-
-**원인 분석**
-
-| 계층               | 확인 방법                                   | 문제                                             |
-| ------------------ | ------------------------------------------- | ------------------------------------------------ |
-| Next.js middleware | 서버에서 httpOnly 쿠키 확인                 | `refresh_token` 쿠키 없으면 비인증으로 판단      |
-| OnboardingWidget   | 클라이언트에서 `tokenStore.getToken()` 확인 | 새로고침 시 메모리 초기화 → 항상 비인증으로 보임 |
-
-`middleware.ts`에서 `is_authenticated` 쿠키로 이중 체크를 시도했으나 Edge Runtime 환경에서 빌드 오류가 발생해 middleware 자체를 제거하고 클라이언트 레벨 방어로 전환했습니다.
-
-**해결**
-
-`OnboardingWidget` 마운트 시 두 단계로 인증 상태를 확인합니다.
-
-```ts
-useEffect(() => {
-  // 1단계: 메모리에 토큰이 있으면 즉시 리다이렉트
-  if (tokenStore.getToken()) {
-    router.replace("/");
-    return;
-  }
-  // 2단계: 메모리가 비어 있으면 reissue로 세션 유효 여부 확인
-  reissueToken().then((token) => {
-    if (token) {
-      tokenStore.setToken(token);
-      router.replace("/");
-    } else {
-      setAuthChecked(true); // 비로그인 확정 → 로그인 화면 렌더링
-    }
-  });
-}, []);
-```
-
-| 시나리오                               | 수정 전          | 수정 후                        |
-| -------------------------------------- | ---------------- | ------------------------------ |
-| 로그인 후 `/onboarding` 주소 직접 입력 | 로그인 화면 노출 | 홈(`/`)으로 리다이렉트         |
-| 새로고침 후 `/onboarding` 접근         | 로그인 화면 노출 | 세션 복원 후 홈으로 리다이렉트 |
-| 로그아웃 후 `/onboarding` 접근         | 정상             | 정상                           |
-
----
-
-### 4. React Compiler와 수동 `useCallback` 충돌
+### 2. React Compiler와 수동 `useCallback` 충돌
 
 **현상**
 
@@ -637,48 +560,7 @@ const handleNext = useCallback(() => {
 
 ---
 
-### 5. 로그인 전환 시 이전 사용자 정보 잔존
-
-**현상**
-
-소셜 로그인 후 로그아웃 → 일반 로그인 전환 시, 새로고침하기 전까지 이전 소셜 계정의 이름·정보가 그대로 표시됐습니다.
-
-**원인 분석**
-
-로그아웃 시 `tokenStore.clearToken()`으로 Access Token과 sessionStorage는 정상 삭제됐지만, **TanStack Query 캐시가 초기화되지 않았습니다.** 새 토큰으로 요청을 보내기 전에 캐시된 `/auth/me` 응답이 이전 사용자 데이터를 반환했고, 쿼리 staleTime(5분)이 남아 있어 재요청도 발생하지 않았습니다.
-
-```
-로그아웃
-  └─ clearToken() → accessToken = null, sessionStorage 삭제 ✅
-  └─ queryClient.clear() 누락 ❌
-
-새 계정으로 로그인
-  └─ setToken(newToken) ✅
-  └─ useCurrentUser() → 캐시 히트 → 이전 사용자 데이터 반환 ❌
-```
-
-**해결**
-
-토큰이 교체되는 세 지점 모두에 `queryClient.clear()`를 추가했습니다.
-
-| 위치 | 시점 |
-| ---- | ---- |
-| `SettingsTab.tsx` | 로그아웃 확인 후 |
-| `AccountDeleteDialog.tsx` | 탈퇴 완료 후 |
-| `SocialCallbackWidget.tsx` | 새 소셜 토큰 세팅 직전 (`clearToken()` + `queryClient.clear()`) |
-
-```ts
-// 소셜 콜백에서 이전 세션 완전 초기화 후 교체
-tokenStore.clearToken();
-queryClient.clear();
-tokenStore.setToken(result.tokens.accessToken);
-```
-
-> **교훈**: 토큰 교체 시 `clearToken()`만으로는 부족합니다. TanStack Query 캐시는 토큰과 독립적으로 살아있으므로, 사용자가 바뀌는 모든 지점에서 반드시 `queryClient.clear()`를 함께 호출해야 합니다.
-
----
-
-### 6. 소셜 로그인 온보딩 미완료 이탈 → `/auth/me` CORS 오류 + 무한 리다이렉트 루프
+### 3. 소셜 로그인 온보딩 미완료 이탈 → `/auth/me` CORS 오류 + 무한 리다이렉트 루프
 
 **현상**
 
@@ -758,7 +640,7 @@ if (tokenStore.getToken()) {
 
 ---
 
-### 7. 예매하기 클릭 시 모달이 깜빡이고 예매 페이지로 이동되지 않는 문제
+### 4. 예매하기 클릭 시 모달이 깜빡이고 예매 페이지로 이동되지 않는 문제
 
 **현상**
 
