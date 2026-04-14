@@ -182,7 +182,7 @@ export function TicketDetailWidget({ reservationId }: TicketDetailWidgetProps) {
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">결제 상태</span>
             <span className="font-medium">
-              {reservation.paymentStatus === "SUCCESS" ? "결제 완료" : reservation.paymentStatus}
+              {reservation.paymentStatus === "PAID" ? "결제 완료" : reservation.paymentStatus}
             </span>
           </div>
           {reservation.paidAt && (
