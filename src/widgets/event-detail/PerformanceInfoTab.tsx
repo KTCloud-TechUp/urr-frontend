@@ -39,8 +39,16 @@ function formatTierWindowDate(isoDate: string): string {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")} (${weekdays[d.getDay()]}) ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
+const TIER_ORDER: Record<string, number> = {
+  LIGHTNING: 0,
+  THUNDER: 1,
+  CLOUD: 2,
+};
+
 export function PerformanceInfoTab({ event }: PerformanceInfoTabProps) {
-  const bookingWindows = event.dates[0]?.bookingWindows ?? [];
+  const bookingWindows = (event.dates[0]?.bookingWindows ?? [])
+    .filter((w) => w.tier !== "MIST")
+    .sort((a, b) => (TIER_ORDER[a.tier] ?? 99) - (TIER_ORDER[b.tier] ?? 99));
 
   return (
     <div className="space-y-6">
