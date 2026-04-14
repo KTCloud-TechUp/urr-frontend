@@ -27,6 +27,8 @@ import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
 import { getEvents } from "@/features/event/api/getEvents";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { useBookingStore } from "./useBookingStore";
+import { releaseReservation } from "../api/releaseReservation";
+import { getUserIdFromToken } from "@/shared/lib/jwt";
 import type { TierWindow } from "@/shared/types";
 
 // Fallback tier price map (used when sections API is unavailable)
@@ -108,6 +110,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     confirmationData,
     seatTimerSecondsLeft,
     queueToken,
+    reservationRefs,
     setEventLoaded,
     selectDate,
     toggleLeftPanel,
@@ -308,8 +311,18 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   );
 
   const resetBooking = useCallback(() => {
+    const allReservationIds = reservationRefs.flatMap((ref) => ref.reservationIds);
+    if (allReservationIds.length > 0) {
+      const userId = getUserIdFromToken();
+      if (userId) {
+        releaseReservation(
+          { reservationIds: allReservationIds, reason: "USER_ABORT" },
+          userId,
+        ).catch(() => {/* fire-and-forget */});
+      }
+    }
     reset();
-  }, [reset]);
+  }, [reset, reservationRefs]);
 
   const clearPaymentFailed = useCallback(() => {
     setPaymentFailed(false);

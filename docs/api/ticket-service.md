@@ -4,24 +4,24 @@
 >
 > 마지막 확인: 2026-04-14
 
-| #   | API                                      | 메서드 | 엔드포인트                                                      | 연동 파일                                       | 상태         | 비고                                                        |
-| --- | ---------------------------------------- | ------ | --------------------------------------------------------------- | ----------------------------------------------- | ------------ | ----------------------------------------------------------- |
-| 1   | 좌석 조회                                | GET    | `/api/v1/ticket/events/{eventId}/shows/{showId}/seats`          | —                                               | ❌ 미연동    | 코드는 event-service의 `/shows/.../seats/availability` 사용 |
-| 2   | 다중 좌석 선점 + 예약 생성               | POST   | `/api/v1/ticket/reservations`                                   | `features/booking/api/bookTicket.ts`            | ⚠️ 수정 필요 | request: `seatId`→`seatIds[]`, response 구조 변경           |
-| 3   | 예약 확정                                | POST   | `/api/v1/ticket/reservations/confirm`                           | `features/booking/api/confirmReservation.ts`    | ⚠️ 수정 필요 | request/response 구조 완전 변경                             |
-| 4   | 결제 전 선점 상태 조회                   | GET    | `/api/v1/ticket/reservations/{reservationId}/hold-status`       | —                                               | ❌ 미연동    |                                                             |
-| 5   | 예약 만료 처리                           | POST   | `/api/v1/ticket/reservations/{reservationId}/expire`            | —                                               | ➖ 불필요    | 스케줄러 처리                                               |
-| 6   | 예약 취소                                | POST   | `/api/v1/ticket/reservations/cancel`                            | `features/booking/api/cancelReservation.ts`     | ✅ 연동됨    | body: `{eventId, showId, seatId}`, `X-User-Id` 헤더         |
-| 7   | 환불 처리                                | POST   | `/api/v1/ticket/reservations/{reservationId}/refund`            | —                                               | ➖ 불필요    | 서버 내부 처리                                              |
-| 8   | 예약티켓 목록 조회                       | GET    | `/api/v1/ticket/users/reservations`                             | `features/reservation/api/getMyReservations.ts` | ✅ 연동됨    | URL 일치 (헤더로 userId 전달)                               |
-| 9   | (내부) 양도 가능 여부 조회               | GET    | `/api/v1/ticket/internal/transfers/{reservationId}/eligibility` | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
-| 10  | (내부) 소유권 양도 완료                  | POST   | `/api/v1/ticket/internal/transfers/{reservationId}/complete`    | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
-| 11  | (내부) 티켓 좌석 정보 조회 (양도용)      | GET    | `/api/v1/ticket/internal/transfer-seat-info`                    | —                                               | ⚠️ 스펙 불일치 | POST→GET 변경, body `{showId,tier,zoneNo}` → query `{eventId,showId}` + 헤더 `X-User-Id` |
-| 12  | (내부) 특정 티어/구역 사용불가 좌석 조회 | POST   | `/api/v1/ticket/internal/seats/statuses`                        | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
-| 13  | 티켓 좌석 정보 조회                      | POST   | `/api/v1/ticket/seats/statuses`                                 | —                                               | ➖ 불필요    | 서비스 내부 API                                             |
-| 14  | Health Check                             | GET    | `/health`                                                       | —                                               | ➖ 불필요    |                                                             |
-| 15  | 선점 해제                                | POST   | `/api/v1/ticket/reservations/release`                           | —                                               | ❌ 미연동    | PENDING 예약 즉시 해제 (대기열 이탈 등 시나리오)            |
-| 16  | (내부) 결제 결과 반영                    | POST   | `/api/v1/ticket/internal/payments/ticket/result`                | —                                               | ➖ 불필요    | 결제 서비스 → 티켓 서비스 내부 콜백                         |
+| #   | API                                      | 메서드 | 엔드포인트                                                      | 연동 파일                                       | 상태         | 비고                                                                                     |
+| --- | ---------------------------------------- | ------ | --------------------------------------------------------------- | ----------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------- |
+| 1   | 좌석 조회                                | GET    | `/api/v1/ticket/events/{eventId}/shows/{showId}/seats`          | —                                               | ❌ 미연동    | 코드는 event-service의 `/shows/.../seats/availability` 사용                              |
+| 2   | 다중 좌석 선점 + 예약 생성               | POST   | `/api/v1/ticket/reservations`                                   | `features/booking/api/bookTicket.ts`            | ✅ 연동됨    | `seatIds[]` 배열, response `{ reservationIds[], seatIds[], paymentId, ... }` 일치         |
+| 3   | 예약 확정                                | POST   | `/api/v1/ticket/reservations/confirm`                           | `features/booking/api/confirmReservation.ts`    | ✅ 연동됨    | request `{ reservationIds[] }`, response `{ paymentId, reservations[] }` 일치            |
+| 4   | 결제 전 선점 상태 조회                   | GET    | `/api/v1/ticket/reservations/{reservationId}/hold-status`       | —                                               | ❌ 미연동    |                                                                                          |
+| 5   | 예약 만료 처리                           | POST   | `/api/v1/ticket/reservations/{reservationId}/expire`            | —                                               | ➖ 불필요    | 스케줄러 처리                                                                            |
+| 6   | 예약 취소                                | POST   | `/api/v1/ticket/reservations/cancel`                            | `features/booking/api/cancelReservation.ts`     | ✅ 연동됨    | body: `{eventId, showId, seatId}`, `X-User-Id` 헤더                                      |
+| 7   | 환불 처리                                | POST   | `/api/v1/ticket/reservations/{reservationId}/refund`            | —                                               | ➖ 불필요    | 서버 내부 처리                                                                           |
+| 8   | 예약티켓 목록 조회                       | GET    | `/api/v1/ticket/users/reservations`                             | `features/reservation/api/getMyReservations.ts` | ✅ 연동됨    | URL 일치 (헤더로 userId 전달)                                                            |
+| 9   | (내부) 양도 가능 여부 조회               | GET    | `/api/v1/ticket/internal/transfers/{reservationId}/eligibility` | —                                               | ➖ 불필요    | 서비스 내부 API                                                                          |
+| 10  | (내부) 소유권 양도 완료                  | POST   | `/api/v1/ticket/internal/transfers/{reservationId}/complete`    | —                                               | ➖ 불필요    | 서비스 내부 API                                                                          |
+| 11  | (내부) 티켓 좌석 정보 조회 (양도용)      | GET    | `/api/v1/ticket/internal/transfer-seat-info`                    | —                                               | ➖ 불필요    | POST→GET 변경, body `{showId,tier,zoneNo}` → query `{eventId,showId}` + 헤더 `X-User-Id` |
+| 12  | (내부) 특정 티어/구역 사용불가 좌석 조회 | POST   | `/api/v1/ticket/internal/seats/statuses`                        | —                                               | ➖ 불필요    | 서비스 내부 API                                                                          |
+| 13  | 티켓 좌석 정보 조회                      | POST   | `/api/v1/ticket/seats/statuses`                                 | —                                               | ➖ 불필요    | 서비스 내부 API                                                                          |
+| 14  | Health Check                             | GET    | `/health`                                                       | —                                               | ➖ 불필요    |                                                                                          |
+| 15  | 선점 해제                                | POST   | `/api/v1/ticket/reservations/release`                           | `features/booking/api/releaseReservation.ts`    | ✅ 연동됨    | `resetBooking()` 호출 시 reservationRefs가 있으면 자동 호출 (fire-and-forget)            |
+| 16  | (내부) 결제 결과 반영                    | POST   | `/api/v1/ticket/internal/payments/ticket/result`                | —                                               | ➖ 불필요    | 결제 서비스 → 티켓 서비스 내부 콜백                                                      |
 
 ---
 
@@ -1015,17 +1015,15 @@ POST /api/v1/ticket/reservations/release
 
 ```json
 {
-  "reservationIds": [
-    "8f7184cb-95a5-4de1-9fa6-3f5ab8d2c16d"
-  ],
+  "reservationIds": ["8f7184cb-95a5-4de1-9fa6-3f5ab8d2c16d"],
   "reason": "USER_ABORT"
 }
 ```
 
-| 필드           | 타입           | 필수 | 설명                      |
-| -------------- | -------------- | ---- | ------------------------- |
+| 필드           | 타입           | 필수 | 설명                           |
+| -------------- | -------------- | ---- | ------------------------------ |
 | reservationIds | List\<String\> | Y    | 해제할 예약 ID 목록 (1개 이상) |
-| reason         | String         | N    | 해제 사유                 |
+| reason         | String         | N    | 해제 사유                      |
 
 ## Response 200
 
@@ -1045,12 +1043,12 @@ POST /api/v1/ticket/reservations/release
 
 ### AbortReservationsResponse 필드
 
-| 필드                   | 타입                   | 설명                                      |
-| ---------------------- | ---------------------- | ----------------------------------------- |
-| requestedCount         | int                    | 요청된 예약 수                            |
-| releasedCount          | int                    | 실제 해제된 수                            |
-| releasedReservationIds | List\<String\>         | 해제된 예약 ID 목록                       |
-| skippedReservations    | Map\<String, String\>  | 건너뛴 예약 ID → 사유 (PENDING 아닌 경우) |
+| 필드                   | 타입                  | 설명                                      |
+| ---------------------- | --------------------- | ----------------------------------------- |
+| requestedCount         | int                   | 요청된 예약 수                            |
+| releasedCount          | int                   | 실제 해제된 수                            |
+| releasedReservationIds | List\<String\>        | 해제된 예약 ID 목록                       |
+| skippedReservations    | Map\<String, String\> | 건너뛴 예약 ID → 사유 (PENDING 아닌 경우) |
 
 ---
 
@@ -1083,13 +1081,13 @@ POST /api/v1/ticket/internal/payments/ticket/result
 }
 ```
 
-| 필드           | 타입           | 필수 | 설명                     |
-| -------------- | -------------- | ---- | ------------------------ |
-| userId         | Long           | Y    | 사용자 ID                |
-| paymentId      | Long           | Y    | 결제 ID                  |
-| reservationIds | List\<String\> | Y    | 처리할 예약 ID 목록      |
-| status         | String         | Y    | `SUCCESS` 또는 `FAILED`  |
-| reason         | String         | N    | 실패 사유 (nullable)     |
+| 필드           | 타입           | 필수 | 설명                    |
+| -------------- | -------------- | ---- | ----------------------- |
+| userId         | Long           | Y    | 사용자 ID               |
+| paymentId      | Long           | Y    | 결제 ID                 |
+| reservationIds | List\<String\> | Y    | 처리할 예약 ID 목록     |
+| status         | String         | Y    | `SUCCESS` 또는 `FAILED` |
+| reason         | String         | N    | 실패 사유 (nullable)    |
 
 ## Response 200
 

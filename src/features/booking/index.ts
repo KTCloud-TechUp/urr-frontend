@@ -10,6 +10,8 @@ export { useSeatLockSimulation } from "./model/useSeatLockSimulation";
 export { useCountdown } from "./model/useCountdown";
 export { useNavigationBlock } from "./model/useNavigationBlock";
 export { usePaymentForm } from "./model/usePaymentForm";
+export { releaseReservation } from "./api/releaseReservation";
+export type { ReleaseReservationParams, ReleaseReservationResponse } from "./api/releaseReservation";
 export { VenueMap } from "./ui/VenueMap";
 export { SECTION_BBOXES, GRAPE_SECTION_BBOXES, GRAPE_SCALE, VENUE_VIEWBOX, GRAPE_VIEWBOX } from "@/shared/lib/venue";
 export { SeatOverlay } from "./ui/SeatOverlay";
