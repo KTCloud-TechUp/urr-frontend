@@ -49,6 +49,8 @@ export interface MeResponseData {
   userId: number;
   email: string;
   nickname: string;
+  name: string;
+  phoneNumber: string;
   role: string;
   onboardingCompleted: boolean;
   marketingConsent: boolean;
@@ -64,6 +66,8 @@ export interface AuthUser {
   userId: number;
   email: string;
   nickname: string;
+  name: string;
+  phoneNumber: string;
   role: string;
   onboardingCompleted: boolean;
   marketingConsent: boolean;

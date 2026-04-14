@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import {
   Search,
   X,
@@ -13,17 +14,56 @@ import {
   SlidersHorizontal,
   ChevronDown,
   ListFilter,
+  Loader2,
 } from "lucide-react";
-import { getArtistGradient, homeRankingEvents } from "@/shared/lib/mocks/home";
-import {
-  trendingSearchTerms,
-  getAllArtists,
-  getAllEvents,
-} from "@/shared/lib/mocks/search";
+import { getArtistGradient } from "@/shared/lib/mocks/home";
+import { trendingSearchTerms } from "@/shared/lib/mocks/search";
+import { getArtists } from "@/features/artist/api/getArtists";
+import { getEvents } from "@/features/event/api/getEvents";
 import { BookingStatusBadge } from "@/entities/event";
 import { formatDateCompact } from "@/shared/lib/format";
-import type { Artist } from "@/shared/types";
+import type { Artist, BookingStatus } from "@/shared/types";
 import type { SearchableEvent } from "@/shared/lib/mocks/search";
+import type { ArtistSummary } from "@/features/artist/api/getArtists";
+import type { EventSummary } from "@/features/event/api/getEvents";
+
+/* ------------------------------------------------------------------ */
+/*  mapping helpers                                                    */
+/* ------------------------------------------------------------------ */
+
+function toArtist(a: ArtistSummary): Artist {
+  return {
+    id: String(a.id),
+    name: a.name,
+    avatar: a.profileImageUrl ?? "",
+    banner: "",
+    bio: a.bio ?? "",
+    followerCount: a.followerCount,
+    category: (a.category?.toLowerCase() as Artist["category"]) ?? "solo",
+  };
+}
+
+function toSearchableEvent(e: EventSummary): SearchableEvent {
+  const status: BookingStatus = e.active ? "open" : "closed";
+  return {
+    id: String(e.eventId),
+    artistId: String(e.artistId),
+    title: e.title,
+    venue: e.venueTemplateName,
+    poster: e.posterImageUrl ?? "",
+    status,
+    dates: [
+      {
+        id: "0",
+        date: e.openDate,
+        bookingWindows: [],
+        totalSeats: 0,
+        remainingSeats: 0,
+      },
+    ],
+    artistName: e.artistName ?? "",
+  };
+}
 
 /* ------------------------------------------------------------------ */
 /*  helpers                                                            */
@@ -103,8 +143,8 @@ function PopularArtistsSection({ artists }: { artists: Artist[] }) {
   );
 }
 
-function PopularEventsSection() {
-  const top5 = homeRankingEvents.slice(0, 5);
+function PopularEventsSection({ events }: { events: SearchableEvent[] }) {
+  const top5 = events.slice(0, 5);
   return (
     <section className="space-y-4">
       <h2 className="text-base font-semibold flex items-center gap-2 text-muted-foreground">
@@ -121,9 +161,9 @@ function PopularEventsSection() {
             <span className="text-lg font-bold text-muted-foreground/50 w-6 text-center shrink-0">
               {i + 1}
             </span>
-            {evt.profileImage ? (
+            {evt.poster ? (
               <Image
-                src={evt.profileImage}
+                src={evt.poster}
                 alt={evt.title}
                 width={44}
                 height={44}
@@ -236,6 +276,28 @@ export function SearchWidget() {
   const filterRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
+  const { data: artistsRaw = [], isLoading: artistsLoading } = useQuery({
+    queryKey: ["artists"],
+    queryFn: getArtists,
+  });
+
+  const { data: eventsRaw = [], isLoading: eventsLoading } = useQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+  });
+
+  const allArtists = useMemo(
+    () =>
+      [...artistsRaw]
+        .sort((a, b) => (b.followerCount ?? 0) - (a.followerCount ?? 0))
+        .map(toArtist),
+    [artistsRaw],
+  );
+
+  const allEvents = useMemo(() => eventsRaw.map(toSearchableEvent), [eventsRaw]);
+
+  const isLoading = artistsLoading || eventsLoading;
+
   // autofocus
   useEffect(() => {
     inputRef.current?.focus();
@@ -275,10 +337,6 @@ export function SearchWidget() {
     };
   }, []);
 
-  // filtered results
-  const allArtists = useMemo(() => getAllArtists(), []);
-  const allEvents = useMemo(() => getAllEvents(), []);
-
   const filteredArtists = useMemo(() => {
     if (!debouncedQuery || filterType === "event") return [];
     const results = allArtists.filter(
@@ -288,7 +346,6 @@ export function SearchWidget() {
     );
     if (sortBy === "name")
       return [...results].sort((a, b) => a.name.localeCompare(b.name, "ko"));
-    // 'popular' = default order (by followerCount desc), 'latest' = same for artists
     return [...results].sort(
       (a, b) => (b.followerCount ?? 0) - (a.followerCount ?? 0),
     );
@@ -310,7 +367,7 @@ export function SearchWidget() {
         const dateB = b.dates[0]?.date ?? "";
         return dateB.localeCompare(dateA);
       });
-    return results; // popular = default order
+    return results;
   }, [allEvents, debouncedQuery, filterType, sortBy]);
 
   const hasResults = filteredArtists.length > 0 || filteredEvents.length > 0;
@@ -446,17 +503,24 @@ export function SearchWidget() {
         </div>
       </div>
 
+      {/* --- loading --- */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 size={28} className="animate-spin text-muted-foreground" />
+        </div>
+      )}
+
       {/* --- state: empty → curation --- */}
-      {!isSearching && (
+      {!isLoading && !isSearching && (
         <div className="space-y-8">
           <TrendingSection onSelect={handleTrendingClick} />
           <PopularArtistsSection artists={allArtists} />
-          <PopularEventsSection />
+          <PopularEventsSection events={allEvents} />
         </div>
       )}
 
       {/* --- state: results --- */}
-      {isSearching && hasResults && (
+      {!isLoading && isSearching && hasResults && (
         <div className="space-y-6">
           {/* artists */}
           {filteredArtists.length > 0 && (
@@ -513,7 +577,7 @@ export function SearchWidget() {
       )}
 
       {/* --- state: no results --- */}
-      {isSearching && !hasResults && (
+      {!isLoading && isSearching && !hasResults && (
         <div className="text-center py-16 space-y-4">
           <Search size={48} className="mx-auto text-muted-foreground/30" />
           <div className="space-y-1">

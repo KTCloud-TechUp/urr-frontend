@@ -2,7 +2,7 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-eventService
 >
-> 마지막 확인: 2026-04-13
+> 마지막 확인: 2026-04-14 / 마지막 수정: 2026-04-14
 
 | #   | API                                 | 메서드 | 엔드포인트                                                          | 연동 파일                                          | 상태      | 비고                                                                      |
 | --- | ----------------------------------- | ------ | ------------------------------------------------------------------- | -------------------------------------------------- | --------- | ------------------------------------------------------------------------- |
@@ -42,6 +42,8 @@
 | 34  | 회차별 멤버십 예매 오픈 시간표 조회 | GET    | `/api/v1/shows/{eventId}/shows/{showId}/booking-windows`            | `features/booking/api/getBookingWindows.ts`        | ✅ 연동됨 |                                                                           |
 | 35  | 공연 상세 + booking windows 통합 조회 | GET    | `/api/v1/events/{eventId}/detail-with-booking-windows`              | —                                                  | ➖ 불필요 | 신규 엔드포인트 — UI 연결 없음                                            |
 | 36  | 회차별 좌석 목록(가격/수수료 포함) 조회 | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/detail`               | —                                                  | ➖ 불필요 | 신규 엔드포인트 — 티켓 서비스 내부 연동용, query `seatIds`(선택) 지원    |
+| 37  | 공연 단순 상세 조회                     | GET    | `/api/v1/events/{eventId}`                                          | —                                                  | ➖ 불필요 | artistId 없이 eventId만으로 조회 (EventQueryController) — UI 연결 없음 |
+| 38  | (내부) 티켓 확인용 공연/좌석 정보 조회 | GET    | `/api/v1/shows/internal/tickets/info`                               | —                                                  | ➖ 불필요 | query: `eventId`, `showId`; `X-User-Id` 헤더 — 티켓 서비스 내부용     |
 
 ---
 
@@ -596,12 +598,16 @@ GET /api/v1/artists/followings?userId=101
       {
         "tier":"MIST",
         "presaleOffsetMinutes":30,
-        "bookingFeeWon":1000
+        "bookingFeeWon":1000,
+        "bookingType":"GENERAL",
+        "transferFeeRate":null
       },
       {
         "tier":"THUNDER",
         "presaleOffsetMinutes":120,
-        "bookingFeeWon":500
+        "bookingFeeWon":500,
+        "bookingType":"PRESALE",
+        "transferFeeRate":5
       }
     ]
   }

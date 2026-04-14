@@ -14,6 +14,8 @@ export async function fetchMe(): Promise<AuthUser> {
     userId: data.userId,
     email: data.email,
     nickname: data.nickname,
+    name: data.name,
+    phoneNumber: data.phoneNumber,
     role: data.role,
     onboardingCompleted: data.onboardingCompleted,
     marketingConsent: data.marketingConsent,

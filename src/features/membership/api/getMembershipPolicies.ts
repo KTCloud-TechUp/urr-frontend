@@ -1,10 +1,14 @@
 import { apiRequest } from "@/shared/api/client";
 import type { TierLevel } from "@/shared/types";
 
+export type BookingType = "PRESALE" | "GENERAL";
+
 export interface MembershipTierPolicy {
   tier: TierLevel;
   presaleOffsetMinutes: number;
   bookingFeeWon: number;
+  bookingType: BookingType;
+  transferFeeRate: number | null;
 }
 
 interface MembershipPoliciesResponse {
