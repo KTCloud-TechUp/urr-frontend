@@ -16,6 +16,7 @@ interface TermItem {
   required: boolean;
   label: string;
   description?: string;
+  href?: string;
 }
 
 const TERMS: TermItem[] = [
@@ -24,12 +25,14 @@ const TERMS: TermItem[] = [
     required: true,
     label: "서비스 이용약관 동의",
     description: "우르르 서비스 이용에 관한 기본 약관",
+    href: "/policies/urr-01-terms-of-service.html",
   },
   {
     id: "privacy",
     required: true,
     label: "개인정보 수집 및 이용 동의",
     description: "본인인증 및 서비스 제공을 위한 개인정보 처리 방침",
+    href: "/policies/urr-02-privacy-policy.html",
   },
   {
     id: "marketing",
@@ -141,6 +144,16 @@ export function TermsStep({
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {term.description}
                 </p>
+              )}
+              {term.href && (
+                <a
+                  href={term.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary underline mt-1 inline-block"
+                >
+                  약관 보기
+                </a>
               )}
             </div>
             <button
