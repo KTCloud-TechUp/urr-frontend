@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Mail } from "lucide-react";
 import { Button, Input, Checkbox } from "@/shared/ui";
@@ -332,19 +333,23 @@ export function AuthStep({
 
       <p className="mt-8 text-xs text-muted-foreground text-center leading-relaxed">
         서비스에 가입하면 URR의{" "}
-        <button
-          type="button"
+        <Link
+          href="/policies/urr-01-terms-of-service.html"
+          target="_blank"
+          rel="noreferrer"
           className="underline underline-offset-2 hover:text-foreground cursor-pointer"
         >
           서비스 이용약관
-        </button>{" "}
+        </Link>{" "}
         및{" "}
-        <button
-          type="button"
+        <Link
+          href="/policies/urr-02-privacy-policy.html"
+          target="_blank"
+          rel="noreferrer"
           className="underline underline-offset-2 hover:text-foreground cursor-pointer"
         >
           개인정보 처리방침
-        </button>
+        </Link>
         에
         <br />
         동의하는 것으로 간주합니다.

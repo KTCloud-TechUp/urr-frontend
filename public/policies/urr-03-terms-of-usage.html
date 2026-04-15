@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>팬클럽 운영정책 — URR 우르르</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--blue-50:#f0f7ff;--blue-100:#e0f0ff;--blue-200:#BFDAF7;--blue-300:#93c5f0;--blue-400:#60a5e8;--blue-500:#3b82d4;--blue-600:#2563b8;--blue-700:#1d4e9a;--text-primary:#0f1f3d;--text-secondary:#3a5580;--text-muted:#7a99bb;--border:#d0e4f4;--border-light:#e8f3fc;--white:#ffffff;--surface:#f7fbff;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--white);color:var(--text-primary);font-family:'Noto Sans KR',sans-serif;font-weight:400;font-size:15px;line-height:1.85;}
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:100;}
+    .topbar-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;}
+    .brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;}
+    .brand-logo{font-family:'Noto Serif KR',serif;font-weight:600;font-size:1.1rem;color:var(--blue-700);letter-spacing:.05em;}
+    .brand-divider{width:1px;height:14px;background:var(--border);}
+    .brand-label{font-size:.78rem;color:var(--text-muted);}
+    .doc-nav{display:flex;gap:.25rem;}
+    .doc-nav a{font-size:.78rem;color:var(--text-muted);text-decoration:none;padding:.3rem .75rem;border-radius:4px;transition:all .15s;}
+    .doc-nav a:hover{color:var(--blue-600);background:var(--blue-50);}
+    .doc-nav a.current{color:var(--blue-600);background:var(--blue-100);font-weight:500;}
+    .page{max-width:960px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:0;min-height:calc(100vh - 56px);}
+    .toc{border-right:1px solid var(--border-light);padding:2.5rem 1.5rem 2.5rem 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+    .toc-label{font-size:.68rem;font-weight:700;color:var(--text-muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem;padding-left:.75rem;}
+    .toc-link{display:block;font-size:.8rem;color:var(--text-secondary);text-decoration:none;padding:.35rem .75rem;border-radius:4px;border-left:2px solid transparent;transition:all .15s;line-height:1.4;margin-bottom:.1rem;}
+    .toc-link:hover{color:var(--blue-600);background:var(--blue-50);}
+    .toc-link.active{color:var(--blue-600);border-left-color:var(--blue-400);background:var(--blue-50);font-weight:500;}
+    .toc-group{margin-bottom:1.5rem;}
+    .content{padding:3rem 0 6rem 3rem;min-width:0;}
+    .doc-header{padding-bottom:2rem;margin-bottom:2.5rem;border-bottom:2px solid var(--blue-200);}
+    .doc-type-badge{display:inline-block;font-size:.7rem;font-weight:700;color:var(--blue-600);background:var(--blue-100);border:1px solid var(--blue-200);padding:.25rem .75rem;border-radius:2px;letter-spacing:.08em;margin-bottom:1rem;}
+    .doc-title{font-family:'Noto Serif KR',serif;font-size:1.75rem;font-weight:600;color:var(--text-primary);margin-bottom:.75rem;}
+    .doc-meta{display:flex;gap:2rem;flex-wrap:wrap;}
+    .doc-meta-item{font-size:.8rem;color:var(--text-muted);}
+    .doc-meta-item strong{color:var(--text-secondary);font-weight:500;}
+    .notice-box{background:var(--blue-50);border:1px solid var(--blue-200);border-left:3px solid var(--blue-400);padding:1rem 1.25rem;margin-bottom:2rem;font-size:.85rem;color:var(--text-secondary);line-height:1.7;border-radius:0 4px 4px 0;}
+    .notice-box strong{color:var(--blue-700);}
+    .warn-box{background:#fff8f0;border:1px solid #f4d4a0;border-left:3px solid #e8a020;padding:1rem 1.25rem;margin:1rem 0;font-size:.85rem;color:#7a4800;line-height:1.7;border-radius:0 4px 4px 0;}
+    .chapter{margin-bottom:3rem;}
+    .chapter-title{font-size:.7rem;font-weight:700;color:var(--blue-500);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;}
+    .chapter-heading{font-family:'Noto Serif KR',serif;font-size:1.2rem;font-weight:600;color:var(--text-primary);padding-bottom:.75rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;}
+    .article{margin-bottom:1.75rem;}
+    .article-title{font-size:.9rem;font-weight:700;color:var(--text-primary);margin-bottom:.6rem;display:flex;align-items:baseline;gap:.5rem;}
+    .article-no{font-size:.75rem;color:var(--blue-500);font-weight:500;flex-shrink:0;}
+    .article-body{font-size:.875rem;color:#2e4060;line-height:1.9;}
+    .article-body p{margin-bottom:.6rem;}
+    .clause-list{list-style:none;margin:.5rem 0;padding:0;}
+    .clause-list>li{display:flex;gap:.6rem;margin-bottom:.5rem;font-size:.875rem;color:#2e4060;line-height:1.8;}
+    .clause-num{color:var(--blue-500);font-weight:500;font-size:.8rem;flex-shrink:0;margin-top:1px;min-width:1.5rem;}
+    .sub-list{list-style:none;margin:.4rem 0 .2rem 1.2rem;padding:0;}
+    .sub-list>li{position:relative;padding-left:1rem;margin-bottom:.3rem;font-size:.84rem;color:#4a6480;line-height:1.75;}
+    .sub-list>li::before{content:'·';position:absolute;left:0;color:var(--blue-400);font-weight:700;}
+    .data-table{width:100%;border-collapse:collapse;font-size:.84rem;margin:1rem 0;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+    .data-table th{background:var(--blue-50);color:var(--text-secondary);font-weight:600;padding:.65rem 1rem;text-align:left;border-bottom:1px solid var(--border);font-size:.8rem;}
+    .data-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border-light);color:#2e4060;vertical-align:top;}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--blue-50);}
+    .highlight{color:var(--blue-600);font-weight:600;}
+    /* 등급 카드 */
+    .grade-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0;}
+    .grade-card{border:1px solid var(--border);padding:1.25rem;border-radius:4px;background:var(--surface);}
+    .grade-card-name{font-weight:700;font-size:1rem;margin-bottom:.25rem;color:var(--text-primary);}
+    .grade-card-cond{font-size:.78rem;color:var(--text-muted);margin-bottom:.75rem;}
+    .grade-card-perks{list-style:none;padding:0;}
+    .grade-card-perks li{font-size:.82rem;color:var(--text-secondary);padding:.2rem 0;border-bottom:1px solid var(--border-light);}
+    .grade-card-perks li:last-child{border-bottom:none;}
+    .grade-card-perks li::before{content:'✓ ';color:var(--blue-400);font-weight:700;}
+    .grade-card.black{border-top:3px solid #1a1a2e;}
+    .grade-card.gold{border-top:3px solid #c8910a;}
+    .grade-card.silver{border-top:3px solid #8899aa;}
+    .grade-card.general{border-top:3px solid var(--blue-300);}
+    footer{background:var(--surface);border-top:1px solid var(--border);padding:2rem;text-align:center;}
+    .footer-inner{max-width:960px;margin:0 auto;}
+    .footer-logo{font-family:'Noto Serif KR',serif;font-weight:600;font-size:1rem;color:var(--blue-700);margin-bottom:.5rem;}
+    .footer-text{font-size:.78rem;color:var(--text-muted);line-height:1.9;}
+    @media(max-width:768px){.page{grid-template-columns:1fr;}.toc{display:none;}.content{padding:2rem 1rem 4rem;}.doc-nav{display:none;}.grade-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#">
+      <span class="brand-logo">URR 우르르</span>
+      <span class="brand-divider"></span>
+      <span class="brand-label">법적 문서 모음</span>
+    </a>
+    <nav class="doc-nav">
+      <a href="urr-01-terms-of-service.html">서비스 이용약관</a>
+      <a href="urr-02-privacy-policy.html">개인정보처리방침</a>
+      <a href="urr-03-terms-of-usage.html" class="current">이용정책</a>
+      <a href="urr-04-location-based-service-terms.html">위치정보 이용약관</a>
+      <a href="urr-05-youth-policy.html">청소년 보호정책</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+  <aside class="toc">
+    <div class="toc-group">
+      <div class="toc-label">제1장 티켓 예매 서비스</div>
+      <a class="toc-link" href="#art1">제1조 예매 서비스의 제공</a>
+      <a class="toc-link" href="#art2">제2조 티켓 예매 수수료</a>
+      <a class="toc-link" href="#art3">제3조 부정이용에 대한 규제</a>
+      <a class="toc-link" href="#art4">제4조 모바일 티켓</a>
+      <a class="toc-link" href="#art5">제5조 예매의 취소 및 환불</a>
+      <a class="toc-link" href="#art6">제6조 예매취소 방법</a>
+      <a class="toc-link" href="#art7">제7조 티켓 취소수수료</a>
+      <a class="toc-link" href="#art8">제8조 선결제수단별 환불 소요 기간</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-label">제2장 멤버십 등급 체계</div>
+      <a class="toc-link" href="#art9">제9조 멤버십 등급 기준</a>
+      <a class="toc-link" href="#art10">제10조 등급별 혜택 상세</a>
+      <a class="toc-link" href="#art11">제11조 등급 산정 기준</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-label">제3장 양도 서비스</div>
+      <a class="toc-link" href="#art12">제12조 양도 서비스</a>
+      <a class="toc-link" href="#art13">제13조 선예매 제한 및 자격 박탈</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-label">제4장 서비스 이용제한</div>
+      <a class="toc-link" href="#art14">제14조 정책 위반 및 제재</a>
+      <a class="toc-link" href="#art15">제15조 멤버십 연동 정책 변경</a>
+    </div>
+  </aside>
+
+  
+
+  <main class="content">
+    <div class="doc-header">
+      <div class="doc-type-badge">TERMS OF USAGE · 03/05</div>
+      <h1 class="doc-title">이용정책</h1>
+      <div class="doc-meta">
+        <span class="doc-meta-item"><strong>시행일자</strong> 2026년 04월 03일</span>
+        <span class="doc-meta-item"><strong>문서 번호</strong> URR-TOU-2026-001</span>
+      </div>
+    </div>
+
+    <div class="notice-box">
+      본 이용정책은 서비스 이용 약관을 기반으로, URR에서 제공하는 개별 서비스의 이용과 관련된 세부 규정과 절차를 안내합니다. 본 정책은 URR가 제공하는 서비스의 이용 조건을 명확히 하고, 이용자가 해당 서비스를 원활하게 이용하기 위해 준수해야 할 사항들을 규정하고 있으므로, 본 정책을 주의 깊게 읽고 관련 내용을 반드시 준수해 주시기 바랍니다.
+    </div>
+
+    <!-- 제1장 티켓 예매 서비스 -->
+    <section class="chapter">
+      <div class="chapter-title">Chapter 1</div>
+      <h2 class="chapter-heading">제1장 티켓 예매 서비스</h2>
+
+      <div class="article" id="art1">
+        <div class="article-title"><span class="article-no">제1조</span> 예매 서비스의 제공</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>회사는 회사가 운영하는 앱/웹, 전화 또는 현장 안내 창구 등을 통해 공연, 스포츠, 전시, 이벤트 등에 관한 정보를 제공하고, 이와 관련된 티켓 예매서비스를 제공합니다.</span></li>
+            <li><span class="clause-num">②</span><span>예매가능 기간을 포함하여 예매에 관한 구체적 사항은 각 상품, 결제수단, 수령방법 등에 따라 다를 수 있으며 자세한 사항은 각 상품별로 안내된 내용에 따릅니다.</span></li>
+            <li><span class="clause-num">③</span><span>회사는 본인확인, 선량한 이용자의 보호 및 공정한 예매 질서의 확립 등을 위해 전문기관을 통한 휴대전화번호 인증, 실명확인을 또는 생체정보확인을 통한 본인인증, 기타 방법에 의한 인증(이하 “본인인증”)을 요청할 수 있으며, 본인인증을 진행하지 않은 경우 서비스 이용이 제한될 수 있습니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="article" id="art2">
+        <div class="article-title"><span class="article-no">제2조</span> 티켓 예매 수수료</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span><strong>멤버십 등급제 이용 수수료</strong> 회사는 티켓의 판매가격과 별도로 회사가 제공하는 예매서비스에 대한 이용료로서 예매수수료를 부과합니다. 예매수수료 정책은 개별 상품페이지에 별도로 게시할 수 있고, 이용자의 멤버십 등급에 대해 통지한 후 변경될 수 있습니다.</span></li>
+            <li><span class="clause-num">②</span><span><strong>인증 정보 입력</strong> 예매수수료는 개별 상품 또는 멤버십 회원 등급 및 예매방법에 따라 차등하여 적용될 수 있습니다.</span></li>
+            <li><span class="clause-num">③</span><span><strong>자격 검증</strong> 상품별로 달리 정하고 있지 않는 한 예매수수료는 예매의 취소 기타 사정에도 불구하고 환급되지 아니합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="article" id="art3">
+        <div class="article-title"><span class="article-no">제3조</span> 부정이용에 대한 규제</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>회사는 선량한 이용자의 보호를 위하여 다음 각 호에 따라 해당 이용자에 대하여 특정한 예매를 취소하거나 일정한 기간을 정하여 예매를 제한하는 등 서비스 이용을 제한할 수 있습니다.</span></li>
+            <ul class="sub-list">
+              <li><span class="clause-num">1.</span><span> 회사가 허용하지 않은 부정한 방법으로 티켓을 예매(시도)하거나 서비스를 이용한 경우. 여기에는 프로그램을 이용해 비정상적으로 반복접속하는 행위, 회사가 정한 방식을 우회하여 예매오픈 시간 전에 예매페이지에 접근하는 행위, 무통장미입금 등 결제수단을 악용하는 행위, 반복적인 (다량)예매 후 취소하는 행위 등이 포함되며 이에 국한되지 않습니다.</span></li>
+              <li><span class="clause-num">2.</span><span> 암표매매의 목적으로 서비스를 이용하거나, 암표를 매매한 이력이 있는 경우</span></li>
+              <li><span class="clause-num">3.</span><span> 암표를 구매한 경우 또는 서비스 이용 약관, 이용정책 기타 회사의 정책 또는 규정에 위반하여 티켓을 판매하는 제3자로부터 그 티켓을 구매한 경우</span></li>
+              <li><span class="clause-num">4.</span><span> 타인의 정보를 도용하거나 허위 정보를 입력하는 등 부정한 방법을 이용해 본인인증을 하거나 티켓을 예매하는 등의 방법으로 서비스를 이용하는 경우</span></li>
+              <li><span class="clause-num">5.</span><span> 회사에 대한 채무를 기한 내에 지급하지 않는 경우 또는 회사로부터 부당이득을 얻는 행위를 한 경우, 회사 또는 제3자에 대한 부당신고 및 제보, 허위사실 유포 등의 방법으로 회사의 정상적인 운영 및 서비스 제공을 저해하는 행위를 하는 경우</span></li>
+              <li><span class="clause-num">6.</span><span> 다른 이용자의 원활한 예매 및 취소에 지장을 초래하는 행위를 하는 경우</span></li>
+              <li><span class="clause-num">7.</span><span> 기타 이에 준하는 부정한 이용으로 판단되는 경우</span></li>
+            </ul>
+            <li><span class="clause-num">②</span><span>본 조 제1항의 경우 회사는 이용자에게 1일 이상의 소명 기간을 부여합니다. 이 기간 내에 이용자가 소명을 제출하고, 그 내용이 합리적인 경우 회사는 제1항의 서비스 이용 제한을 해제할 수 있습니다.</span></li>
+            <li><span class="clause-num">③</span><span>이용자가 본 조 제1항에 위반하는 행위를 반복하여 회사 또는 다른 이용자에게 피해를 주는 경우, 회사는 서비스 이용약관 제25조에 따라 서비스의 일시적▪영구적 이용정지 및 이용계약의 해지 등의 조치를 취할 수 있습니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="article" id="art4">
+        <div class="article-title"><span class="article-no">제4조</span> 모바일티켓</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>“모바일티켓”이란 이용자가 회사 또는 제휴예매처(모바일티켓 서비스를 이용할 수 있도록 회사와 제휴된 예매처, 이하 "제휴예매처"라 합니다)로부터 예매한 티켓을 회사의 모바일앱 또는 웹을 통하여 바코드, QR코드 등 식별수단으로 표기한 것으로, 인쇄된 티켓과 동일한 효력을 갖습니다.</span></li>
+            <li><span class="clause-num">②</span><span>제휴예매처에서 예매한 공연 등은 회사가 직접 판매하거나 통신판매중개를 하는 상품 또는 서비스에 해당하지 않습니다. 이 경우 회사는 모바일티켓 서비스만을 제공하며, 티켓의 구매 및 공연 관람 등 거래와 관련된 책임은 거래당사자(이용자와 판매자 또는 판매대행사, 통신판매중개자 등) 사이에 부담하여야 하고, 회사는 이에 대하여 원칙적으로 관여하지 않으며 어떠한 책임도 부담하지 않습니다.</span></li>
+            <li><span class="clause-num">③</span><span>회사는 제휴예매처와의 계약관계에 따라서 모바일티켓 서비스 일부 또는 전부의 제공을 중단하거나, 변경할 수 있습니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="article" id="art5">
+        <div class="article-title"><span class="article-no">제5조</span> 예매의 취소 및 환불</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>티켓의 예매는 취소마감기한 전까지 취소할 수 있습니다.</span></li>
+            <ul class="sub-list">
+              <li><span class="clause-num">1.</span><span> 취소마감기한은 개별 상품에 따라 다르며, 각 상품페이지 또는 예매내역에 별도로 게시하거나 이용자에 대한 통지 후 변경될 수 있습니다.</span></li>
+              <li><span class="clause-num">2.</span><span> 취소마감기한은 주최사 또는 공연장 사정에 의해 변경될 수 있습니다.</span></li>
+            </ul>
+            <li><span class="clause-num">②</span><span>예매한 티켓을 분실하거나 훼손한 경우 예매의 취소, 변경, 재발행이 허용되지 않습니다.</span></li>
+            <li><span class="clause-num">③</span><span>회사 또는 판매자에게 회원이 예매한 티켓을 공급할 수 없는 불가피한 사유가 발생한 경우, 회사는 회원이 해당 티켓을 예매한 날로부터 1일 내에 회원에게 거래 이행이 불가능한 사실을 고지하고 취소 및 환불 처리를 할 수 있습니다.</span></li>
+            <li><span class="clause-num">④</span><span>회원이 통상적인 거래 조건으로 보기 어려운 명백한 오류(가격, 좌석, 권종, 혜택의 현저한 오표기 또는 예매 오픈 시간의 오류 등)를 인지할 수 있었음에도 이를 악용하여 티켓 거래계약을 체결하였다고 합리적으로 판단되는 경우, 회사는 사전 통보 후 해당 예매를 취소 및 환불할 수 있고, 그에 대하여 어떠한 책임도 지지 않습니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="article" id="art6">
+        <div class="article-title"><span class="article-no">제6조</span> 예매취소 방법</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>이용자는 상품별로 달리 정하지 않는 한 앱/웹에서 티켓을 예매한 경우 앱/웹에서 취소마감기한 내에 예매를 취소할 수 있습니다.</span></li>
+            <li><span class="clause-num">②</span><span>예매 당일 이후에 예매를 취소하는 경우 제8조에 따라 취소수수료가 부과됩니다. 이 때 예매 당일이란 예매일이 속한 그 날을 의미하며, 예매 시각으로부터 24시간까지의 기간을 의미하지 않습니다.</span></li>
+            <li><span class="clause-num">③</span><span>예매수수료 및 배송료 기타 각 상품별로 정하고 있는 각종 비용은 예매 취소에도 불구하고 환불되지 않습니다.</span></li>
+            <li><span class="clause-num">④</span><span>건전한 예매질서의 확립, 관련법령의 준수, 기술적 필요 기타 부득이한 사유가 있는 경우 회사는 본 조에서 정한 방법 이외의 예매취소 방법을 제공할 수 있으며 이 경우 이용자는 회사가 제공하는 방법에 따라야 합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+
+      <div class="article" id="art7">
+        <div class="article-title"><span class="article-no">제7조</span> 티켓 취소수수료</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>이용자가 예매를 취소할 경우에는 회사에 취소수수료를 지불하여야 합니다.</span></li>
+            <li><span class="clause-num">②</span><span>개별 상품별로 취소수수료를 정하지 않은 경우에는 취소일에 따라 아래와 같이 취소수수료가 부과됩니다.</span></li>
+            <ul class="sub-list">
+              <li><span class="clause-num">1.</span><span> 공연일로부터 10일 이상 남은 때 취소하는 경우에는 다음과 같이 취소수수료가 부과됩니다.</span></li>
+                <ul class="sub-list">
+                  <li><span class="clause-num"></span><span> - 뮤지컬, 콘서트, 클래식 등 공연권 : 4,000원 <br> - 단, 상기 금액은 판매 가격의 10%를 초과하지 않으며, 예매 후 7일 이내 취소하는 경우에는 취소수수료가 부과되지 않습니다.</span></li>
+                </ul>
+              <li><span class="clause-num">2.</span><span> 공연일로부터 10일 미만 남은 때 취소하는 경우에는 다음과 같이 취소수수료가 부과됩니다.</span></li>
+                <ul class="sub-list">
+                  <li><span class="clause-num"></span><span> - 관람일 9일전~7일전까지 : 티켓금액의 10% <br> - 관람일 6일전~3일 전까지 : 티켓금액의 20% <br> - 관람일 2일전~1일 전까지 : 티켓금액의 30% <br> - 관람일 당일 : 티켓금액의 90% (단, 관람일 당일 취소가 허용된 상품에 한함)</span></li>
+                </ul>
+            <li><span class="clause-num">③</span><span>본항 제1호 내지 제2호에도 불구하고 예매 당일 밤 12시 이전에 취소할 경우 취소수수료가 부과되지 않습니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="article" id="art8">
+        <div class="article-title"><span class="article-no">제8조</span> 결제수단별 환불 소요 기간</div>
+        <div class="article-body">
+          <p>결제수단별 환불 소요 기간은 다음 각 항과 같습니다. 단, 공지사항, 각 상품페이지에서 또는 취소 및 환불 과정에서 개별 안내되는 경우 그에 따릅니다.</p>
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>신용카드: 결제취소 승인 후 영업일 기준 약 4~6일 내 카드사 환불 처리됩니다.</span></li>
+            <li><span class="clause-num">②</span><span>무통장 입금: 결제취소 승인 및 환불 계좌번호가 등록된 후 영업일 기준 약 5~7일 내 환불됩니다.</span></li>
+            <li><span class="clause-num">③</span><span>휴대폰 결제: 결제취소 신청 후 즉시 환불됩니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 제2장 등급 체계 -->
+    <section class="chapter">
+      <div class="chapter-title">Chapter 2</div>
+      <h2 class="chapter-heading">제2장 멤버십 등급 체계</h2>
+
+      <div class="article" id="art9">
+        <div class="article-title"><span class="article-no">제9조</span> 멤버십 등급 기준</div>
+        <div class="article-body">
+          <div class="grade-grid">
+            <div class="grade-card black">
+              <div class="grade-card-name">라이트닝</div>
+              <div class="grade-card-cond">멤버십 가입 및 n점 이상 달성 시</div>
+              <ul class="grade-card-perks">
+                <li>선예매 1</li>
+                <ul class="sub-list">
+                  <li>개별 오픈</li>
+                  <li>썬더 등급보다 1시간 일찍 예매 가능</li>
+                </ul>
+                <li>1인 최대 n매 예매</li>
+                <li>예매 수수료 1,000원</li>
+                <li>양도 수수료 5%</li>
+              </ul>
+            </div>
+            <div class="grade-card gold">
+              <div class="grade-card-name">썬더</div>
+              <div class="grade-card-cond">멤버십 가입 및 n점 이상 달성 시</div>
+              <ul class="grade-card-perks">
+                <li>선예매 2</li>
+                <ul class="sub-list">
+                  <li>클라우드 등급보다 2일 일찍 예매 가능</li>
+                </ul>
+                <li>1인 최대 n매 예매</li>
+                <li>예매 수수료 2,000원</li>
+                <li>양도 수수료 5%</li>
+              </ul>
+            </div>
+            <div class="grade-card silver">
+              <div class="grade-card-name">클라우드</div>
+              <div class="grade-card-cond">멤버십 가입 직후</div>
+              <ul class="grade-card-perks">
+                <li>일반 예매와 동시 진행</li>
+                <ul class="sub-list">
+                  <li>미스트 등급보다 1시간 일찍 예매 가능</li>
+                </ul>
+                <li>1인 최대 n매 예매</li>
+                <li>예매 수수료 3,000원</li>
+                <li>양도 수수료 10%</li>
+              </ul>
+            </div>
+            <div class="grade-card general">
+              <div class="grade-card-name">미스트</div>
+              <div class="grade-card-cond">회원가입 직후</div>
+              <ul class="grade-card-perks">
+                <li>일반 예매와 동시 진행</li>
+                <li>1인 최대 n매 예매</li>
+                <li>예매 수수료 4,000원</li>
+                <li>양도 수수료 10%</li>
+              </ul>
+            </div>
+          </div>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;">※ 등급 혜택 및 기준은 멤버십·공연별로 달라질 수 있으며, 변경 시 사전 공지합니다.</p>
+        </div>
+      </div>
+
+      <div class="article" id="art10">
+        <div class="article-title"><span class="article-no">제10조</span> 등급별 혜택 상세</div>
+        <div class="article-body">
+          <table class="data-table">
+            <thead>
+              <tr><th>혜택</th><th>라이트닝</th><th>썬더</th><th>클라우드</th><th>미스트</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>선예매 권한</td><td class="highlight">공연별 상이</td><td class="highlight">라이트닝 등급 + 1h</td><td>썬더 등급 +2d</td><td>클라우드 등급 + 1h</td></tr>
+              <tr><td>최대 예매 매수</td><td class="highlight">n매</td><td class="highlight">n매</td><td>n매</td><td>n매</td></tr>
+              <tr><td>예매 수수료</td><td class="highlight">1,000원</td><td class="highlight">2,000원</td><td>3,000원</td><td>4,000원</td></tr>
+              <tr><td>양도 수수료</td><td class="highlight">5%</td><td>5%</td><td>10%</td><td>10%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="article" id="art11">
+        <div class="article-title"><span class="article-no">제11조</span> 등급 산정 기준</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>등급은 팬클럽 가입 기간, URR 서비스 이용 이력, 팬클럽 운영 주체의 활동 평가 등을 종합하여 산정합니다.</span></li>
+            <li><span class="clause-num">②</span><span>등급은 매월 1일 자동으로 갱신됩니다. 단, 팬클럽 멤버십 상태 변경 시 즉시 반영됩니다.</span></li>
+            <li><span class="clause-num">③</span><span>부정 예매, 암표 거래 등 정책 위반 이력이 있는 경우 등급이 강제 하향될 수 있습니다.</span></li>
+            <li><span class="clause-num">④</span><span>등급 승급에 필요한 '우수 활동 인정' 기준은 팬클럽 운영 주체와 협의하여 별도 공지합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 제3장 양도 서비스 -->
+    <section class="chapter">
+      <div class="chapter-title">Chapter 3</div>
+      <h2 class="chapter-heading">제3장 양도 서비스</h2>
+
+      <div class="article" id="art12">
+        <div class="article-title"><span class="article-no">제12조</span> 양도 서비스</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>클라우드 등급 이상만 양도 서비스를 이용할 수 있습니다.</span></li>
+            <li><span class="clause-num">②</span><span>라이트닝 등급 회원의 선예매 일시는 공연 별로 일시가 상이합니다.</span></li>
+            <li><span class="clause-num">③</span><span>선예매 오픈 일정 및 선예매 가능 좌석 수는 공연 주최자와 회사가 협의하여 결정하며, 해당 공연 상품 페이지에 사전 고지합니다.</span></li>
+            <li><span class="clause-num">④</span><span>선예매를 통해 예매한 티켓은 이후 일반 예매 기간 중 중복 예매가 불가합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="article" id="art13">
+        <div class="article-title"><span class="article-no">제13조</span> 선예매 제한 및 자격 박탈</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>선예매 권한을 이용해 예매 후 암표 거래를 한 사실이 확인된 경우, 해당 예매는 즉시 취소되고 선예매 권한이 영구 박탈됩니다.</span></li>
+            <li><span class="clause-num">②</span><span>동일 공연에 대해 선예매와 일반 예매 모두 예매한 경우, 중복 예매로 간주하여 모든 예매를 취소할 수 있습니다.</span></li>
+          </ul>
+          <div class="warn-box">
+            <strong>[주의]</strong> 선예매 권한은 멤버십 회원에게만 부여되는 특권입니다. 선예매 권한 남용 시 블랙리스트 등록 및 영구 이용 정지 처분을 받을 수 있습니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 제4장 서비스 이용제한 -->
+    <section class="chapter">
+      <div class="chapter-title">Chapter 4</div>
+      <h2 class="chapter-heading">제4장 서비스 이용제한</h2>
+
+      <div class="article" id="art14">
+        <div class="article-title"><span class="article-no">제14조</span> 정책 위반 및 제재</div>
+        <div class="article-body">
+          <table class="data-table">
+            <thead>
+              <tr><th>위반 유형</th><th>제재 내용</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>허위 멤버십 인증</td><td>멤버십 자격 즉시 박탈 + 예매 취소 + 90일 이용 정지</td></tr>
+              <tr><td>타인 멤버십 정보 도용</td><td>멤버십 자격 박탈 + 영구 이용 정지 + 법적 조치 검토</td></tr>
+              <tr><td>선예매 권한 남용 (암표 거래)</td><td>선예매 권한 영구 박탈 + 멤버십 블랙리스트 등록</td></tr>
+              <tr><td>등급 혜택 부정 이용</td><td>해당 혜택 회수 + 등급 강제 하향</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="article" id="art15">
+        <div class="article-title"><span class="article-no">제15조</span> 멤버십 연동 정책 변경</div>
+        <div class="article-body">
+          <ul class="clause-list">
+            <li><span class="clause-num">①</span><span>멤버십 운영 주체의 정책 변경, 서비스 종료, 기술적 사유 등으로 인해 팬클럽 연동이 불가능해질 경우, 회사는 이를 7일 이전에 공지하고 대체 인증 방법을 안내합니다.</span></li>
+            <li><span class="clause-num">②</span><span>연동 불가로 인해 자격이 확인되지 않는 기간 동안에는 멤버십 서비스 이용이 일시 제한될 수 있으며, 이에 대한 보상은 상황에 따라 별도 공지합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter">
+      <div class="chapter-title">Addendum</div>
+      <h2 class="chapter-heading">부칙</h2>
+      <div class="article">
+        <div class="article-body"><p>본 이용정책은 <strong>2026년 4월 3일</strong>부터 시행합니다. 세부 등급 기준 및 혜택은 공연별로 상이할 수 있으며, 각 공연 페이지에서 확인하시기 바랍니다.</p></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">URR 우르르</div>
+    <div class="footer-text">주식회사 우르르 · 멤버십 문의: membership@urr.co.kr<br>© 2026 URR Inc. All rights reserved.</div>
+  </div>
+</footer>
+</body>
+</html>

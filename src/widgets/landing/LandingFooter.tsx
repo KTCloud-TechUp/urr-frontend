@@ -24,9 +24,12 @@ const FOOTER_COLS = [
   {
     title: "법적정보",
     links: [
-      { label: "개인정보처리방침", href: "#" },
-      { label: "이용약관", href: "#" },
-      { label: "청소년 보호정책", href: "#" },
+      {
+        label: "개인정보처리방침",
+        href: "/policies/urr-02-privacy-policy.html",
+      },
+      { label: "이용약관", href: "/policies/urr-01-terms-of-service.html" },
+      { label: "청소년 보호정책", href: "/policies/urr-05-youth-policy.html" },
     ],
   },
 ];
@@ -177,10 +180,16 @@ export function LandingFooter() {
         >
           <span>© 2026 URR. All rights reserved.</span>
           <div className="flex gap-6">
-            <Link href="#" style={{ color: "#4b5e78" }}>
+            <Link
+              href="/policies/urr-02-privacy-policy.html"
+              style={{ color: "#4b5e78" }}
+            >
               개인정보처리방침
             </Link>
-            <Link href="#" style={{ color: "#4b5e78" }}>
+            <Link
+              href="/policies/urr-01-terms-of-service.html"
+              style={{ color: "#4b5e78" }}
+            >
               이용약관
             </Link>
           </div>

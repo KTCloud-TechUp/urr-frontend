@@ -8,7 +8,11 @@ export function Footer() {
           {/* Left: Brand column */}
           <div className="shrink-0 space-y-7">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icons/logo_final.svg" alt="URR" className="h-11 w-auto" />
+            <img
+              src="/icons/logo_final.svg"
+              alt="URR"
+              className="h-11 w-auto"
+            />
 
             {/* Social icons */}
             <div className="flex items-center gap-2.5 text-muted-foreground">
@@ -145,10 +149,16 @@ export function Footer() {
         <div className="flex items-center justify-between mt-12 text-xs text-muted-foreground">
           <p>&copy; 2026 URR Inc.</p>
           <nav className="flex items-center gap-5">
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a
+              href="/policies/urr-01-terms-of-service.html"
+              className="hover:text-foreground transition-colors"
+            >
               이용약관
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a
+              href="/policies/urr-02-privacy-policy.html"
+              className="hover:text-foreground transition-colors"
+            >
               개인정보처리방침
             </a>
             <a href="#" className="hover:text-foreground transition-colors">

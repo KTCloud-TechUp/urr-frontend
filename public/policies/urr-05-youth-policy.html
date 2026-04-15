@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>청소년 보호정책 — URR 우르르</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--blue-50:#f0f7ff;--blue-100:#e0f0ff;--blue-200:#BFDAF7;--blue-300:#93c5f0;--blue-400:#60a5e8;--blue-500:#3b82d4;--blue-600:#2563b8;--blue-700:#1d4e9a;--text-primary:#0f1f3d;--text-secondary:#3a5580;--text-muted:#7a99bb;--border:#d0e4f4;--border-light:#e8f3fc;--white:#ffffff;--surface:#f7fbff;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--white);color:var(--text-primary);font-family:'Noto Sans KR',sans-serif;font-weight:400;font-size:15px;line-height:1.85;}
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:100;}
+    .topbar-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;}
+    .brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;}
+    .brand-logo{font-family:'Noto Serif KR',serif;font-weight:600;font-size:1.1rem;color:var(--blue-700);letter-spacing:.05em;}
+    .brand-divider{width:1px;height:14px;background:var(--border);}
+    .brand-label{font-size:.78rem;color:var(--text-muted);}
+    .doc-nav{display:flex;gap:.25rem;}
+    .doc-nav a{font-size:.78rem;color:var(--text-muted);text-decoration:none;padding:.3rem .75rem;border-radius:4px;transition:all .15s;}
+    .doc-nav a:hover{color:var(--blue-600);background:var(--blue-50);}
+    .doc-nav a.current{color:var(--blue-600);background:var(--blue-100);font-weight:500;}
+    .page{max-width:960px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:0;min-height:calc(100vh - 56px);}
+    .toc{border-right:1px solid var(--border-light);padding:2.5rem 1.5rem 2.5rem 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+    .toc-label{font-size:.68rem;font-weight:700;color:var(--text-muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem;padding-left:.75rem;}
+    .toc-link{display:block;font-size:.8rem;color:var(--text-secondary);text-decoration:none;padding:.35rem .75rem;border-radius:4px;border-left:2px solid transparent;transition:all .15s;line-height:1.4;margin-bottom:.1rem;}
+    .toc-link:hover{color:var(--blue-600);background:var(--blue-50);}
+    .toc-link.active{color:var(--blue-600);border-left-color:var(--blue-400);background:var(--blue-50);font-weight:500;}
+    .toc-group{margin-bottom:1.5rem;}
+    .content{padding:3rem 0 6rem 3rem;min-width:0;}
+    .doc-header{padding-bottom:2rem;margin-bottom:2.5rem;border-bottom:2px solid var(--blue-200);}
+    .doc-type-badge{display:inline-block;font-size:.7rem;font-weight:700;color:var(--blue-600);background:var(--blue-100);border:1px solid var(--blue-200);padding:.25rem .75rem;border-radius:2px;letter-spacing:.08em;margin-bottom:1rem;}
+    .doc-title{font-family:'Noto Serif KR',serif;font-size:1.75rem;font-weight:600;color:var(--text-primary);margin-bottom:.75rem;}
+    .doc-meta{display:flex;gap:2rem;flex-wrap:wrap;}
+    .doc-meta-item{font-size:.8rem;color:var(--text-muted);}
+    .doc-meta-item strong{color:var(--text-secondary);font-weight:500;}
+    .notice-box{background:var(--blue-50);border:1px solid var(--blue-200);border-left:3px solid var(--blue-400);padding:1rem 1.25rem;margin-bottom:2rem;font-size:.85rem;color:var(--text-secondary);line-height:1.7;border-radius:0 4px 4px 0;}
+    .notice-box strong{color:var(--blue-700);}
+    .chapter{margin-bottom:3rem;}
+    .chapter-title{font-size:.7rem;font-weight:700;color:var(--blue-500);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;}
+    .chapter-heading{font-family:'Noto Serif KR',serif;font-size:1.2rem;font-weight:600;color:var(--text-primary);padding-bottom:.75rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;}
+    .article{margin-bottom:1.75rem;}
+    .article-title{font-size:.9rem;font-weight:700;color:var(--text-primary);margin-bottom:.6rem;display:flex;align-items:baseline;gap:.5rem;}
+    .article-no{font-size:.75rem;color:var(--blue-500);font-weight:500;flex-shrink:0;}
+    .article-body{font-size:.875rem;color:#2e4060;line-height:1.9;}
+    .article-body p{margin-bottom:.6rem;}
+    .clause-list{list-style:none;margin:.5rem 0;padding:0;}
+    .clause-list>li{display:flex;gap:.6rem;margin-bottom:.5rem;font-size:.875rem;color:#2e4060;line-height:1.8;}
+    .clause-num{color:var(--blue-500);font-weight:500;font-size:.8rem;flex-shrink:0;margin-top:1px;min-width:1.5rem;}
+    .sub-list{list-style:none;margin:.4rem 0 .2rem 1.2rem;padding:0;}
+    .sub-list>li{position:relative;padding-left:1rem;margin-bottom:.3rem;font-size:.84rem;color:#4a6480;line-height:1.75;}
+    .sub-list>li::before{content:'·';position:absolute;left:0;color:var(--blue-400);font-weight:700;}
+    .data-table{width:100%;border-collapse:collapse;font-size:.84rem;margin:1rem 0;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+    .data-table th{background:var(--blue-50);color:var(--text-secondary);font-weight:600;padding:.65rem 1rem;text-align:left;border-bottom:1px solid var(--border);font-size:.8rem;}
+    .data-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border-light);color:#2e4060;vertical-align:top;}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--blue-50);}
+    .highlight{color:var(--blue-600);font-weight:600;}
+    /* 담당자 카드 */
+    .manager-card{background:var(--blue-50);border:1px solid var(--blue-200);padding:1.5rem;border-radius:4px;margin:1rem 0;}
+    .manager-title{font-size:.75rem;font-weight:700;color:var(--blue-600);letter-spacing:.08em;margin-bottom:.75rem;}
+    .manager-info{font-size:.875rem;color:var(--text-secondary);line-height:1.9;}
+    footer{background:var(--surface);border-top:1px solid var(--border);padding:2rem;text-align:center;}
+    .footer-inner{max-width:960px;margin:0 auto;}
+    .footer-logo{font-family:'Noto Serif KR',serif;font-weight:600;font-size:1rem;color:var(--blue-700);margin-bottom:.5rem;}
+    .footer-text{font-size:.78rem;color:var(--text-muted);line-height:1.9;}
+    @media(max-width:768px){.page{grid-template-columns:1fr;}.toc{display:none;}.content{padding:2rem 1rem 4rem;}.doc-nav{display:none;}}
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#">
+      <span class="brand-logo">URR 우르르</span>
+      <span class="brand-divider"></span>
+      <span class="brand-label">법적 문서 모음</span>
+    </a>
+    
+    <nav class="doc-nav">
+      <a href="urr-01-terms-of-service.html">서비스 이용약관</a>
+      <a href="urr-02-privacy-policy.html">개인정보처리방침</a>
+      <a href="urr-03-terms-of-usage.html">이용정책</a>
+      <a href="urr-04-location-based-service-terms.html">위치정보 이용약관</a>
+      <a href="urr-05-youth-policy.html" class="current">청소년 보호정책</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+  <aside class="toc">
+    <div class="toc-group">
+      <div class="toc-label">1. 유해정보에 대한 청소년 접근제한 및 관리적 조치</div>
+      <a class="toc-link" href="#art1">1. 유해정보에 대한 청소년 접근제한 및 관리적 조치</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-label">2. 청소년 보호를 위한 교육실시</div>
+      <a class="toc-link" href="#art2">2. 청소년 보호를 위한 교육실시</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-label">3. 유해정보로 인한 피해상담 및 고충처리</div>
+      <a class="toc-link" href="#art3">3. 유해정보로 인한 피해상담 및 고충처리</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-label">4. 청소년 보호 책임자 및 담당자</div>
+      <a class="toc-link" href="#art4">4. 청소년 보호 책임자 및 담당자</a>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="doc-header">
+      <div class="doc-type-badge">YOUTH PROTECTION POLICY · 05/05</div>
+      <h1 class="doc-title">청소년 보호정책</h1>
+      <div class="doc-meta">
+        <span class="doc-meta-item"><strong>시행일자</strong> 2026년 04월 03일</span>
+        <span class="doc-meta-item"><strong>문서 번호</strong> URR-YPP-2026-001</span>
+        <span class="doc-meta-item"><strong>근거 법령</strong> 청소년 보호법</span>
+      </div>
+    </div>
+
+    <div class="notice-box">
+      주식회사 URR (이하 "회사"라 합니다)는 각종 청소년유해정보로부터 19세 미만의 청소년들을 보호하기 위하여 「청소년 보호법」, 「전자상거래 등에서의 소비자보호에 관한 법률」, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 등 관련 법령에 근거하여 청소년보호정책을 시행하고 있습니다. 또한 회사는 청소년의 건전한 성장을 저해하는 유해정보와 비윤리적 반사회적 행위에 대해서는 엄격하게 제재하고 있습니다.
+    </div>
+
+    <!-- 제1장 -->
+    <section class="chapter">
+      <h2 class="chapter-heading">1. 유해정보에 대한 청소년 접근제한 및 관리적 조치</h2>
+
+      <div class="article" id="art1">
+        <div class="article-body">
+          <p>회사는 청소년들이 청소년 유해물에 접근할 수 없도록 별도의 성인인증 장치를 마련하고, 청소년유해물 표시를 통해 청소년 유해정보의 노출을 최대한 예방하며, 청소년에게 유해할 수 있는 상품의 주문 및 판매를 제한하고 있습니다.</p>
+        </div>
+      </div>
+    </section>  
+
+
+      <!-- 제2장 -->
+    <section class="chapter">
+      <h2 class="chapter-heading">2. 청소년 보호를 위한 교육실시</h2>
+
+      <div class="article" id="art2">
+        <div class="article-body">
+          <p>회사는 청소년 보호와 관련한 업무 담당자를 대상으로 관련법령 및 유해정보 발견 시 처리 방법 등을 교육하고 있습니다.</p>
+        </div>
+      </div>
+    </section>  
+
+      <!-- 제3장 -->
+    <section class="chapter">
+      <h2 class="chapter-heading">3. 유해정보로 인한 피해상담 및 고충처리</h2>
+
+      <div class="article" id="art3">
+        <div class="article-body">
+          <p>회사는 청소년 유해매체물의 유통으로 인한 피해신고 및 처리를 위해 신고센터를 통한 신고를 접수 받아 처리 하고 있습니다.</p>
+        </div>
+      </div>
+    </section> 
+
+      <!-- 제4장 -->
+    <section class="chapter">
+      <h2 class="chapter-heading">4. 청소년 보호 책임자 및 담당자</h2>
+
+      <div class="article" id="art4">
+        <div class="article-body">
+          <p>회사는 청소년 보호에 대한 의견수렴 및 불만처리를 담당하는 청소년 보호 책임자 및 담당자를 지정 운영하고 있습니다. <br>청소년 유해정보의 신고 및 피해상담, 고충처리 등 청소년보호와 관련한 문제는 아래의 청소년보호 책임자 및 담당자에게 연락하여 주시면 신속하고 공정하게 처리하도록 하겠습니다.</p>
+
+          <div class="manager-card">
+            <div class="manager-title">청소년 보호 책임자</div>
+            <div class="manager-info">
+              성명 : 아무개<br>
+              소속부서 : 우르르쾅쾅<br>
+              전화번호: 2002-0329<br>
+              전자 우편 : youth@urr.co.kr
+            </div>
+          </div>
+
+
+          <div class="manager-card">
+            <div class="manager-title">청소년 보호 담당자</div>
+            <div class="manager-info">
+              성명 : 아무갱<br>
+              소속부서 : 우르르쾅쾅<br>
+              전화번호: 2002-0329<br>
+              전자 우편 : youth@urr.co.kr
+            </div>
+          </div>
+        </div>
+      </div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">URR 우르르</div>
+    <div class="footer-text">청소년 보호 책임자: youth@urr.co.kr · 청소년 상담전화: 1388<br>© 2026 URR Inc. All rights reserved.</div>
+  </div>
+</footer>
+</body>
+</html>
