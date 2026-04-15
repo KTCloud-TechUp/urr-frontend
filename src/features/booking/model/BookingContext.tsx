@@ -95,7 +95,7 @@ interface BookingProviderProps {
 }
 
 export function BookingProvider({ eventId, children }: BookingProviderProps) {
-  useCurrentUser();
+  const { data: currentUser } = useCurrentUser();
 
   const [paymentFailed, setPaymentFailed] = useState(false);
 
@@ -163,7 +163,9 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   useEffect(() => {
     if (!showsLoading && eventDates.length > 0 && isLoading) {
       setEventLoaded(eventDates[0].id);
-      const startPhase = sessionStorage.getItem("urr:booking:startPhase") as BookingState | null;
+      const startPhase = sessionStorage.getItem(
+        "urr:booking:startPhase",
+      ) as BookingState | null;
       if (startPhase) {
         sessionStorage.removeItem("urr:booking:startPhase");
         transitionTo(startPhase);
@@ -249,7 +251,38 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     };
   }, [showsLoading, eventDates]);
 
-  const userTier = mockUser.tier;
+  const userTier = useMemo<TierLevel>(() => {
+    const memberships = currentUser?.memberships ?? [];
+    const activeTiers = memberships
+      .filter(
+        (membership) => new Date(membership.endDate).getTime() > Date.now(),
+      )
+      .map((membership) => membership.tier.toUpperCase() as TierLevel)
+      .filter(
+        (tier): tier is TierLevel =>
+          tier === "LIGHTNING" ||
+          tier === "THUNDER" ||
+          tier === "CLOUD" ||
+          tier === "MIST",
+      );
+
+    if (activeTiers.length === 0) {
+      return mockUser.tier;
+    }
+
+    const tierRank: Record<TierLevel, number> = {
+      LIGHTNING: 4,
+      THUNDER: 3,
+      CLOUD: 2,
+      MIST: 1,
+    };
+
+    return activeTiers.reduce(
+      (best, tier) => (tierRank[tier] > tierRank[best] ? tier : best),
+      "MIST",
+    );
+  }, [currentUser?.memberships]);
+
   const maxSeats = MAX_SEATS_PER_TIER[userTier];
 
   const [now, setNow] = useState(() => Date.now());
@@ -275,9 +308,15 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     }
     // 2순위: bookingWindows Record<tier, opensAt> 형태 (API가 이 포맷으로 반환하는 경우)
     if (bookingWindowsData?.bookingWindows) {
-      const fromRecord = (Object.entries(bookingWindowsData.bookingWindows) as [string, string][])
+      const fromRecord = (
+        Object.entries(bookingWindowsData.bookingWindows) as [string, string][]
+      )
         .filter(([, opensAt]) => !!opensAt)
-        .map(([tier, opensAt]) => ({ tier: tier as TierLevel, opensAt, fee: 0 }));
+        .map(([tier, opensAt]) => ({
+          tier: tier as TierLevel,
+          opensAt,
+          fee: 0,
+        }));
       if (fromRecord.length > 0) return fromRecord;
     }
     // 3순위: getShows() 응답에 포함된 bookingWindows
@@ -311,14 +350,18 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
   );
 
   const resetBooking = useCallback(() => {
-    const allReservationIds = reservationRefs.flatMap((ref) => ref.reservationIds);
+    const allReservationIds = reservationRefs.flatMap(
+      (ref) => ref.reservationIds,
+    );
     if (allReservationIds.length > 0) {
       const userId = getUserIdFromToken();
       if (userId) {
         releaseReservation(
           { reservationIds: allReservationIds, reason: "USER_ABORT" },
           userId,
-        ).catch(() => {/* fire-and-forget */});
+        ).catch(() => {
+          /* fire-and-forget */
+        });
       }
     }
     reset();
@@ -410,7 +453,9 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     ],
   );
 
-  return <BookingContext.Provider value={value}>{children}</BookingContext.Provider>;
+  return (
+    <BookingContext.Provider value={value}>{children}</BookingContext.Provider>
+  );
 }
 
 export function useBooking(): BookingContextValue {

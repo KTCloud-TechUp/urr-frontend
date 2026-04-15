@@ -4,11 +4,15 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import { getMyReservations } from "../api/getMyReservations";
 import { getEvents } from "@/features/event";
 import { getShows, getSections } from "@/features/show";
-import type { Ticket, Event } from "@/shared/types";
+import type { Ticket, Event, TierLevel } from "@/shared/types";
 
-// seatId 형식: "{sectionCode}-{row}-{number}" (API #31 스펙 확인)
-// 예: "VIP1-A-1" → section: "VIP1", row: "A", seatNumber: "1"
-function parseSeatId(seatId: string): { section: string; row: string; seatNumber: string } {
+// seatId 형식: "{tier}-{zoneNo}-{row}-{number}" 또는 "{sectionCode}-{row}-{number}"
+// 예: "VIP-1-3-1" 또는 "VIP1-A-1"
+function parseSeatId(seatId: string): {
+  section: string;
+  row: string;
+  seatNumber: string;
+} {
   const parts = seatId.split("-");
   if (parts.length >= 3) {
     const seatNumber = parts[parts.length - 1];
@@ -19,7 +23,14 @@ function parseSeatId(seatId: string): { section: string; row: string; seatNumber
   return { section: seatId, row: "-", seatNumber: "-" };
 }
 
-export function useMyReservations(userId?: string | number) {
+function normalizeSectionCode(code: string): string {
+  return code.replace(/-/g, "").toUpperCase();
+}
+
+export function useMyReservations(
+  userId?: string | number,
+  userTier: TierLevel = "MIST",
+) {
   const { data: reservations = [], isLoading: resLoading } = useQuery({
     queryKey: ["my-reservations", userId, "CONFIRMED"],
     queryFn: () => getMyReservations(userId!, "CONFIRMED"),
@@ -54,13 +65,19 @@ export function useMyReservations(userId?: string | number) {
     })),
   });
 
-  const isLoading = resLoading || eventsLoading || showResults.some((r) => r.isLoading) || sectionResults.some((r) => r.isLoading);
+  const isLoading =
+    resLoading ||
+    eventsLoading ||
+    showResults.some((r) => r.isLoading) ||
+    sectionResults.some((r) => r.isLoading);
 
   const tickets: (Ticket & { event: Event })[] = reservations.flatMap((r) => {
     const eventSummary = allEvents.find((e) => e.eventId === r.eventId);
     const eventIndex = uniqueEventIds.indexOf(r.eventId);
     const shows = showResults[eventIndex]?.data ?? [];
     const show = shows.find((s) => s.showId === r.showId);
+    const tierFee =
+      show?.bookingWindows.find((window) => window.tier === userTier)?.fee ?? 0;
 
     const event: Event = {
       id: String(r.eventId),
@@ -68,9 +85,25 @@ export function useMyReservations(userId?: string | number) {
       title: eventSummary?.title ?? `공연 #${r.eventId}`,
       venue: eventSummary?.venueTemplateName ?? "",
       dates: show
-        ? [{ id: String(show.showId), date: show.startAt, bookingWindows: [], totalSeats: show.capacity, remainingSeats: show.remainingSeats }]
+        ? [
+            {
+              id: String(show.showId),
+              date: show.startAt,
+              bookingWindows: [],
+              totalSeats: show.capacity,
+              remainingSeats: show.remainingSeats,
+            },
+          ]
         : eventSummary
-          ? [{ id: "1", date: eventSummary.openDate + "T19:00:00", bookingWindows: [], totalSeats: 0, remainingSeats: 0 }]
+          ? [
+              {
+                id: "1",
+                date: eventSummary.openDate + "T19:00:00",
+                bookingWindows: [],
+                totalSeats: 0,
+                remainingSeats: 0,
+              },
+            ]
           : [],
       poster: eventSummary?.posterImageUrl ?? "",
       status: eventSummary?.active ? "open" : "closed",
@@ -83,12 +116,17 @@ export function useMyReservations(userId?: string | number) {
 
     const showIndex = uniqueShowIds.indexOf(r.showId);
     const sections = sectionResults[showIndex]?.data?.sections ?? [];
-    // getSections 코드는 "VIP","S","R","A" 형식 (zoneNo 없음)
-    // seatId → section이 "VIP-1", "VIP1" 등으로 오면 접미 숫자·대시 제거해 매칭
     const tierCode = section.replace(/-?\d+$/, "");
+    const normalizedSection = normalizeSectionCode(section);
     const matchedSection =
       sections.find((s) => s.code === section) ??
-      sections.find((s) => s.code === tierCode);
+      sections.find(
+        (s) => normalizeSectionCode(s.code) === normalizedSection,
+      ) ??
+      sections.find((s) => s.code === tierCode) ??
+      sections.find(
+        (s) => normalizeSectionCode(s.code) === normalizeSectionCode(tierCode),
+      );
     const price = matchedSection?.price ?? 0;
 
     const ticket: Ticket & { event: Event } = {
@@ -100,7 +138,7 @@ export function useMyReservations(userId?: string | number) {
       row,
       seatNumber,
       price,
-      tierFee: 0,
+      tierFee,
       qrCode: r.reservationId,
       isTransferable: r.transferEligible,
       isUpcoming,

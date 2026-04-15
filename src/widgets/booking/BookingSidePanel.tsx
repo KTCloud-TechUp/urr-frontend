@@ -16,7 +16,7 @@ import {
   GRADE_ORDER,
 } from "@/features/booking/ui/SectionListTable";
 import { cn } from "@/shared/lib/utils";
-import type { Section, EventDate, TierLevel } from "@/shared/types";
+import type { Section, EventDate, TierLevel, TierWindow } from "@/shared/types";
 
 interface BookingSidePanelProps {
   // Sections
@@ -32,6 +32,7 @@ interface BookingSidePanelProps {
   // Pricing
   section: Section | null;
   selectedDate: EventDate | null;
+  tierWindows: TierWindow[];
   userTier: TierLevel;
 
   // Timer
@@ -50,6 +51,7 @@ export function BookingSidePanel({
   onRemoveSeat,
   section,
   selectedDate,
+  tierWindows,
   userTier,
   timerSeconds,
   onPay,
@@ -68,8 +70,7 @@ export function BookingSidePanel({
   );
   const seatCount = selectedSeatIds.length;
   const hasSection = !!selectedSectionId && !!section;
-  const tierFee =
-    selectedDate?.bookingWindows.find((w) => w.tier === userTier)?.fee ?? 0;
+  const tierFee = tierWindows.find((w) => w.tier === userTier)?.fee ?? 0;
   const subtotal = section ? section.price * seatCount : 0;
   const feeTotal = tierFee * seatCount;
   const total = subtotal + feeTotal;
@@ -237,7 +238,9 @@ export function BookingSidePanel({
                         <button
                           key={sec.id}
                           disabled={sec.remainingSeats === 0}
-                          onClick={() => sec.remainingSeats > 0 && onSectionClick(sec.id)}
+                          onClick={() =>
+                            sec.remainingSeats > 0 && onSectionClick(sec.id)
+                          }
                           className={cn(
                             "w-full flex items-center gap-3 px-8 py-2 transition-colors text-left",
                             sec.remainingSeats === 0
@@ -292,7 +295,12 @@ export function BookingSidePanel({
           {tierFee > 0 && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground flex items-center gap-1">
-                <Image src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
+                <Image
+                  src={TIER_IMAGES[userTier]}
+                  width={16}
+                  height={16}
+                  alt=""
+                />
                 <span>{TIER_LABELS[userTier]} 수수료</span>
               </span>
               <span className="tabular-nums">
