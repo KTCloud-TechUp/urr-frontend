@@ -37,7 +37,7 @@ const FOOTER_COLS = [
 export function LandingFooter() {
   return (
     <footer
-      className="pt-[60px] pb-8"
+      className="pt-15 pb-8"
       style={{
         background: "#080812",
         borderTop: "1px solid rgba(255,94,50,0.08)",
@@ -144,9 +144,11 @@ export function LandingFooter() {
               </h4>
               <div className="flex flex-col gap-2.5">
                 {col.links.map((link) => (
-                  <Link
+                  <a
                     key={link.label}
                     href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="transition-colors duration-200"
                     style={{
                       fontSize: "0.78rem",
@@ -161,7 +163,7 @@ export function LandingFooter() {
                     }
                   >
                     {link.label}
-                  </Link>
+                  </a>
                 ))}
               </div>
             </div>
@@ -180,18 +182,22 @@ export function LandingFooter() {
         >
           <span>© 2026 URR. All rights reserved.</span>
           <div className="flex gap-6">
-            <Link
+            <a
               href="/policies/urr-02-privacy-policy.html"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{ color: "#4b5e78" }}
             >
               개인정보처리방침
-            </Link>
-            <Link
+            </a>
+            <a
               href="/policies/urr-01-terms-of-service.html"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{ color: "#4b5e78" }}
             >
               이용약관
-            </Link>
+            </a>
           </div>
         </div>
       </div>
