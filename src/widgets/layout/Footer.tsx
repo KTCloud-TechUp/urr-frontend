@@ -151,12 +151,16 @@ export function Footer() {
           <nav className="flex items-center gap-5">
             <a
               href="/policies/urr-01-terms-of-service.html"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
             >
               이용약관
             </a>
             <a
               href="/policies/urr-02-privacy-policy.html"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
             >
               개인정보처리방침
