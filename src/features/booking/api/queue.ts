@@ -20,7 +20,8 @@ export interface VwrCheckData {
   token?: string;
   position: number;
   servingCounter: number;
-  totalInQueue: number;
+  totalInQueue: number;          // (deprecated) 누적 발급 수 — currentlyWaiting 사용
+  currentlyWaiting?: number;     // 현재 실제 대기 중인 인원 (실시간 감소, 입장 완료자 제외)
   ahead: number;
   estimatedWait?: number;
   nextPoll?: number;
