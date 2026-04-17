@@ -1,6 +1,6 @@
 # URR 프론트엔드 — API 연동 진행 현황
 
-> 마지막 갱신: 2026-04-14  
+> 마지막 갱신: 2026-04-17  
 > 범례: ✅ 완료 / 🔄 부분 연동 (일부 mock) / 🔲 미연동 (전체 mock)
 
 ---
@@ -100,14 +100,14 @@
 
 ## 멤버십 (Membership)
 
-| 기능                | 엔드포인트                                               | 상태 | 비고                                                                                            |
-| ------------------- | -------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------- |
-| 내 멤버십 목록 조회 | `GET /membership/my`                                     | ✅   |                                                                                                 |
-| 멤버십 구독         | `POST /membership/artists/{artistId}/subscribe`          | ✅   |                                                                                                 |
-| 멤버십 해지         | `DELETE /membership/artists/{artistId}/cancel`           | ✅   |                                                                                                 |
-| 닉네임 변경         | `PATCH /membership/nickname`                             | ✅   |                                                                                                 |
-| 멤버십 정책 조회    | `GET /membership/artists/{artistId}/membership-policies` | 🔄   | 가입 화면 연동. `bookingType`·`transferFeeRate` 필드 백엔드 추가 대기 (→ `backend-requests.md`) |
-| 선예매 정책 조회    | `GET /membership/artists/{artistId}/presale-policy`      | ✅   |                                                                                                 |
+| 기능                | 엔드포인트                                               | 상태 | 비고                                                             |
+| ------------------- | -------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| 내 멤버십 목록 조회 | `GET /membership/my`                                     | ✅   |                                                                  |
+| 멤버십 구독         | `POST /membership/artists/{artistId}/subscribe`          | ✅   |                                                                  |
+| 멤버십 해지         | `DELETE /membership/artists/{artistId}/cancel`           | ✅   |                                                                  |
+| 닉네임 변경         | `PATCH /membership/nickname`                             | ✅   |                                                                  |
+| 멤버십 정책 조회    | `GET /membership/artists/{artistId}/membership-policies` | ✅   | 가입 화면 연동 완료. `bookingType`·`transferFeeRate` 필드 반영됨 |
+| 선예매 정책 조회    | `GET /membership/artists/{artistId}/presale-policy`      | ✅   |                                                                  |
 
 ---
 
@@ -126,9 +126,9 @@
 
 ## 검색 (Search)
 
-| 기능                      | 엔드포인트 | 상태 | 비고                                         |
-| ------------------------- | ---------- | ---- | -------------------------------------------- |
-| 아티스트 + 공연 통합 검색 | —          | 🔲   | 전체 mock (`src/shared/lib/mocks/search.ts`) |
+| 기능                      | 엔드포인트 | 상태 | 비고                                                                             |
+| ------------------------- | ---------- | ---- | -------------------------------------------------------------------------------- |
+| 아티스트 + 공연 통합 검색 | —          | 🔄   | 검색 결과는 `getArtists`/`getEvents` API 기반. 통합 검색 전용 엔드포인트 미연동. |
 
 ---
 
@@ -156,7 +156,6 @@
 
 | 항목                                  | 우선순위 | 비고                                                                                                                                                    |
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 검색 API 연동                         | 🟡 보통  | 아티스트·공연 통합 검색 엔드포인트 필요                                                                                                                 |
 | 알림 API 연동                         | 🟢 낮음  | SSE 또는 폴링 방식 결정 필요                                                                                                                            |
 | 공연정보 탭 실제 API 연동             | 🟡 보통  | `PerformanceInfoTab` — 현재 mock `EventDetail` 타입 사용. 백엔드에 `notices`·`identityVerification`·`performanceDescription` 필드 추가 필요 가능성 있음 |
 | 아티스트 홈탭 debutDate·agency·genres | 🟢 낮음  | API 미제공 필드. 백엔드 추가 시 `ArtistDetail` 타입 업데이트 후 `extendedInfo` mock 제거 가능                                                           |
@@ -174,4 +173,4 @@
 | ~~`MyPageWidget` `mockUser` spread 정리~~   | ~~🟡 보통~~ | ~~`src/widgets/my-page/MyPageWidget.tsx:44`~~             | ~~`displayUser`에 `...mockUser` spread로 `tier`·`followedArtistIds`가 mock에서 옴.~~ `tier`는 active 멤버십 중 최고 tier 파생으로 **완료**. `followedArtistIds`는 여전히 mock. |
 | `TransferPurchaseSidebar` mock import 제거  | ✅          | `src/widgets/transfer/TransferPurchaseSidebar.tsx:14`     | `updateTransferListingStatus` mock import가 이미 제거되어 상태 갱신은 TanStack Query invalidation으로 처리됩니다                                                               |
 | `useMyReservations` `tierFee` 하드코딩      | ✅          | `src/features/reservation/model/useMyReservations.ts:104` | `show.bookingWindows`에서 현재 유저 tier에 맞는 fee를 계산하도록 변경                                                                                                          |
-| `getMyReservations` `userId` 헤더 중복 검토 | 🟢 낮음     | `src/features/reservation/api/getMyReservations.ts:38`    | `X-User-Id` 헤더가 ticket-service 문서 기준으로 필요함. 백엔드 요구 여부 추가 검증 필요                                                                                        |
+| `getMyReservations` `userId` 헤더 중복 검토 | ✅          | `src/features/reservation/api/getMyReservations.ts:38`    | `apiRequest()`는 Authorization만 자동 주입. ticketing 서비스는 별도 `X-User-Id` 헤더를 요구하므로 현재 구현이 적절합니다.                                                      |
