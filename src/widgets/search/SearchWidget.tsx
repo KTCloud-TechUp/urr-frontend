@@ -7,9 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Search,
   X,
-  TrendingUp,
   Users,
-  Calendar,
   Flame,
   SlidersHorizontal,
   ChevronDown,
@@ -17,15 +15,16 @@ import {
   Loader2,
 } from "lucide-react";
 import { getArtistGradient } from "@/shared/lib/mocks/home";
-import { trendingSearchTerms } from "@/shared/lib/mocks/search";
 import { getArtists } from "@/features/artist/api/getArtists";
 import { getEvents } from "@/features/event/api/getEvents";
 import { BookingStatusBadge } from "@/entities/event";
-import { formatDateCompact } from "@/shared/lib/format";
 import type { Artist, BookingStatus } from "@/shared/types";
 import type { SearchableEvent } from "@/shared/lib/mocks/search";
 import type { ArtistSummary } from "@/features/artist/api/getArtists";
 import type { EventSummary } from "@/features/event/api/getEvents";
+import { TrendingSection } from "./TrendingSection";
+import { SearchResults } from "./SearchResults";
+import { useSearchFilters } from "./model/useSearchFilters";
 
 /* ------------------------------------------------------------------ */
 /*  mapping helpers                                                    */
@@ -66,44 +65,8 @@ function toSearchableEvent(e: EventSummary): SearchableEvent {
 }
 
 /* ------------------------------------------------------------------ */
-/*  helpers                                                            */
+/*  pre-search curation sub-components                                */
 /* ------------------------------------------------------------------ */
-
-function matchesQuery(text: string, q: string) {
-  return text.toLowerCase().includes(q.toLowerCase());
-}
-
-function formatFollowers(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
-}
-
-/* ------------------------------------------------------------------ */
-/*  sub-components                                                     */
-/* ------------------------------------------------------------------ */
-
-function TrendingSection({ onSelect }: { onSelect: (term: string) => void }) {
-  return (
-    <section className="space-y-4">
-      <h2 className="text-base font-semibold flex items-center gap-2 text-muted-foreground">
-        <TrendingUp size={18} />
-        인기 검색어
-      </h2>
-      <div className="flex flex-wrap gap-2">
-        {trendingSearchTerms.map((term) => (
-          <button
-            key={term}
-            onClick={() => onSelect(term)}
-            className="rounded-full border border-border px-3.5 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-          >
-            {term}
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 function PopularArtistsSection({ artists }: { artists: Artist[] }) {
   return (
@@ -187,74 +150,6 @@ function PopularEventsSection({ events }: { events: SearchableEvent[] }) {
   );
 }
 
-function ArtistResultRow({ artist }: { artist: Artist }) {
-  return (
-    <Link
-      href={`/artists/${artist.id}`}
-      className="flex items-center gap-4 px-4 py-3 hover:bg-accent/50 transition-colors"
-    >
-      {artist.avatar ? (
-        <Image
-          src={artist.avatar}
-          alt={artist.name}
-          width={48}
-          height={48}
-          className="size-12 rounded-full shrink-0 object-cover"
-        />
-      ) : (
-        <div
-          className="size-12 rounded-full shrink-0"
-          style={{ background: getArtistGradient(artist.id) }}
-        />
-      )}
-      <div className="min-w-0 flex-1">
-        <p className="font-semibold truncate">{artist.name}</p>
-        {artist.followerCount !== undefined && (
-          <p className="text-sm text-muted-foreground">
-            팔로워 {formatFollowers(artist.followerCount)}
-          </p>
-        )}
-      </div>
-    </Link>
-  );
-}
-
-function EventResultRow({ event }: { event: SearchableEvent }) {
-  const firstDate = event.dates[0]?.date ?? "";
-  const dateStr = firstDate ? formatDateCompact(firstDate) : "";
-
-  return (
-    <Link
-      href={`/events/${event.id}`}
-      className="flex items-center gap-4 px-4 py-3 hover:bg-accent/50 transition-colors"
-    >
-      {event.poster ? (
-        <Image
-          src={event.poster}
-          alt={event.title}
-          width={60}
-          height={60}
-          className="size-15 rounded-lg shrink-0 object-cover"
-        />
-      ) : (
-        <div
-          className="size-15 rounded-lg shrink-0"
-          style={{ background: getArtistGradient(event.artistId) }}
-        />
-      )}
-      <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex items-center gap-2">
-          <p className="font-semibold truncate">{event.title}</p>
-          <BookingStatusBadge status={event.status} />
-        </div>
-        <p className="text-sm text-muted-foreground truncate">
-          {event.artistName} · {dateStr} · {event.venue}
-        </p>
-      </div>
-    </Link>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /*  main                                                               */
 /* ------------------------------------------------------------------ */
@@ -262,19 +157,7 @@ function EventResultRow({ event }: { event: SearchableEvent }) {
 export function SearchWidget() {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [showAllArtists, setShowAllArtists] = useState(false);
-  const [showAllEvents, setShowAllEvents] = useState(false);
-  const [filterType, setFilterType] = useState<"all" | "artist" | "event">(
-    "all",
-  );
-  const [sortBy, setSortBy] = useState<"popular" | "latest" | "name">(
-    "popular",
-  );
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
-  const sortRef = useRef<HTMLDivElement>(null);
 
   const { data: artistsRaw = [], isLoading: artistsLoading } = useQuery({
     queryKey: ["artists"],
@@ -298,6 +181,28 @@ export function SearchWidget() {
 
   const isLoading = artistsLoading || eventsLoading;
 
+  const {
+    filterType,
+    setFilterType,
+    sortBy,
+    setSortBy,
+    showFilterDropdown,
+    setShowFilterDropdown,
+    showSortDropdown,
+    setShowSortDropdown,
+    filterRef,
+    sortRef,
+    filteredArtists,
+    filteredEvents,
+    showAllArtists,
+    setShowAllArtists,
+    showAllEvents,
+    setShowAllEvents,
+    visibleArtists,
+    visibleEvents,
+    resetShowAll,
+  } = useSearchFilters(allArtists, allEvents, debouncedQuery);
+
   // autofocus
   useEffect(() => {
     inputRef.current?.focus();
@@ -310,7 +215,7 @@ export function SearchWidget() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Escape → clear, close dropdowns on outside click
+  // Escape → clear query, close dropdowns
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -321,54 +226,9 @@ export function SearchWidget() {
         inputRef.current?.focus();
       }
     }
-    function handleClickOutside(e: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
-        setShowFilterDropdown(false);
-      }
-      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
-        setShowSortDropdown(false);
-      }
-    }
     document.addEventListener("keydown", handleKey);
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const filteredArtists = useMemo(() => {
-    if (!debouncedQuery || filterType === "event") return [];
-    const results = allArtists.filter(
-      (a) =>
-        matchesQuery(a.name, debouncedQuery) ||
-        matchesQuery(a.bio, debouncedQuery),
-    );
-    if (sortBy === "name")
-      return [...results].sort((a, b) => a.name.localeCompare(b.name, "ko"));
-    return [...results].sort(
-      (a, b) => (b.followerCount ?? 0) - (a.followerCount ?? 0),
-    );
-  }, [allArtists, debouncedQuery, filterType, sortBy]);
-
-  const filteredEvents = useMemo(() => {
-    if (!debouncedQuery || filterType === "artist") return [];
-    const results = allEvents.filter(
-      (e) =>
-        matchesQuery(e.title, debouncedQuery) ||
-        matchesQuery(e.venue, debouncedQuery) ||
-        matchesQuery(e.artistName, debouncedQuery),
-    );
-    if (sortBy === "name")
-      return [...results].sort((a, b) => a.title.localeCompare(b.title, "ko"));
-    if (sortBy === "latest")
-      return [...results].sort((a, b) => {
-        const dateA = a.dates[0]?.date ?? "";
-        const dateB = b.dates[0]?.date ?? "";
-        return dateB.localeCompare(dateA);
-      });
-    return results;
-  }, [allEvents, debouncedQuery, filterType, sortBy]);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [setShowFilterDropdown, setShowSortDropdown]);
 
   const hasResults = filteredArtists.length > 0 || filteredEvents.length > 0;
   const isSearching = debouncedQuery.length > 0;
@@ -376,24 +236,15 @@ export function SearchWidget() {
   function handleTrendingClick(term: string) {
     setQuery(term);
     setDebouncedQuery(term);
-    setShowAllArtists(false);
-    setShowAllEvents(false);
+    resetShowAll();
   }
 
   function handleClear() {
     setQuery("");
     setDebouncedQuery("");
-    setShowAllArtists(false);
-    setShowAllEvents(false);
+    resetShowAll();
     inputRef.current?.focus();
   }
-
-  const visibleArtists = showAllArtists
-    ? filteredArtists
-    : filteredArtists.slice(0, 5);
-  const visibleEvents = showAllEvents
-    ? filteredEvents
-    : filteredEvents.slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -449,8 +300,6 @@ export function SearchWidget() {
                   onClick={() => {
                     setFilterType(opt.value);
                     setShowFilterDropdown(false);
-                    setShowAllArtists(false);
-                    setShowAllEvents(false);
                   }}
                   className={`w-full text-left px-4 py-2.5 text-sm hover:bg-accent transition-colors cursor-pointer ${filterType === opt.value ? "text-primary font-semibold" : "text-foreground"}`}
                 >
@@ -521,59 +370,16 @@ export function SearchWidget() {
 
       {/* --- state: results --- */}
       {!isLoading && isSearching && hasResults && (
-        <div className="space-y-6">
-          {/* artists */}
-          {filteredArtists.length > 0 && (
-            <section className="space-y-2">
-              <h2 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 px-1">
-                <Users size={16} />
-                아티스트
-                <span className="text-xs font-normal">
-                  ({filteredArtists.length})
-                </span>
-              </h2>
-              <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-                {visibleArtists.map((a) => (
-                  <ArtistResultRow key={a.id} artist={a} />
-                ))}
-              </div>
-              {filteredArtists.length > 5 && !showAllArtists && (
-                <button
-                  onClick={() => setShowAllArtists(true)}
-                  className="w-full text-center text-sm text-muted-foreground hover:text-foreground py-2 transition-colors cursor-pointer"
-                >
-                  아티스트 {filteredArtists.length - 5}개 더 보기
-                </button>
-              )}
-            </section>
-          )}
-
-          {/* events */}
-          {filteredEvents.length > 0 && (
-            <section className="space-y-2">
-              <h2 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 px-1">
-                <Calendar size={16} />
-                공연
-                <span className="text-xs font-normal">
-                  ({filteredEvents.length})
-                </span>
-              </h2>
-              <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-                {visibleEvents.map((e) => (
-                  <EventResultRow key={e.id} event={e} />
-                ))}
-              </div>
-              {filteredEvents.length > 5 && !showAllEvents && (
-                <button
-                  onClick={() => setShowAllEvents(true)}
-                  className="w-full text-center text-sm text-muted-foreground hover:text-foreground py-2 transition-colors cursor-pointer"
-                >
-                  공연 {filteredEvents.length - 5}개 더 보기
-                </button>
-              )}
-            </section>
-          )}
-        </div>
+        <SearchResults
+          filteredArtists={filteredArtists}
+          filteredEvents={filteredEvents}
+          visibleArtists={visibleArtists}
+          visibleEvents={visibleEvents}
+          showAllArtists={showAllArtists}
+          showAllEvents={showAllEvents}
+          onShowMoreArtists={() => setShowAllArtists(true)}
+          onShowMoreEvents={() => setShowAllEvents(true)}
+        />
       )}
 
       {/* --- state: no results --- */}

@@ -27,6 +27,15 @@ export function formatDateShort(isoDate: string): string {
   })
 }
 
+/** "2026. 06. 01." — ko-KR 숫자형 날짜 (멤버십 만료일 등) */
+export function formatDateNumeric(isoDate: string): string {
+  return new Date(isoDate).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+}
+
 /** "2026년 6월 1일" — year + month + day (no weekday) */
 export function formatDateCompact(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('ko-KR', {
@@ -42,6 +51,17 @@ export function formatEventDateTime(isoDate: string): string {
     month: 'numeric',
     day: 'numeric',
     weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(isoDate))
+}
+
+/** "6월 1일 18:00" — month + day + time (weekday 없음, 예매 창 시간표용) */
+export function formatDateTime(isoDate: string): string {
+  return new Intl.DateTimeFormat('ko-KR', {
+    month: 'numeric',
+    day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,

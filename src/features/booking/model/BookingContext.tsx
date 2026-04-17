@@ -17,8 +17,6 @@ import type {
   EventDate,
   ConfirmationData,
 } from "@/shared/types";
-import { mockEvent } from "@/shared/lib/mocks/event-detail";
-import { mockUser } from "@/shared/lib/mocks/user";
 import { MAX_SEATS_PER_TIER } from "@/shared/lib/mocks/seats";
 import { getShows } from "@/features/show/api/getShows";
 import { getSections } from "@/features/show/api/getSections";
@@ -27,6 +25,7 @@ import { getBookingWindows } from "@/features/booking/api/getBookingWindows";
 import { getEvents } from "@/features/event/api/getEvents";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { useBookingStore } from "./useBookingStore";
+import { useBookingSession } from "./useBookingSession";
 import { releaseReservation } from "../api/releaseReservation";
 import { getUserIdFromToken } from "@/shared/lib/jwt";
 import type { TierWindow } from "@/shared/types";
@@ -123,6 +122,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     setSeatTimerSecondsLeft,
     setQueueToken,
   } = useBookingStore();
+  const bookingSession = useBookingSession();
 
   // Fetch events list to derive artistId for this event
   const { data: events } = useQuery({
@@ -181,11 +181,9 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     if (!params.get("paymentFail")) return;
 
     window.history.replaceState({}, "", window.location.pathname);
-    sessionStorage.removeItem("urr:toss:booking");
-    sessionStorage.removeItem("urr:toss:reservations");
-    sessionStorage.removeItem("urr:toss:userId");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    bookingSession.clear();
     setPaymentFailed(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // showId derived from selectedDateId
@@ -238,18 +236,19 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
     );
   }, [seatsSummary, sectionPriceMap]);
 
-  // Build event object with real dates (keep mock metadata until event detail API is integrated)
+  // Build event object from real API data
   const event: BookingEvent | null = useMemo(() => {
     if (showsLoading || eventDates.length === 0) return null;
+    const meta = events?.find((e) => String(e.eventId) === String(eventId));
     return {
-      id: mockEvent.id,
-      title: mockEvent.title,
-      venue: mockEvent.venue,
-      poster: mockEvent.poster,
-      status: mockEvent.status,
+      id: String(eventId),
+      title: meta?.title ?? "",
+      venue: meta?.venueTemplateName ?? "",
+      poster: meta?.posterImageUrl ?? "",
+      status: meta?.active ? "open" : "closed",
       dates: eventDates,
     };
-  }, [showsLoading, eventDates]);
+  }, [showsLoading, eventDates, events, eventId]);
 
   const userTier = useMemo<TierLevel>(() => {
     const memberships = currentUser?.memberships ?? [];
@@ -267,7 +266,7 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
       );
 
     if (activeTiers.length === 0) {
-      return mockUser.tier;
+      return "MIST";
     }
 
     const tierRank: Record<TierLevel, number> = {

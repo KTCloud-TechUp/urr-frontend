@@ -6,7 +6,7 @@ import { ChevronLeft, MapPin } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { useBooking } from "@/features/booking/model/BookingContext";
 import { useCountdown } from "@/features/booking/model/useCountdown";
-import { formatCountdown, formatEventDateTime } from "@/shared/lib/format";
+import { formatCountdown, formatEventDateTime, formatDateTime } from "@/shared/lib/format";
 import { TierBadge } from "@/entities/user/ui/TierBadge";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -19,16 +19,6 @@ import { LeftPanelCollapsed } from "./LeftPanelCollapsed";
 const TIER_ORDER: TierLevel[] = ["LIGHTNING", "THUNDER", "CLOUD", "MIST"];
 
 
-function formatWindowDate(isoDate: string): string {
-  const d = new Date(isoDate);
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(d);
-}
 
 function TierScheduleRow({
   tier,
@@ -58,7 +48,7 @@ function TierScheduleRow({
           isOpen ? "text-success font-semibold" : "text-muted-foreground",
         )}
       >
-        {isOpen ? "오픈됨" : formatWindowDate(opensAt)}
+        {isOpen ? "오픈됨" : formatDateTime(opensAt)}
       </span>
     </div>
   );
