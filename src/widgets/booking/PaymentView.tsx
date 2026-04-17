@@ -12,7 +12,11 @@ import { usePaymentForm } from "@/features/booking/model/usePaymentForm";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { TimerDisplay } from "@/features/booking/ui/TimerDisplay";
 import { PriceDisplay } from "@/shared/ui/PriceDisplay";
-import { formatPrice, parseSeatDisplay, formatDateDot } from "@/shared/lib/format";
+import {
+  formatPrice,
+  parseSeatDisplay,
+  formatDateDot,
+} from "@/shared/lib/format";
 import { PAYMENT_METHODS } from "@/shared/lib/constants";
 import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 import { bookTicket } from "@/features/booking/api/bookTicket";
@@ -20,7 +24,10 @@ import { cancelReservation } from "@/features/booking/api/cancelReservation";
 import { createPaymentRecord } from "@/features/payment/api/createPaymentRecord";
 import { getTossPayments, TOSS_METHOD_MAP } from "@/features/payment/lib/toss";
 import { ApiError } from "@/shared/api/client";
-import { useBookingStore, type ReservationRef } from "@/features/booking/model/useBookingStore";
+import {
+  useBookingStore,
+  type ReservationRef,
+} from "@/features/booking/model/useBookingStore";
 import type { ConfirmationData } from "@/shared/types";
 import { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
 
@@ -42,6 +49,7 @@ export function PaymentView() {
     selectedSectionId,
     sectionsForDate,
     userTier,
+    tierWindows,
     transitionTo,
   } = useBooking();
 
@@ -72,8 +80,8 @@ export function PaymentView() {
     [sectionsForDate, selectedSectionId],
   );
 
-  const tierFee =
-    selectedDate?.bookingWindows.find((w) => w.tier === userTier)?.fee ?? 0;
+  const tierFee = tierWindows.find((w) => w.tier === userTier)?.fee ?? 0;
+  const hasUserTierWindow = tierWindows.some((w) => w.tier === userTier);
   const seatCount = selectedSeatIds.length;
   const subtotal = section ? section.price * seatCount : 0;
   const feeTotal = tierFee * seatCount;
@@ -115,20 +123,26 @@ export function PaymentView() {
       });
 
       // 선점 직후 refs 저장 — createPaymentRecord/requestPayment 실패 시에도 취소 가능
-      const reservationRefList: ReservationRef[] = [{
-        eventId: Number(eventId),
-        showId: Number(selectedDate.id),
-        seatIds: reservation.seatIds,
-        reservationIds: reservation.reservationIds,
-      }];
+      const reservationRefList: ReservationRef[] = [
+        {
+          eventId: Number(eventId),
+          showId: Number(selectedDate.id),
+          seatIds: reservation.seatIds,
+          reservationIds: reservation.reservationIds,
+        },
+      ];
       setReservations(reservationRefList, "");
 
-      const orderId = `res_${Date.now()}`;
+      const orderId = reservation.orderId;
+      const payableAmount = reservation.totalAmount;
 
       // orderId 확정 후 store·sessionStorage 갱신
       // — Toss 리다이렉트 후 JS 메모리 초기화되므로 sessionStorage 백업 필수
       setReservations(reservationRefList, orderId);
-      sessionStorage.setItem("urr:toss:reservations", JSON.stringify(reservationRefList));
+      sessionStorage.setItem(
+        "urr:toss:reservations",
+        JSON.stringify(reservationRefList),
+      );
 
       // Toss 결제창 띄우기 전, 백엔드에 orderId 사전 등록
       // — confirmPayment 시 이 orderId로 결제 레코드를 조회하므로 반드시 먼저 호출
@@ -137,7 +151,7 @@ export function PaymentView() {
         userId: currentUser?.userId ?? "",
         referenceId,
         orderId,
-        amount: total,
+        amount: payableAmount,
       });
 
       // Toss 리다이렉트 복귀 후 /booking/complete 페이지에서 복원에 사용
@@ -154,19 +168,25 @@ export function PaymentView() {
             tierFee,
           };
         }),
-        totalAmount: total,
+        totalAmount: payableAmount,
         bookedAt: new Date().toISOString(),
         eventTitle: event?.title ?? "",
         eventVenue: event?.venue ?? "",
         showDate: selectedDate?.date ?? "",
         userTier,
       };
-      sessionStorage.setItem("urr:toss:booking", JSON.stringify(confirmationData));
-      sessionStorage.setItem("urr:toss:userId", String(currentUser?.userId ?? ""));
+      sessionStorage.setItem(
+        "urr:toss:booking",
+        JSON.stringify(confirmationData),
+      );
+      sessionStorage.setItem(
+        "urr:toss:userId",
+        String(currentUser?.userId ?? ""),
+      );
 
       const tossPayments = await getTossPayments();
       await tossPayments.requestPayment(TOSS_METHOD_MAP[selectedMethod], {
-        amount: total,
+        amount: payableAmount,
         orderId,
         orderName: `${event?.title ?? "티켓"} ${seatCount}매`,
         successUrl: `${window.location.origin}/booking/complete`,
@@ -197,7 +217,6 @@ export function PaymentView() {
     buyerName,
     buyerPhone,
     selectedMethod,
-    total,
     event,
     seatCount,
     section,
@@ -292,10 +311,15 @@ export function PaymentView() {
                     {formatPrice(section?.price ?? 0)} × {seatCount}
                   </span>
                 </div>
-                {tierFee > 0 && (
+                {hasUserTierWindow && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground flex items-center gap-1">
-                      <Image src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
+                      <Image
+                        src={TIER_IMAGES[userTier]}
+                        width={16}
+                        height={16}
+                        alt=""
+                      />
                       <span>{TIER_LABELS[userTier]} 수수료</span>
                     </span>
                     <span className="tabular-nums">
@@ -498,7 +522,7 @@ export function PaymentView() {
                       {formatPrice(subtotal)}
                     </span>
                   </div>
-                  {feeTotal > 0 && (
+                  {hasUserTierWindow && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">수수료</span>
                       <span className="tabular-nums">

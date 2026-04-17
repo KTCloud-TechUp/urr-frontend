@@ -10,8 +10,15 @@ import {
   Loader2,
   ShieldCheck,
 } from "lucide-react";
-import { Button, Separator, PaymentDialog, PriceDisplay, FaceValueBadge } from "@/shared/ui";
+import {
+  Button,
+  Separator,
+  PaymentDialog,
+  PriceDisplay,
+  FaceValueBadge,
+} from "@/shared/ui";
 import { formatPrice, formatDateShort } from "@/shared/lib/format";
+import { confirmPayment } from "@/features/payment/api/confirmPayment";
 import { reserveTransferPost, confirmTransferPost } from "@/features/transfer";
 import type { Event, TransferListing, Membership } from "@/shared/types";
 
@@ -38,11 +45,13 @@ export function TransferPurchaseSidebar({
   const [isReserving, setIsReserving] = useState(false);
   const orderIdRef = useRef<string | null>(null);
 
-  // Toss 결제 성공 콜백: ?paymentKey=... 파라미터 감지 후 양도 confirm
+  // Toss 결제 성공 콜백: ?paymentKey=...&orderId=...&amount=... 파라미터 감지 후 결제 확인 → 양도 confirm
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const paymentKey = params.get("paymentKey");
+    const orderId = params.get("orderId");
+    const amount = params.get("amount");
     const paymentFail = params.get("paymentFail");
 
     if (paymentFail) {
@@ -51,7 +60,10 @@ export function TransferPurchaseSidebar({
       return;
     }
 
-    if (!paymentKey) return;
+    if (!paymentKey || !orderId || !amount) return;
+
+    const amountValue = Number(amount);
+    if (Number.isNaN(amountValue)) return;
 
     const raw = sessionStorage.getItem("urr:toss:transfer");
     if (!raw) return;
@@ -59,19 +71,32 @@ export function TransferPurchaseSidebar({
     sessionStorage.removeItem("urr:toss:transfer");
     window.history.replaceState({}, "", window.location.pathname);
 
-    const { orderId, storedUserId } = JSON.parse(raw) as { orderId: string; storedUserId: string };
+    const { storedUserId } = JSON.parse(raw) as {
+      orderId: string;
+      storedUserId: string;
+    };
 
     setStep("processing");
-    confirmTransferPost(orderId, paymentKey, storedUserId)
+    confirmPayment({
+      paymentKey,
+      orderId,
+      amount: amountValue,
+      userId: storedUserId,
+    })
+      .then(() => confirmTransferPost(orderId, paymentKey, storedUserId))
       .then(() => {
-        queryClient.invalidateQueries({ queryKey: ["transfer-posts", artistId] });
-        queryClient.invalidateQueries({ queryKey: ["transfer-post", listing.id] });
+        queryClient.invalidateQueries({
+          queryKey: ["transfer-posts", artistId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["transfer-post", listing.id],
+        });
         setStep("complete");
       })
       .catch(() => {
         setStep("complete"); // 낙관적 처리
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isMember = membership?.isActive === true;
@@ -105,7 +130,9 @@ export function TransferPurchaseSidebar({
       {step === "summary" && (
         <div className="p-6 space-y-4">
           <div>
-            <h4 className="font-semibold text-sm line-clamp-1">{listing.event.title}</h4>
+            <h4 className="font-semibold text-sm line-clamp-1">
+              {listing.event.title}
+            </h4>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
               <Calendar size={12} />
               <span>{dateStr}</span>
@@ -134,13 +161,23 @@ export function TransferPurchaseSidebar({
 
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold">총 결제 금액</span>
-            <span className="text-xl font-bold tabular-nums">{formatPrice(listing.price)}</span>
+            <span className="text-xl font-bold tabular-nums">
+              {formatPrice(listing.price)}
+            </span>
           </div>
 
           {isMember ? (
-            <Button className="w-full h-12" onClick={handlePaymentOpen} disabled={isReserving || !userId}>
-              {isReserving ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-              {isReserving ? '준비 중...' : '결제하기'}
+            <Button
+              className="w-full h-12"
+              onClick={handlePaymentOpen}
+              disabled={isReserving || !userId}
+            >
+              {isReserving ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <CreditCard size={16} />
+              )}
+              {isReserving ? "준비 중..." : "결제하기"}
             </Button>
           ) : (
             <div className="space-y-3">
@@ -180,14 +217,21 @@ export function TransferPurchaseSidebar({
         totalAmount={listing.price}
         onComplete={handlePaymentComplete}
         onCancel={() => setShowPaymentDialog(false)}
-        tossConfig={orderIdRef.current ? {
-          orderId: orderIdRef.current,
-          orderName: `${listing.event.title} 양도 티켓`,
-          successUrl: `${typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""}`,
-          failUrl: `${typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""}?paymentFail=1`,
-          storageKey: "urr:toss:transfer",
-          storageData: { orderId: orderIdRef.current, storedUserId: String(userId ?? "") },
-        } : undefined}
+        tossConfig={
+          orderIdRef.current
+            ? {
+                orderId: orderIdRef.current,
+                orderName: `${listing.event.title} 양도 티켓`,
+                successUrl: `${typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""}`,
+                failUrl: `${typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""}?paymentFail=1`,
+                storageKey: "urr:toss:transfer",
+                storageData: {
+                  orderId: orderIdRef.current,
+                  storedUserId: String(userId ?? ""),
+                },
+              }
+            : undefined
+        }
       />
 
       {/* Processing */}
@@ -217,7 +261,9 @@ export function TransferPurchaseSidebar({
           </div>
 
           <div className="rounded-lg border border-border bg-muted/30 p-3 w-full text-left">
-            <p className="text-sm font-semibold line-clamp-1">{listing.event.title}</p>
+            <p className="text-sm font-semibold line-clamp-1">
+              {listing.event.title}
+            </p>
             <p className="text-xs text-muted-foreground mt-0.5">
               {listing.section} · {listing.seatInfo}
             </p>

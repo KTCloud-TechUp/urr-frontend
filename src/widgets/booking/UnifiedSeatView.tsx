@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useMemo,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useBooking } from "@/features/booking/model/BookingContext";
@@ -19,7 +14,6 @@ import { TimerExpiryModal } from "./TimerExpiryModal";
 import { formatEventDateTime } from "@/shared/lib/format";
 import type { Seat, SeatStatus } from "@/shared/types";
 
-
 export function UnifiedSeatView() {
   const {
     eventId,
@@ -32,6 +26,7 @@ export function UnifiedSeatView() {
     selectedSeatIds,
     selectedDate,
     userTier,
+    tierWindows,
     maxSeats,
     selectSection,
     toggleSeat,
@@ -80,9 +75,20 @@ export function UnifiedSeatView() {
 
   // Fetch real seat availability for the selected section
   const { data: seatsData } = useQuery({
-    queryKey: ["seats-availability", eventId, showId, sectionTierCode, sectionZoneNo],
-    queryFn: () => getSeatsAvailability(eventId, showId!, sectionTierCode!, sectionZoneNo!),
-    enabled: isInSeatMode && showId !== null && sectionTierCode !== null && sectionZoneNo !== null,
+    queryKey: [
+      "seats-availability",
+      eventId,
+      showId,
+      sectionTierCode,
+      sectionZoneNo,
+    ],
+    queryFn: () =>
+      getSeatsAvailability(eventId, showId!, sectionTierCode!, sectionZoneNo!),
+    enabled:
+      isInSeatMode &&
+      showId !== null &&
+      sectionTierCode !== null &&
+      sectionZoneNo !== null,
     staleTime: 30_000,
     refetchOnWindowFocus: false,
   });
@@ -109,12 +115,15 @@ export function UnifiedSeatView() {
         sectionId: s.section,
         row: s.row,
         number: s.number,
-        status: (s.status === "AVAILABLE" && s.sellable ? "available" : "taken") as SeatStatus,
+        status: (s.status === "AVAILABLE" && s.sellable
+          ? "available"
+          : "taken") as SeatStatus,
       }));
   }, [seatsData]);
 
   const layout = useMemo(() => {
-    if (apiSeats.length === 0) return { rows: 0, seatsPerRow: 0, rowLabels: [] as string[] };
+    if (apiSeats.length === 0)
+      return { rows: 0, seatsPerRow: 0, rowLabels: [] as string[] };
     // row 고유값(순서 유지) → 실제 행 레이블, max(number) → 열 수
     const rowLabels = [...new Set(apiSeats.map((s) => s.row))];
     const seatsPerRow = Math.max(...apiSeats.map((s) => Number(s.number)));
@@ -243,7 +252,10 @@ export function UnifiedSeatView() {
               dimNonSelected={isInSeatMode}
               zoomedSectionId={isInSeatMode ? selectedSectionId : null}
               seatOverlay={
-                isInSeatMode && selectedSectionId && bbox && seats.length > 0 ? (
+                isInSeatMode &&
+                selectedSectionId &&
+                bbox &&
+                seats.length > 0 ? (
                   <SeatOverlay
                     seats={seats}
                     rows={layout.rows}
@@ -284,6 +296,7 @@ export function UnifiedSeatView() {
           onRemoveSeat={toggleSeat}
           section={section}
           selectedDate={selectedDate ?? null}
+          tierWindows={tierWindows}
           userTier={userTier}
           timerSeconds={timer.secondsLeft}
           onPay={handlePay}

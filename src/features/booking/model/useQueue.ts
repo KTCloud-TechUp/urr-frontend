@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { Section } from "@/shared/types";
-import { vwrAssign, vwrCheck, setEntryTokenCookie, checkQueue, pollQueue } from "../api/queue";
+import {
+  vwrAssign,
+  vwrCheck,
+  setEntryTokenCookie,
+  checkQueue,
+  pollQueue,
+} from "../api/queue";
 import type { QueuePhase } from "./useQueueSimulation";
 
 export type QueueError = "entry-failed" | "poll-failed" | null;
@@ -62,7 +68,10 @@ export function useQueue(
   }
 
   // --- Step 1~3: VWR 대기열 ---
-  const skipVwr = process.env.NEXT_PUBLIC_SKIP_VWR === "true";
+  const isLocalDev =
+    typeof window !== "undefined" &&
+    /^(localhost|127(\.0\.0\.1)?|0\.0\.0\.0)$/.test(window.location.hostname);
+  const skipVwr = process.env.NEXT_PUBLIC_SKIP_VWR === "true" || isLocalDev;
 
   const startVwr = useCallback(async () => {
     // 로컬 개발: VWR Lambda 없으면 Tier2 직접 진입
@@ -114,7 +123,7 @@ export function useQueue(
         setError("entry-failed");
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   // --- Step 4: Tier2 Queue ---
@@ -188,7 +197,10 @@ export function useQueue(
     };
   }, [startVwr]);
 
-  const totalRemaining = sectionsForDate.reduce((sum, s) => sum + s.remainingSeats, 0);
+  const totalRemaining = sectionsForDate.reduce(
+    (sum, s) => sum + s.remainingSeats,
+    0,
+  );
 
   const probability =
     totalRemaining > 0 && position > 0

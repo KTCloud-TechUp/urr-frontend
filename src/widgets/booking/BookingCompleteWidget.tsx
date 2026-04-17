@@ -74,18 +74,28 @@ export function BookingCompleteWidget() {
       ? (JSON.parse(rawReservations) as ReservationRef[])
       : [];
 
-    confirmPayment({ paymentKey, orderId, amount: Number(amount), userId: savedUserId })
+    confirmPayment({
+      paymentKey,
+      orderId,
+      amount: Number(amount),
+      userId: savedUserId,
+    })
       .then(async () => {
         // AWS 환경: SQS → Lambda가 예약 확정 처리 (프론트 직접 호출 불필요)
         // 로컬 환경: SQS 없으므로 프론트가 직접 confirm 호출
-        const isLocal = process.env.NEXT_PUBLIC_API_BASE_URL?.includes("localhost");
+        const isLocal =
+          process.env.NEXT_PUBLIC_API_BASE_URL?.includes("localhost");
         if (isLocal) {
-          const allReservationIds = restoredRefs.flatMap((ref) => ref.reservationIds ?? []);
+          const allReservationIds = restoredRefs.flatMap(
+            (ref) => ref.reservationIds ?? [],
+          );
           if (allReservationIds.length > 0) {
-            await confirmReservation({ reservationIds: allReservationIds, userId: savedUserId })
-              .catch(() => {
-                // 이미 확정된 예약이거나 백엔드가 내부 처리한 경우 — 무시
-              });
+            await confirmReservation({
+              reservationIds: allReservationIds,
+              userId: savedUserId,
+            }).catch(() => {
+              // 이미 확정된 예약이거나 백엔드가 내부 처리한 경우 — 무시
+            });
           }
         }
         setData(completeData);
@@ -95,8 +105,22 @@ export function BookingCompleteWidget() {
         // confirmPayment 자체가 실패한 경우만 에러 처리
         setPhase("error");
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    // 결제 완료 페이지에서 뒤로가기를 눌러도 예매 화면으로 돌아가지 않도록 처리
+    window.history.pushState(null, "", window.location.pathname);
+
+    const handlePopState = () => {
+      router.replace("/");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [router]);
 
   useEffect(() => {
     if (phase !== "success") return;
@@ -108,7 +132,10 @@ export function BookingCompleteWidget() {
     });
   }, [phase]);
 
-  const handleGoToWallet = useCallback(() => router.push("/my-page?tab=wallet"), [router]);
+  const handleGoToWallet = useCallback(
+    () => router.push("/my-page?tab=wallet"),
+    [router],
+  );
   const handleGoHome = useCallback(() => router.push("/"), [router]);
 
   const ticketSubtotal = useMemo(
@@ -162,7 +189,9 @@ export function BookingCompleteWidget() {
         <div className="text-center space-y-2 animate-in fade-in duration-300">
           <p className="text-6xl">🎉</p>
           <h1 className="text-2xl font-bold">예매 완료!</h1>
-          <p className="text-sm text-muted-foreground">예매가 성공적으로 완료되었습니다</p>
+          <p className="text-sm text-muted-foreground">
+            예매가 성공적으로 완료되었습니다
+          </p>
         </div>
 
         {/* QR 코드 */}
@@ -227,12 +256,19 @@ export function BookingCompleteWidget() {
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">티켓 가격</span>
-              <span className="tabular-nums">{formatPrice(ticketSubtotal)}</span>
+              <span className="tabular-nums">
+                {formatPrice(ticketSubtotal)}
+              </span>
             </div>
-            {feeSubtotal > 0 && data.userTier && (
+            {data.userTier && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground flex items-center gap-1">
-                  <Image src={TIER_IMAGES[data.userTier]} width={16} height={16} alt="" />
+                  <Image
+                    src={TIER_IMAGES[data.userTier]}
+                    width={16}
+                    height={16}
+                    alt=""
+                  />
                   <span>{TIER_LABELS[data.userTier]} 수수료</span>
                 </span>
                 <span className="tabular-nums">{formatPrice(feeSubtotal)}</span>
@@ -249,14 +285,21 @@ export function BookingCompleteWidget() {
           <div className="pt-2 border-t border-border">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">예매번호</span>
-              <span className="text-xs font-mono tabular-nums">{data.bookingId}</span>
+              <span className="text-xs font-mono tabular-nums">
+                {data.bookingId}
+              </span>
             </div>
           </div>
         </div>
 
         {/* 버튼 */}
         <div className="flex gap-3">
-          <Button variant="ghost" size="lg" className="flex-1" onClick={handleGoHome}>
+          <Button
+            variant="ghost"
+            size="lg"
+            className="flex-1"
+            onClick={handleGoHome}
+          >
             홈으로 돌아가기
           </Button>
           <Button size="lg" className="flex-1" onClick={handleGoToWallet}>
