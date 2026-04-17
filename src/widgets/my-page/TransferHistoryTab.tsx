@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/dialog'
-import { formatPrice } from '@/shared/lib/format'
+import { formatPrice, formatDateShort, formatDateNumeric } from '@/shared/lib/format'
 import type { MyTransferRecord } from '@/shared/lib/mocks/my-page'
 import type { Event } from '@/shared/types'
 
@@ -180,13 +180,7 @@ interface TransferHistoryCardProps {
 
 function TransferHistoryCard({ record, onEdit, onCancel }: TransferHistoryCardProps) {
   const firstDate = record.event.dates[0]?.date ?? ''
-  const dateStr = firstDate
-    ? new Date(firstDate).toLocaleDateString('ko-KR', {
-        month: 'long',
-        day: 'numeric',
-        weekday: 'short',
-      })
-    : ''
+  const dateStr = firstDate ? formatDateShort(firstDate) : ''
 
   const netPayout = record.price - record.platformFee
   const isListed = record.status === 'listed' && record.role === 'seller'
@@ -271,11 +265,7 @@ function TransferHistoryCard({ record, onEdit, onCancel }: TransferHistoryCardPr
 
       {/* Date */}
       <p className="text-xs text-muted-foreground">
-        {new Date(record.createdAt).toLocaleDateString('ko-KR', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        })}
+        {formatDateNumeric(record.createdAt)}
       </p>
     </div>
   )

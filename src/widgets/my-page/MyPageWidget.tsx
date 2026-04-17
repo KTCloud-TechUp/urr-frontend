@@ -9,7 +9,6 @@ import { TicketWalletTab } from "./TicketWalletTab";
 import { TransferHistoryTab } from "./TransferHistoryTab";
 import { SettingsTab } from "./SettingsTab";
 import { MyPageSkeleton } from "./MyPageSkeleton";
-import { mockUser } from "@/shared/lib/mocks/user";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import {
   useMemberships,
@@ -45,11 +44,17 @@ export function MyPageWidget() {
   const { data: memberships = [], isLoading: isMembershipsLoading } =
     useMemberships();
   const displayUser: User = {
-    ...mockUser,
-    name: meData?.nickname ?? mockUser.name,
-    email: meData?.email ?? mockUser.email,
-    memberships,
+    id: String(meData?.userId ?? ""),
+    name: meData?.nickname ?? meData?.name ?? "",
+    email: meData?.email ?? "",
+    avatar: "",
     tier: deriveTopTier(memberships),
+    phoneNumber: meData?.phoneNumber ?? "",
+    birthDate: "",
+    gender: "male",
+    authProvider: "kakao",
+    memberships,
+    followedArtistIds: [],
   };
   const { tickets, isLoading: isTicketsLoading } = useMyReservations(
     meData?.userId,

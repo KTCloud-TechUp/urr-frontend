@@ -17,12 +17,12 @@ interface MembershipIntroStepProps {
 
 const TIER_ORDER: TierLevel[] = ["LIGHTNING", "THUNDER", "CLOUD", "MIST"];
 
-function formatOffset(minutes: number): string {
+function formatTimeLabel(minutes: number): string {
   if (minutes === 0) return "최우선 오픈";
-  if (minutes < 60) return `일반예매 ${minutes}분 전 오픈`;
-  if (minutes % (60 * 24) === 0) return `일반예매 ${minutes / (60 * 24)}일 전 오픈`;
-  if (minutes % 60 === 0) return `일반예매 ${minutes / 60}시간 전 오픈`;
-  return `일반예매 ${minutes}분 전 오픈`;
+  if (minutes < 60) return `${minutes}분 먼저`;
+  if (minutes % (60 * 24) === 0) return `${minutes / (60 * 24)}일 먼저`;
+  if (minutes % 60 === 0) return `${minutes / 60}시간 먼저`;
+  return `${minutes}분 먼저`;
 }
 
 export function MembershipIntroStep({
@@ -37,7 +37,12 @@ export function MembershipIntroStep({
 
   const policyMap = Object.fromEntries(
     (policies ?? []).map((p) => [p.tier, p]),
-  ) as Partial<Record<TierLevel, import("../api/getMembershipPolicies").MembershipTierPolicy>>;
+  ) as Partial<
+    Record<
+      TierLevel,
+      import("../api/getMembershipPolicies").MembershipTierPolicy
+    >
+  >;
 
   return (
     <div className="space-y-8">
@@ -87,8 +92,7 @@ export function MembershipIntroStep({
             <thead>
               <tr className="bg-muted/50">
                 <th className="text-left px-4 py-3 font-semibold">티어</th>
-                <th className="text-left px-4 py-3 font-semibold">예매</th>
-                <th className="text-left px-4 py-3 font-semibold">선예매 시점</th>
+                <th className="text-left px-4 py-3 font-semibold">우선순위</th>
                 <th className="text-left px-4 py-3 font-semibold">
                   예매 수수료
                 </th>
@@ -100,6 +104,7 @@ export function MembershipIntroStep({
             <tbody>
               {TIER_ORDER.map((tier, idx) => {
                 const policy = policyMap[tier];
+                const isPresale = policy?.bookingType === "PRESALE";
                 return (
                   <tr
                     key={tier}
@@ -108,15 +113,18 @@ export function MembershipIntroStep({
                     <td className="px-4 py-3">
                       <TierBadge tier={tier} size="sm" />
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {policy
-                        ? policy.bookingType === "PRESALE"
-                          ? "선예매"
-                          : "일반 예매"
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {policy ? formatOffset(policy.presaleOffsetMinutes) : "—"}
+                    <td className="px-4 py-3">
+                      {!policy ? (
+                        <span className="text-muted-foreground">—</span>
+                      ) : isPresale ? (
+                        <span className="text-sm text-muted-foreground">
+                          {formatTimeLabel(policy.presaleOffsetMinutes)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">
+                          일반예매
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {policy

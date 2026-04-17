@@ -9,6 +9,7 @@ import { Input } from '@/shared/ui/input'
 import { TierBadge } from '@/entities/user'
 import { getArtistGradient } from '@/shared/lib/mocks/home'
 import { cn } from '@/shared/lib/utils'
+import { formatDateNumeric } from '@/shared/lib/format'
 import type { Membership, TierLevel } from '@/shared/types'
 import { TIER_LABELS } from '@/shared/types'
 
@@ -52,13 +53,7 @@ export function MembershipCard({
   const [isEditingNickname, setIsEditingNickname] = useState(false)
   const [nicknameInput, setNicknameInput] = useState(membership.nickname)
 
-  const expiryDate = membership.expiresAt
-    ? new Date(membership.expiresAt).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      })
-    : '-'
+  const expiryDate = membership.expiresAt ? formatDateNumeric(membership.expiresAt) : '-'
 
   const gradient = getArtistGradient(membership.artistId)
 
