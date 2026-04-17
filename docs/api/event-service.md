@@ -2,7 +2,7 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-eventService
 >
-> 마지막 확인: 2026-04-14 / 마지막 수정: 2026-04-14
+> 마지막 확인: 2026-04-17 / 마지막 수정: 2026-04-17
 
 | #   | API                                 | 메서드 | 엔드포인트                                                          | 연동 파일                                          | 상태      | 비고                                                                      |
 | --- | ----------------------------------- | ------ | ------------------------------------------------------------------- | -------------------------------------------------- | --------- | ------------------------------------------------------------------------- |
@@ -36,7 +36,7 @@
 | 28  | 공연 회차 상세 조회                 | GET    | `/api/v1/shows/{eventId}/shows/{showId}`                            | `features/show/api/getShowDetail.ts`               | ✅ 연동됨 |                                                                           |
 | 29  | 공연 회차 좌석 메타데이터 조회      | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seatmap`                    | —                                                  | ➖ 불필요 | VenueMap이 하드코딩 SVG — UI 연결점 없음                                  |
 | 30  | 회차별 가격/구역 정책 조회          | GET    | `/api/v1/shows/{showId}/sections`                                   | `features/show/api/getSections.ts`                 | ✅ 연동됨 | BookingContext에서 구역별 실제 가격 사용 (기존 TIER_PRICES 하드코딩 대체) |
-| 31  | 공연 회차 좌석 카탈로그 조회        | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats`                      | `features/show/api/getShowSeats.ts`                | ✅ 연동됨 | seatId 형식: `{tier}-{zoneNo}-{row}-{number}` (예: `VIP-1-3-1`)           |
+| 31  | 공연 회차 좌석 카탈로그 조회        | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats`                      | `features/show/api/getShowSeats.ts`                | ✅ 연동됨 | seatId 형식: `{tier}-{zoneNo}-{row}-{number}` (예: `VIP-1-3-1`); `section` query param 추가 |
 | 32  | 잔여석 전체 요약 조회               | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/summary`              | `features/booking/api/getSeatsSummary.ts`          | ✅ 연동됨 |                                                                           |
 | 33  | 특정 티어/구역 예매 가능 좌석 조회  | GET    | `/api/v1/shows/{eventId}/shows/{showId}/seats/availability`         | `features/booking/api/getSeatsAvailability.ts`     | ✅ 연동됨 |                                                                           |
 | 34  | 회차별 멤버십 예매 오픈 시간표 조회 | GET    | `/api/v1/shows/{eventId}/shows/{showId}/booking-windows`            | `features/booking/api/getBookingWindows.ts`        | ✅ 연동됨 |                                                                           |
@@ -2016,6 +2016,10 @@ X-User-Role: ADMIN
 
 - `eventId`: 공연 ID
 - `showId`: 회차 ID
+
+### Query 파라미터
+
+- `section` (optional): 구역 코드로 필터링 (예: `VIP`, `S`). 대소문자 무관 (백엔드에서 toUpperCase 처리)
 
 ### Body
 

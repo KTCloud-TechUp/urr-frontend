@@ -2,7 +2,7 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-communityService
 >
-> 마지막 확인: 2026-04-14 / 마지막 수정: 2026-04-14
+> 마지막 확인: 2026-04-17 / 마지막 수정: 2026-04-17
 
 | #   | API                              | 메서드 | 엔드포인트                             | 연동 파일                                                         | 상태      | 비고 |
 | --- | -------------------------------- | ------ | -------------------------------------- | ----------------------------------------------------------------- | --------- | ---- |
@@ -10,7 +10,7 @@
 | 0-2 | Ops Health Check                 | GET    | `/health`                              | —                                                                 | ➖ 불필요 |      |
 | 1-1 | 양도 게시글 등록                 | POST   | `/api/v1/transfers/posts`              | `features/transfer/api/getTransferPosts.ts` (createTransferPost)  | ✅ 연동됨 |      |
 | 1-2 | 양도 게시글 상세 조회            | GET    | `/api/v1/transfers/posts/{id}`         | `features/transfer/api/getTransferPosts.ts` (getTransferPostById) | ✅ 연동됨 |      |
-| 1-3 | 양도 게시글 목록 조회            | GET    | `/api/v1/transfers/posts`              | `features/transfer/api/getTransferPosts.ts` (getTransferPosts)    | ✅ 연동됨 |      |
+| 1-3 | 양도 게시글 목록 조회            | GET    | `/api/v1/transfers/posts`              | `features/transfer/api/getTransferPosts.ts` (getTransferPosts)    | ✅ 연동됨 | Response에 `sellerTradeCount` 필드 추가 |
 | 1-4 | 양도 게시글 삭제                 | DELETE | `/api/v1/transfers/posts/{id}`         | `features/transfer/api/getTransferPosts.ts` (deleteTransferPost)  | ✅ 연동됨 |      |
 | 1-5 | 양도 게시글 예매(결제요청)       | POST   | `/api/v1/transfers/posts/{id}/reserve` | `features/transfer/api/getTransferPosts.ts` (reserveTransferPost) | ✅ 연동됨 |      |
 | 1-6 | 양도 게시글 예매 확정(결제 확정) | POST   | `/api/v1/transfers/posts/confirm`      | `features/transfer/api/getTransferPosts.ts` (confirmTransferPost) | ✅ 연동됨 |      |
@@ -248,6 +248,7 @@ GET /api/v1/transfers/posts?artistId=10&showId=20&page=0&size=10
         "faceValue": 150000,
         "sellingPrice": 145000,
         "sellerTier": "PLATINUM",
+        "sellerTradeCount": 3,
         "status": "LISTED",
         "createdAt": "2026-03-26T20:00:00"
       }
