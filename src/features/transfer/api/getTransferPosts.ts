@@ -1,5 +1,10 @@
 import { apiRequest } from "@/shared/api/client";
-import type { TransferListing, TransferStatus, TierLevel, Event } from "@/shared/types";
+import type {
+  TransferListing,
+  TransferStatus,
+  TierLevel,
+  Event,
+} from "@/shared/types";
 
 export type EnrichedTransfer = TransferListing & { event: Event };
 
@@ -14,6 +19,7 @@ interface TransferPostItem {
   faceValue: number;
   sellingPrice: number;
   sellerTier: string;
+  sellerTradeCount: number;
   status: string;
   createdAt: string;
 }
@@ -51,7 +57,7 @@ function mapToEnrichedTransfer(item: TransferPostItem): EnrichedTransfer {
     eventId: String(item.showId),
     sellerId: "",
     sellerTier: toTierLevel(item.sellerTier),
-    sellerTransactionCount: 0,
+    sellerTransactionCount: item.sellerTradeCount,
     price: item.sellingPrice,
     faceValue: item.faceValue,
     section: item.section,
@@ -98,8 +104,13 @@ interface TransferPostDetail {
   createdAt: string;
 }
 
-function mapDetailToEnrichedTransfer(item: TransferPostDetail): EnrichedTransfer {
-  const seatParts = [item.rowInfo && `${item.rowInfo}열`, item.seatNumber && `${item.seatNumber}번`]
+function mapDetailToEnrichedTransfer(
+  item: TransferPostDetail,
+): EnrichedTransfer {
+  const seatParts = [
+    item.rowInfo && `${item.rowInfo}열`,
+    item.seatNumber && `${item.seatNumber}번`,
+  ]
     .filter(Boolean)
     .join(" ");
 
@@ -145,10 +156,10 @@ export async function getTransferPostById(
     headers["X-User-Id"] = String(userId);
   }
 
-  const res = await apiRequest<{ isSuccess: boolean; data: TransferPostDetail }>(
-    `/transfers/posts/${id}`,
-    { service: "community", headers },
-  );
+  const res = await apiRequest<{
+    isSuccess: boolean;
+    data: TransferPostDetail;
+  }>(`/transfers/posts/${id}`, { service: "community", headers });
 
   return mapDetailToEnrichedTransfer(res.data.data);
 }
@@ -200,7 +211,12 @@ export async function createTransferPost(
     method: "POST",
     service: "community",
     headers: { "X-User-Id": String(userId) },
-    body: { artistId: Number(artistId), eventId: Number(eventId), showId: Number(showId), reservationId },
+    body: {
+      artistId: Number(artistId),
+      eventId: Number(eventId),
+      showId: Number(showId),
+      reservationId,
+    },
   });
 }
 

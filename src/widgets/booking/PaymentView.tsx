@@ -217,7 +217,6 @@ export function PaymentView() {
     buyerName,
     buyerPhone,
     selectedMethod,
-    total,
     event,
     seatCount,
     section,

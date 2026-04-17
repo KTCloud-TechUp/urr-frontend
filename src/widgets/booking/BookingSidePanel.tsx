@@ -50,7 +50,6 @@ export function BookingSidePanel({
   maxSeats,
   onRemoveSeat,
   section,
-  selectedDate,
   tierWindows,
   userTier,
   timerSeconds,
