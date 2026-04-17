@@ -131,6 +131,7 @@ export function MyPageWidget() {
             tickets={tickets}
             user={displayUser}
             userId={meData?.userId}
+            salesRecords={salesRecords}
           />
         </TabsContent>
 
