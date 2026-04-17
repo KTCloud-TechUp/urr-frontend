@@ -102,7 +102,9 @@ export function useQueue(
             // 대기 표시 업데이트
             setPreviousPosition(position);
             setPosition(result.ahead);
-            setTotalInQueue(result.totalInQueue);
+            // VWR 응답에 currentlyWaiting 있으면 우선 사용 (실시간 감소).
+            // 없으면 totalInQueue로 fallback (백엔드 미배포 환경 호환).
+            setTotalInQueue(result.currentlyWaiting ?? result.totalInQueue);
             setWaitTimeSec(result.estimatedWait ?? null);
             // 적응형 폴링
             const nextPollMs = (result.nextPoll ?? 5) * 1000;
