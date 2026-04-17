@@ -14,10 +14,12 @@
   - `totalAmount` = 티켓 가격 합계 + 수수료 합계로 올바르게 계산하여 응답해야 함
   - 우선순위: 🔴 긴급
 
-- `POST /api/v1/transfers/posts` 양도 등록 API에 `sellingPrice` 필드 추가 요청
-  - 현재 프론트는 양도 가격 입력과 수수료/예상 수령액을 계산하여 보여주지만, 실제 등록 요청에는 가격 정보가 포함되지 않음
-  - 백엔드에서 양도 판매가를 받도록 API 계약을 명확히 해야 하며, 수수료/수령액 계산 로직도 서버 측에서 일관되게 처리 필요
-  - 우선순위: 🟡 보통
+- `POST /api/v1/ticket/reservations/cancel` 500 Internal Server Error 수정 요청
+  - 마이페이지에서 예매 취소 시 500 응답 반환
+  - 프론트는 스펙대로 `{ eventId, showId, seatId }` body + `X-User-Id` 헤더 전송 (형식 이상 없음)
+  - 예상 원인: ① 이미 CONFIRMED(결제완료) 상태인 예약 취소 시 내부 로직 미처리 ② DB에 저장된 seatId 형식과 프론트 전송값 불일치 ③ `X-User-Id` Long 파싱 오류
+  - 백엔드 서버 로그 확인 및 원인 파악 요청
+  - 우선순위: 🔴 긴급
 
 ---
 

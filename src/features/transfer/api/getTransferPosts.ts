@@ -200,14 +200,22 @@ export async function confirmTransferPost(
   });
 }
 
+export interface CreateTransferPostResult {
+  id: number;
+  sellingPrice: number;
+  sellerExpectedAmount: number;
+  feeRate: number;
+  feeAmount: number;
+}
+
 export async function createTransferPost(
   userId: number | string,
   artistId: number | string,
   eventId: number | string,
   showId: number | string,
   reservationId: string,
-): Promise<void> {
-  await apiRequest("/transfers/posts", {
+): Promise<CreateTransferPostResult> {
+  const res = await apiRequest<{ isSuccess: boolean; data: CreateTransferPostResult }>("/transfers/posts", {
     method: "POST",
     service: "community",
     headers: { "X-User-Id": String(userId) },
@@ -218,6 +226,7 @@ export async function createTransferPost(
       reservationId,
     },
   });
+  return res.data.data;
 }
 
 export async function updateTransferPost(

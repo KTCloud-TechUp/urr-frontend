@@ -12,11 +12,13 @@ import { TransferListingModal } from './TransferListingModal'
 import { CancelBookingDialog } from './CancelBookingDialog'
 import { cancelReservation } from '@/features/booking/api/cancelReservation'
 import type { Ticket, Event, TierLevel, User } from '@/shared/types'
+import type { MyTransferRecord } from '@/shared/lib/mocks/my-page'
 
 interface TicketWalletTabProps {
   tickets: (Ticket & { event: Event })[]
   user: User
   userId?: number | string
+  salesRecords?: (MyTransferRecord & { event: Event })[]
 }
 
 function getEffectiveTier(user: User, artistId: string): TierLevel {
@@ -26,13 +28,25 @@ function getEffectiveTier(user: User, artistId: string): TierLevel {
   return membership?.tier ?? user.tier
 }
 
-export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps) {
+function buildListedKeys(records: (MyTransferRecord & { event: Event })[] = []): Set<string> {
+  const keys = new Set<string>()
+  for (const r of records) {
+    if (r.status !== 'listed') continue
+    const match = r.seatInfo.match(/(\S+)열 (\S+)번/)
+    if (match) keys.add(`${r.section}-${match[1]}-${match[2]}`)
+  }
+  return keys
+}
+
+export function TicketWalletTab({ tickets, user, userId, salesRecords }: TicketWalletTabProps) {
   const queryClient = useQueryClient()
 
   const [selectedTicket, setSelectedTicket] = useState<(Ticket & { event: Event }) | null>(null)
   const [transferTicket, setTransferTicket] = useState<(Ticket & { event: Event }) | null>(null)
   const [cancelTicket, setCancelTicket] = useState<(Ticket & { event: Event }) | null>(null)
-  const [listedTicketIds, setListedTicketIds] = useState<Set<string>>(new Set())
+  const [listedTicketIds, setListedTicketIds] = useState<Set<string>>(
+    () => buildListedKeys(salesRecords),
+  )
 
   const upcoming = tickets.filter((t) => t.isUpcoming)
   const past = tickets.filter((t) => !t.isUpcoming)
@@ -47,8 +61,14 @@ export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps)
   })
 
   const handleListed = useCallback((ticketId: string, _: number) => {
-    setListedTicketIds((prev) => new Set(prev).add(ticketId))
-  }, [])
+    const ticket = tickets.find((t) => t.id === ticketId)
+    setListedTicketIds((prev) => {
+      const next = new Set(prev)
+      next.add(ticketId)
+      if (ticket) next.add(`${ticket.section}-${ticket.row}-${ticket.seatNumber}`)
+      return next
+    })
+  }, [tickets])
 
   const handleCancelTransfer = useCallback((ticketId: string) => {
     if (window.confirm('양도 등록을 취소하시겠습니까?')) {
@@ -94,18 +114,22 @@ export function TicketWalletTab({ tickets, user, userId }: TicketWalletTabProps)
           <section>
             <h3 className="text-base font-semibold mb-3">다가오는 공연</h3>
             <div className="space-y-3">
-              {upcoming.map((ticket) => (
-                <TicketCard
-                  key={ticket.id}
-                  ticket={ticket}
-                  variant="upcoming"
-                  isListed={listedTicketIds.has(ticket.id)}
-                  onViewQR={() => setSelectedTicket(ticket)}
-                  onTransfer={() => setTransferTicket(ticket)}
-                  onCancelTransfer={() => handleCancelTransfer(ticket.id)}
-                  onCancelBooking={() => setCancelTicket(ticket)}
-                />
-              ))}
+              {upcoming.map((ticket) => {
+                const seatKey = `${ticket.section}-${ticket.row}-${ticket.seatNumber}`
+                const isListed = listedTicketIds.has(ticket.id) || listedTicketIds.has(seatKey)
+                return (
+                  <TicketCard
+                    key={ticket.id}
+                    ticket={ticket}
+                    variant="upcoming"
+                    isListed={isListed}
+                    onViewQR={() => setSelectedTicket(ticket)}
+                    onTransfer={() => setTransferTicket(ticket)}
+                    onCancelTransfer={() => handleCancelTransfer(ticket.id)}
+                    onCancelBooking={() => setCancelTicket(ticket)}
+                  />
+                )
+              })}
             </div>
           </section>
         )}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { Calendar, MapPin, CheckCircle2, Loader2 } from "lucide-react";
 import { createTransferPost } from "@/features/transfer";
+import type { CreateTransferPostResult } from "@/features/transfer";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,8 @@ export function TransferListingModal({
 }: TransferListingModalProps) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("confirm");
+  const [apiResult, setApiResult] = useState<CreateTransferPostResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -47,9 +50,20 @@ export function TransferListingModal({
         ticket!.showId ?? ticket!.event.dates[0]?.id ?? "0",
         ticket!.id,
       ),
-    onSuccess: () => {
-      onListed(ticket!.id, transferPrice);
+    onSuccess: (result) => {
+      setApiResult(result);
+      setErrorMessage(null);
+      onListed(ticket!.id, result.sellingPrice);
       setStep("success");
+    },
+    onError: async (err: unknown) => {
+      const { ApiError } = await import("@/shared/api/client");
+      if (err instanceof ApiError) {
+        const body = await err.response.json().catch(() => null);
+        setErrorMessage(body?.message ?? "양도 등록에 실패했습니다.");
+      } else {
+        setErrorMessage("양도 등록에 실패했습니다.");
+      }
     },
   });
 
@@ -148,6 +162,9 @@ export function TransferListingModal({
               </div>
             </div>
 
+            {errorMessage && (
+              <p className="text-sm text-destructive text-center">{errorMessage}</p>
+            )}
             <Button
               className="w-full"
               onClick={handleSubmit}
@@ -179,6 +196,22 @@ export function TransferListingModal({
                 아티스트의 양도 탭에서 등록 내역을 확인할 수 있습니다.
               </p>
             </div>
+            {apiResult && (
+              <div className="w-full rounded-lg border border-border p-4 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">판매가</span>
+                  <span className="tabular-nums">{formatPrice(apiResult.sellingPrice)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">수수료 ({apiResult.feeRate}%)</span>
+                  <span className="tabular-nums text-destructive">-{formatPrice(apiResult.feeAmount)}</span>
+                </div>
+                <div className="flex justify-between border-t border-border pt-2 font-semibold">
+                  <span>실수령액</span>
+                  <span className="tabular-nums">{formatPrice(apiResult.sellerExpectedAmount)}</span>
+                </div>
+              </div>
+            )}
             <div className="flex flex-col gap-2 w-full mt-2">
               <Button onClick={handleViewListing}>등록 내역 보기</Button>
               <Button variant="ghost" onClick={onClose}>
