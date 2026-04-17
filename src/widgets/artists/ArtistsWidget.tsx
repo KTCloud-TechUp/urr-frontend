@@ -1,11 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/shared/lib/utils";
 import { ScrollableRow } from "@/shared/ui";
 import { useArtists } from "@/features/artist";
+import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { getArtistGradient, newArtistCards } from "@/shared/lib/mocks/home";
 
 const labelBadgeStyle: Record<string, string> = {
@@ -22,8 +24,18 @@ export function ArtistsWidget() {
   const router = useRouter();
 
   const { data: artists = [], isLoading } = useArtists();
+  const { data: currentUser } = useCurrentUser();
 
   const rankingArtists = artists.slice(0, 10);
+  const activeMembershipArtistIds = useMemo(
+    () =>
+      new Set(
+        currentUser?.memberships
+          .filter((membership) => new Date(membership.endDate) > new Date())
+          .map((membership) => String(membership.artistId)) ?? [],
+      ),
+    [currentUser?.memberships],
+  );
 
   return (
     <div className="space-y-16">
@@ -59,7 +71,9 @@ export function ArtistsWidget() {
                   ) : (
                     <div
                       className="absolute inset-0 flex items-center justify-center text-sm text-white font-medium"
-                      style={{ background: getArtistGradient(String(artist.id)) }}
+                      style={{
+                        background: getArtistGradient(String(artist.id)),
+                      }}
                     >
                       {artist.name.charAt(0)}
                     </div>
@@ -191,16 +205,27 @@ export function ArtistsWidget() {
                       {artist.name}
                     </p>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      router.push(`/membership?artistId=${artist.id}`);
-                    }}
-                    className="shrink-0 px-3 py-1 rounded-full bg-foreground text-background text-[11px] font-semibold hover:bg-foreground/90 transition-colors cursor-pointer"
-                  >
-                    멤버십 가입
-                  </button>
+                  {activeMembershipArtistIds.has(String(artist.id)) ? (
+                    <button
+                      type="button"
+                      className="shrink-0 px-3 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-semibold cursor-default"
+                      disabled
+                    >
+                      가입중
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        router.push(`/membership?artistId=${artist.id}`);
+                      }}
+                      className="shrink-0 px-3 py-1 rounded-full bg-foreground text-background text-[11px] font-semibold hover:bg-foreground/90 transition-colors cursor-pointer"
+                    >
+                      멤버십 가입
+                    </button>
+                  )}
                 </Link>
               ))}
         </div>
