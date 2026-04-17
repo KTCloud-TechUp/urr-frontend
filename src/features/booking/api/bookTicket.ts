@@ -10,6 +10,7 @@ export interface BookTicketParams {
 }
 
 export interface BookTicketResponse {
+  orderId: string;
   reservationIds: string[];
   seatIds: string[];
   status: string;

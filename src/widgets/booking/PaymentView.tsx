@@ -81,6 +81,7 @@ export function PaymentView() {
   );
 
   const tierFee = tierWindows.find((w) => w.tier === userTier)?.fee ?? 0;
+  const hasUserTierWindow = tierWindows.some((w) => w.tier === userTier);
   const seatCount = selectedSeatIds.length;
   const subtotal = section ? section.price * seatCount : 0;
   const feeTotal = tierFee * seatCount;
@@ -132,7 +133,8 @@ export function PaymentView() {
       ];
       setReservations(reservationRefList, "");
 
-      const orderId = `res_${Date.now()}`;
+      const orderId = reservation.orderId;
+      const payableAmount = reservation.totalAmount;
 
       // orderId 확정 후 store·sessionStorage 갱신
       // — Toss 리다이렉트 후 JS 메모리 초기화되므로 sessionStorage 백업 필수
@@ -149,7 +151,7 @@ export function PaymentView() {
         userId: currentUser?.userId ?? "",
         referenceId,
         orderId,
-        amount: total,
+        amount: payableAmount,
       });
 
       // Toss 리다이렉트 복귀 후 /booking/complete 페이지에서 복원에 사용
@@ -166,7 +168,7 @@ export function PaymentView() {
             tierFee,
           };
         }),
-        totalAmount: total,
+        totalAmount: payableAmount,
         bookedAt: new Date().toISOString(),
         eventTitle: event?.title ?? "",
         eventVenue: event?.venue ?? "",
@@ -184,7 +186,7 @@ export function PaymentView() {
 
       const tossPayments = await getTossPayments();
       await tossPayments.requestPayment(TOSS_METHOD_MAP[selectedMethod], {
-        amount: total,
+        amount: payableAmount,
         orderId,
         orderName: `${event?.title ?? "티켓"} ${seatCount}매`,
         successUrl: `${window.location.origin}/booking/complete`,
@@ -310,7 +312,7 @@ export function PaymentView() {
                     {formatPrice(section?.price ?? 0)} × {seatCount}
                   </span>
                 </div>
-                {tierFee > 0 && (
+                {hasUserTierWindow && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground flex items-center gap-1">
                       <Image
@@ -521,7 +523,7 @@ export function PaymentView() {
                       {formatPrice(subtotal)}
                     </span>
                   </div>
-                  {feeTotal > 0 && (
+                  {hasUserTierWindow && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">수수료</span>
                       <span className="tabular-nums">

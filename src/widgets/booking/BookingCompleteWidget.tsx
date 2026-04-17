@@ -260,7 +260,7 @@ export function BookingCompleteWidget() {
                 {formatPrice(ticketSubtotal)}
               </span>
             </div>
-            {feeSubtotal > 0 && data.userTier && (
+            {data.userTier && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground flex items-center gap-1">
                   <Image

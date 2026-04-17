@@ -28,13 +28,8 @@ function formatEventDate(isoDate: string): string {
 }
 
 export function ConfirmationView() {
-  const {
-    event,
-    selectedDate,
-    userTier,
-    confirmationData,
-    resetBooking,
-  } = useBooking();
+  const { event, selectedDate, userTier, confirmationData, resetBooking } =
+    useBooking();
 
   const { setSidebar } = useLayout();
   const router = useRouter();
@@ -98,11 +93,7 @@ export function ConfirmationView() {
 
         {/* QR Code card */}
         <div className="bg-white rounded-2xl shadow-md p-8 flex flex-col items-center gap-4">
-          <QRCodeSVG
-            value={confirmationData.bookingId}
-            size={200}
-            level="M"
-          />
+          <QRCodeSVG value={confirmationData.bookingId} size={200} level="M" />
           <p className="text-xs text-muted-foreground font-mono tabular-nums">
             {confirmationData.bookingId}
           </p>
@@ -157,15 +148,18 @@ export function ConfirmationView() {
                 {formatPrice(ticketSubtotal)}
               </span>
             </div>
-            {feeSubtotal > 0 && (
+            {feeSubtotal >= 0 && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground flex items-center gap-1">
-                  <Image src={TIER_IMAGES[userTier]} width={16} height={16} alt="" />
+                  <Image
+                    src={TIER_IMAGES[userTier]}
+                    width={16}
+                    height={16}
+                    alt=""
+                  />
                   <span>{TIER_LABELS[userTier]} 수수료</span>
                 </span>
-                <span className="tabular-nums">
-                  {formatPrice(feeSubtotal)}
-                </span>
+                <span className="tabular-nums">{formatPrice(feeSubtotal)}</span>
               </div>
             )}
             <Separator />

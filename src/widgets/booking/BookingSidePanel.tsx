@@ -71,6 +71,7 @@ export function BookingSidePanel({
   const seatCount = selectedSeatIds.length;
   const hasSection = !!selectedSectionId && !!section;
   const tierFee = tierWindows.find((w) => w.tier === userTier)?.fee ?? 0;
+  const hasUserTierWindow = tierWindows.some((w) => w.tier === userTier);
   const subtotal = section ? section.price * seatCount : 0;
   const feeTotal = tierFee * seatCount;
   const total = subtotal + feeTotal;
@@ -292,7 +293,7 @@ export function BookingSidePanel({
               {formatPrice(section.price)} × {seatCount}
             </span>
           </div>
-          {tierFee > 0 && (
+          {hasUserTierWindow && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground flex items-center gap-1">
                 <Image
