@@ -182,7 +182,6 @@ export function BookingProvider({ eventId, children }: BookingProviderProps) {
 
     window.history.replaceState({}, "", window.location.pathname);
     bookingSession.clear();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPaymentFailed(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
