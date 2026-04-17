@@ -181,14 +181,14 @@
 
 | 항목 | 상태 | 비고 |
 | ---- | ---- | ---- |
-| `IdentityStep.tsx` 검증 유틸 추출 | 🔲 | 이름/생년월일/전화번호 검증 로직을 `features/auth/onboarding/lib/validators.ts`로 분리 |
-| `SearchWidget.tsx` 분리 (596줄) | 🔲 | `TrendingSection`, `SearchResults` 컴포넌트 분리 + `useSearchFilters()` 훅 추출 |
-| sessionStorage 직접 호출 훅으로 추출 | 🔲 | `PaymentView.tsx` 내 분산된 `sessionStorage` 호출을 `useBookingSession.ts`로 통합 |
+| `IdentityStep.tsx` 검증 유틸 추출 | ✅ | 이름/생년월일/전화번호 검증 로직을 `features/auth/onboarding/lib/validators.ts`로 분리 |
+| `SearchWidget.tsx` 분리 (596줄) | ✅ | `TrendingSection`, `SearchResults` 컴포넌트 분리 + `useSearchFilters()` 훅 추출 |
+| sessionStorage 직접 호출 훅으로 추출 | ✅ | `PaymentView.tsx` 내 분산된 `sessionStorage` 호출을 `useBookingSession.ts`로 통합 (BookingContext, BookingCompleteWidget도 적용) |
 
 ### Low Priority
 
 | 항목 | 상태 | 비고 |
 | ---- | ---- | ---- |
-| 날짜 포매터 통합 검토 | 🔲 | 7가지 포매터 중복 여부 점검 및 인라인 `Intl.DateTimeFormat` 제거 |
-| `ArtistHomeTab.tsx` 섹션 분리 (447줄) | 🔲 | 섹션별 서브컴포넌트 분리 |
-| Mock 데이터 환경 조건부 처리 | 🔲 | `MyPageWidget.tsx`, `BookingContext.tsx` 내 mock 데이터 → API 연동 or 개발환경 전용 처리 |
+| 날짜 포매터 통합 검토 | ✅ | `formatDateNumeric`, `formatDateTime` 추가. `BookingCompleteWidget`, `LeftPanel`, `MembershipCard`, `TransferHistoryTab` 인라인 제거 |
+| `ArtistHomeTab.tsx` 섹션 분리 (447줄) | ✅ | `MembershipSection`, `ArtistInfoSection`, `CommunitySection`, `EventsSection`, `TransferSection` 분리 |
+| Mock 데이터 환경 조건부 처리 | ✅ | `MyPageWidget`: `mockUser` 스프레드 제거 → API 데이터 직접 매핑. `BookingContext`: `mockEvent`/`mockUser` 제거 → `events` 리스트에서 실데이터 파생 |
