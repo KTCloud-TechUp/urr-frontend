@@ -18,6 +18,7 @@ import {
   useBookingStore,
   type ReservationRef,
 } from "@/features/booking/model/useBookingStore";
+import { useBookingSession } from "@/features/booking/model/useBookingSession";
 import type { ConfirmationData } from "@/shared/types";
 import { PaymentProcessingOverlay } from "./PaymentProcessingOverlay";
 import { PaymentConfirmPhase } from "./PaymentConfirmPhase";
@@ -47,6 +48,7 @@ export function PaymentView() {
 
   const { reservationRefs, setReservations } = useBookingStore();
   const { data: currentUser } = useCurrentUser();
+  const bookingSession = useBookingSession();
 
   const [phase, setPhase] = useState<PaymentPhase>("confirm-seats");
   const retryTimer = useSeatTimer(60);
@@ -127,13 +129,9 @@ export function PaymentView() {
       const orderId = reservation.orderId;
       const payableAmount = reservation.totalAmount;
 
-      // orderId 확정 후 store·sessionStorage 갱신
+      // orderId 확정 후 store 갱신
       // — Toss 리다이렉트 후 JS 메모리 초기화되므로 sessionStorage 백업 필수
       setReservations(reservationRefList, orderId);
-      sessionStorage.setItem(
-        "urr:toss:reservations",
-        JSON.stringify(reservationRefList),
-      );
 
       // Toss 결제창 띄우기 전, 백엔드에 orderId 사전 등록
       // — confirmPayment 시 이 orderId로 결제 레코드를 조회하므로 반드시 먼저 호출
@@ -166,12 +164,9 @@ export function PaymentView() {
         showDate: selectedDate?.date ?? "",
         userTier,
       };
-      sessionStorage.setItem(
-        "urr:toss:booking",
-        JSON.stringify(confirmationData),
-      );
-      sessionStorage.setItem(
-        "urr:toss:userId",
+      bookingSession.save(
+        reservationRefList,
+        confirmationData,
         String(currentUser?.userId ?? ""),
       );
 
@@ -188,9 +183,7 @@ export function PaymentView() {
       // requestPayment 는 성공 시 successUrl?paymentKey=...&orderId=...&amount=... 로 리다이렉트
       // — 이 이후 코드는 실행되지 않음
     } catch (err) {
-      sessionStorage.removeItem("urr:toss:booking");
-      sessionStorage.removeItem("urr:toss:reservations");
-      sessionStorage.removeItem("urr:toss:userId");
+      bookingSession.clear();
       if (err instanceof ApiError && err.status === 409) {
         setReservations([], "");
         setPhase("seats-taken");
@@ -215,6 +208,7 @@ export function PaymentView() {
     userTier,
     retryTimer,
     setReservations,
+    bookingSession,
   ]);
 
   const handleCancel = useCallback(() => {

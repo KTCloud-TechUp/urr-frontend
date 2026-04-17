@@ -10,34 +10,21 @@ import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
 import { confirmPayment } from "@/features/payment/api/confirmPayment";
 import { confirmReservation } from "@/features/booking/api/confirmReservation";
-import type { ReservationRef } from "@/features/booking/model/useBookingStore";
+import { useBookingSession } from "@/features/booking/model/useBookingSession";
 import type { ConfirmationData } from "@/shared/types";
 import { TierBadge } from "@/entities/user/ui/TierBadge";
 import { PriceDisplay } from "@/shared/ui/PriceDisplay";
-import { formatPrice } from "@/shared/lib/format";
+import { formatPrice, formatDateDot } from "@/shared/lib/format";
 import { TIER_IMAGES, TIER_LABELS } from "@/shared/types";
 
 type Phase = "loading" | "success" | "error";
-
-function formatEventDate(isoDate: string): string {
-  if (!isoDate) return "";
-  const d = new Date(isoDate);
-  if (isNaN(d.getTime())) return "";
-  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const w = weekdays[d.getDay()];
-  const h = String(d.getHours()).padStart(2, "0");
-  const min = String(d.getMinutes()).padStart(2, "0");
-  return `${y}.${m}.${day} (${w}) ${h}:${min}`;
-}
 
 export function BookingCompleteWidget() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("loading");
   const [data, setData] = useState<ConfirmationData | null>(null);
   const hasRun = useRef(false);
+  const bookingSession = useBookingSession();
 
   useEffect(() => {
     // React 18 Strict Mode에서 effect가 두 번 실행되는 것을 방지
@@ -54,25 +41,17 @@ export function BookingCompleteWidget() {
       return;
     }
 
-    // sessionStorage를 먼저 읽고 즉시 제거 — 이중 호출 시 두 번째 실행은 raw가 null
-    const raw = sessionStorage.getItem("urr:toss:booking");
-    const rawReservations = sessionStorage.getItem("urr:toss:reservations");
-    const savedUserId = sessionStorage.getItem("urr:toss:userId") ?? "";
-    sessionStorage.removeItem("urr:toss:booking");
-    sessionStorage.removeItem("urr:toss:reservations");
-    sessionStorage.removeItem("urr:toss:userId");
+    // sessionStorage를 먼저 읽고 즉시 제거 — 이중 호출 시 두 번째 실행은 null
+    const session = bookingSession.consume();
     window.history.replaceState({}, "", window.location.pathname);
 
-    if (!raw) {
+    if (!session) {
       // 이미 처리됐거나 직접 URL 접근 — 홈으로
       router.replace("/");
       return;
     }
 
-    const completeData = JSON.parse(raw) as ConfirmationData;
-    const restoredRefs: ReservationRef[] = rawReservations
-      ? (JSON.parse(rawReservations) as ReservationRef[])
-      : [];
+    const { confirmationData: completeData, reservationRefs: restoredRefs, userId: savedUserId } = session;
 
     confirmPayment({
       paymentKey,
@@ -214,7 +193,7 @@ export function BookingCompleteWidget() {
             {data.showDate && (
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Calendar size={14} className="shrink-0" />
-                <span>{formatEventDate(data.showDate)}</span>
+                <span>{formatDateDot(data.showDate)}</span>
               </div>
             )}
             {data.eventVenue && (
