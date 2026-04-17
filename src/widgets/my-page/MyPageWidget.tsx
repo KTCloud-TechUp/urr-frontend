@@ -79,11 +79,6 @@ export function MyPageWidget() {
     router.push(`/my-page?tab=${tab}`, { scroll: false });
   };
 
-  const handleUpdateUser = (updates: Partial<Pick<User, "name" | "email">>) => {
-    // TODO: PATCH /api/v1/user
-    void updates;
-  };
-
   const handleCancelMembership = (membershipId: string) => {
     const membership = memberships.find((m) => m.id === membershipId);
     if (!membership?.orderId) return;
@@ -144,7 +139,6 @@ export function MyPageWidget() {
         <TabsContent value="settings" className="pt-6">
           <SettingsTab
             user={displayUser}
-            onUpdateUser={handleUpdateUser}
             initialConsents={
               meData
                 ? {

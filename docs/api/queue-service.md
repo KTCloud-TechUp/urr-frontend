@@ -4,13 +4,14 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-queueService
 >
-> 마지막 확인: 2026-04-13
+> 마지막 확인: 2026-04-17 / 마지막 수정: 2026-04-17
 
 | # | API | 메서드 | 엔드포인트 | 연동 파일 | 상태 | 비고 |
 |---|-----|--------|-----------|----------|------|------|
 | 1 | 대기열 진입 및 확인 | POST | `/api/v1/queue/check/{showId}` | `features/booking/api/queue.ts` (checkQueue) | ✅ 연동됨 | |
 | 2 | 대기열 상태 폴링 | GET | `/api/v1/queue/{showId}` | `features/booking/api/queue.ts` (pollQueue) | ✅ 연동됨 | |
-| 3 | Health Check | GET | `/health` | — | ➖ 불필요 | |
+| 3 | 대기열 퇴장 | DELETE | `/api/v1/queue/{showId}` | — | ➖ 불필요 | 결제 완료 시 Lambda가 자동 처리 — 프론트 연동 불필요 |
+| 4 | Health Check | GET | `/health` | — | ➖ 불필요 | |
 
 ---
 
@@ -187,7 +188,44 @@ GET /api/v1/queue/{showId}
 
 ---
 
-## **3. 헬스 체크**
+## **3. 대기열 퇴장**
+
+### **API**
+
+```
+DELETE /api/v1/queue/{showId}
+```
+
+### **설명**
+
+결제 완료 후 유저를 active 대기열에서 제거합니다. **결제 시 Lambda가 자동으로 처리하므로 프론트엔드에서 별도 호출 불필요.**
+
+### **Path Variable**
+
+| 이름     | 타입 | 설명    |
+| -------- | ---- | ------- |
+| `showId` | Long | 공연 ID |
+
+### **요청 헤더**
+
+| 이름        | 타입 | 필수 | 설명                    |
+| ----------- | ---- | ---- | ----------------------- |
+| `X-User-Id` | Long | Y    | 현재 로그인한 사용자 ID |
+
+### **응답 예시**
+
+```json
+{
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "OK",
+  "data": null
+}
+```
+
+---
+
+## **4. 헬스 체크**
 
 ### **API**
 

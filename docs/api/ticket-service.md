@@ -2,12 +2,12 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-ticketService
 >
-> 마지막 확인: 2026-04-14
+> 마지막 확인: 2026-04-17 / 마지막 수정: 2026-04-17
 
 | #   | API                                      | 메서드 | 엔드포인트                                                      | 연동 파일                                       | 상태         | 비고                                                                                     |
 | --- | ---------------------------------------- | ------ | --------------------------------------------------------------- | ----------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------- |
-| 1   | 좌석 조회                                | GET    | `/api/v1/ticket/events/{eventId}/shows/{showId}/seats`          | —                                               | ❌ 미연동    | 코드는 event-service의 `/shows/.../seats/availability` 사용                              |
-| 2   | 다중 좌석 선점 + 예약 생성               | POST   | `/api/v1/ticket/reservations`                                   | `features/booking/api/bookTicket.ts`            | ✅ 연동됨    | `seatIds[]` 배열, response `{ reservationIds[], seatIds[], paymentId, ... }` 일치         |
+| 1   | 좌석 조회                                | GET    | `/api/v1/ticket/events/{eventId}/shows/{showId}/seats`          | —                                               | ➖ 불필요    | event-service `/seats/availability`로 커버됨. 실시간 선점 충돌(seatVersion) 필요 시 재검토 |
+| 2   | 다중 좌석 선점 + 예약 생성               | POST   | `/api/v1/ticket/reservations`                                   | `features/booking/api/bookTicket.ts`            | ✅ 연동됨    | `seatIds[]` 배열, response에 `orderId` 필드 추가됨                                       |
 | 3   | 예약 확정                                | POST   | `/api/v1/ticket/reservations/confirm`                           | `features/booking/api/confirmReservation.ts`    | ✅ 연동됨    | request `{ reservationIds[] }`, response `{ paymentId, reservations[] }` 일치            |
 | 4   | 결제 전 선점 상태 조회                   | GET    | `/api/v1/ticket/reservations/{reservationId}/hold-status`       | —                                               | ❌ 미연동    |                                                                                          |
 | 5   | 예약 만료 처리                           | POST   | `/api/v1/ticket/reservations/{reservationId}/expire`            | —                                               | ➖ 불필요    | 스케줄러 처리                                                                            |
@@ -168,6 +168,7 @@ POST /api/v1/ticket/reservations
     "status": "PENDING",
     "paymentStatus": "PENDING",
     "paymentId": 5001,
+    "orderId": "res_8f7184cb95a5",
     "totalAmount": 176000,
     "expiresAt": "2026-03-31T09:00:00"
   }
@@ -183,6 +184,7 @@ POST /api/v1/ticket/reservations
 | status         | ReservationStatus | `PENDING`           |
 | paymentStatus  | PaymentStatus     | `PENDING`           |
 | paymentId      | Long              | 생성된 결제 ID      |
+| orderId        | String            | 주문 번호 (Toss 결제용) |
 | totalAmount    | Long              | 총 결제 금액        |
 | expiresAt      | LocalDateTime     | 선점 만료 시각      |
 

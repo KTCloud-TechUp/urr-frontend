@@ -29,7 +29,6 @@ import type { User } from '@/shared/types'
 
 interface SettingsTabProps {
   user: User
-  onUpdateUser: (updates: Partial<Pick<User, 'name' | 'email'>>) => void
   initialConsents?: {
     marketingConsent: boolean
     pushConsent: boolean
@@ -37,7 +36,7 @@ interface SettingsTabProps {
   }
 }
 
-export function SettingsTab({ user, onUpdateUser, initialConsents }: SettingsTabProps) {
+export function SettingsTab({ user, initialConsents }: SettingsTabProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
 
@@ -110,7 +109,6 @@ export function SettingsTab({ user, onUpdateUser, initialConsents }: SettingsTab
       queryClient.setQueryData<AuthUser>(AUTH_ME_QUERY_KEY, (prev) =>
         prev ? { ...prev, name: editName } : prev,
       )
-      onUpdateUser({ name: editName })
       setIsEditing(false)
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 2000)

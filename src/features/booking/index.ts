@@ -9,7 +9,6 @@ export { useSeatTimer } from "./model/useSeatTimer";
 export { useSeatLockSimulation } from "./model/useSeatLockSimulation";
 export { useCountdown } from "./model/useCountdown";
 export { useNavigationBlock } from "./model/useNavigationBlock";
-export { usePaymentForm } from "./model/usePaymentForm";
 export { releaseReservation } from "./api/releaseReservation";
 export type { ReleaseReservationParams, ReleaseReservationResponse } from "./api/releaseReservation";
 export { VenueMap } from "./ui/VenueMap";
