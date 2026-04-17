@@ -27,6 +27,15 @@ function normalizeSectionCode(code: string): string {
   return code.replace(/-/g, "").toUpperCase();
 }
 
+function getTierFee(
+  show: { bookingWindows: { tier: TierLevel; fee: number }[] } | undefined,
+  userTier: TierLevel,
+) {
+  return (
+    show?.bookingWindows.find((window) => window.tier === userTier)?.fee ?? 0
+  );
+}
+
 export function useMyReservations(
   userId?: string | number,
   userTier: TierLevel = "MIST",
@@ -76,8 +85,7 @@ export function useMyReservations(
     const eventIndex = uniqueEventIds.indexOf(r.eventId);
     const shows = showResults[eventIndex]?.data ?? [];
     const show = shows.find((s) => s.showId === r.showId);
-    const tierFee =
-      show?.bookingWindows.find((window) => window.tier === userTier)?.fee ?? 0;
+    const tierFee = getTierFee(show, userTier);
 
     const event: Event = {
       id: String(r.eventId),
