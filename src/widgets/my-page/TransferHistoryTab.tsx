@@ -43,8 +43,7 @@ function TransferEditModal({ record, open, onClose, onSave, isPending }: Transfe
     onSave(record.id, newPrice)
   }
 
-  const faceValue = record?.faceValue ?? 0
-  const numPrice = parseInt(price, 10) || 0
+const numPrice = parseInt(price, 10) || 0
   const fee = Math.round(numPrice * 0.05)
   const payout = numPrice - fee
 
@@ -60,7 +59,7 @@ function TransferEditModal({ record, open, onClose, onSave, isPending }: Transfe
             {/* Event info */}
             <div className="rounded-lg bg-muted/50 p-3 space-y-1">
               <p className="text-sm font-semibold">{record.event.title}</p>
-              <p className="text-xs text-muted-foreground">{record.section} · {record.seatInfo}</p>
+              <p className="text-xs text-muted-foreground">{record.section} {record.seatInfo}</p>
             </div>
 
             {/* Price input */}
@@ -72,9 +71,6 @@ function TransferEditModal({ record, open, onClose, onSave, isPending }: Transfe
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="가격을 입력하세요"
               />
-              <p className="text-xs text-muted-foreground">
-                정가: {formatPrice(faceValue)}
-              </p>
             </div>
 
             {/* Price breakdown */}
@@ -142,7 +138,7 @@ function TransferCancelDialog({ record, open, onClose, onConfirm, isPending }: T
           <div className="space-y-5 pt-2">
             <div className="rounded-lg bg-muted/50 p-3 space-y-1">
               <p className="text-sm font-semibold">{record.event.title}</p>
-              <p className="text-xs text-muted-foreground">{record.section} · {record.seatInfo}</p>
+              <p className="text-xs text-muted-foreground">{record.section} {record.seatInfo}</p>
               <p className="text-xs text-muted-foreground">등록가: {formatPrice(record.price)}</p>
             </div>
 
@@ -176,9 +172,10 @@ interface TransferHistoryCardProps {
   record: MyTransferRecord & { event: Event }
   onEdit?: (record: MyTransferRecord & { event: Event }) => void
   onCancel?: (record: MyTransferRecord & { event: Event }) => void
+  dimmed?: boolean
 }
 
-function TransferHistoryCard({ record, onEdit, onCancel }: TransferHistoryCardProps) {
+function TransferHistoryCard({ record, onEdit, onCancel, dimmed }: TransferHistoryCardProps) {
   const firstDate = record.event.dates[0]?.date ?? ''
   const dateStr = firstDate ? formatDateShort(firstDate) : ''
 
@@ -186,7 +183,7 @@ function TransferHistoryCard({ record, onEdit, onCancel }: TransferHistoryCardPr
   const isListed = record.status === 'listed' && record.role === 'seller'
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className={`rounded-lg border border-border bg-card p-4 space-y-3${dimmed ? ' opacity-60' : ''}`}>
       {/* Header: event + status */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -228,7 +225,7 @@ function TransferHistoryCard({ record, onEdit, onCancel }: TransferHistoryCardPr
       </div>
 
       {/* Seat info */}
-      <p className="text-sm font-medium">{record.section} · {record.seatInfo}</p>
+      <p className="text-sm font-medium">{record.section} {record.seatInfo}</p>
 
       {/* Price breakdown */}
       <div className="flex items-center gap-4 text-sm">
@@ -284,8 +281,9 @@ export function TransferHistoryTab({ records, userId }: TransferHistoryTabProps)
   const [cancelTarget, setCancelTarget] = useState<(MyTransferRecord & { event: Event }) | null>(null)
   const [localRecords, setLocalRecords] = useState(records)
 
-  const sellerRecords = localRecords.filter((r) => r.role === 'seller')
-  const buyerRecords = localRecords.filter((r) => r.role === 'buyer')
+  const sellerRecords = localRecords.filter((r) => r.role === 'seller' && r.status !== 'cancelled')
+  const buyerRecords = localRecords.filter((r) => r.role === 'buyer' && r.status !== 'cancelled')
+  const cancelledRecords = localRecords.filter((r) => r.status === 'cancelled')
 
   const updateMutation = useMutation({
     mutationFn: ({ id, price }: { id: string; price: number }) =>
@@ -347,6 +345,18 @@ export function TransferHistoryTab({ records, userId }: TransferHistoryTabProps)
             <div className="space-y-3">
               {buyerRecords.map((r) => (
                 <TransferHistoryCard key={r.id} record={r} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Cancelled */}
+        {cancelledRecords.length > 0 && (
+          <section>
+            <h3 className="text-base font-semibold mb-3 text-muted-foreground">취소된 양도</h3>
+            <div className="space-y-3">
+              {cancelledRecords.map((r) => (
+                <TransferHistoryCard key={r.id} record={r} dimmed />
               ))}
             </div>
           </section>

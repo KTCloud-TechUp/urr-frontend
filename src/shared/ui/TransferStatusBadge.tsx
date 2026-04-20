@@ -6,14 +6,14 @@ const statusStyles: Record<TransferStatus, string> = {
   listed: 'bg-transfer-listed/10 text-transfer-listed',
   sold: 'bg-transfer-sold/10 text-transfer-sold',
   completed: 'bg-transfer-sold/10 text-transfer-sold',
-  cancelled: 'bg-muted text-muted-foreground',
+  cancelled: 'bg-destructive/10 text-destructive',
 }
 
 const dotStyles: Record<TransferStatus, string> = {
   listed: 'bg-transfer-listed',
   sold: 'bg-transfer-sold',
   completed: 'bg-transfer-sold',
-  cancelled: 'bg-muted-foreground',
+  cancelled: 'bg-destructive',
 }
 
 interface TransferStatusBadgeProps {

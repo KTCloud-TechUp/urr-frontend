@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Calendar, MapPin, CheckCircle2, Loader2 } from "lucide-react";
 import { createTransferPost } from "@/features/transfer";
 import type { CreateTransferPostResult } from "@/features/transfer";
@@ -37,6 +37,7 @@ export function TransferListingModal({
   onListed,
 }: TransferListingModalProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [step, setStep] = useState<Step>("confirm");
   const [apiResult, setApiResult] = useState<CreateTransferPostResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -54,6 +55,7 @@ export function TransferListingModal({
       setApiResult(result);
       setErrorMessage(null);
       onListed(ticket!.id, result.sellingPrice);
+      queryClient.invalidateQueries({ queryKey: ["my-transfer-sales"] });
       setStep("success");
     },
     onError: async (err: unknown) => {
@@ -99,7 +101,7 @@ export function TransferListingModal({
 
   function handleViewListing() {
     onClose();
-    router.push(`/artists/${ticket!.event.artistId}`);
+    router.push(`/my-page?tab=transfers`);
   }
 
   return (
