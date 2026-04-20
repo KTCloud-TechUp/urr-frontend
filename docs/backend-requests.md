@@ -8,18 +8,32 @@
 
 ## 대기 중
 
-- 예약/결제 API의 `totalAmount` 금액 오류 수정 요청
-  - 예약 응답(`POST /api/v1/reservations`)과 결제 확인 응답의 `totalAmount`가 실제 티켓 가격보다 낮은 값으로 내려옴 (예: 티켓 가격 198,000원인데 totalAmount = 165,000원)
-  - 결제 위젯에서 Toss에 넘기는 `amount`와 예매 완료 페이지의 총 결제 금액 모두 이 값을 사용하므로, 실 결제 금액이 잘못 청구됨
-  - `totalAmount` = 티켓 가격 합계 + 수수료 합계로 올바르게 계산하여 응답해야 함
+- 좌석 가격 / 수수료 / 예매 구분 DB 수정 → **백엔드 수정 예정** 🔴
+  - 프론트 기준 전달 완료. 백엔드 실서버 DB 반영 예정
+  - **반영 내용**
+    - 구역 정가: VIP 165,000 / R석 143,000 / S석 121,000 / A석 99,000
+    - 예매 구분: 라이트닝·썬더·클라우드 → 우선예매 / 미스트 → 일반예매
+    - `presale_offset_minutes` 오류 수정 (선예매 시점이 역순으로 적용되던 버그)
+    - 예매 수수료 (좌석당): 라이트닝 0원 / 썬더 3,000원 / 클라우드 5,000원 / 미스트 8,000원
+    - 양도 수수료율: 라이트닝 5% / 썬더 5% / 클라우드 10% / 미스트 10%
   - 우선순위: 🔴 긴급
 
-- `POST /api/v1/ticket/reservations/cancel` 500 Internal Server Error 수정 요청
-  - 마이페이지에서 예매 취소 시 500 응답 반환
-  - 프론트는 스펙대로 `{ eventId, showId, seatId }` body + `X-User-Id` 헤더 전송 (형식 이상 없음)
-  - 예상 원인: ① 이미 CONFIRMED(결제완료) 상태인 예약 취소 시 내부 로직 미처리 ② DB에 저장된 seatId 형식과 프론트 전송값 불일치 ③ `X-User-Id` Long 파싱 오류
-  - 백엔드 서버 로그 확인 및 원인 파악 요청
-  - 우선순위: 🔴 긴급
+- `GET /api/v1/ticket/users/reservations` 응답에 `paymentId` 필드 추가 요청
+  - **배경**: 취소 API(`POST /api/v1/ticket/reservations/cancel`)가 묶음 예매 전체 취소로 동작하도록 백엔드가 변경됨 (같은 `paymentId`에 묶인 좌석 전부 취소)
+  - **문제**: 현재 `MyReservationResponse`에 `paymentId`가 없어 프론트가 묶음 예매 여부를 판단할 수 없음
+  - **요청**: `MyReservationResponse`에 `paymentId: Long` 필드 추가
+  - **프론트 활용**: 같은 `paymentId`를 가진 예약이 2개 이상이면 취소 모달에 "이 예매 전체(N매)를 취소합니다. 묶음 예매는 개별 취소가 불가합니다." 문구 표시
+  - **대안 협의 필요**: `paymentId` 추가가 부담스럽다면, `bundledSeatCount: Int` (같은 결제의 총 좌석 수) 단일 필드 추가로도 가능
+  - 우선순위: 🟡 보통
+
+- `/me/sales` WITHDRAWN 항목 포함 요청
+  - **조사 결과**: DELETE 호출 시 DB에서 `status = WITHDRAWN`으로 변경되는 건 확인됨. 단, `/me/sales` 조회 시 백엔드가 WITHDRAWN을 필터링하여 제외하므로 새로고침 시 항목이 사라짐. API 문서상 반환 status는 LISTED·COMPLETED만 정의되어 있음
+  - **문제**: 프론트에서 로컬 상태로 `status: "cancelled"` 표시는 가능하지만, 페이지 재진입 시 기록이 완전히 소실됨
+  - **요청**:
+    1. `/me/sales` 응답에 `WITHDRAWN` 상태 항목도 포함하여 반환
+    2. API 문서에 `WITHDRAWN` status 추가 및 문서화
+  - **프론트 준비**: `toStatus('WITHDRAWN') → 'cancelled'` 매핑은 이미 구현되어 있어, 백엔드 반영 즉시 동작 가능
+  - 우선순위: 🟡 보통
 
 ---
 

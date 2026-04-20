@@ -86,6 +86,8 @@ export interface Ticket {
   qrCode: string;
   isTransferable: boolean;
   isUpcoming: boolean;
+  refundStatus?: "NONE" | "REQUESTED" | "COMPLETED" | "FAILED";
+  cancelledAt?: string | null;
 }
 
 export interface TransferListing {

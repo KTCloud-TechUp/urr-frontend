@@ -2,7 +2,7 @@
 
 > 백엔드 코드 경로: C:\Users\kkaeng\Desktop\Dev\URR\urr-backend\urr-ticketService
 >
-> 마지막 확인: 2026-04-17 / 마지막 수정: 2026-04-17
+> 마지막 확인: 2026-04-20 / 마지막 수정: 2026-04-20
 
 | #   | API                                      | 메서드 | 엔드포인트                                                      | 연동 파일                                       | 상태         | 비고                                                                                     |
 | --- | ---------------------------------------- | ------ | --------------------------------------------------------------- | ----------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------- |
@@ -12,11 +12,11 @@
 | 4   | 결제 전 선점 상태 조회                   | GET    | `/api/v1/ticket/reservations/{reservationId}/hold-status`       | —                                               | ❌ 미연동    |                                                                                          |
 | 5   | 예약 만료 처리                           | POST   | `/api/v1/ticket/reservations/{reservationId}/expire`            | —                                               | ➖ 불필요    | 스케줄러 처리                                                                            |
 | 6   | 예약 취소                                | POST   | `/api/v1/ticket/reservations/cancel`                            | `features/booking/api/cancelReservation.ts`     | ✅ 연동됨    | body: `{eventId, showId, seatId}`, `X-User-Id` 헤더                                      |
-| 7   | 환불 처리                                | POST   | `/api/v1/ticket/reservations/{reservationId}/refund`            | —                                               | ➖ 불필요    | 서버 내부 처리                                                                           |
+| 7   | 환불 처리                                | POST   | `/api/v1/ticket/reservations/refund`                            | —                                               | ➖ 불필요    | 경로 변경: `/{reservationId}/refund` → `/refund`. Request body에 `reservationIds[]` 추가됨 |
 | 8   | 예약티켓 목록 조회                       | GET    | `/api/v1/ticket/users/reservations`                             | `features/reservation/api/getMyReservations.ts` | ✅ 연동됨    | URL 일치 (헤더로 userId 전달)                                                            |
 | 9   | (내부) 양도 가능 여부 조회               | GET    | `/api/v1/ticket/internal/transfers/{reservationId}/eligibility` | —                                               | ➖ 불필요    | 서비스 내부 API                                                                          |
 | 10  | (내부) 소유권 양도 완료                  | POST   | `/api/v1/ticket/internal/transfers/{reservationId}/complete`    | —                                               | ➖ 불필요    | 서비스 내부 API                                                                          |
-| 11  | (내부) 티켓 좌석 정보 조회 (양도용)      | GET    | `/api/v1/ticket/internal/transfer-seat-info`                    | —                                               | ➖ 불필요    | POST→GET 변경, body `{showId,tier,zoneNo}` → query `{eventId,showId}` + 헤더 `X-User-Id` |
+| 11  | (내부) 티켓 좌석 정보 조회 (양도용)      | GET    | `/api/v1/ticket/internal/transfer-seat-info`                    | —                                               | ➖ 불필요    | query 변경: `{eventId,showId}` → `{reservationId}`. response 구조 변경: `seats[]` → `{eventId,showId,seat,originalPrice}` |
 | 12  | (내부) 특정 티어/구역 사용불가 좌석 조회 | POST   | `/api/v1/ticket/internal/seats/statuses`                        | —                                               | ➖ 불필요    | 서비스 내부 API                                                                          |
 | 13  | 티켓 좌석 정보 조회                      | POST   | `/api/v1/ticket/seats/statuses`                                 | —                                               | ➖ 불필요    | 서비스 내부 API                                                                          |
 | 14  | Health Check                             | GET    | `/health`                                                       | —                                               | ➖ 불필요    |                                                                                          |
@@ -479,8 +479,10 @@ POST /api/v1/ticket/reservations/cancel
 ## API
 
 ```
-POST /api/v1/ticket/reservations/{reservationId}/refund
+POST /api/v1/ticket/reservations/refund
 ```
+
+> ⚠️ **경로 변경**: `/{reservationId}/refund` → `/refund` (path variable 제거)
 
 ## 설명
 
@@ -492,7 +494,7 @@ POST /api/v1/ticket/reservations/{reservationId}/refund
 
 ## Path Parameters
 
-- `reservationId` (String): 예약 ID
+- 없음
 
 ## Query Parameters
 
@@ -502,13 +504,15 @@ POST /api/v1/ticket/reservations/{reservationId}/refund
 
 ```json
 {
-  "success": true
+  "success": true,
+  "reservationIds": ["8f7184cb-95a5-4de1-9fa6-3f5ab8d2c16d"]
 }
 ```
 
-| 필드    | 타입    | 필수 | 설명           |
-| ------- | ------- | ---- | -------------- |
-| success | Boolean | Y    | 환불 성공 여부 |
+| 필드           | 타입           | 필수 | 설명                       |
+| -------------- | -------------- | ---- | -------------------------- |
+| success        | Boolean        | N    | 환불 성공 여부             |
+| reservationIds | List\<String\> | Y    | 환불 처리할 예약 ID 목록   |
 
 ## Response 200
 
@@ -756,11 +760,11 @@ POST /api/v1/ticket/internal/transfers/{reservationId}/complete
 GET /api/v1/ticket/internal/transfer-seat-info
 ```
 
-> ⚠️ **스펙 불일치**: 문서 원본은 `POST` + body `{showId, tier, zoneNo}` 였으나, 실제 백엔드는 `GET` + query params로 변경됨
+> ⚠️ **스펙 변경**: query params `eventId`+`showId` → `reservationId` 단건 기준으로 변경. Response 구조도 `{seats[]}` → `{eventId, showId, seat, originalPrice}`로 변경됨.
 
 ## 설명
 
-- Community(양도) 서비스가 특정 사용자/이벤트/회차 기준으로 양도 대상 좌석 정보를 조회
+- Community(양도) 서비스가 `reservationId` 기준으로 양도 대상 좌석 정보를 조회
 
 ## Headers
 
@@ -772,8 +776,7 @@ GET /api/v1/ticket/internal/transfer-seat-info
 
 ## Query Parameters
 
-- `eventId` (Long, 필수): 공연 ID
-- `showId` (Long, 필수): 회차 ID
+- `reservationId` (String, 필수): 예약 ID — 기존 `eventId`+`showId` 방식에서 변경됨
 
 ## Request Body
 
@@ -787,32 +790,22 @@ GET /api/v1/ticket/internal/transfer-seat-info
   "statusCode": 200,
   "message": "OK",
   "data": {
-    "seats": [
-      {
-        "seatId": "VIP1-A-01",
-        "status": "LOCKED"
-      },
-      {
-        "seatId": "VIP1-A-02",
-        "status": "RESERVED"
-      }
-    ]
+    "eventId": 10,
+    "showId": 100,
+    "seat": "VIP1-A-01",
+    "originalPrice": 150000
   }
 }
 ```
 
-### InternalUnavailableSeatsResponse 필드
+### TransferSeatInfoResponse 필드
 
-| 필드  | 타입                   | 설명               |
-| ----- | ---------------------- | ------------------ |
-| seats | List\<SeatStatusItem\> | 사용불가 좌석 목록 |
-
-#### SeatStatusItem
-
-| 필드   | 타입       | 설명                              |
-| ------ | ---------- | --------------------------------- |
-| seatId | String     | 좌석 ID                           |
-| status | SeatStatus | `AVAILABLE`, `LOCKED`, `RESERVED` |
+| 필드          | 타입   | 설명                      |
+| ------------- | ------ | ------------------------- |
+| eventId       | Long   | 공연 ID (nullable)        |
+| showId        | Long   | 회차 ID (nullable)        |
+| seat          | String | 좌석 ID (nullable)        |
+| originalPrice | Long   | 원가 (nullable)           |
 
 ---
 

@@ -30,6 +30,7 @@ interface TransferPurchaseSidebarProps {
   membership?: Membership;
   artistId: string;
   userId?: number | string;
+  isOwner?: boolean;
 }
 
 export function TransferPurchaseSidebar({
@@ -37,6 +38,7 @@ export function TransferPurchaseSidebar({
   membership,
   artistId,
   userId,
+  isOwner = false,
 }: TransferPurchaseSidebarProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -166,7 +168,20 @@ export function TransferPurchaseSidebar({
             </span>
           </div>
 
-          {isMember ? (
+          {isOwner ? (
+            <div className="space-y-3">
+              <Button className="w-full h-12" disabled>
+                <CreditCard size={16} />
+                결제하기
+              </Button>
+              <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2.5">
+                <span className="text-sm">🙅</span>
+                <p className="text-xs text-muted-foreground font-medium">
+                  본인이 등록한 양도 게시물은 구매할 수 없습니다
+                </p>
+              </div>
+            </div>
+          ) : isMember ? (
             <Button
               className="w-full h-12"
               onClick={handlePaymentOpen}

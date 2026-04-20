@@ -46,13 +46,21 @@ export function useMyReservations(
     enabled: userId !== undefined,
   });
 
+  const { data: cancelledReservations = [], isLoading: cancelledLoading } = useQuery({
+    queryKey: ["my-reservations", userId, "CANCELLED"],
+    queryFn: () => getMyReservations(userId!, "CANCELLED"),
+    enabled: userId !== undefined,
+  });
+
   const { data: allEvents = [], isLoading: eventsLoading } = useQuery({
     queryKey: ["events"],
     queryFn: getEvents,
   });
 
+  const allReservations = [...reservations, ...cancelledReservations];
+
   // 예약에 포함된 고유 eventId 목록
-  const uniqueEventIds = [...new Set(reservations.map((r) => r.eventId))];
+  const uniqueEventIds = [...new Set(allReservations.map((r) => r.eventId))];
 
   const showResults = useQueries({
     queries: uniqueEventIds.map((eventId) => ({
@@ -63,7 +71,7 @@ export function useMyReservations(
     })),
   });
 
-  const uniqueShowIds = [...new Set(reservations.map((r) => r.showId))];
+  const uniqueShowIds = [...new Set(allReservations.map((r) => r.showId))];
 
   const sectionResults = useQueries({
     queries: uniqueShowIds.map((showId) => ({
@@ -76,6 +84,7 @@ export function useMyReservations(
 
   const isLoading =
     resLoading ||
+    cancelledLoading ||
     eventsLoading ||
     showResults.some((r) => r.isLoading) ||
     sectionResults.some((r) => r.isLoading);
@@ -156,5 +165,58 @@ export function useMyReservations(
     return [ticket];
   });
 
-  return { tickets, isLoading };
+  const cancelledTickets: (Ticket & { event: Event })[] = cancelledReservations.flatMap((r) => {
+    const eventSummary = allEvents.find((e) => e.eventId === r.eventId);
+    const eventIndex = uniqueEventIds.indexOf(r.eventId);
+    const shows = showResults[eventIndex]?.data ?? [];
+    const show = shows.find((s) => s.showId === r.showId);
+
+    const event: Event = {
+      id: String(r.eventId),
+      artistId: String(eventSummary?.artistId ?? ""),
+      title: eventSummary?.title ?? `공연 #${r.eventId}`,
+      venue: eventSummary?.venueTemplateName ?? "",
+      dates: show
+        ? [{ id: String(show.showId), date: show.startAt, bookingWindows: [], totalSeats: show.capacity, remainingSeats: show.remainingSeats }]
+        : eventSummary
+          ? [{ id: "1", date: eventSummary.openDate + "T19:00:00", bookingWindows: [], totalSeats: 0, remainingSeats: 0 }]
+          : [],
+      poster: eventSummary?.posterImageUrl ?? "",
+      status: eventSummary?.active ? "open" : "closed",
+    };
+
+    const { section, row, seatNumber } = parseSeatId(r.seatId);
+
+    const showIndex = uniqueShowIds.indexOf(r.showId);
+    const sections = sectionResults[showIndex]?.data?.sections ?? [];
+    const tierCode = section.replace(/-?\d+$/, "");
+    const normalizedSection = normalizeSectionCode(section);
+    const matchedSection =
+      sections.find((s) => s.code === section) ??
+      sections.find((s) => normalizeSectionCode(s.code) === normalizedSection) ??
+      sections.find((s) => s.code === tierCode) ??
+      sections.find((s) => normalizeSectionCode(s.code) === normalizeSectionCode(tierCode));
+    const price = matchedSection?.price ?? 0;
+    const tierFee = getTierFee(show, userTier);
+
+    return [{
+      id: r.reservationId,
+      eventId: String(r.eventId),
+      showId: String(r.showId),
+      seatId: r.seatId,
+      section,
+      row,
+      seatNumber,
+      price,
+      tierFee,
+      qrCode: r.reservationId,
+      isTransferable: false,
+      isUpcoming: false,
+      refundStatus: r.refundStatus,
+      cancelledAt: r.updatedAt,
+      event,
+    }];
+  });
+
+  return { tickets, cancelledTickets, isLoading };
 }

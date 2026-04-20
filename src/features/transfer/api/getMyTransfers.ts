@@ -9,6 +9,7 @@ interface SaleItem {
   showName: string;
   showDate: string;
   section: string;
+  zone: string;
   rowInfo: string;
   seatNumber: string;
   sellingPrice: number;
@@ -23,6 +24,7 @@ interface PurchaseItem {
   showName: string;
   showDate: string;
   section: string;
+  zone: string;
   rowInfo: string;
   seatNumber: string;
   sellingPrice: number;
@@ -41,7 +43,9 @@ interface ApiResponse<T> {
 // ── Helpers ─────────────────────────────────────────────
 
 function toStatus(raw: string): TransferStatus {
-  return raw.toLowerCase() as TransferStatus;
+  const lower = raw.toLowerCase();
+  if (lower === 'withdrawn') return 'cancelled';
+  return lower as TransferStatus;
 }
 
 function makeEvent(showName: string, showDate: string): Event {
@@ -76,9 +80,9 @@ export async function getMySales(
     role: "seller" as const,
     counterpartyName: "",
     price: item.sellingPrice,
-    faceValue: item.sellingPrice + item.feeAmount,
+    faceValue: item.sellingPrice,
     platformFee: item.feeAmount,
-    section: item.section,
+    section: item.zone ? `${item.section.toUpperCase()}-${item.zone}` : item.section.toUpperCase(),
     seatInfo: `${item.rowInfo}열 ${item.seatNumber}번`,
     status: toStatus(item.status),
     createdAt: item.createdAt,
@@ -102,7 +106,7 @@ export async function getMyPurchases(
     price: item.sellingPrice,
     faceValue: item.sellingPrice,
     platformFee: 0,
-    section: item.section,
+    section: item.zone ? `${item.section.toUpperCase()}-${item.zone}` : item.section.toUpperCase(),
     seatInfo: `${item.rowInfo}열 ${item.seatNumber}번`,
     status: toStatus(item.status),
     createdAt: item.updatedAt,

@@ -156,11 +156,19 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
       poster: e.posterImageUrl ?? "",
       status: e.active ? "open" : "closed",
     }));
-  const now = new Date();
-  const upcoming = allEvents.filter((e) => new Date(e.dates[0]?.date ?? 0) >= now);
-  const past = allEvents.filter((e) => new Date(e.dates[0]?.date ?? 0) < now);
+  const upcoming = allEvents.filter((e) => e.status === "open");
+  const past = allEvents.filter((e) => e.status !== "open");
   const nextEvent = upcoming[0];
   const communityPosts = getCommunityPostsByArtistId(artist.id);
+
+  const eventPosterMap = new Map(allEvents.map((e) => [e.id, e.poster]));
+  const enrichedTransferListings = transferListings.map((l) => ({
+    ...l,
+    event: {
+      ...l.event,
+      poster: eventPosterMap.get(l.event.id) ?? l.event.poster,
+    },
+  }));
 
   return (
     <div>
@@ -209,7 +217,7 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
             extendedInfo={extendedInfo}
             nextEvent={nextEvent}
             upcomingEvents={upcoming}
-            transferListings={transferListings}
+            transferListings={enrichedTransferListings}
             communityPosts={communityPosts}
             membership={membership}
             onNavigateTab={(tab) => handleTabChange(tab as Tab)}
@@ -231,7 +239,7 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
         )}
         {activeTab === "transfers" && (
           membership
-            ? <ArtistTransferTab listings={transferListings} events={allEvents} membership={membership} artistId={artist.id} />
+            ? <ArtistTransferTab listings={enrichedTransferListings} events={allEvents} membership={membership} artistId={artist.id} />
             : <MembershipGate artistId={artist.id} artistName={artist.name} />
         )}
       </div>
