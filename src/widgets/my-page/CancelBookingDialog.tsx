@@ -24,6 +24,7 @@ import type { Ticket, Event } from '@/shared/types'
 
 interface CancelBookingDialogProps {
   ticket: (Ticket & { event: Event }) | null
+  bundleCount?: number
   open: boolean
   isPending: boolean
   onClose: () => void
@@ -39,6 +40,7 @@ const CANCEL_REASONS = [
 
 export function CancelBookingDialog({
   ticket,
+  bundleCount = 1,
   open,
   isPending,
   onClose,
@@ -64,6 +66,12 @@ export function CancelBookingDialog({
         </AlertDialogHeader>
 
         <div className="space-y-4 py-2">
+          {bundleCount > 1 && (
+            <div className="rounded-md bg-amber-50 border border-amber-200 p-3 text-sm space-y-1">
+              <p className="text-amber-700 font-medium">묶음 예매 안내</p>
+              <p className="text-amber-600">이 예매 전체({bundleCount}매)를 취소합니다. 묶음 예매는 개별 취소가 불가합니다.</p>
+            </div>
+          )}
           <div className="rounded-md bg-destructive/10 p-3 text-sm space-y-1">
             <p className="text-destructive font-medium">취소 유의사항</p>
             <p className="text-muted-foreground">• 취소 후 동일 좌석 재예매가 불가할 수 있습니다</p>

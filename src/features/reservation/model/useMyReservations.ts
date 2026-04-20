@@ -151,6 +151,7 @@ export function useMyReservations(
       eventId: String(r.eventId),
       showId: String(r.showId),
       seatId: r.seatId,
+      paymentId: r.paymentId ?? null,
       section,
       row,
       seatNumber,

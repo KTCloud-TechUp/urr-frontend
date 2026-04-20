@@ -78,6 +78,8 @@ export interface Ticket {
   showId?: string;
   /** 원본 seatId — 예약 취소 API (POST /ticket/reservations/cancel) 호출용 */
   seatId?: string;
+  /** 묶음 예매 식별용 — 같은 paymentId는 전체 일괄 취소됨 */
+  paymentId?: number | null;
   section: string;
   row: string;
   seatNumber: string;

@@ -60,6 +60,12 @@ export function TicketWalletTab({ tickets, cancelledTickets = [], user, userId, 
   const upcoming = tickets.filter((t) => t.isUpcoming)
   const past = tickets.filter((t) => !t.isUpcoming)
 
+  // paymentId별 묶음 좌석 수 계산 (paymentId가 있는 경우만)
+  const paymentIdCountMap = tickets.reduce<Record<number, number>>((acc, t) => {
+    if (t.paymentId != null) acc[t.paymentId] = (acc[t.paymentId] ?? 0) + 1
+    return acc
+  }, {})
+
   const cancelMutation = useMutation({
     mutationFn: ({ eventId, showId, seatId }: { eventId: number; showId: number; seatId: string }) =>
       cancelReservation({ eventId, showId, seatId }, userId ?? ""),
@@ -205,6 +211,7 @@ export function TicketWalletTab({ tickets, cancelledTickets = [], user, userId, 
       {/* Cancel Booking Dialog */}
       <CancelBookingDialog
         ticket={cancelTicket}
+        bundleCount={cancelTicket?.paymentId != null ? (paymentIdCountMap[cancelTicket.paymentId] ?? 1) : 1}
         open={!!cancelTicket}
         isPending={cancelMutation.isPending}
         onClose={() => setCancelTicket(null)}
