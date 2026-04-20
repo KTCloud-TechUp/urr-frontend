@@ -56,7 +56,7 @@ export function MyPageWidget() {
     memberships,
     followedArtistIds: [],
   };
-  const { tickets, isLoading: isTicketsLoading } = useMyReservations(
+  const { tickets, cancelledTickets, isLoading: isTicketsLoading } = useMyReservations(
     meData?.userId,
     displayUser.tier,
   );
@@ -129,6 +129,7 @@ export function MyPageWidget() {
         <TabsContent value="wallet" className="pt-6">
           <TicketWalletTab
             tickets={tickets}
+            cancelledTickets={cancelledTickets}
             user={displayUser}
             userId={meData?.userId}
             salesRecords={salesRecords}

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Ticket as TicketIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/shared/ui/button'
 import { TicketCard } from '@/shared/ui/TicketCard'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -16,6 +17,7 @@ import type { MyTransferRecord } from '@/shared/lib/mocks/my-page'
 
 interface TicketWalletTabProps {
   tickets: (Ticket & { event: Event })[]
+  cancelledTickets?: (Ticket & { event: Event })[]
   user: User
   userId?: number | string
   salesRecords?: (MyTransferRecord & { event: Event })[]
@@ -28,25 +30,32 @@ function getEffectiveTier(user: User, artistId: string): TierLevel {
   return membership?.tier ?? user.tier
 }
 
+function normalizeSection(code: string): string {
+  return code.replace(/-/g, '').toUpperCase()
+}
+
 function buildListedKeys(records: (MyTransferRecord & { event: Event })[] = []): Set<string> {
   const keys = new Set<string>()
   for (const r of records) {
     if (r.status !== 'listed') continue
     const match = r.seatInfo.match(/(\S+)열 (\S+)번/)
-    if (match) keys.add(`${r.section}-${match[1]}-${match[2]}`)
+    if (match) {
+      keys.add(`${r.section}-${match[1]}-${match[2]}`)
+      keys.add(`${normalizeSection(r.section)}-${match[1]}-${match[2]}`)
+    }
   }
   return keys
 }
 
-export function TicketWalletTab({ tickets, user, userId, salesRecords }: TicketWalletTabProps) {
+export function TicketWalletTab({ tickets, cancelledTickets = [], user, userId, salesRecords }: TicketWalletTabProps) {
   const queryClient = useQueryClient()
 
   const [selectedTicket, setSelectedTicket] = useState<(Ticket & { event: Event }) | null>(null)
   const [transferTicket, setTransferTicket] = useState<(Ticket & { event: Event }) | null>(null)
   const [cancelTicket, setCancelTicket] = useState<(Ticket & { event: Event }) | null>(null)
-  const [listedTicketIds, setListedTicketIds] = useState<Set<string>>(
-    () => buildListedKeys(salesRecords),
-  )
+  const [optimisticListedIds, setOptimisticListedIds] = useState<Set<string>>(new Set())
+
+  const apiListedKeys = buildListedKeys(salesRecords)
 
   const upcoming = tickets.filter((t) => t.isUpcoming)
   const past = tickets.filter((t) => !t.isUpcoming)
@@ -56,13 +65,18 @@ export function TicketWalletTab({ tickets, user, userId, salesRecords }: TicketW
       cancelReservation({ eventId, showId, seatId }, userId ?? ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-reservations', userId, 'CONFIRMED'] })
+      queryClient.invalidateQueries({ queryKey: ['my-reservations', userId, 'CANCELLED'] })
       setCancelTicket(null)
+      toast.success('예매가 취소되었습니다.', { description: '환불은 3~5 영업일 내 처리됩니다.' })
+    },
+    onError: () => {
+      toast.error('예매 취소에 실패했습니다.', { description: '잠시 후 다시 시도해주세요.' })
     },
   })
 
   const handleListed = useCallback((ticketId: string, _: number) => {
     const ticket = tickets.find((t) => t.id === ticketId)
-    setListedTicketIds((prev) => {
+    setOptimisticListedIds((prev) => {
       const next = new Set(prev)
       next.add(ticketId)
       if (ticket) next.add(`${ticket.section}-${ticket.row}-${ticket.seatNumber}`)
@@ -72,7 +86,7 @@ export function TicketWalletTab({ tickets, user, userId, salesRecords }: TicketW
 
   const handleCancelTransfer = useCallback((ticketId: string) => {
     if (window.confirm('양도 등록을 취소하시겠습니까?')) {
-      setListedTicketIds((prev) => {
+      setOptimisticListedIds((prev) => {
         const next = new Set(prev)
         next.delete(ticketId)
         return next
@@ -94,7 +108,7 @@ export function TicketWalletTab({ tickets, user, userId, salesRecords }: TicketW
     })
   }, [cancelTicket, cancelMutation])
 
-  if (tickets.length === 0) {
+  if (tickets.length === 0 && cancelledTickets.length === 0) {
     return (
       <EmptyState
         icon={TicketIcon}
@@ -116,7 +130,8 @@ export function TicketWalletTab({ tickets, user, userId, salesRecords }: TicketW
             <div className="space-y-3">
               {upcoming.map((ticket) => {
                 const seatKey = `${ticket.section}-${ticket.row}-${ticket.seatNumber}`
-                const isListed = listedTicketIds.has(ticket.id) || listedTicketIds.has(seatKey)
+                const normalizedSeatKey = `${normalizeSection(ticket.section)}-${ticket.row}-${ticket.seatNumber}`
+                const isListed = optimisticListedIds.has(ticket.id) || optimisticListedIds.has(seatKey) || apiListedKeys.has(seatKey) || apiListedKeys.has(normalizedSeatKey)
                 return (
                   <TicketCard
                     key={ticket.id}
@@ -145,6 +160,25 @@ export function TicketWalletTab({ tickets, user, userId, salesRecords }: TicketW
                   ticket={ticket}
                   variant="past"
                 />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Cancelled */}
+        {cancelledTickets.length > 0 && (
+          <section>
+            <h3 className="text-base font-semibold mb-3 text-muted-foreground">취소된 예매</h3>
+            <div className="space-y-3">
+              {cancelledTickets.map((ticket) => (
+                <div key={ticket.id} className="relative">
+                  <TicketCard ticket={ticket} variant="past" />
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive">
+                    취소됨
+                    {ticket.refundStatus === 'COMPLETED' && <span className="text-muted-foreground">· 환불 완료</span>}
+                    {ticket.refundStatus === 'REQUESTED' && <span className="text-muted-foreground">· 환불 처리 중</span>}
+                  </div>
+                </div>
               ))}
             </div>
           </section>
