@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AuthStep,
   AgeGateStep,
@@ -17,6 +18,7 @@ import { tokenStore } from "@/shared/api/tokenStore";
 import { reissueToken } from "@/features/auth/api/reissue";
 import { fetchMe } from "@/features/auth/api/me";
 import { logout } from "@/features/auth/api/logout";
+import { AUTH_ME_QUERY_KEY } from "@/features/auth/model/useCurrentUser";
 
 type FlowState =
   | "auth"
@@ -29,6 +31,7 @@ type FlowState =
 function OnboardingWidgetInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const stepParam = searchParams.get("step");
 
   const isSocial = stepParam === "identity";
@@ -57,6 +60,8 @@ function OnboardingWidgetInner() {
     if (tokenStore.getToken()) {
       fetchMe()
         .then((user) => {
+          // 캐시를 최신 유저 정보로 교체 — DB 초기화 후 재로그인 시 이전 캐시 잔존 방지
+          queryClient.setQueryData(AUTH_ME_QUERY_KEY, user);
           if (user.onboardingCompleted) {
             router.replace("/");
           } else {

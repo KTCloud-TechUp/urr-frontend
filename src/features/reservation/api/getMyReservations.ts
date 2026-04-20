@@ -18,6 +18,7 @@ export interface ReservationSummary {
   refundedAt: string | null;
   updatedAt: string;
   transferEligible: boolean;
+  paymentId?: number | null;
 }
 
 interface ReservationsApiResponse {

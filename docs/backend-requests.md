@@ -26,15 +26,6 @@
   - **대안 협의 필요**: `paymentId` 추가가 부담스럽다면, `bundledSeatCount: Int` (같은 결제의 총 좌석 수) 단일 필드 추가로도 가능
   - 우선순위: 🟡 보통
 
-- `/me/sales` WITHDRAWN 항목 포함 요청
-  - **조사 결과**: DELETE 호출 시 DB에서 `status = WITHDRAWN`으로 변경되는 건 확인됨. 단, `/me/sales` 조회 시 백엔드가 WITHDRAWN을 필터링하여 제외하므로 새로고침 시 항목이 사라짐. API 문서상 반환 status는 LISTED·COMPLETED만 정의되어 있음
-  - **문제**: 프론트에서 로컬 상태로 `status: "cancelled"` 표시는 가능하지만, 페이지 재진입 시 기록이 완전히 소실됨
-  - **요청**:
-    1. `/me/sales` 응답에 `WITHDRAWN` 상태 항목도 포함하여 반환
-    2. API 문서에 `WITHDRAWN` status 추가 및 문서화
-  - **프론트 준비**: `toStatus('WITHDRAWN') → 'cancelled'` 매핑은 이미 구현되어 있어, 백엔드 반영 즉시 동작 가능
-  - 우선순위: 🟡 보통
-
 ---
 
 ## 완료
