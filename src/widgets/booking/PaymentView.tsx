@@ -8,6 +8,7 @@ import { useSeatTimer } from "@/features/booking/model/useSeatTimer";
 import { usePaymentForm } from "@/shared/lib/usePaymentForm";
 import { useCurrentUser } from "@/features/auth/model/useCurrentUser";
 import { TimerDisplay } from "@/features/booking/ui/TimerDisplay";
+import { VQAQuizModal } from "@/features/booking/ui/VQAQuizModal";
 import { parseSeatDisplay } from "@/shared/lib/format";
 import { bookTicket } from "@/features/booking/api/bookTicket";
 import { cancelReservation } from "@/features/booking/api/cancelReservation";
@@ -51,6 +52,7 @@ export function PaymentView() {
   const bookingSession = useBookingSession();
 
   const [phase, setPhase] = useState<PaymentPhase>("confirm-seats");
+  const [vqaOpen, setVqaOpen] = useState(false);
   const retryTimer = useSeatTimer(60);
 
   const {
@@ -211,6 +213,20 @@ export function PaymentView() {
     bookingSession,
   ]);
 
+  const handlePaymentButtonClick = useCallback(async () => {
+    if (!selectedDate || !artistId) return;
+    setVqaOpen(true);
+  }, [selectedDate, artistId]);
+
+  const handleVQAPass = useCallback(() => {
+    setVqaOpen(false);
+    void handleSubmitPayment();
+  }, [handleSubmitPayment]);
+
+  const handleVQACancel = useCallback(() => {
+    setVqaOpen(false);
+  }, []);
+
   const handleCancel = useCallback(() => {
     transitionTo("seats-individual");
   }, [transitionTo]);
@@ -259,26 +275,33 @@ export function PaymentView() {
   // --- Phase 2: Payment Form ---
   if (phase === "payment-form") {
     return (
-      <PaymentFormPhase
-        event={event}
-        selectedDate={selectedDate}
-        seatDisplayNames={seatDisplayNames}
-        hasUserTierWindow={hasUserTierWindow}
-        subtotal={subtotal}
-        feeTotal={feeTotal}
-        total={total}
-        buyerName={buyerName}
-        buyerPhone={buyerPhone}
-        selectedMethod={selectedMethod}
-        termsAgreed={termsAgreed}
-        isFormValid={isFormValid}
-        onBack={handleBackToConfirm}
-        onNameChange={handleNameChange}
-        onPhoneChange={handlePhoneChange}
-        onMethodChange={setSelectedMethod}
-        onToggleTerms={toggleTerms}
-        onSubmit={handleSubmitPayment}
-      />
+      <>
+        <PaymentFormPhase
+          event={event}
+          selectedDate={selectedDate}
+          seatDisplayNames={seatDisplayNames}
+          hasUserTierWindow={hasUserTierWindow}
+          subtotal={subtotal}
+          feeTotal={feeTotal}
+          total={total}
+          buyerName={buyerName}
+          buyerPhone={buyerPhone}
+          selectedMethod={selectedMethod}
+          termsAgreed={termsAgreed}
+          isFormValid={isFormValid}
+          onBack={handleBackToConfirm}
+          onNameChange={handleNameChange}
+          onPhoneChange={handlePhoneChange}
+          onMethodChange={setSelectedMethod}
+          onToggleTerms={toggleTerms}
+          onSubmit={handlePaymentButtonClick}
+        />
+        <VQAQuizModal
+          open={vqaOpen}
+          onPass={handleVQAPass}
+          onCancel={handleVQACancel}
+        />
+      </>
     );
   }
 

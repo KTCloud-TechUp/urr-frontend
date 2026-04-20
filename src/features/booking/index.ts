@@ -18,3 +18,4 @@ export { SectionListTable } from "./ui/SectionListTable";
 export { TimerDisplay } from "./ui/TimerDisplay";
 export { SeatStatusLegend } from "./ui/SeatStatusLegend";
 export { Minimap } from "./ui/Minimap";
+export { VQAQuizModal } from "./ui/VQAQuizModal";

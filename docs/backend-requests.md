@@ -8,6 +8,14 @@
 
 ## 대기 중
 
+- VQA 검증 엔드포인트 (🟡 보통)
+  - **요청**: 결제 직전 VQA 정답 여부를 서버에서 검증하는 `POST /api/v1/vqa/verify`
+  - **스펙 제안**
+    - Request: `{ questionId: string, answer: string, userId: number }`
+    - Response: `{ pass: boolean }`
+  - **이유**: 현재는 프론트 로컬 mock 검증만 가능 → 클라이언트 조작으로 우회 가능. 실효성 있는 봇 차단을 위해 **서버 검증** + 문제 출제도 서버에서 랜덤 제공 필요(`GET /api/v1/vqa/question`).
+  - **연관**: `docs/macro-detection.md`의 매크로 탐지 로직과 통합 고려. 오답 반복 시 rate limit/계정 제재 트리거 연계 가능.
+
 - 좌석 가격 / 수수료 / 예매 구분 DB 수정 → **백엔드 수정 예정** 🔴
   - 프론트 기준 전달 완료. 백엔드 실서버 DB 반영 예정
   - **반영 내용**

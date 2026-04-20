@@ -159,9 +159,10 @@ export interface Notification {
 
 export interface VQAQuestion {
   id: string;
+  imageUrl: string;
   question: string;
-  options: string[];
-  correctIndex: number;
+  answer: string;
+  acceptedAnswers?: string[];
 }
 
 export interface ConfirmationData {
