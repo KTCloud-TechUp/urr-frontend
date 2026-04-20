@@ -161,12 +161,12 @@ export function ArtistDetailWidget({ artistId }: ArtistDetailWidgetProps) {
   const nextEvent = upcoming[0];
   const communityPosts = getCommunityPostsByArtistId(artist.id);
 
-  const eventPosterMap = new Map(allEvents.map((e) => [e.id, e.poster]));
+  const eventPosterByTitle = new Map(allEvents.map((e) => [e.title, e.poster]));
   const enrichedTransferListings = transferListings.map((l) => ({
     ...l,
     event: {
       ...l.event,
-      poster: eventPosterMap.get(l.event.id) ?? l.event.poster,
+      poster: eventPosterByTitle.get(l.event.title) ?? l.event.poster,
     },
   }));
 
