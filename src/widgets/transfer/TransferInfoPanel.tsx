@@ -14,7 +14,6 @@ import {
   User,
 } from "lucide-react";
 import {
-  StaticVenuePreview,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -29,15 +28,6 @@ import {
 import type { Event, TransferListing, TierLevel } from "@/shared/types";
 
 type EnrichedTransfer = TransferListing & { event: Event };
-
-function sectionNameToId(section: string): string | null {
-  if (section.includes("VIP")) return "sec-vip";
-  if (section.includes("플로어") && section.includes("R")) return "sec-floor-r";
-  if (section.includes("R")) return "sec-r";
-  if (section.includes("S")) return "sec-s";
-  if (section.includes("A")) return "sec-a";
-  return null;
-}
 
 function getSectionDescription(section: string): string {
   if (section.includes("VIP")) return "무대 최근접 프리미엄 좌석";
@@ -72,7 +62,6 @@ interface TransferInfoPanelProps {
 export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
   const [showProfile, setShowProfile] = useState(false);
 
-  const highlightSection = sectionNameToId(listing.section);
   const sectionDesc = getSectionDescription(listing.section);
   const reliability = getSellerReliability(listing.sellerTier);
 
@@ -112,9 +101,10 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
           좌석 위치
         </h3>
         <div className="flex justify-center">
-          <StaticVenuePreview
-            highlightSectionId={highlightSection}
-            className="w-full max-w-120"
+          <img
+            src="/venue/KSPO-DOME.svg"
+            alt="KSPO 돔 좌석 배치도"
+            className="w-full max-w-120 rounded-lg border border-border/50"
           />
         </div>
         <div className="mt-4 text-center">

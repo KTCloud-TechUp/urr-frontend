@@ -83,6 +83,7 @@ export function TransferDetailWidget({ artistId, listingId }: TransferDetailWidg
               membership={membership}
               artistId={artistId}
               userId={meData?.userId}
+              isOwner={meData?.userId !== undefined && String(meData.userId) === String(listing.sellerId)}
             />
           </div>
         </div>
