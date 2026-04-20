@@ -71,7 +71,6 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
 
   const rowMatch = listing.seatInfo.match(/(\d+)열/);
   const seatMatch = listing.seatInfo.match(/(\d+)번/);
-  const zoneMatch = listing.seatInfo.match(/([A-Z])구역/);
 
   return (
     <div className="space-y-6">
@@ -124,10 +123,10 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
             <span className="text-muted-foreground">구역</span>
             <p className="font-semibold mt-0.5">{listing.section}</p>
           </div>
-          {zoneMatch && (
+          {listing.zone && (
             <div>
               <span className="text-muted-foreground">블록</span>
-              <p className="font-semibold mt-0.5">{zoneMatch[1]}구역</p>
+              <p className="font-semibold mt-0.5">{listing.zone}구역</p>
             </div>
           )}
           {rowMatch && (

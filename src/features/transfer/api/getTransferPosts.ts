@@ -60,7 +60,10 @@ function mapToEnrichedTransfer(item: TransferPostItem): EnrichedTransfer {
     sellerTransactionCount: item.sellerTradeCount,
     price: item.sellingPrice,
     faceValue: item.faceValue,
+    feeAmount: 0,
+    sellerExpectedAmount: 0,
     section: item.section,
+    zone: "",
     seatInfo: item.rowInfo ?? "",
     status: toTransferStatus(item.status),
     createdAt: item.createdAt,
@@ -92,6 +95,7 @@ interface TransferPostDetail {
   showDate: string;
   showVenue: string;
   section: string;
+  zone: string;
   rowInfo: string;
   seatNumber: string;
   faceValue: number;
@@ -123,7 +127,10 @@ function mapDetailToEnrichedTransfer(
     sellerTransactionCount: item.sellerTradeCount,
     price: item.sellingPrice,
     faceValue: item.faceValue,
+    feeAmount: item.feeAmount,
+    sellerExpectedAmount: item.sellerExpectedAmount,
     section: item.section,
+    zone: item.zone ?? "",
     seatInfo: seatParts,
     status: toTransferStatus(item.status),
     createdAt: item.createdAt,

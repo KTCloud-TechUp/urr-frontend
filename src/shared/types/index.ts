@@ -99,7 +99,10 @@ export interface TransferListing {
   sellerTransactionCount: number;
   price: number;
   faceValue: number;
+  feeAmount: number;
+  sellerExpectedAmount: number;
   section: string;
+  zone: string;
   seatInfo: string;
   status: TransferStatus;
   createdAt: string;

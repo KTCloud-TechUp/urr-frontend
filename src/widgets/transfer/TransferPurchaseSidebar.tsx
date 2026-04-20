@@ -157,6 +157,22 @@ export function TransferPurchaseSidebar({
                 정가: {formatPrice(listing.faceValue)}
               </span>
             </div>
+            {listing.feeAmount > 0 && (
+              <div className="rounded-lg bg-muted/50 px-3 py-2.5 space-y-1.5 text-xs text-muted-foreground">
+                <div className="flex justify-between">
+                  <span>양도 가격</span>
+                  <span>{formatPrice(listing.price)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>플랫폼 수수료 (판매자 부담)</span>
+                  <span>-{formatPrice(listing.feeAmount)}</span>
+                </div>
+                <div className="flex justify-between font-medium text-foreground border-t border-border/50 pt-1.5">
+                  <span>판매자 수령액</span>
+                  <span>{formatPrice(listing.sellerExpectedAmount)}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <Separator />
