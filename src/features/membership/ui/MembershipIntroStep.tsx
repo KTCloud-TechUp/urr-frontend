@@ -17,13 +17,12 @@ interface MembershipIntroStepProps {
 
 const TIER_ORDER: TierLevel[] = ["LIGHTNING", "THUNDER", "CLOUD", "MIST"];
 
-function formatTimeLabel(minutes: number): string {
-  if (minutes === 0) return "최우선 오픈";
-  if (minutes < 60) return `${minutes}분 먼저`;
-  if (minutes % (60 * 24) === 0) return `${minutes / (60 * 24)}일 먼저`;
-  if (minutes % 60 === 0) return `${minutes / 60}시간 먼저`;
-  return `${minutes}분 먼저`;
-}
+const TIER_OPEN_LABEL: Record<TierLevel, string> = {
+  LIGHTNING: "일반 오픈 2일 전 +1시간",
+  THUNDER: "일반 오픈 2일 전",
+  CLOUD: "일반 오픈 1시간 전",
+  MIST: "일반 오픈 시점",
+};
 
 export function MembershipIntroStep({
   artist,
@@ -86,13 +85,18 @@ export function MembershipIntroStep({
 
       {/* Tier comparison table */}
       <div className="space-y-3">
-        <h2 className="text-lg font-bold">티어별 혜택 비교</h2>
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-lg font-bold">티어별 혜택 비교</h2>
+          <p className="text-xs text-muted-foreground">
+            티어가 높을수록 더 빠르게 예매가 시작됩니다
+          </p>
+        </div>
         <div className="rounded-xl border border-border overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-muted/50">
                 <th className="text-left px-4 py-3 font-semibold">티어</th>
-                <th className="text-left px-4 py-3 font-semibold">우선순위</th>
+                <th className="text-left px-4 py-3 font-semibold">예매 오픈</th>
                 <th className="text-left px-4 py-3 font-semibold">
                   예매 수수료
                 </th>
@@ -104,7 +108,6 @@ export function MembershipIntroStep({
             <tbody>
               {TIER_ORDER.map((tier, idx) => {
                 const policy = policyMap[tier];
-                const isPresale = policy?.bookingType === "PRESALE";
                 return (
                   <tr
                     key={tier}
@@ -113,22 +116,14 @@ export function MembershipIntroStep({
                     <td className="px-4 py-3">
                       <TierBadge tier={tier} size="sm" />
                     </td>
-                    <td className="px-4 py-3">
-                      {!policy ? (
-                        <span className="text-muted-foreground">—</span>
-                      ) : isPresale ? (
-                        <span className="text-sm text-muted-foreground">
-                          {formatTimeLabel(policy.presaleOffsetMinutes)}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-muted-foreground">
-                          일반예매
-                        </span>
-                      )}
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
+                      {TIER_OPEN_LABEL[tier]}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {policy
-                        ? `${policy.bookingFeeWon.toLocaleString()}원`
+                        ? policy.bookingFeeWon === 0
+                          ? "없음"
+                          : `+${policy.bookingFeeWon.toLocaleString()}원`
                         : "—"}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
@@ -144,6 +139,9 @@ export function MembershipIntroStep({
             </tbody>
           </table>
         </div>
+        <p className="text-xs text-muted-foreground px-1">
+          ※ 모든 티어는 동일한 티켓을 구매할 수 있으며, 예매 시작 시점만 차등 적용됩니다.
+        </p>
       </div>
 
       {/* Price + CTA */}
