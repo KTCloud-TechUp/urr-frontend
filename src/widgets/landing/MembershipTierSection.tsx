@@ -10,7 +10,7 @@ const TIERS = [
     price: "무료",
     priceNote: "",
     booking: "일반 예매",
-    fee: "+₩4,000",
+    fee: "+₩8,000",
     transfer: "양도 불가",
     features: [
       "회원가입 즉시 자동 부여",
@@ -34,7 +34,7 @@ const TIERS = [
     price: "₩30,000",
     priceNote: "/ 년",
     booking: "선예매 +1day",
-    fee: "+₩3,000",
+    fee: "+₩5,000",
     transfer: "10% 수수료",
     features: [
       "선예매 3순위 (+1일)",
@@ -58,7 +58,7 @@ const TIERS = [
     price: "₩30,000",
     priceNote: "/ 년",
     booking: "선예매 +1h",
-    fee: "+₩2,000",
+    fee: "+₩3,000",
     transfer: "5% 수수료",
     features: [
       "선예매 2순위 (+1시간)",
@@ -82,7 +82,7 @@ const TIERS = [
     price: "₩30,000",
     priceNote: "/ 년",
     booking: "선예매 1순위",
-    fee: "+₩1,000",
+    fee: "Free",
     transfer: "5% 수수료",
     features: [
       "선예매 1순위",
