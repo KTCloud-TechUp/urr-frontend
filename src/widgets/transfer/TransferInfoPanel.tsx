@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Calendar,
   MapPin,
@@ -100,9 +101,11 @@ export function TransferInfoPanel({ listing }: TransferInfoPanelProps) {
           좌석 위치
         </h3>
         <div className="flex justify-center">
-          <img
+          <Image
             src="/venue/KSPO-DOME.svg"
             alt="KSPO 돔 좌석 배치도"
+            width={480}
+            height={480}
             className="w-full max-w-120 rounded-lg border border-border/50"
           />
         </div>

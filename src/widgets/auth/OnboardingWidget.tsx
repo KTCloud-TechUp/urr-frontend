@@ -92,7 +92,7 @@ function OnboardingWidgetInner() {
         setAuthChecked(true);
       }
     });
-  }, [initialStep, router]);
+  }, [initialStep, router, queryClient]);
 
   const handleSuccess = useCallback((userName: string) => {
     setCompletedUserName(userName);
